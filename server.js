@@ -9,9 +9,9 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// __dirname already exists in CommonJS — no need to redefine
-// But we do need __dirname when packaging on Render
+// Root directory for static files
 const rootDir = path.resolve(__dirname);
+console.log("Serving static files from:", path.join(rootDir, "public"));
 
 // Serve all frontend files from /public
 app.use(express.static(path.join(rootDir, "public")));
@@ -42,6 +42,7 @@ let students = [
 
 // ---------------- API ROUTES ----------------
 
+// COURSES
 app.get("/api/courses", (req, res) => res.json(courses));
 
 app.post("/api/courses", (req, res) => {
@@ -91,7 +92,7 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(rootDir, "public", "login.html"));
 });
 
-// Any HTML route
+// Any HTML route (e.g., manager.html, instructor.html)
 app.get("/*.html", (req, res) => {
   res.sendFile(path.join(rootDir, "public", req.path));
 });
