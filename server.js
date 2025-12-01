@@ -13,9 +13,14 @@ app.use(express.json());
 // Determine actual root directory containing public/
 let rootDir = __dirname;
 
-// If public folder is not in the same dir as server.js, try one level up
+// Check if public folder exists here or one level up
 if (!fs.existsSync(path.join(rootDir, "public"))) {
-  rootDir = path.join(__dirname, "src");
+  if (fs.existsSync(path.join(__dirname, "src", "public"))) {
+    rootDir = path.join(__dirname, "src");
+  } else {
+    console.error("❌ Could not find public/ folder. Make sure it exists in root or src/");
+    process.exit(1);
+  }
 }
 
 console.log("Serving static files from:", path.join(rootDir, "public"));
@@ -48,7 +53,6 @@ let students = [
 ];
 
 // ---------------- API ROUTES ----------------
-// COURSES
 app.get("/api/courses", (req, res) => res.json(courses));
 app.post("/api/courses", (req, res) => {
   const newCourse = { id: Date.now(), ...req.body };
@@ -60,7 +64,6 @@ app.delete("/api/courses/:id", (req, res) => {
   res.json({ success: true });
 });
 
-// HOMEWORK
 app.get("/api/homework", (req, res) => res.json(homework));
 app.post("/api/homework", (req, res) => {
   const newHW = { id: Date.now(), ...req.body };
@@ -72,7 +75,6 @@ app.delete("/api/homework/:id", (req, res) => {
   res.json({ success: true });
 });
 
-// STUDENTS
 app.get("/api/students", (req, res) => res.json(students));
 app.put("/api/students/:id", (req, res) => {
   const id = Number(req.params.id);
