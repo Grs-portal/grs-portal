@@ -7,29 +7,40 @@
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
+    /* Full page background */
     body {
-      body {
-  background: url('/Screenshot 2025-11-05 104653.png') no-repeat center center fixed;
-  background-size: cover;
-  position: relative;
-}
+      min-height: 100vh;
+      margin: 0;
+      background: url('/Screenshot 2025-11-05 104653.png') no-repeat center center fixed;
+      background-size: cover;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: sans-serif;
+    }
 
-body::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  z-index: 0;
-}
+    /* Semi-transparent overlay */
+    body::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 0;
+    }
 
+    /* Login card appears above overlay */
+    .login-card {
+      position: relative;
+      z-index: 1;
     }
   </style>
 </head>
 
-<body class="text-white min-h-screen flex items-center justify-center relative">
+<body class="text-white">
 
   <!-- LOGIN CARD -->
-  <div class="bg-white/10 backdrop-blur-md p-8 rounded-2xl shadow-2xl w-full max-w-sm relative z-10 border border-white/20">
+  <div class="login-card bg-white/10 backdrop-blur-md p-8 rounded-2xl shadow-2xl w-full max-w-sm border border-white/20">
 
     <h1 class="text-2xl font-semibold text-center mb-6 text-white">Login</h1>
 
@@ -61,7 +72,6 @@ body::before {
     </p>
 
   </div>
-
 
 <script>
 // ======================= LOGIN LOGIC =======================
@@ -108,4 +118,3 @@ document.getElementById("loginForm").addEventListener("submit", (e) => {
 
 </body>
 </html>
-
