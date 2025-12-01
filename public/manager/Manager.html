@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Project Manager Portal</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --soft-green: #BFE3B4;
+      --soft-green-light: #E8F7E4;
+      --soft-green-lighter: #F4FBF1;
+      --soft-green-dark: #9FCB99;
+      --text-dark: #1A1A1A;
+    }
+
+    /* Sidebar Nav */
+    .nav-item {
+      display: block;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-weight: 500;
+      transition: 0.15s;
+      color: var(--text-dark);
+    }
+
+    .nav-item:hover {
+      background: rgba(191, 227, 180, 0.45);
+    }
+
+    .nav-item.active {
+      background: var(--soft-green-dark);
+      color: white;
+    }
+
+    /* Sections */
+    .soft-card {
+      background: white;
+      border: 1px solid var(--soft-green-dark);
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .header-box {
+      background: linear-gradient(to bottom right, var(--soft-green), var(--soft-green-dark));
+      color: var(--text-dark);
+      padding: 26px;
+      border-radius: 20px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+    }
+
+    .btn-primary {
+      background: var(--soft-green-dark);
+      color: white;
+      padding: 10px 18px;
+      border-radius: 10px;
+      transition: 0.15s;
+      font-weight: 600;
+    }
+
+    .btn-primary:hover {
+      background: #86b780;
+    }
+
+    .stat-box {
+      background: white;
+      border: 1px solid var(--soft-green-dark);
+      padding: 18px;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
+    }
+  </style>
+</head>
+
+<body class="min-h-screen bg-[var(--soft-green-light)] text-[var(--text-dark)]">
+
+  <!-- Topbar -->
+  <header class="sticky top-0 z-50 bg-[var(--soft-green)] shadow-md border-b border-[var(--soft-green-dark)]">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+
+      <div class="flex items-center gap-3">
+        <button id="menuBtn"
+          class="lg:hidden text-2xl focus:outline-none hover:opacity-70 transition">☰</button>
+        <h1 class="font-semibold text-lg">Project Manager Portal</h1>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span id="userName" class="text-sm font-medium"></span>
+
+        <div id="topAvatarWrap" class="relative">
+          <div id="userAvatar"
+            class="w-10 h-10 rounded-full bg-white border border-[var(--soft-green-dark)] flex items-center justify-center font-bold cursor-pointer shadow-sm">
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 px-4 py-6">
+
+    <!-- Sidebar -->
+    <aside id="sidebar"
+      class="lg:col-span-3 fixed lg:static top-0 left-0 h-full lg:h-auto w-64 lg:w-auto bg-[var(--soft-green-light)] border-r border-[var(--soft-green-dark)] p-4 shadow-md transform -translate-x-full lg:translate-x-0 transition-transform duration-300 z-40 rounded-r-2xl lg:rounded-2xl">
+
+      <nav>
+        <ul class="space-y-2 mt-2">
+          <li><a data-page="dashboard" class="nav-item active" href="#">Dashboard</a></li>
+          <li><a data-page="projects" class="nav-item" href="#">Projects</a></li>
+          <li><a data-page="students" class="nav-item" href="#">Students & Grades</a></li>
+          <li><a data-page="submitted-homework" class="nav-item" href="#">Submitted Homework</a></li>
+          <li><a data-page="submitted-courses" class="nav-item" href="#">Submitted Courses</a></li>
+          <li><a data-page="create-homework" class="nav-item" href="#">Create Homework</a></li>
+          <li><a data-page="news" class="nav-item" href="#">News</a></li>
+        </ul>
+      </nav>
+
+      <div class="mt-6 grid grid-cols-2 gap-4">
+        <section class="stat-box">
+          <p class="text-sm opacity-70">Active</p>
+          <p id="activeCoursesCount" class="text-xl font-bold">0</p>
+        </section>
+        <section class="stat-box">
+          <p class="text-sm opacity-70">To Grade</p>
+          <p id="toGradeCount" class="text-xl font-bold">0</p>
+        </section>
+      </div>
+
+    </aside>
+
+    <div id="overlay" class="fixed inset-0 bg-black/40 hidden z-30 lg:hidden"></div>
+
+    <!-- Main Content -->
+    <main class="lg:col-span-9 space-y-6">
+
+      <!-- Dashboard -->
+      <div id="dashboard" class="page-section">
+
+        <section class="header-box mb-6">
+          <h2 class="text-2xl font-semibold">Welcome, Manager!</h2>
+          <p class="opacity-80 mt-1">Manage all courses, homework, projects, and grading.</p>
+        </section>
+
+        <section class="soft-card mb-6">
+          <h3 class="text-xl font-semibold mb-3">All Courses</h3>
+          <div id="courses" class="grid gap-4"></div>
+          <button id="createCourseBtn" class="btn-primary mt-4">+ Create Course</button>
+        </section>
+
+        <section class="soft-card">
+          <h3 class="text-xl font-semibold mb-3">Projects</h3>
+          <div id="dashboardProjects" class="grid gap-4"></div>
+          <button id="createProjectBtn" class="btn-primary mt-4">+ Create Project</button>
+        </section>
+
+      </div>
+
+      <!-- Projects Page -->
+      <div id="projects" class="page-section hidden soft-card">
+        <h2 class="text-xl font-semibold mb-4">Projects</h2>
+        <div id="projectsControls" class="mb-4"></div>
+        <div id="projectsFullList" class="space-y-3"></div>
+      </div>
+
+      <!-- Students -->
+      <div id="students" class="page-section hidden soft-card overflow-auto">
+        <h2 class="text-xl font-semibold mb-4">Students & Grades</h2>
+        <table class="min-w-full text-sm">
+          <thead class="bg-[var(--soft-green)] text-[var(--text-dark)] uppercase text-xs">
+            <tr>
+              <th class="px-6 py-3">Student</th>
+              <th class="px-6 py-3">Course</th>
+              <th class="px-6 py-3">Grade</th>
+              <th class="px-6 py-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="studentTable"></tbody>
+        </table>
+      </div>
+
+      <!-- Submitted Homework -->
+      <div id="submitted-homework" class="page-section hidden soft-card">
+        <h2 class="text-xl font-semibold mb-4">Submitted Homework</h2>
+        <div id="homework-list" class="grid gap-4"></div>
+      </div>
+
+      <!-- Courses Submitted -->
+      <div id="submitted-courses" class="page-section hidden soft-card">
+        <h2 class="text-xl font-semibold mb-4">Submitted Courses</h2>
+        <div id="submitted-courses-list"></div>
+      </div>
+
+      <!-- Create Homework -->
+      <div id="create-homework" class="page-section hidden soft-card text-center">
+        <h2 class="text-xl font-semibold mb-4">Create Homework</h2>
+        <button id="openCreateHw" class="btn-primary">+ Add Homework</button>
+      </div>
+
+    </main>
+  </div>
+
+  <footer class="text-center py-4 text-sm opacity-70">
+    © <span id="y"></span> Project Manager Portal · Privacy · Terms
+  </footer>
+
+  <!-- JS -->
+  <script src="manager.js"></script>
+
+</body>
+</html>
