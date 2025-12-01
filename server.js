@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+const fs = require("fs");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -9,8 +10,14 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Root directory for static files
-const rootDir = __dirname;
+// Determine actual root directory containing public/
+let rootDir = __dirname;
+
+// If public folder is not in the same dir as server.js, try one level up
+if (!fs.existsSync(path.join(rootDir, "public"))) {
+  rootDir = path.join(__dirname, "..");
+}
+
 console.log("Serving static files from:", path.join(rootDir, "public"));
 
 // Serve all frontend files from /public
@@ -76,6 +83,7 @@ app.put("/api/students/:id", (req, res) => {
 });
 
 // ---------------- STATIC ROUTES ----------------
+// Root login page
 app.get("/", (req, res) => {
   res.sendFile(path.join(rootDir, "public", "login.html"));
 });
