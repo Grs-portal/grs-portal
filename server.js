@@ -85,19 +85,28 @@ app.put("/api/students/:id", (req, res) => {
   }
 });
 
-// ---------------- STATIC ROUTES ----------------
+const path = require("path");
+
+// Root directory for static files (one level up from Render's /src/)
+const rootDir = path.resolve(__dirname, "..");
+console.log("Serving static files from:", path.join(rootDir, "public"));
+
+// Serve all frontend files from /public
+app.use(express.static(path.join(rootDir, "public")));
 
 // Root login page
 app.get("/", (req, res) => {
   res.sendFile(path.join(rootDir, "public", "login.html"));
 });
 
-// Any HTML route (e.g., manager.html, instructor.html)
+// Any HTML route
 app.get("/*.html", (req, res) => {
   res.sendFile(path.join(rootDir, "public", req.path));
 });
+
 
 // ---------------- START SERVER ----------------
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
 });
+
