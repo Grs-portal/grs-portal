@@ -1,0 +1,118 @@
+/* === Animations === */
+.fade-in { 
+  animation: fadeIn 0.3s ease-in-out; 
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* === Theme Defaults (Soft Green Mode is Default) === */
+body {
+  background-color: #E8F7E4;      /* soft green light */
+  color: #1A1A1A;                 /* dark text */
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* === Scrollbar (Optional) === */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #9FCB99; /* soft green dark */
+  border-radius: 6px;
+}
+
+/* === Light Mode Overrides (Even Softer Green) === */
+body.light {
+  background-color: #F4FBF1;  /* soft green very light */
+  color: #1A1A1A;
+}
+
+/* Containers */
+body.light .bg-white {
+  background-color: #ffffff !important;
+  color: #1A1A1A !important;
+}
+
+body.light .bg-[#F2F0E5],
+body.light .bg-[#E8F7E4] {
+  background-color: #F4FBF1 !important;
+  color: #1A1A1A !important;
+}
+
+/* Remove the old dark colors — convert to greens */
+body.light .bg-[#1C1820],
+body.light .bg-[#3E3B59] {
+  background-color: #DDF1D8 !important; /* pale green */
+  color: #1A1A1A !important;
+}
+
+/* Text */
+body.light .text-[#F2F0E5],
+body.light .text-white {
+  color: #1A1A1A !important;
+}
+
+/* === Sidebar / Navbar === */
+nav,
+#sidebar {
+  background-color: #DDF1D8; /* subtle pale green */
+  border-right: 1px solid #9FCB99;
+}
+
+body.light nav,
+body.light #sidebar {
+  background-color: #ffffff !important;
+  color: #1A1A1A !important;
+  border-right: 1px solid rgba(0,0,0,0.1);
+}
+
+/* === Buttons === */
+button {
+  background-color: #9FCB99; /* soft green dark */
+  color: #ffffff;
+  transition: 0.15s;
+}
+button:hover {
+  background-color: #86b780; /* darker on hover */
+}
+
+body.light button {
+  background-color: #BFE3B4; /* soft green */
+  color: #1A1A1A;
+}
+body.light button:hover {
+  background-color: #A6D39C;
+}
+
+/* === Profile Dropdown === */
+#profileMenu {
+  min-width: 150px;
+  overflow: hidden;
+  background-color: #E8F7E4; 
+  border: 1px solid #9FCB99;
+  color: #1A1A1A;
+}
+
+body.light #profileMenu {
+  background-color: #ffffff !important;
+  color: #1A1A1A !important;
+  border: 1px solid #ddd;
+}
+body.light #profileMenu button:hover {
+  background-color: #F4FBF1 !important;
+}
+
+/* === Modal === */
+#modalBg > div {
+  background-color: #ffffff;
+  border: 1px solid #9FCB99;
+  color: #1A1A1A;
+  transition: all 0.2s ease;
+}
+
+body.light #modalBg > div {
+  background-color: #ffffff !important;
+  color: #1A1A1A !important;
+}
