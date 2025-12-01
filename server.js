@@ -93,10 +93,7 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(rootDir, "public", "login.html"));
 });
 
-// Serve any HTML file in public or subfolders
-app.get("/*", (req, res) => {
-  res.sendFile(path.join(rootDir, "public", req.path));
-});
+// NOTE: Removed the wildcard /* route to prevent ENOENT errors for non-existent files
 
 // ---------------- START SERVER ----------------
 app.listen(PORT, () => {
