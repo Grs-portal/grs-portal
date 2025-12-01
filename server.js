@@ -9,11 +9,12 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Fix paths for CommonJS
-const __dirname = __dirname || path.resolve();
+// __dirname already exists in CommonJS — no need to redefine
+// But we do need __dirname when packaging on Render
+const rootDir = path.resolve(__dirname);
 
 // Serve all frontend files from /public
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(rootDir, "public")));
 
 // ---------------- API DATA ----------------
 let courses = [
@@ -41,7 +42,6 @@ let students = [
 
 // ---------------- API ROUTES ----------------
 
-// COURSES
 app.get("/api/courses", (req, res) => res.json(courses));
 
 app.post("/api/courses", (req, res) => {
@@ -86,14 +86,14 @@ app.put("/api/students/:id", (req, res) => {
 
 // ---------------- STATIC ROUTES ----------------
 
-// Login page (root)
+// Root login page
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "login.html"));
+  res.sendFile(path.join(rootDir, "public", "login.html"));
 });
 
-// Any .html route (manager.html, instructor.html, etc.)
+// Any HTML route
 app.get("/*.html", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", req.path));
+  res.sendFile(path.join(rootDir, "public", req.path));
 });
 
 // ---------------- START SERVER ----------------
