@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Root directory for static files (Render clone root)
+// Root directory for static files
 const rootDir = __dirname;
 console.log("Serving static files from:", path.join(rootDir, "public"));
 
@@ -41,42 +41,32 @@ let students = [
 ];
 
 // ---------------- API ROUTES ----------------
-
-// COURSES
 app.get("/api/courses", (req, res) => res.json(courses));
-
 app.post("/api/courses", (req, res) => {
   const newCourse = { id: Date.now(), ...req.body };
   courses.push(newCourse);
   res.json(newCourse);
 });
-
 app.delete("/api/courses/:id", (req, res) => {
   courses = courses.filter((c) => c.id != req.params.id);
   res.json({ success: true });
 });
 
-// HOMEWORK
 app.get("/api/homework", (req, res) => res.json(homework));
-
 app.post("/api/homework", (req, res) => {
   const newHW = { id: Date.now(), ...req.body };
   homework.push(newHW);
   res.json(newHW);
 });
-
 app.delete("/api/homework/:id", (req, res) => {
   homework = homework.filter((h) => h.id != req.params.id);
   res.json({ success: true });
 });
 
-// STUDENTS
 app.get("/api/students", (req, res) => res.json(students));
-
 app.put("/api/students/:id", (req, res) => {
   const id = Number(req.params.id);
   const idx = students.findIndex((s) => s.enrollment_id === id);
-
   if (idx !== -1) {
     students[idx] = { ...students[idx], ...req.body };
     res.json(students[idx]);
@@ -86,14 +76,12 @@ app.put("/api/students/:id", (req, res) => {
 });
 
 // ---------------- STATIC ROUTES ----------------
-
-// Root login page
 app.get("/", (req, res) => {
   res.sendFile(path.join(rootDir, "public", "login.html"));
 });
 
-// Any HTML route (manager.html, instructor.html, etc.)
-app.get("/*.html", (req, res) => {
+// Serve any HTML file in public, including subfolders
+app.get("/*", (req, res) => {
   res.sendFile(path.join(rootDir, "public", req.path));
 });
 
