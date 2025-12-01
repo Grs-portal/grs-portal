@@ -9,8 +9,8 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Root directory for static files
-const rootDir = path.resolve(__dirname);
+// Root directory for static files (one level up from Render's /src/)
+const rootDir = path.resolve(__dirname, "..");
 console.log("Serving static files from:", path.join(rootDir, "public"));
 
 // Serve all frontend files from /public
@@ -85,28 +85,19 @@ app.put("/api/students/:id", (req, res) => {
   }
 });
 
-const path = require("path");
-
-// Root directory for static files (one level up from Render's /src/)
-const rootDir = path.resolve(__dirname, "..");
-console.log("Serving static files from:", path.join(rootDir, "public"));
-
-// Serve all frontend files from /public
-app.use(express.static(path.join(rootDir, "public")));
+// ---------------- STATIC ROUTES ----------------
 
 // Root login page
 app.get("/", (req, res) => {
   res.sendFile(path.join(rootDir, "public", "login.html"));
 });
 
-// Any HTML route
+// Any HTML route (manager.html, instructor.html, etc.)
 app.get("/*.html", (req, res) => {
   res.sendFile(path.join(rootDir, "public", req.path));
 });
-
 
 // ---------------- START SERVER ----------------
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
 });
-
