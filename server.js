@@ -9,8 +9,8 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Root directory for static files (one level up from Render's /src/)
-const rootDir = path.resolve(__dirname, "..");
+// Root directory for static files (Render clone root)
+const rootDir = __dirname;
 console.log("Serving static files from:", path.join(rootDir, "public"));
 
 // Serve all frontend files from /public
