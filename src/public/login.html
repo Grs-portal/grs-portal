@@ -7,7 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
-    /* Full page background */
+    /* Full-page background */
     body {
       min-height: 100vh;
       margin: 0;
@@ -20,16 +20,16 @@
       font-family: sans-serif;
     }
 
-    /* Semi-transparent overlay */
+    /* Dark overlay */
     body::before {
       content: "";
       position: absolute;
       inset: 0;
-      background: rgba(0, 0, 0, 0.5);
+      background: rgba(0, 0, 0, 0.55);
       z-index: 0;
     }
 
-    /* Login card appears above overlay */
+    /* Card on top of overlay */
     .login-card {
       position: relative;
       z-index: 1;
@@ -60,7 +60,8 @@
                required />
       </div>
 
-      <button class="w-full bg-yellow-400 hover:bg-yellow-300 text-blue-900 py-2 rounded-lg font-medium transition">
+      <button
+        class="w-full bg-yellow-400 hover:bg-yellow-300 text-blue-900 py-2 rounded-lg font-medium transition">
         Login
       </button>
 
@@ -70,53 +71,41 @@
       Don’t have an account?
       <a href="Register.html" class="text-yellow-300 font-semibold hover:underline">Register</a>
     </p>
-
   </div>
 
 <script>
-// ======================= LOGIN LOGIC =======================
+// ======================= LOGIN HANDLER =======================
 
-const ACCOUNTS = {
-  instructor: {
-    username: "root",
-    password: "1234",
-    redirect: "instructor/index.html",
-    name: "Instructor Root"
-  },
-  manager: {
-    username: "manager",
-    password: "9999",
-    redirect: "/manager/manager.html",
-    name: "Project Manager"
-  }
-};
-
-document.getElementById("loginForm").addEventListener("submit", (e) => {
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const user = document.getElementById("username").value.trim();
-  const pass = document.getElementById("password").value.trim();
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
 
-  for (let role in ACCOUNTS) {
-    const acc = ACCOUNTS[role];
+  // Send login request to server
+  const response = await fetch("/api/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password })
+  });
 
-    if (user === acc.username && pass === acc.password) {
+  const result = await response.json();
 
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("role", role);
-      localStorage.setItem("userName", acc.name);
-      localStorage.setItem("userAvatar", "");
-
-      window.location.href = acc.redirect;
-      return;
-    }
+  // If login failed → Show error
+  if (!result.success) {
+    alert("Invalid username or password");
+    return;
   }
 
-  alert("Invalid username or password.");
+  // Save session info
+  localStorage.setItem("isLoggedIn", "true");
+  localStorage.setItem("role", result.role);
+  localStorage.setItem("name", result.name);
+
+  // Redirect to instructor or manager portal
+  window.location.href = result.redirect;
 });
 </script>
 
 </body>
 </html>
-
-
