@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>PBC — Portals</title>
-  <link rel="stylesheet" href="CSS/style.css" />
+  <link rel="stylesheet" href="src/public/homepage/CSS/style.css" />
 
   <!-- Lucide (optional) -->
   <script src="https://unpkg.com/lucide@latest" defer></script>
@@ -16,30 +16,36 @@
       background-color: #003329;}
   </style>
 
-  <!-- HEADER -->
-  <header class="site-header">
-    <div class="container header-inner">
+
+
+
+      <!-----------------------
+           NAVIGATION BAR 
+     ------------------------->
+  <header class="site-header" style="background-color: white;">
+    <div class="container header-inner" style="background-color: white;">
       <nav class="main-nav">
         <div class="nav-left">
-          <a href="index.html" class="nav-link">Home</a>
-          <a href="courses.html" class="nav-link">Courses</a>
-          <a href="projects.html" class="nav-link ">Projects</a>
+          <a href="src/public/homepage/index.html" class="nav-link">Home</a>
+          <a href="src/public/homepage/courses.html" class="nav-link">Courses</a>
+          <a href="src/public/homepage/projects.html" class="nav-link">Projects</a>
         </div>
 
         <!-- centered circle logo -->
         <div class="logo-circle">
-          <img src="images/logo no bg 2.png" alt="PBC logo">
+          <img src="/images/logo no bg 2.png" alt="PBC logo">
         </div>
 
         <div class="nav-right">
-          <a href="about.html" class="nav-link active">About Us</a>
-          <a href="Portal.html" class="nav-link">Portals</a>
-          <a href="contact.html" class="nav-link ">Contact</a>
+          <a href="src/public/homepage/about.html" class="nav-link">About Us</a>
+          <a href="src/public/homepage/Portal.html" class="nav-link active">Portals</a>
+          <a href="src/public/homepage/contact.html" class="nav-link">Contact</a>
         </div>
       </nav>
 
     </div>
   </header>
+
 
   <!-- HERO -->
   <section class="hero" aria-label="Portal hero">
@@ -96,8 +102,11 @@
   </main>
 
 
-<!-- FOOTER -->
-  <footer class="fancy-footer">
+  
+        <!-----------------------
+            FOOTER 
+     ------------------------->  
+<footer class="fancy-footer">
   <div class="footer-background-word">Hofi Korsou</div>
 
   <div class="footer-container">
@@ -105,15 +114,15 @@
 
       <!-- LOGO + TEXT -->
       <div class="footer-col-wide">
-        <img src="images/logo no bg.png" alt="logo" class="footer-logo" />
+        <img src="src/public/homepage/images/logo no bg.png" alt="logo" class="footer-logo" />
       </div>
 
       <!-- COL 1 -->
       <div class="footer-col">
         <h3>Company</h3>
         <ul>
-          <li><a href="#">About Us</a></li>
-          <li><a href="#">Contact Us</a></li>
+          <li><a href="src/public/homepage/about.html">About Us</a></li>
+          <li><a href="src/public/homepage/contact.html">Contact Us</a></li>
         </ul>
       </div>
 
@@ -131,8 +140,8 @@
        <div class="footer-col">
         <h3>Knowledge</h3>
         <ul>
-          <li><a href="#">Courses</a></li>
-          <li><a href="#">Projects</a></li>
+          <li><a href="src/public/homepage/courses.html">Courses</a></li>
+          <li><a href="src/public/homepage/projects.html">Projects</a></li>
         </ul>
       </div>
 
@@ -163,12 +172,12 @@
   </div>
 </footer>
 
+
   <script>
-    // --- small parallax for hero layers ---
     (function(){
       const lBack = document.getElementById('layer-back');
       const lMid  = document.getElementById('layer-mid');
-      // subtle vertical movement linked to scroll and to pointer movement on hero
+
       function onScroll(){
         const sc = window.scrollY || window.pageYOffset;
         // small translate (0..40px)
@@ -180,7 +189,7 @@
       window.addEventListener('scroll', onScroll, {passive:true});
       onScroll();
 
-      // keyboard accessibility: when focusing portal, show hover state by adding class
+      
       const portals = document.querySelectorAll('.portal');
       portals.forEach(p => {
         p.addEventListener('focus', ()=> p.classList.add('keyboard-focus'));

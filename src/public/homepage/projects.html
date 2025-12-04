@@ -4,30 +4,32 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Projects</title>
-  <link rel="stylesheet" href="CSS/style.css" />
+  <link rel="stylesheet" href="src/public/homepage/CSS/style.css" />
 </head>
 <body class="project-page">
 
 
-  <!-- HEADER -->
-  <header class="site-header">
-    <div class="container header-inner">
+      <!-----------------------
+           NAVIGATION BAR 
+     ------------------------->
+  <header class="site-header" style="background-color: white;">
+    <div class="container header-inner" style="background-color: white;">
       <nav class="main-nav">
         <div class="nav-left">
-          <a href="index.html" class="nav-link">Home</a>
-          <a href="courses.html" class="nav-link">Courses</a>
-          <a href="projects.html" class="nav-link active">Projects</a>
+          <a href="src/public/homepage/index.html" class="nav-link">Home</a>
+          <a href="src/public/homepage/courses.html" class="nav-link">Courses</a>
+          <a href="src/public/homepage/projects.html" class="nav-link active">Projects</a>
         </div>
 
         <!-- centered circle logo -->
         <div class="logo-circle">
-          <img src="images/logo no bg 2.png" alt="PBC logo">
+          <img src="/images/logo no bg 2.png" alt="PBC logo">
         </div>
 
         <div class="nav-right">
-          <a href="about.html" class="nav-link">About Us</a>
-          <a href="Portal.html" class="nav-link">Portals</a>
-          <a href="contact.html" class="nav-link">Contact</a>
+          <a href="src/public/homepage/about.html" class="nav-link">About Us</a>
+          <a href="src/public/homepage/Portal.html" class="nav-link">Portals</a>
+          <a href="src/public/homepage/contact.html" class="nav-link">Contact</a>
         </div>
       </nav>
 
@@ -36,12 +38,12 @@
 
 
 
-   <!--HERO-->
+  <!--HERO-->
  <section class="sub-hero" style="
   position: relative;
   width: 100%;
   height: 700px;
-  background-image: url('images/wavy hero.png');
+  background-image: url('src/public/homepage/images/wavy hero.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -54,10 +56,11 @@
   margin-bottom: -280px; /* overlaps into next section */
   z-index: 1;
 ">
+
   <div class="sub-hero-inner">
     <h1> Explore Our Projects </h1>
     <p> Want to work on a project with us? </p>
-    <a href="contact.html" class="project-hero-cta">Get in Touch</a>
+    <a href="src/public/homepage/contact.html" class="project-hero-cta">Get in Touch</a>
   </div>
 </section>
 
@@ -153,9 +156,14 @@
 
   </div>
 </section>
-  
-<!-- FOOTER -->
-  <footer class="fancy-footer">
+ 
+
+
+
+      <!-----------------------
+            FOOTER 
+     ------------------------->  
+<footer class="fancy-footer">
   <div class="footer-background-word">Hofi Korsou</div>
 
   <div class="footer-container">
@@ -163,15 +171,15 @@
 
       <!-- LOGO + TEXT -->
       <div class="footer-col-wide">
-        <img src="images/logo no bg.png" alt="logo" class="footer-logo" />
+        <img src="src/public/homepage/images/logo no bg.png" alt="logo" class="footer-logo" />
       </div>
 
       <!-- COL 1 -->
       <div class="footer-col">
         <h3>Company</h3>
         <ul>
-          <li><a href="#">About Us</a></li>
-          <li><a href="#">Contact Us</a></li>
+          <li><a href="src/public/homepage/about.html">About Us</a></li>
+          <li><a href="src/public/homepage/contact.html">Contact Us</a></li>
         </ul>
       </div>
 
@@ -189,8 +197,8 @@
        <div class="footer-col">
         <h3>Knowledge</h3>
         <ul>
-          <li><a href="#">Courses</a></li>
-          <li><a href="#">Projects</a></li>
+          <li><a href="src/public/homepage/courses.html">Courses</a></li>
+          <li><a href="src/public/homepage/projects.html">Projects</a></li>
         </ul>
       </div>
 
@@ -220,6 +228,7 @@
     </div>
   </div>
 </footer>
+
 
 <!-- FontAwesome Icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
