@@ -127,7 +127,7 @@ res.json({ success: true, message: "Account created", account: { username, role,
 
 // ---------------- STATIC ROUTES ----------------
 // Root homepage (index.html)
-app.get("/", (req, res) => {
+app.get("/homepage", (req, res) => {
 res.sendFile(path.join(rootDir, "public", "homepage", "index.html"));
 });
 
@@ -144,5 +144,6 @@ res.sendFile(path.join(rootDir, "public", "manager", "manager.html"));
 app.listen(PORT, () => {
 console.log(`✅ Server running on port ${PORT}`);
 });
+
 
 
