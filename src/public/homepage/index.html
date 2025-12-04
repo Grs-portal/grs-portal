@@ -6,12 +6,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Parallax Scrolling Website | Codehal</title>
-
-    <!-- FIXED PATH -->
-    <link rel="stylesheet" href="CSS/style.css">
+    <link rel="stylesheet" href="src/public/homepage/CSS/style.css">
 </head>
 
-<body style="background-color: #003329;">
+<body>
+    <style>
+        body {
+            background-color: #003329;
+        }
+    </style>
 
     <!-----------------------
            NAVIGATION BAR 
@@ -19,108 +22,104 @@
     <header class="site-header" style="background-color: white;">
         <div class="container header-inner" style="background-color: white;">
             <nav class="main-nav">
-
                 <div class="nav-left">
-                    <a href="index.html" class="nav-link active">Home</a>
-                    <a href="courses.html" class="nav-link">Courses</a>
-                    <a href="projects.html" class="nav-link">Projects</a>
+                    <a href="src/public/homepage/index.html" class="nav-link active">Home</a>
+                    <a href="src/public/homepage/courses.html" class="nav-link">Courses</a>
+                    <a href="src/public/homepage/projects.html" class="nav-link">Projects</a>
                 </div>
 
                 <!-- centered circle logo -->
                 <div class="logo-circle">
-                    <img src="images/logo no bg 2.png" alt="PBC logo">
+                    <img src="src/public/homepage/images/logo no bg 2.png" alt="PBC logo">
                 </div>
 
                 <div class="nav-right">
-                    <a href="about.html" class="nav-link">About Us</a>
-                    <a href="Portal.html" class="nav-link">Portals</a>
-                    <a href="contact.html" class="nav-link">Contact</a>
+                    <a href="src/public/homepage/about.html" class="nav-link">About Us</a>
+                    <a href="src/public/homepage/Portal.html" class="nav-link">Portals</a>
+                    <a href="src/public/homepage/contact.html" class="nav-link">Contact</a>
                 </div>
-
             </nav>
         </div>
     </header>
-
 
     <!-----------------------
               HERO 
     ------------------------->
     <section class="parallax-hero">
+        <img src="src/public/homepage/images/hill1.png" id="hill1">
+        <img src="src/public/homepage/images/hill2.png" id="hill2">
+        <img src="src/public/homepage/images/hill3.png" id="hill3">
+        <img src="src/public/homepage/images/hill4.png" id="hill4">
+        <img src="src/public/homepage/images/hill5.png" id="hill5">
 
-        <!-- FIXED IMAGE PATHS -->
-        <img src="images/hill1.png" id="hill1">
-        <img src="images/hill2.png" id="hill2">
-        <img src="images/hill3.png" id="hill3">
-        <img src="images/hill4.png" id="hill4">
-        <img src="images/hill5.png" id="hill5">
-
-        <img src="images/house.png" id="house">
-        <img src="images/leaf.png" id="leaf">
-        <img src="images/plant.png" id="plant">
-
+        <img src="src/public/homepage/images/house.png" id="house">
+        <img src="src/public/homepage/images/leaf.png" id="leaf">
+        <img src="src/public/homepage/images/plant.png" id="plant">
         <h1 id="text">Welcome To <span style="color: rgb(14, 81, 14);">Hofi Korsou</span></h1>
     </section>
 
-
     <!-----------------------
-        MISSION SECTION
+        MISSION-SECTION
     ------------------------->
     <section class="parallax-mission-section">
-
-        <!-- FIXED PATHS -->
-        <img src="images/blob 1.png" id="blob1">
-        <img src="images/blob 2.png" id="blob2">
-        <img src="images/blob 3.png" id="blob3">
+        <img src="src/public/homepage/images/blob 1.png" id="blob1">
+        <img src="src/public/homepage/images/blob 2.png" id="blob2">
+        <img src="src/public/homepage/images/blob 3.png" id="blob3">
 
         <div class="mission-layout">
-
             <div class="mission-left">
                 <h2 id="missiontext1">Our Mission</h2>
                 <p id="missiontext2">
                     Lorem ipsum dolor sit amet, consectetur adipisicing elit.<br>
-                    Temporibus provident error non quos blanditiis dignissimos.<br>
-                    <a style="top: 25%;" href="about.html">Learn more -→</a>
+                    Temporibus provident error non quos blanditiis dignissimos.
+                    <br>
+                    <a style="top: 25%;" href="src/public/homepage/about.html">Learn more -→ </a>
                 </p>
             </div>
 
-            <!-- Your mission cards remain untouched except for path fixes -->
-            <!-- CARD 1 -->
             <div class="mission-grid">
                 <div class="mission-card">
                     <div class="blob-bg"></div>
                     <div class="icon-circle">
-                        <!-- SVG unchanged -->
-                        (SVG...)
+                        <img src="src/public/homepage/images/icon-courses.svg" alt="Courses Icon">
                     </div>
-
                     <h3>Our Courses</h3>
                     <p>Learn more about the amazing courses that we offer.</p>
-
                     <div id="home-slide-btn-wrapper">
                         <button class="slide-btn" id="home-slide-btn" style="margin-left: 18%;">
                             <span class="IconContainer">
-                                <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd"
-                                    clip-rule="evenodd">
-                                    <path
-                                        d="M21.883 12l-7.527 6.235.644.765 9-7.521-9-7.479-.645.764 7.529 6.236h-21.884v1h21.883z" />
-                                </svg>
+                                <img src="src/public/homepage/images/arrow-right.svg" alt="arrow icon">
                             </span>
                         </button>
                     </div>
                 </div>
 
-                <!-- CARD 2 -->
                 <div class="mission-card">
                     <div class="blob-bg"></div>
-
                     <div class="icon-circle">
-                        <!-- SVG unchanged -->
-                        (SVG...)
+                        <img src="src/public/homepage/images/icon-projects.svg" alt="Projects Icon">
                     </div>
+                    <h3>Our Projects</h3>
+                    <p>Learn more about our projects & workshops that we offer.</p>
+                    <button class="slide-btn" id="home-slide-btn" style="margin-left: 18%;">
+                        <span class="IconContainer">
+                            <img src="src/public/homepage/images/arrow-right.svg" alt="arrow icon">
+                        </span>
+                    </button>
+                </div>
 
-                    <h3>Our Community</h3>
-                    <p>Join our incredible group of learners and adventurers.</p>
-
+                <div class="mission-card">
+                    <div class="blob-bg"></div>
+                    <div class="icon-circle">
+                        <img src="src/public/homepage/images/icon-workshops.svg" alt="Workshops Icon">
+                    </div>
+                    <h3>Our Workshops</h3>
+                    <p>Discover our workshops designed for hands-on learning experiences.</p>
+                    <button class="slide-btn" id="home-slide-btn" style="margin-left: 18%;">
+                        <span class="IconContainer">
+                            <img src="src/public/homepage/images/arrow-right.svg" alt="arrow icon">
+                        </span>
+                    </button>
                 </div>
             </div>
         </div>
