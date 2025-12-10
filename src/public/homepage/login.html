@@ -80,26 +80,33 @@ const ACCOUNTS = {
 };
 
 
-document.getElementById("loginForm").addEventListener("submit", (e) => {
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const user = document.getElementById("username").value.trim();
-  const pass = document.getElementById("password").value.trim();
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
 
-  for (let role in ACCOUNTS) {
-    const acc = ACCOUNTS[role];
+  const res = await fetch("/api/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password })
+  });
 
-    if (user === acc.username && pass === acc.password) {
+  const data = await res.json();
 
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("role", role);
-      localStorage.setItem("userName", acc.name);
-      localStorage.setItem("userAvatar", "");
-
-      window.location.href = acc.redirect;
-      return;
-    }
+  if (!data.success) {
+    alert("Invalid username or password");
+    return;
   }
+
+  // Save info
+  localStorage.setItem("role", data.role);
+  localStorage.setItem("name", data.name);
+
+  // 🔥 IMPORTANT: use redirect value from server
+  window.location.href = data.redirect;
+});
+
 
   alert("Invalid username or password.");
 });
