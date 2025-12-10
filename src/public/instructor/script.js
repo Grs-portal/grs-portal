@@ -1,12 +1,11 @@
 
 document.addEventListener("DOMContentLoaded", () => {
-
-  // ========== FIXED LOGIN CHECK ==========
-  // Corrected path based on your folder structure:
-  // src/public/homepage/login.html
   const LOGIN_PATH = "/homepage/login.html";
 
-  if (!localStorage.getItem("isLoggedIn")) {
+  // --- FIX: Prevent redirect loop on login page ---
+  const isLoginPage = window.location.pathname.endsWith("login.html");
+  
+  if (!isLoginPage && !localStorage.getItem("isLoggedIn")) {
     window.location.href = LOGIN_PATH;
     return;
   }
@@ -417,4 +416,5 @@ document.addEventListener("DOMContentLoaded", () => {
   // ======== DEFAULT PAGE ========
   showPage("dashboard");
 });
+
 
