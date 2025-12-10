@@ -103,7 +103,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   localStorage.setItem("role", data.role);
   localStorage.setItem("name", data.name);
 
-  // 🔥 IMPORTANT: use redirect value from server
+  //  use redirect value from server
   window.location.href = data.redirect;
 });
 
