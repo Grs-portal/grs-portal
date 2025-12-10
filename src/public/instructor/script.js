@@ -2,7 +2,7 @@ const API_BASE = "http://localhost:3000";
 
 document.addEventListener("DOMContentLoaded", () => {
   if (!localStorage.getItem("isLoggedIn")) {
-    window.location.href = "/homepage/login.html";
+    window.location.href = "/login.html";
     return;
   }
 
@@ -370,7 +370,7 @@ document.getElementById("logoutBtn2").onclick = logout;
 
 function logout() {
   localStorage.removeItem("isLoggedIn");
-  window.location.href = "/login.html";  // done finally
+  window.location.href = "/homepage/login.html";  // done finally
 }
 
 
@@ -398,6 +398,7 @@ function logout() {
   // ======== Default Page ========
   showPage("dashboard");
 });
+
 
 
 
