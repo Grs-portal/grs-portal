@@ -137,16 +137,12 @@ app.get("/", (req, res) => {
 });
 
 // Instructor portal
-app.get("/instructor", (req, res) => {
-  res.sendFile(path.join(rootDir, "public", "instructor", "index.html"));
-});
+app.get("/instructor/", (req, res) => res.redirect("/instructor"));
+app.get("/manager/", (req, res) => res.redirect("/manager"));
 
-// Manager portal
-app.get("/manager", (req, res) => {
-  res.sendFile(path.join(rootDir, "public", "manager", "manager.html"));
-});
 
 // ---------------- START SERVER ----------------
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
 });
+
