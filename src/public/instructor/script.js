@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:3000";
+const PORT = process.env.PORT || 3000;
 
 document.addEventListener("DOMContentLoaded", () => {
   if (!localStorage.getItem("isLoggedIn")) {
@@ -398,3 +398,4 @@ function logout() {
   // ======== Default Page ========
   showPage("dashboard");
 });
+
