@@ -68,16 +68,17 @@ const ACCOUNTS = {
   instructor: {
     username: "root",
     password: "1234",
-    redirect: "/index.html",
+    redirect: "/instructor/index.html",
     name: "Instructor Root"
   },
   manager: {
     username: "manager",
     password: "9999",
-    redirect: "/Manager.html",
+    redirect: "/manager/Manager.html",
     name: "Project Manager"
   }
 };
+
 
 document.getElementById("loginForm").addEventListener("submit", (e) => {
   e.preventDefault();
