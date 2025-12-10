@@ -2,7 +2,7 @@ const PORT = process.env.PORT || 3000;
 
 document.addEventListener("DOMContentLoaded", () => {
   if (!localStorage.getItem("isLoggedIn")) {
-    window.location.href = "homepage/login.html";
+    window.location.href = "/homepage/login.html";
     return;
   }
 
@@ -398,5 +398,6 @@ function logout() {
   // ======== Default Page ========
   showPage("dashboard");
 });
+
 
 
