@@ -1,4 +1,3 @@
-const API_BASE = "http://localhost:3000";
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -418,3 +417,4 @@ document.addEventListener("DOMContentLoaded", () => {
   // ======== DEFAULT PAGE ========
   showPage("dashboard");
 });
+
