@@ -1,8 +1,14 @@
 const API_BASE = "http://localhost:3000";
 
 document.addEventListener("DOMContentLoaded", () => {
+
+  // ========== FIXED LOGIN CHECK ==========
+  // Corrected path based on your folder structure:
+  // src/public/homepage/login.html
+  const LOGIN_PATH = "/homepage/login.html";
+
   if (!localStorage.getItem("isLoggedIn")) {
-    window.location.href = "/login.html";
+    window.location.href = LOGIN_PATH;
     return;
   }
 
@@ -20,20 +26,23 @@ document.addEventListener("DOMContentLoaded", () => {
     sidebar.classList.toggle("-translate-x-full");
     overlay.classList.toggle("hidden");
   });
+
   overlay?.addEventListener("click", () => {
     sidebar.classList.add("-translate-x-full");
     overlay.classList.add("hidden");
   });
 
-  // ======== Navigation ========
+  // ======== NAVIGATION ========
   menuLinks.forEach((link) => {
     link.addEventListener("click", (e) => {
       e.preventDefault();
       const pageId = link.dataset.page;
       showPage(pageId);
+
       menuLinks.forEach((l) =>
         l.classList.remove("bg-[#1C1820]", "text-[#F2F0E5]")
       );
+
       link.classList.add("bg-[#1C1820]", "text-[#F2F0E5]");
       sidebar.classList.add("-translate-x-full");
       overlay.classList.add("hidden");
@@ -58,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // ======== Animated Counter ========
+  // ======== COUNTER ANIMATION ========
   function animateCount(id, target) {
     const el = document.getElementById(id);
     let count = 0;
@@ -73,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 20);
   }
 
-  // ======== Toast Notifications ========
+  // ======== TOASTS ========
   function showToast(message, color = "#1C1820") {
     const toast = document.createElement("div");
     toast.className =
@@ -84,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => toast.remove(), 2500);
   }
 
-  // ======== Activity Log ========
+  // ======== ACTIVITY LOG ========
   const activitySection = document.createElement("section");
   activitySection.innerHTML = `
     <div class="bg-[#F2F0E5] rounded-2xl shadow-md p-5 border border-[#B6AEA4]/30 fade-in mt-6">
@@ -100,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
     list.prepend(item);
   }
 
-  // ======== Loaders ========
+  // ======== LOAD DASHBOARD ========
   async function loadDashboard() {
     try {
       const [coursesRes, hwRes] = await Promise.all([
@@ -118,13 +127,13 @@ document.addEventListener("DOMContentLoaded", () => {
       container.innerHTML = courses
         .map(
           (c) => `
-        <article class="bg-white rounded-2xl border border-[#B6AEA4]/40 p-4 shadow-sm flex justify-between items-center">
-          <div>
-            <h4 class="font-semibold text-[#1C1820]">${c.title}</h4>
-            <p class="text-sm text-[#3E3B59]">${c.description || ""}</p>
-          </div>
-          <button data-id="${c.id}" class="deleteCourseBtn text-sm px-3 py-1.5 bg-rose-100 text-rose-700 rounded-lg hover:bg-rose-200 transition">🗑</button>
-        </article>`
+          <article class="bg-white rounded-2xl border border-[#B6AEA4]/40 p-4 shadow-sm flex justify-between items-center">
+            <div>
+              <h4 class="font-semibold text-[#1C1820]">${c.title}</h4>
+              <p class="text-sm text-[#3E3B59]">${c.description || ""}</p>
+            </div>
+            <button data-id="${c.id}" class="deleteCourseBtn text-sm px-3 py-1.5 bg-rose-100 text-rose-700 rounded-lg hover:bg-rose-200 transition">🗑</button>
+          </article>`
         )
         .join("");
 
@@ -141,17 +150,18 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       });
     } catch (err) {
-      console.error("Dashboard load error:", err);
+      console.error("Dashboard error:", err);
     }
   }
 
+  // ======== LOAD STUDENTS ========
   async function loadStudents() {
     try {
       const res = await fetch(`${API_BASE}/api/students`);
       const data = await res.json();
+
       const table = document.getElementById("studentTable");
 
-      // Search bar
       let search = document.getElementById("studentSearch");
       if (!search) {
         const input = document.createElement("input");
@@ -160,19 +170,17 @@ document.addEventListener("DOMContentLoaded", () => {
         input.className =
           "mb-3 w-full px-3 py-2 rounded-lg border border-[#B6AEA4]/40 bg-[#F2F0E5] text-[#1C1820]";
         table.parentElement.parentElement.prepend(input);
+
         search = input;
+
         input.addEventListener("input", (e) => {
           const term = e.target.value.toLowerCase();
-          document
-            .querySelectorAll("#studentTable tr")
-            .forEach(
-              (row) =>
-                (row.style.display = row.textContent
-                  .toLowerCase()
-                  .includes(term)
-                  ? ""
-                  : "none")
-            );
+          document.querySelectorAll("#studentTable tr").forEach(
+            (row) =>
+              (row.style.display = row.textContent.toLowerCase().includes(term)
+                ? ""
+                : "none")
+          );
         });
       }
 
@@ -190,22 +198,23 @@ document.addEventListener("DOMContentLoaded", () => {
         )
         .join("");
 
-      document.querySelectorAll(".editBtn").forEach((btn) => {
+      document.querySelectorAll(".editBtn").forEach((btn) =>
         btn.addEventListener("click", () =>
           openEditGradeModal(btn.dataset.id, btn.dataset.grade)
-        );
-      });
+        )
+      );
     } catch (err) {
       console.error("Students load error:", err);
     }
   }
 
+  // ======== LOAD HOMEWORK ========
   async function loadHomework() {
     try {
       const res = await fetch(`${API_BASE}/api/homework`);
       const hw = await res.json();
-      const list = document.getElementById("homework-list");
 
+      const list = document.getElementById("homework-list");
       list.innerHTML = hw
         .map(
           (h) => `
@@ -220,7 +229,7 @@ document.addEventListener("DOMContentLoaded", () => {
         )
         .join("");
 
-      document.querySelectorAll(".deleteHomeworkBtn").forEach((btn) => {
+      document.querySelectorAll(".deleteHomeworkBtn").forEach((btn) =>
         btn.addEventListener("click", async () => {
           if (confirm("Delete this homework?")) {
             await fetch(`${API_BASE}/api/homework/${btn.dataset.id}`, {
@@ -231,17 +240,14 @@ document.addEventListener("DOMContentLoaded", () => {
             loadHomework();
             loadDashboard();
           }
-        });
-      });
+        })
+      );
     } catch (err) {
       console.error("Homework load error:", err);
     }
   }
 
-  // ======== Modals ========
-  document.getElementById("addCourseBtn")?.addEventListener("click", () => openCourseModal());
-  document.getElementById("addHomeworkBtn")?.addEventListener("click", () => openHomeworkModal());
-
+  // ======== MODALS ========
   function openCourseModal() {
     showModal(`
       <h2 class="text-xl font-semibold mb-4">Create Course</h2>
@@ -252,15 +258,19 @@ document.addEventListener("DOMContentLoaded", () => {
         <button id="submitModal" class="px-4 py-2 bg-[#1C1820] text-[#F2F0E5] rounded-lg hover:bg-[#3E3B59]">Create</button>
       </div>
     `);
+
     document.getElementById("submitModal").onclick = async () => {
       const title = document.getElementById("courseTitle").value.trim();
       const description = document.getElementById("courseDesc").value.trim();
+
       if (!title) return showToast("Title required!", "#b91c1c");
+
       await fetch(`${API_BASE}/api/courses`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, description }),
       });
+
       closeModal();
       logActivity(`Created course: ${title}`);
       showToast("Course created successfully!", "#166534");
@@ -280,17 +290,22 @@ document.addEventListener("DOMContentLoaded", () => {
         <button id="submitModal" class="px-4 py-2 bg-[#1C1820] text-[#F2F0E5] rounded-lg hover:bg-[#3E3B59]">Submit</button>
       </div>
     `);
+
     document.getElementById("submitModal").onclick = async () => {
       const course_id = document.getElementById("hwCourse").value.trim();
       const title = document.getElementById("hwTitle").value.trim();
       const description = document.getElementById("hwDesc").value.trim();
       const submitted_by = document.getElementById("hwBy").value.trim();
-      if (!title || !course_id) return showToast("Please fill all fields", "#b91c1c");
+
+      if (!title || !course_id)
+        return showToast("Please fill all fields", "#b91c1c");
+
       await fetch(`${API_BASE}/api/homework`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ course_id, title, description, submitted_by }),
       });
+
       closeModal();
       logActivity(`Created homework: ${title}`);
       showToast("Homework created!", "#166534");
@@ -308,15 +323,19 @@ document.addEventListener("DOMContentLoaded", () => {
         <button id="submitModal" class="px-4 py-2 bg-[#1C1820] text-[#F2F0E5] rounded-lg hover:bg-[#3E3B59]">Save</button>
       </div>
     `);
+
     document.getElementById("submitModal").onclick = async () => {
       const newGrade = Number(document.getElementById("gradeInput").value);
+
       if (isNaN(newGrade) || newGrade < 1 || newGrade > 10)
         return showToast("Grade must be between 1–10!", "#b91c1c");
+
       await fetch(`${API_BASE}/api/students/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ grade: newGrade }),
       });
+
       closeModal();
       logActivity(`Updated grade to ${newGrade}`);
       showToast("Grade updated!", "#166534");
@@ -324,6 +343,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   }
 
+  // ======== MODAL UTILITIES ========
   function showModal(innerHTML) {
     const modalBg = document.createElement("div");
     modalBg.id = "modalBg";
@@ -333,7 +353,9 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="bg-white rounded-2xl p-6 shadow-lg w-[90%] max-w-md fade-in">${innerHTML}</div>
     `;
     document.body.appendChild(modalBg);
+
     document.getElementById("cancelModal").onclick = closeModal;
+
     modalBg.addEventListener("click", (e) => {
       if (e.target === modalBg) closeModal();
     });
@@ -343,41 +365,38 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("modalBg")?.remove();
   }
 
- // ======== Profile dropdown ========
-const userName = document.getElementById("userName");
-const userAvatar = document.getElementById("userAvatar");
-const name = localStorage.getItem("userName") || "Teacher";
-userName.textContent = name;
-userAvatar.style.backgroundImage = "url('https://i.pravatar.cc/40')";
-userAvatar.style.backgroundSize = "cover";
+  // ======== PROFILE DROPDOWN ========
+  const userName = document.getElementById("userName");
+  const userAvatar = document.getElementById("userAvatar");
 
-// Dropdown
-const dropdown = document.createElement("div");
-dropdown.id = "profileMenu";
-dropdown.className =
-  "absolute right-4 top-14 bg-[#3E3B59] text-[#F2F0E5] rounded-lg shadow-lg hidden";
-dropdown.innerHTML = `
-  <button id="viewProfile" class="block w-full text-left px-4 py-2 hover:bg-[#4E4A69]">View Profile</button>
-  <button id="logoutBtn2" class="block w-full text-left px-4 py-2 hover:bg-[#4E4A69]">Logout</button>
-`;
-document.body.appendChild(dropdown);
+  const name = localStorage.getItem("userName") || "Teacher";
+  userName.textContent = name;
 
-// Toggle dropdown
-userAvatar.addEventListener("click", () => dropdown.classList.toggle("hidden"));
+  userAvatar.style.backgroundImage = "url('https://i.pravatar.cc/40')";
+  userAvatar.style.backgroundSize = "cover";
 
-// Logout functionality
-document.getElementById("logoutBtn2").onclick = logout;
+  const dropdown = document.createElement("div");
+  dropdown.id = "profileMenu";
+  dropdown.className =
+    "absolute right-4 top-14 bg-[#3E3B59] text-[#F2F0E5] rounded-lg shadow-lg hidden";
+  dropdown.innerHTML = `
+    <button id="viewProfile" class="block w-full text-left px-4 py-2 hover:bg-[#4E4A69]">View Profile</button>
+    <button id="logoutBtn2" class="block w-full text-left px-4 py-2 hover:bg-[#4E4A69]">Logout</button>
+  `;
+  document.body.appendChild(dropdown);
 
-function logout() {
-  localStorage.removeItem("isLoggedIn");
-  window.location.href = "/login.html";  // done finally
-}
+  userAvatar.addEventListener("click", () =>
+    dropdown.classList.toggle("hidden")
+  );
 
+  document.getElementById("logoutBtn2").onclick = logout;
 
+  function logout() {
+    localStorage.removeItem("isLoggedIn");
+    window.location.href = LOGIN_PATH; // FIXED
+  }
 
-
-
-  // ======== Theme toggle ========
+  // ======== THEME TOGGLE ========
   const themeBtn = document.createElement("button");
   themeBtn.id = "themeToggle";
   themeBtn.textContent = "🌗";
@@ -392,15 +411,10 @@ function logout() {
       document.body.classList.contains("light") ? "light" : "dark"
     );
   });
+
   if (localStorage.getItem("theme") === "light")
     document.body.classList.add("light");
 
-  // ======== Default Page ========
+  // ======== DEFAULT PAGE ========
   showPage("dashboard");
 });
-
-
-
-
-
-
