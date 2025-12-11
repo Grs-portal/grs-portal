@@ -34,6 +34,7 @@ app.use(express.static(path.join(rootDir, "public")));
 let accounts = [
   { username: "root", password: "1234", role: "instructor", name: "Instructor Root" },
   { username: "manager", password: "9999", role: "manager", name: "Project Manager" }
+  { username: "student", password: "1234", role: "student", name: "student" }
 ];
 
 let courses = [
@@ -111,7 +112,7 @@ app.post("/api/login", (req, res) => {
   }
 
   // Simple redirect based on role
-  const redirect = user.role === "instructor" ? "/instructor/" : "/manager/";
+  const redirect = user.role === "instructor" ? "/instructor/" : "/manager/" : "/students/";
   res.json({ success: true, role: user.role, name: user.name, redirect });
 });
 
@@ -139,10 +140,12 @@ app.get("/", (req, res) => {
 // Instructor portal
 app.get("/instructor/", (req, res) => res.redirect("/instructor"));
 app.get("/manager/", (req, res) => res.redirect("/manager"));
+app.get("/students/", (req, res) => res.redirect("/students"));
 
 
 // ---------------- START SERVER ----------------
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
 });
+
 
