@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Schedule</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 flex flex-col items-center py-10">
+  
+  <div class="flex flex-col lg:flex-row gap-6 w-full max-w-6xl">
+    <!-- Calendar -->
+    <div class="bg-white shadow-md rounded-2xl p-6 flex-1">
+      <div class="flex justify-between items-center mb-4">
+        <button id="prevMonth" class="px-3 py-1 bg-gray-100 rounded-lg hover:bg-gray-200">‹</button>
+        <h2 id="monthYear" class="text-xl font-semibold"></h2>
+        <button id="nextMonth" class="px-3 py-1 bg-gray-100 rounded-lg hover:bg-gray-200">›</button>
+      </div>
+
+      <div class="grid grid-cols-7 text-center font-semibold text-gray-600">
+        <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div>
+        <div>Thu</div><div>Fri</div><div>Sat</div>
+      </div>
+
+      <div id="calendarDays" class="grid grid-cols-7 mt-2 gap-1"></div>
+    </div>
+
+    <!-- Plans Sidebar -->
+    <div class="bg-white shadow-md rounded-2xl p-6 w-full lg:w-80">
+      <h3 class="text-lg font-semibold mb-3">📋 Your Plans</h3>
+      <div id="plansList" class="space-y-3 text-sm text-gray-700">
+        <p class="text-gray-400 italic">No plans yet. Click a date to add one!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="planModal" class="hidden fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
+    <div class="bg-white rounded-xl p-6 w-80 shadow-lg">
+      <h3 id="modalDate" class="text-lg font-semibold mb-3"></h3>
+      <textarea id="planText" class="w-full border rounded-lg p-2 h-24" placeholder="Write your plan here..."></textarea>
+      <div class="flex justify-end mt-4 space-x-2">
+        <button id="deletePlan" class="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600">Delete</button>
+        <button id="savePlan" class="px-3 py-1 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Save</button>
+        <button id="closeModal" class="px-3 py-1 bg-gray-300 rounded-lg hover:bg-gray-400">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  const monthYear = document.getElementById("monthYear");
+  const calendarDays = document.getElementById("calendarDays");
+  const planModal = document.getElementById("planModal");
+  const modalDate = document.getElementById("modalDate");
+  const planText = document.getElementById("planText");
+  const saveBtn = document.getElementById("savePlan");
+  const closeBtn = document.getElementById("closeModal");
+  const deleteBtn = document.getElementById("deletePlan");
+  const plansList = document.getElementById("plansList");
+
+  let currentDate = new Date();
+  let selectedDate = null;
+  const plans = JSON.parse(localStorage.getItem("plans") || "{}");
+
+  function renderCalendar() {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startDay = firstDay.getDay();
+    const totalDays = lastDay.getDate();
+
+    monthYear.textContent = firstDay.toLocaleString("default", { month: "long", year: "numeric" });
+    calendarDays.innerHTML = "";
+
+    for (let i = 0; i < startDay; i++) {
+      calendarDays.innerHTML += `<div></div>`;
+    }
+
+    for (let day = 1; day <= totalDays; day++) {
+      const dateKey = `${year}-${month + 1}-${day}`;
+      const hasPlan = plans[dateKey];
+      calendarDays.innerHTML += `
+        <div class="border rounded-lg p-2 h-20 text-sm cursor-pointer flex flex-col justify-between transition
+          ${hasPlan ? 'bg-indigo-50 border-indigo-400' : 'hover:bg-gray-100'}"
+          data-date="${dateKey}">
+          <div class="text-right font-semibold">${day}</div>
+          ${hasPlan ? `<div class="text-xs text-indigo-600 truncate">${plans[dateKey]}</div>` : ""}
+        </div>`;
+    }
+
+    document.querySelectorAll("[data-date]").forEach(dayEl => {
+      dayEl.addEventListener("click", () => openModal(dayEl.getAttribute("data-date")));
+    });
+
+    renderPlansList();
+  }
+
+  function renderPlansList() {
+    plansList.innerHTML = "";
+    const sortedKeys = Object.keys(plans).sort((a, b) => new Date(a) - new Date(b));
+    if (sortedKeys.length === 0) {
+      plansList.innerHTML = `<p class="text-gray-400 italic">No plans yet. Click a date to add one!</p>`;
+      return;
+    }
+
+    sortedKeys.forEach(date => {
+      const plan = plans[date];
+      const div = document.createElement("div");
+      div.className = "border rounded-lg p-2 hover:bg-gray-50 transition cursor-pointer";
+      div.innerHTML = `
+        <div class="font-semibold text-indigo-700">${date}</div>
+        <div class="text-sm text-gray-600 truncate">${plan}</div>`;
+      div.addEventListener("click", () => openModal(date));
+      plansList.appendChild(div);
+    });
+  }
+
+  function openModal(date) {
+    selectedDate = date;
+    modalDate.textContent = "Plans for " + date;
+    planText.value = plans[date] || "";
+    planModal.classList.remove("hidden");
+  }
+
+  document.getElementById("prevMonth").addEventListener("click", () => {
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    renderCalendar();
+  });
+
+  document.getElementById("nextMonth").addEventListener("click", () => {
+    currentDate.setMonth(currentDate.getMonth() + 1);
+    renderCalendar();
+  });
+
+  saveBtn.addEventListener("click", () => {
+    if (planText.value.trim()) {
+      plans[selectedDate] = planText.value.trim();
+    } else {
+      delete plans[selectedDate];
+    }
+    localStorage.setItem("plans", JSON.stringify(plans));
+    renderCalendar();
+    planModal.classList.add("hidden");
+  });
+
+  deleteBtn.addEventListener("click", () => {
+    delete plans[selectedDate];
+    localStorage.setItem("plans", JSON.stringify(plans));
+    renderCalendar();
+    planModal.classList.add("hidden");
+  });
+
+  closeBtn.addEventListener("click", () => {
+    planModal.classList.add("hidden");
+  });
+
+  renderCalendar();
+
+  </script>
+</body>
+</html>

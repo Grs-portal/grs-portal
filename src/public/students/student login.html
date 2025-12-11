@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - Student Portal</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    h1 {
+      color: blue;
+      font-family: Verdana, sans-serif;
+      font-size: 250%;
+    }
+    p {
+      color: red;
+      font-family: Courier, monospace;
+      font-size: 160%;
+    }
+  </style>
+</head>
+
+<body class="relative bg-cover bg-center min-h-screen flex items-center justify-center"
+      style="background-image: url('hofi korsou.jpg');">
+
+  <!-- Dark overlay -->
+  <div class="absolute inset-0 bg-black bg-opacity-60"></div>
+
+  <!-- Login box -->
+  <section class="relative z-10 max-w-md w-full p-8 bg-white bg-opacity-95 backdrop-blur-sm shadow-2xl rounded-xl">
+    <h2 class="text-3xl font-bold mb-6 text-center text-indigo-700">STUDENT PORTAL</h2>
+    <h3 class="text-2xl font-semibold mb-4 text-gray-900 text-center">Login</h3>
+
+    <!-- Error message -->
+    <div id="error-message" class="mb-4 text-red-600 font-medium hidden text-center">
+      Invalid name or verification code.
+    </div>
+
+    <form id="loginForm" class="space-y-4">
+      <!-- Name -->
+      <div>
+        <label for="firstName" class="block text-sm font-medium text-gray-700">Name:</label>
+        <input
+          type="text"
+          id="firstName"
+          name="firstName"
+          required
+          class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-200 focus:border-indigo-400"
+        />
+      </div>
+
+      <!-- Verification Code -->
+      <div>
+        <label for="verificationCode" class="block text-sm font-medium text-gray-700">Verification Code:</label>
+        <input
+          type="text"
+          id="verificationCode"
+          name="verificationCode"
+          maxlength="6"
+          pattern="[0-9]{6}"
+          required
+          class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-200 focus:border-indigo-400 tracking-widest text-center"
+        />
+      </div>
+
+      <!-- Login button -->
+      <div>
+        <button
+          type="submit"
+          class="w-full py-2 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
+        >
+          Login
+        </button>
+      </div>
+    </form>
+
+    <!-- Register link -->
+    <p class="mt-4 text-sm text-gray-700 text-center">
+      Don't have an account?
+      <a href="register.html" class="text-indigo-600 hover:underline">Register here</a>
+    </p>
+  </section>
+
+  <script>
+    const loginForm = document.getElementById('loginForm');
+    const errorMessage = document.getElementById('error-message');
+
+    loginForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const firstName = document.getElementById('firstName').value.trim();
+      const verificationCode = document.getElementById('verificationCode').value.trim();
+
+      // Demo validation
+      if (firstName === 'admin' && verificationCode === '123456') {
+        alert('Login successful!');
+        window.location.href = 'student portal.html';
+      } else {
+        errorMessage.classList.remove('hidden');
+      }
+    });
+  </script>
+</body>
+</html>

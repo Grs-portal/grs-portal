@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registration</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    h1 {
+      color: blue;
+      font-family: Verdana, sans-serif;
+      font-size: 250%;
+    }
+    p {
+      color: red;
+      font-family: Courier, monospace;
+      font-size: 160%;
+    }
+  </style>
+</head>
+
+<body class="relative bg-cover bg-center min-h-screen flex items-center justify-center" 
+      style="background-image: url('hofi korsou.jpg');">
+
+  <!-- Dark overlay -->
+  <div class="absolute inset-0 bg-black bg-opacity-60"></div>
+
+  <!-- Registration box -->
+  <section class="relative z-10 max-w-md w-full p-8 bg-white bg-opacity-95 backdrop-blur-sm shadow-2xl rounded-xl">
+    <h2 class="text-3xl font-bold mb-6 text-center text-indigo-700">STUDENT</h2>
+    <h3 class="text-2xl font-semibold mb-4 text-gray-900 text-center">Create an account</h3>
+
+    <!-- Error message -->
+    <div id="error-message" class="mb-4 text-red-600 font-medium hidden text-center">
+      Please fill out all fields correctly or check your verification code.
+    </div>
+
+    <form id="registerForm" class="space-y-4">
+      <!-- First Name -->
+      <div>
+        <label for="firstName" class="block text-sm font-medium text-gray-700">First Name:</label>
+        <input
+          type="text"
+          id="firstName"
+          name="firstName"
+          required
+          class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-200 focus:border-indigo-400"
+        />
+      </div>
+
+      <!-- Surname -->
+      <div>
+        <label for="surname" class="block text-sm font-medium text-gray-700">Surname:</label>
+        <input
+          type="text"
+          id="surname"
+          name="surname"
+          required
+          class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-200 focus:border-indigo-400"
+        />
+      </div>
+
+      <!-- Date of Birth -->
+      <div>
+        <label for="dob" class="block text-sm font-medium text-gray-700">Date of Birth:</label>
+        <input
+          type="date"
+          id="dob"
+          name="dob"
+          required
+          class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-200 focus:border-indigo-400"
+        />
+      </div>
+
+      <!-- Verification Code -->
+      <div>
+        <label for="verification" class="block text-sm font-medium text-gray-700">Verification Code:</label>
+        <div class="flex gap-2">
+          <input
+            type="text"
+            id="verification"
+            name="verification"
+            maxlength="6"
+            pattern="[0-9]{6}"
+            required
+            placeholder="Enter 6-digit code"
+            class="flex-1 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-200 focus:border-indigo-400 tracking-widest text-center"
+          />
+          <button
+            type="button"
+            id="sendCode"
+            class="mt-1 px-3 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 transition"
+          >
+            Send Code
+          </button>
+        </div>
+        <p id="codeMessage" class="text-sm text-green-600 mt-1 hidden text-center"></p>
+      </div>
+
+      <!-- Submit button -->
+      <div>
+        <button
+          type="submit"
+          class="w-full py-2 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
+        >
+          Register
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <script>
+    const registerForm = document.getElementById('registerForm');
+    const errorMessage = document.getElementById('error-message');
+    const sendCodeBtn = document.getElementById('sendCode');
+    const codeMessage = document.getElementById('codeMessage');
+
+    let generatedCode = null; // store code when "Send Code" clicked
+
+    // Handle Send Code button
+    sendCodeBtn.addEventListener('click', () => {
+      generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+      codeMessage.textContent = `Your verification code is: ${generatedCode}`;
+      codeMessage.classList.remove('hidden');
+    });
+
+    // Handle form submission
+    registerForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const firstName = document.getElementById('firstName').value.trim();
+      const surname = document.getElementById('surname').value.trim();
+      const dob = document.getElementById('dob').value.trim();
+      const verification = document.getElementById('verification').value.trim();
+
+      if (firstName && surname && dob && verification === generatedCode) {
+        alert('Registration successful!');
+        window.location.href = 'student portal.html';
+      } else {
+        errorMessage.classList.remove('hidden');
+      }
+    });
+  </script>
+</body>
+</html>

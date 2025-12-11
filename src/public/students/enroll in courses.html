@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Portal – Enroll in Courses</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body class="min-h-screen bg-gray-50 font-sans flex flex-col">
+  <!-- Topbar -->
+  <header class="sticky top-0 z-40 bg-green-500/60 backdrop-blur border-b border-green-500/60 text-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img src="project caribbean 1.png" class="w-10 h-10 rounded-lg object-contain" alt="Logo" />
+        <span class="font-semibold text-lg">Student Portal</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span id="studentName" class="font-medium"></span>
+        <button id="logoutBtn" class="px-4 py-1.5 rounded-xl border border-white hover:bg-white hover:text-blue-700 transition font-medium">
+          Logout
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="flex flex-1">
+    <!-- Sidebar -->
+    <aside class="hidden lg:flex flex-col w-64 bg-white border-r border-gray-200 shadow-sm p-6 space-y-6">
+      <nav>
+        <ul class="space-y-2">
+          <li>
+            <a href="#" class="block px-4 py-2 rounded-xl text-sm bg-blue-100 text-blue-700 font-semibold">Enroll in Courses</a>
+          </li>
+          <li>
+            <a href="dashboard.html" class="block px-4 py-2 rounded-xl text-sm text-gray-700 hover:bg-gray-100 transition">Dashboard</a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="space-y-4">
+        <div class="bg-gray-50 rounded-2xl border border-gray-100 p-4 text-center shadow-sm">
+          <p class="text-sm text-gray-500">Enrolled Courses</p>
+          <p id="sidebarEnrolledCount" class="text-2xl font-semibold text-gray-900">0</p>
+        </div>
+        <div class="bg-gray-50 rounded-2xl border border-gray-100 p-4 text-center shadow-sm">
+          <p class="text-sm text-gray-500">Available Courses</p>
+          <p class="text-2xl font-semibold text-gray-900">5</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 space-y-12 max-w-6xl mx-auto">
+      <!-- Search + Filter -->
+      <section class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+        <input id="searchInput" type="text" placeholder="Search courses..." class="w-full md:w-1/3 px-4 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+      </section>
+
+      <!-- Available Courses -->
+      <section>
+        <h2 class="text-2xl font-semibold mb-6 text-gray-900">Available Courses</h2>
+        <div id="coursesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+      </section>
+
+      <!-- Enrolled Courses -->
+      <section>
+        <h2 class="text-2xl font-semibold mb-6 text-gray-900">My Enrolled Courses</h2>
+        <div id="enrolledCoursesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    const courses = [
+      { id: 1, name: "Mental Health First Aid", description: "Learn how to provide initial support to someone in crisis." },
+      { id: 2, name: "JavaScript", description: "Master the fundamentals of JavaScript programming." },
+      { id: 3, name: "English", description: "Improve your English communication and writing." },
+      { id: 4, name: "Papiamentu", description: "Explore the local language and culture." },
+      { id: 5, name: "Information Technology", description: "Learn programming and computer systems." }
+    ];
+
+    const coursesList = document.getElementById('coursesList');
+    const enrolledList = document.getElementById('enrolledCoursesList');
+    const searchInput = document.getElementById('searchInput');
+
+    function renderCourses(filter = "") {
+      coursesList.innerHTML = '';
+      const enrolledCourses = JSON.parse(localStorage.getItem('enrolledCourses') || '[]');
+
+      courses
+        .filter(c => c.name.toLowerCase().includes(filter.toLowerCase()))
+        .forEach(course => {
+          const isEnrolled = enrolledCourses.includes(course.id);
+          const card = document.createElement('div');
+          card.className = 'bg-white p-5 rounded-2xl shadow-sm border border-gray-100 transition hover:shadow-md';
+          card.innerHTML = `
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">${course.name}</h3>
+            <p class="text-gray-600 mb-4">${course.description}</p>
+            <button
+              class="px-3 py-2 w-full rounded-xl border transition enrollBtn ${isEnrolled ? 'bg-green-500/60 text-white hover:bg-green-500/60' : 'border-gray-300 hover:bg-green-500/60 hover:text-white'}"
+              data-id="${course.id}"
+            >
+              ${isEnrolled ? 'Unenroll' : 'Enroll'}
+            </button>
+          `;
+          coursesList.appendChild(card);
+        });
+
+      updateEnrolledCounter();
+      renderEnrolledCourses();
+    }
+
+    function renderEnrolledCourses() {
+      const enrolledCourses = JSON.parse(localStorage.getItem('enrolledCourses') || '[]');
+      enrolledList.innerHTML = '';
+
+      if (enrolledCourses.length === 0) {
+        enrolledList.innerHTML = `<p class="col-span-full text-gray-500 italic text-center">You haven’t enrolled in any courses yet.</p>`;
+        return;
+      }
+
+      courses.filter(c => enrolledCourses.includes(c.id)).forEach(course => {
+        const card = document.createElement('div');
+        card.className = 'bg-white p-5 rounded-2xl shadow-sm border border-gray-100 transition hover:shadow-md';
+        card.innerHTML = `
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">${course.name}</h3>
+          <p class="text-gray-600 mb-4">${course.description}</p>
+          <button
+            class="px-3 py-2 w-full rounded-xl border border-gray-300 hover:bg-green-500/60 hover:text-white transition enrollBtn"
+            data-id="${course.id}"
+          >
+            Unenroll
+          </button>
+        `;
+        enrolledList.appendChild(card);
+      });
+    }
+
+    function updateEnrolledCounter() {
+      const enrolledCourses = JSON.parse(localStorage.getItem('enrolledCourses') || '[]');
+      document.getElementById('sidebarEnrolledCount').textContent = enrolledCourses.length;
+    }
+
+    document.addEventListener('click', e => {
+      if (e.target.classList.contains('enrollBtn')) {
+        const id = parseInt(e.target.dataset.id);
+        let enrolled = JSON.parse(localStorage.getItem('enrolledCourses') || '[]');
+
+        if (enrolled.includes(id)) {
+          enrolled = enrolled.filter(x => x !== id);
+        } else {
+          enrolled.push(id);
+        }
+
+        localStorage.setItem('enrolledCourses', JSON.stringify(enrolled));
+        renderCourses(searchInput.value);
+      }
+    });
+
+    searchInput.addEventListener('input', e => renderCourses(e.target.value));
+
+    const studentName = localStorage.getItem('studentName') || 'Student';
+    document.getElementById('studentName').textContent = `Welcome, ${studentName}`;
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      ['studentName', 'studentCode', 'enrolledCourses'].forEach(k => localStorage.removeItem(k));
+      window.location.href = 'student login.html';
+    });
+
+    renderCourses();
+  </script>
+</body>
+</html>
