@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>PBC — Portals</title>
-  <link rel="stylesheet" href="/homepage/CSS/style.css" />
+  <link rel="stylesheet" href="CSS/style.css" />
 
   <!-- Lucide (optional) -->
   <script src="https://unpkg.com/lucide@latest" defer></script>
@@ -16,36 +16,38 @@
       background-color: #003329;}
   </style>
 
-
-
-
-      <!-----------------------
-           NAVIGATION BAR 
-     ------------------------->
-  <header class="site-header" style="background-color: white;">
-    <div class="container header-inner" style="background-color: white;">
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="container header-inner">
       <nav class="main-nav">
         <div class="nav-left">
-          <a href="/homepage/index.html" class="nav-link">Home</a>
-          <a href="/homepage/courses.html" class="nav-link">Courses</a>
-          <a href="/homepage/projects.html" class="nav-link">Projects</a>
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="courses.html" class="nav-link">Courses</a>
+          <a href="projects.html" class="nav-link ">Projects</a>
         </div>
 
         <!-- centered circle logo -->
         <div class="logo-circle">
-          <img src="/images/logo no bg 2.png" alt="PBC logo">
+          <img src="images/logo no bg 2.png" alt="PBC logo">
         </div>
 
         <div class="nav-right">
-          <a href="/homepage/about.html" class="nav-link">About Us</a>
-          <a href="/homepage/Portal.html" class="nav-link active">Portals</a>
-          <a href="/homepage/contact.html" class="nav-link">Contact</a>
+          <a href="about.html" class="nav-link">About Us</a>
+          <a href="Portal.html" class="nav-link active">Portals</a>
+          <a href="contact.html" class="nav-link ">Contact</a>
+          <div class="language-dropdown">
+            <button class="lang-btn">EN ▾</button>
+            <ul class="lang-menu">
+              <li data-lang="en">English</li>
+              <li data-lang="nl">Dutch</li>
+              <li data-lang="es">Spanish</li>
+            </ul>
+          </div>
         </div>
       </nav>
 
     </div>
   </header>
-
 
   <!-- HERO -->
   <section class="hero" aria-label="Portal hero">
@@ -76,21 +78,21 @@
     <section class="portal-section">
     <div class="portal-grid">
 
-        <a class="portal-card student" href="/homepage/login.html">
+        <a class="portal-card student">
             <div class="portal-inner-shape">
                 <svg height="50px" width="50px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 392.53 392.53" xml:space="preserve" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path style="fill:#FFFFFF;" d="M329.404,226.586l3.685-51.329c-37.689-19.717-85.915-15.321-125.931,11.507v152.372 c36.331-12.154,78.739-4.461,112.743,20.17c1.422-19.717,4.396-61.285,4.396-61.285c-11.184-5.947-18.877-17.778-18.877-31.354 v-6.465C305.421,244.558,315.441,231.37,329.404,226.586z"></path> <path style="fill:#56ACE0;" d="M59.376,175.257l3.685,51.329c13.899,4.784,23.984,18.036,23.984,33.552v6.465 c0,13.576-7.628,25.406-18.877,31.354v0.388c1.487,20.299,2.909,40.663,4.396,60.962c34.004-24.63,76.477-32.194,112.743-20.17 V186.828C145.227,159.935,97,155.539,59.376,175.257z"></path> <path style="fill:#FFC10D;" d="M306.972,233.503l3.168-44.283c-12.154-5.56-51.394-10.925-81.261,9.826v113.39 c20.558-3.62,51.717,1.616,71.628,11.184c0.646-8.339,2.651-36.008,2.651-36.008"></path> <path style="fill:#194F82;" d="M196.233,136.21c37.56,0,68.137-30.578,68.137-68.137S233.792,0,196.233,0 s-68.137,30.578-68.137,68.137S158.673,136.21,196.233,136.21z M196.233,21.786c25.6,0,46.352,20.816,46.352,46.352 s-20.816,46.352-46.352,46.352s-46.352-20.816-46.352-46.352S170.633,21.786,196.233,21.786z"></path> <path style="fill:#FFC10D;" d="M196.233,21.786c-25.6,0-46.352,20.816-46.352,46.352s20.816,46.352,46.352,46.352 s46.352-20.816,46.352-46.352S221.833,21.786,196.233,21.786z"></path> <g> <path style="fill:#FFFFFF;" d="M359.724,280.307v-34.004h-18.747c-7.564,0-13.77,6.206-13.77,13.77v6.465 c0,7.564,6.206,13.77,13.77,13.77H359.724L359.724,280.307z"></path> <path style="fill:#FFFFFF;" d="M65.194,266.602v-6.465c0-7.564-6.206-13.77-13.77-13.77H32.742v34.004h18.747 C59.053,280.307,65.194,274.166,65.194,266.602z"></path> </g> <path style="fill:#194F82;" d="M359.724,224.517h-8.339l3.943-54.626c0.323-4.073-1.681-7.952-5.236-10.15 c-45.382-27.539-104.921-24.113-153.923,8.145c-48.937-32.194-108.541-35.62-153.923-8.145c-3.491,2.069-5.495,6.012-5.236,10.15 l3.943,54.626h-8.21c-12.024,0-21.786,9.826-21.786,21.786v34.004c0,12.024,9.826,21.786,21.786,21.786h13.834 c1.939,26.764,3.879,53.398,5.818,80.162c0.517,8.145,10.99,14.287,18.554,6.982c33.939-33.745,83.329-43.636,120.178-23.984 c4.008,1.616,7.37,1.422,10.279,0c36.848-19.717,86.303-9.826,120.178,23.984c7.499,7.758,18.618,0.323,18.554-6.982 c1.875-26.764,3.879-53.398,5.818-80.162h13.834c12.024,0,21.786-9.826,21.786-21.786v-34.004 C381.509,234.343,371.813,224.517,359.724,224.517z M65.194,266.602c0,7.564-6.206,13.77-13.77,13.77H32.742v-34.004h18.747 c7.564,0,13.77,6.206,13.77,13.77v6.465L65.194,266.602L65.194,266.602z M185.307,339.135 c-36.331-12.154-78.739-4.461-112.743,20.17c-1.487-20.299-2.909-40.663-4.396-60.962v-0.388 c11.184-5.947,18.877-17.778,18.877-31.354v-6.465c0-15.515-10.02-28.768-23.984-33.551l-3.685-51.329 c37.689-19.717,85.915-15.321,125.931,11.572V339.135z M319.901,359.305c-34.004-24.63-76.412-32.323-112.743-20.17V274.23h21.463 c6.012,0,10.925-4.848,10.925-10.925c0-6.077-4.848-10.925-10.925-10.925h-21.463v-19.717h47.838 c6.012,0,10.925-4.848,10.925-10.925c0-6.012-4.849-10.925-10.925-10.925h-47.774v-24.113 c40.081-26.893,88.307-31.289,125.931-11.507l-3.685,51.329c-13.899,4.784-23.984,18.036-23.984,33.551v6.465 c0,13.576,7.628,25.341,18.877,31.354C324.362,297.956,321.324,339.523,319.901,359.305z M340.976,280.307 c-7.564,0-13.77-6.206-13.77-13.77v-6.465c0-7.564,6.206-13.77,13.77-13.77h18.747v34.004H340.976L340.976,280.307z"></path> </g></svg>
             </div>
             <h3>Student Portal</h3>
         </a>
 
-        <a class="portal-card teacher" href="/homepage/login.html">
+        <a class="portal-card teacher">
             <div class="portal-inner-shape">
                 <svg height="55px" width="55px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 392.727 392.727" xml:space="preserve" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <polyline style="fill:#FFFFFF;" points="65.034,370.747 161.293,370.747 178.877,270.545 47.515,270.545 "></polyline> <polygon style="fill:#56ACE0;" points="83.329,348.897 73.438,292.331 152.889,292.331 142.998,348.897 "></polygon> <path style="fill:#FFC10D;" d="M113.196,99.491c-9.115,0-16.614,7.434-16.614,16.614c0,9.115,7.434,16.614,16.614,16.614 c9.115,0,16.614-7.434,16.614-16.614S122.376,99.491,113.196,99.491z"></path> <g> <path style="fill:#194F82;" d="M113.196,77.64c-21.204,0-38.4,17.261-38.4,38.4s17.261,38.4,38.4,38.4s38.4-17.261,38.4-38.4 S134.335,77.64,113.196,77.64z M113.196,132.655c-9.115,0-16.614-7.434-16.614-16.614c0-9.115,7.434-16.614,16.614-16.614 c9.115,0,16.614,7.434,16.614,16.614C129.81,125.285,122.376,132.655,113.196,132.655z"></path> <path style="fill:#194F82;" d="M215.337,248.76h-31.354v-44.347c0-24.501-19.911-44.347-44.347-44.347 c-3.168,0-6.206,1.422-8.275,3.814l-18.166,21.204L95.03,163.879c-2.069-2.392-5.107-3.814-8.275-3.814 c-24.501,0-44.347,19.911-44.347,44.347v44.347H10.99c-6.012,0-10.925,4.848-10.925,10.925c0,6.077,4.848,10.925,10.925,10.925 h14.287l19.846,113.067c0.905,5.172,5.43,9.051,10.731,9.051h114.489c5.301,0,9.826-3.814,10.731-9.051l19.846-113.067h14.287 c6.012,0,10.925-4.848,10.925-10.925C226.198,253.608,221.35,248.76,215.337,248.76z M64.194,204.412 c0-10.925,7.758-19.911,18.036-22.109l22.691,26.57c4.848,5.495,12.412,4.784,16.549,0l22.691-26.57 c10.279,2.133,18.036,11.184,18.036,22.109v44.347H64.194V204.412z M161.293,370.747H65.034l-3.297-19.006h14.933 c6.012,0,10.925-4.849,10.925-10.925s-4.848-10.925-10.925-10.925H57.923l-3.103-17.648h43.378c6.012,0,10.925-4.848,10.925-10.925 c0-6.012-4.848-10.925-10.925-10.925H51.071l-3.491-19.911h131.426L161.293,370.747z"></path> </g> <path style="fill:#FFC10D;" d="M162.133,204.412c0-10.925-7.758-19.911-18.036-22.109l-22.691,26.57 c-4.073,4.784-11.636,5.495-16.549,0l-22.691-26.57c-10.279,2.133-18.036,11.184-18.036,22.109v44.347h98.004V204.412 L162.133,204.412z"></path> <rect x="202.731" y="21.786" style="fill:#56ACE0;" width="168.081" height="119.855"></rect> <g> <path style="fill:#194F82;" d="M329.309,116.687h-62.642c-6.012,0-10.925-4.848-10.925-10.925c0-6.012,4.848-10.925,10.925-10.925 h62.642c6.012,0,10.925,4.848,10.925,10.925C340.17,111.838,335.321,116.687,329.309,116.687z"></path> <path style="fill:#194F82;" d="M329.309,68.461h-85.01c-6.012,0-10.925-4.848-10.925-10.925s4.848-10.925,10.925-10.925h85.01 c6.012,0,10.925,4.848,10.925,10.925S335.321,68.461,329.309,68.461z"></path> <path style="fill:#194F82;" d="M381.802,0H191.806c-6.012,0-10.925,4.848-10.925,10.925v141.64c0,6.012,4.848,10.925,10.925,10.925 h189.931c6.012,0,10.925-4.848,10.925-10.925V10.861C392.663,4.848,387.814,0,381.802,0z M370.877,141.64H202.731V21.786h168.081 V141.64H370.877z"></path> </g> </g></svg>
             </div>
             <h3>Teacher Portal</h3>
         </a>
 
-        <a class="portal-card manager" href="/homepage/login.html">
+        <a class="portal-card manager">
             <div class="portal-inner-shape">
                 <svg height="50px" width="50px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 392.598 392.598" xml:space="preserve" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path style="fill:#56ACE0;" d="M43.604,347.41V176.097c0-0.84,0.711-1.552,1.552-1.552h302.222c0.84,0,1.552,0.711,1.552,1.552 V347.41c0,0.84-0.711,1.552-1.552,1.552H45.156C44.315,348.962,43.604,348.251,43.604,347.41z"></path> <g> <path style="fill:#FFFFFF;" d="M115.103,196.331c-10.343,0-18.877,8.404-18.877,18.877c0,10.473,8.404,18.877,18.877,18.877 s18.877-8.404,18.877-18.877C133.98,204.735,125.446,196.331,115.103,196.331z"></path> <path style="fill:#FFFFFF;" d="M115.103,288.453c-23.661,0-43.442,16.614-48.42,38.723h96.84 C158.481,305.067,138.634,288.453,115.103,288.453z"></path> </g> <g> <path style="fill:#194F82;" d="M317.317,211.2H212.59c-6.012,0-10.925-4.848-10.925-10.925c0-6.012,4.848-10.925,10.925-10.925 h104.727c6.012,0,10.925,4.848,10.925,10.925C328.242,206.352,323.329,211.2,317.317,211.2z"></path> <path style="fill:#194F82;" d="M317.317,272.679H212.59c-6.012,0-10.925-4.848-10.925-10.925c0-6.012,4.848-10.925,10.925-10.925 h104.727c6.012,0,10.925,4.848,10.925,10.925C328.178,267.701,323.329,272.679,317.317,272.679z"></path> <path style="fill:#194F82;" d="M317.317,334.093H212.59c-6.012,0-10.925-4.848-10.925-10.925c0-6.012,4.848-10.925,10.925-10.925 h104.727c6.012,0,10.925,4.848,10.925,10.925C328.178,329.244,323.329,334.093,317.317,334.093z"></path> </g> <rect x="146.133" y="109.059" style="fill:#FFC10D;" width="100.331" height="21.786"></rect> <g> <path style="fill:#194F82;" d="M115.103,266.667c-39.434,0-71.37,32.065-71.37,71.37c0,6.012,4.848,10.925,10.925,10.925h121.083 c0.065,0,0.065,0,0.065,0c6.012,0,11.83-5.236,10.731-12.606C185.568,297.762,153.891,266.667,115.103,266.667z M66.618,327.176 c4.978-22.109,24.824-38.723,48.42-38.723s43.442,16.614,48.42,38.723H66.618z"></path> <path style="fill:#194F82;" d="M115.103,255.935c22.432,0,40.663-18.23,40.663-40.663s-18.23-40.663-40.663-40.663 S74.44,192.84,74.44,215.273S92.671,255.935,115.103,255.935z M115.103,196.331c10.408,0,18.877,8.404,18.877,18.877 c0,10.473-8.404,18.877-18.877,18.877c-10.343,0-18.877-8.404-18.877-18.877C96.226,204.735,104.63,196.331,115.103,196.331z"></path> <path style="fill:#194F82;" d="M359.855,130.974H268.25V98.198c0-6.012-4.848-10.925-10.925-10.925h-21.851V10.925 C235.475,4.913,230.626,0,224.549,0h-56.566c-6.012,0-10.925,4.848-10.925,10.925v76.347h-21.851 c-6.012,0-10.925,4.848-10.925,10.925v32.711H32.743c-18.036,0.065-32.711,14.739-32.711,32.776v196.202 c0,18.036,14.675,32.711,32.711,32.711h327.111c18.036,0,32.711-14.675,32.711-32.711V163.62 C392.566,145.648,377.891,130.974,359.855,130.974z M178.909,21.851h34.78v65.422h-34.78V21.851z M146.133,109.188h100.331v21.786 H146.133V109.188z M370.78,359.887c0,6.012-4.848,10.925-10.925,10.925H32.743c-6.012,0-10.925-4.848-10.925-10.925V163.62 c0-6.012,4.848-10.925,10.925-10.925h327.111c6.012,0,10.925,4.848,10.925,10.925V359.887L370.78,359.887z"></path> </g> <rect x="178.909" y="21.851" style="fill:#FFC10D;" width="34.78" height="65.422"></rect> </g></svg>
             </div>
@@ -102,11 +104,8 @@
   </main>
 
 
-  
-        <!-----------------------
-            FOOTER 
-     ------------------------->  
-<footer class="fancy-footer">
+<!-- FOOTER -->
+  <footer class="fancy-footer">
   <div class="footer-background-word">Hofi Korsou</div>
 
   <div class="footer-container">
@@ -114,15 +113,15 @@
 
       <!-- LOGO + TEXT -->
       <div class="footer-col-wide">
-        <img src="/homepage/images/logo no bg.png" alt="logo" class="footer-logo" />
+        <img src="images/logo no bg.png" alt="logo" class="footer-logo" />
       </div>
 
       <!-- COL 1 -->
       <div class="footer-col">
         <h3>Company</h3>
         <ul>
-          <li><a href="/homepage/about.html">About Us</a></li>
-          <li><a href="/homepage/contact.html">Contact Us</a></li>
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Contact Us</a></li>
         </ul>
       </div>
 
@@ -130,9 +129,9 @@
       <div class="footer-col">
         <h3>Portals</h3>
         <ul>
-          <li><a href="/homepage/login.html">Students</a></li>
-          <li><a href="/homepage/login.html">Teachers</a></li>
-          <li><a href="/homepage/login.html">Manager</a></li>
+          <li><a href="#">Students</a></li>
+          <li><a href="#">Teachers</a></li>
+          <li><a href="#">Guests#</a></li>
         </ul>
       </div>
 
@@ -140,8 +139,8 @@
        <div class="footer-col">
         <h3>Knowledge</h3>
         <ul>
-          <li><a href="/homepage/courses.html">Courses</a></li>
-          <li><a href="/homepage/projects.html">Projects</a></li>
+          <li><a href="#">Courses</a></li>
+          <li><a href="#">Projects</a></li>
         </ul>
       </div>
 
@@ -172,12 +171,12 @@
   </div>
 </footer>
 
-
   <script>
+    // --- small parallax for hero layers ---
     (function(){
       const lBack = document.getElementById('layer-back');
       const lMid  = document.getElementById('layer-mid');
-
+      // subtle vertical movement linked to scroll and to pointer movement on hero
       function onScroll(){
         const sc = window.scrollY || window.pageYOffset;
         // small translate (0..40px)
@@ -189,7 +188,7 @@
       window.addEventListener('scroll', onScroll, {passive:true});
       onScroll();
 
-      
+      // keyboard accessibility: when focusing portal, show hover state by adding class
       const portals = document.querySelectorAll('.portal');
       portals.forEach(p => {
         p.addEventListener('focus', ()=> p.classList.add('keyboard-focus'));
@@ -208,9 +207,3 @@
   <script> document.addEventListener('DOMContentLoaded', ()=> { if(window.lucide) lucide.createIcons(); }) </script>
 </body>
 </html>
-
-
-
-
-
-
