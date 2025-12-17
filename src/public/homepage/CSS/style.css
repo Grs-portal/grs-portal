@@ -1,4 +1,19 @@
 
+/*================NOTES================*/
+/*-----------> IHOME PAGE
+              FIX THE OVERFLOW ✓
+              MAKE THE BTNS INVISIBLE ✓
+              MAKE SUBPAGES
+  -----------> ABOUT US PAGE, 
+              FIX MARGINS  ✓
+              PUT HOVER EFFECT ON COLLAGE
+              FIX THE OVERFLOW ✓
+  -----------> PORTALS PAGE
+              CENTER HRO CONTENT 
+  FIX ALL LOGOS            
+*/
+        
+
 
 /*=============================== GLOBAL===============================*/
 
@@ -29,8 +44,6 @@
     padding: 0;
     box-sizing: border-box;
     font-family: 'Poppins', sans-serif;
-    overflow: hideen;
-    position: relative;
 }
 
 
@@ -39,7 +52,9 @@ html,body {
     padding:0; 
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; 
     color:var(--dark-gray); 
-    background:var(--white); 
+    background:var(--white);
+    overflow-x:hidden;
+    overflow-y: auto;
 }
 
 /* container */
@@ -55,6 +70,59 @@ html,body {
 .nav-left, .nav-right { display:flex; gap:1rem; align-items:center; }
 .nav-link { text-decoration:none; color:#20361f; font-weight:600; padding:0.5rem 0.25rem; }
 .nav-link.active { color:var(--accent-2); }
+
+/* Language dropdown container */
+.language-dropdown {
+  position: relative;
+  display: inline-block;
+  left: 100px;
+}
+
+/* Button styling */
+.lang-btn {
+  background: var(--accent-2);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.lang-btn:hover {
+  background: var(--text);
+}
+
+/* Dropdown menu */
+.lang-menu {
+  display: none; /* hidden by default */
+  position: absolute;
+  right: 0;
+  top: 110%;
+  background: white;
+  min-width: 120px;
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  list-style: none;
+  padding: 0.5rem 0;
+  margin: 0;
+  z-index: 100;
+}
+
+.lang-menu li {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.lang-menu li:hover {
+  background: #f0f0f0;
+}
+
+/* Show menu on hover */
+.language-dropdown:hover .lang-menu {
+  display: block;
+}
+
 
 .logo-circle {
   position:absolute;
@@ -118,9 +186,9 @@ html,body {
 
 
 
-/* ===================== SLIDE / PROJECT BUTTON (Unified) ===================== */
+/* ===================== SLIDE / PROJECT BUTTON ===================== */
 
-/* Keep compatibility with both old and new class names */
+/* General button styles */
 .slide-btn,
 .project-btn {
   display: flex;
@@ -130,10 +198,7 @@ html,body {
   width: 150px;
   height: 40px;
   padding-left: 6px;
-
   border-radius: 40px;
-  border: 1px solid rgba(255,255,255,0.35);
-  background: rgba(255,255,255,0.5);
 
   cursor: pointer;
   overflow: hidden;
@@ -143,13 +208,20 @@ html,body {
   text-decoration: none;
   transition: transform 0.18s ease;
   -webkit-tap-highlight-color: transparent;
-  /* Ensure not hidden by older, less-specific rules */
-  opacity: 1 !important;
-  pointer-events: auto !important;
-  transform: none !important;
 }
 
-/* container that expands on hover */
+
+.slide-btn {
+  border: 1px solid rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.5);
+}
+
+.project-btn {
+  border: 1px solid rgba(31, 77, 36, 0.35);
+  background: rgba(69, 138, 76, 0.5);
+}
+
+/* Icon inside button */
 .IconContainer {
   width: 36px;
   height: 36px;
@@ -165,29 +237,37 @@ html,body {
   overflow: hidden;
 }
 
-.mission-card p, .slide-btn {
+/* Hide text by default */
+.mission-card p, 
+.mission-card .slide-btn {
   opacity: 0;
   transform: translateY(20px);
   pointer-events: none;
 }
 
-
-/* text / label */
+/* Text inside button */
 .btn-text,
-.text {                 /* .text kept for compatibility with older markup */
+.text {
   margin-left: 10px;
   font-size: 15px;
   font-weight: 600;
   white-space: nowrap;
   transition: opacity 0.22s ease, transform 0.22s ease;
-  color: #05221a; /* if your button is pale bg, override with desired color */
+  color: #05221a;
 }
 
-/* Hover: expand icon container, hide text */
+/* Show button when card is hovered */
+.mission-card:hover .slide-btn {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+/* Hover effects: only trigger when hovering button */
 .slide-btn:hover .IconContainer,
 .project-btn:hover .IconContainer {
   width: 140px;
-  border-radius: 40px; /* make it pill when expanded */
+  border-radius: 40px;
 }
 
 .slide-btn:hover .btn-text,
@@ -200,27 +280,22 @@ html,body {
   font-size: 0;
 }
 
-/* pressed */
+/* Press effect */
 .slide-btn:active,
 .project-btn:active {
   transform: scale(0.96);
 }
 
-
-
-/* small screens fallback */
+/* Small screens fallback */
 @media (max-width: 480px) {
-  .slide-btn,
-  .project-btn {
+  .mission-card .slide-btn {
     width: 38px;
     height: 38px;
     padding-left: 4px;
     border-radius: 999px;
   }
-  .slide-btn .btn-text,
-  .project-btn .btn-text,
-  .slide-btn .text,
-  .project-btn .text {
+  .mission-card .slide-btn .btn-text,
+  .mission-card .slide-btn .text {
     display: none;
   }
 }
@@ -244,8 +319,9 @@ html,body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    height: 120vh;
     background-color: var(--sky-blue);
+    overflow: hidden;
 }
 
 .parallax-hero img {
@@ -256,6 +332,19 @@ html,body {
     height: auto;
     pointer-events: none;
 }
+
+.parallax-hero img,
+#text,
+#plant,
+#leaf,
+#house,
+#blob1,
+#blob2,
+#blob3 {
+    position: absolute;
+    will-change: transform;
+}
+
 
 #house {
     position: absolute;
@@ -278,10 +367,10 @@ html,body {
     position: relative;
     background: #003329;
     padding: 120px 60px;
-    top: 200px;
-    overflow: visible;
-    overflow-x: hidden;
+    margin-top: 180px;  
+    overflow: hidden;
 }
+
 
 
 
@@ -313,23 +402,23 @@ html,body {
 
 #blob1 {
     left: -50%;
-    top: 200px;
+    top: 180px;
 }
 
 #blob2 {
-    top: 600px;
+    top: 580px;
     left: 0;
 }
 
 #blob3 {
     left: 10%;
-    top: 200px;
+    top: 180px;
 }
 
 /* ----- mission texts ----- */
 
 #missiontext1 {
-    margin-top: 850px;
+    margin-top: 830px;
     margin-left: -10px;
 }
 
@@ -340,7 +429,7 @@ html,body {
 
 .mission-left a {
     display: inline-block;
-    margin-top: 10px; /* ← move it down */
+    margin-top: 10px;
     color: rgb(188, 226, 205);
     text-decoration: underline;
     font-weight: 600;
@@ -362,6 +451,7 @@ html,body {
     width: 100%;
     max-width: 1500px;
     margin: 0 auto;
+    overflow: visible;
 }
 
 
@@ -369,7 +459,8 @@ html,body {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 35px;
-    margin: 490px 50px 0 0;
+    margin: 470px 50px 0 0;
+    overflow: visible;
 }
 
 .mission-card {
@@ -378,12 +469,12 @@ html,body {
     border-radius: 25px;
     background: transparent;
     color: white;
-    overflow: hidden;
     cursor: pointer;
     transition: 0.4s ease;
     width: 300px;
     height: 400px;
     isolation: isolate;
+    overflow: hidden;
 }
 
 .mission-card * {
@@ -479,86 +570,67 @@ html,body {
 
 
 
-/*=============================== MENTAL HEALTH CAROUSEL ===============================*/
+/*=============================== MENTAL HEALTH SECTION ===============================*/
 
-/*----containers----*/
 
-.simple-carousel {
-  position: relative;
-  width: 100%;
-  height: 150vh;
-  max-width: 900px;
-  margin: 100px auto;
-  overflow: hidden;
-  margin-top: 100px;
-  background-color: var(--bg-green);
+.mental-health-grid {
+  height: auto;
+  margin-bottom: 200px;
+  overflow: visible;
+  padding: 6rem 6rem;
+  background: var(--bg-green);
 }
 
-.carousel-track {
-  display: flex;
-  transition: transform 0.5s ease;
+.mental-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2.5rem;
 }
 
-.carousel-slide {
-  min-width: 100%;
-  display: flex;
-  justify-content: center;
-}
-
-/*----content----*/
-
+/* Card styling */
 .slide-card {
-  background: rgba(41, 165, 145, 0.15);
-  border: 2px solid rgba(41, 165, 145, 0.25);
-  backdrop-filter: blur(3px);
-  padding: 25px;
-  border-radius: 20px;
-  width: 80%;
+  background: white;
+  border-radius: 22px;
+  padding: 2rem;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.06);
   text-align: center;
+  transition: transform .35s ease, box-shadow .35s ease;
+}
+
+.slide-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 18px 35px rgba(0,0,0,0.12);
 }
 
 .slide-card img {
   width: 100%;
-  max-width: 350px;
-  border-radius: 12px;
-  margin-bottom: 20px;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 16px;
+  margin-bottom: 1.5rem;
 }
 
 .slide-card h2 {
-  color: #bce2cd;
-  margin-bottom: 10px;
+  font-size: 1.6rem;
+  margin-bottom: .75rem;
 }
 
 .slide-card p {
-  color: #e7f7f3;
-  font-size: 0.95rem;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #444;
 }
 
-/*----left & right buttons----*/
-
-.carousel-btn {
-  position: absolute;
-  top: 25%;
-  transform: translateY(-50%);
-  font-size: 40px;
-  border: none;
-  background: rgba(0,0,0,0.2);
-  color: #fff;
-  padding: 10px 18px;
-  border-radius: 50%;
-  cursor: pointer;
+/* Center button properly */
+.slide-card .project-btn {
+  margin: 1.5rem auto 0;
 }
 
-.carousel-btn.left {
-  left: 20px;
-}
-
-.carousel-btn.right {
-  right: 20px;
-}
-
-.carousel-btn:hover {
-  background: rgba(0,0,0,0.35);
+/* Responsive */
+@media (max-width: 900px) {
+  .mental-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 
@@ -631,7 +703,11 @@ html,body {
 
 /* sidebar filters controls */
 .filter-group {
-  margin-bottom: 1.2rem;
+  margin-bottom: 1.8rem;
+}
+
+.courses-sidebar h3{
+  margin-bottom: 1.0rem;
 }
 
 .filter-group input,
@@ -758,12 +834,25 @@ html,body {
     font-size: 3rem;
     font-weight: 700;
     margin-bottom: 1rem;
+    color: var(--accent);
 }
 
 .hero-text p {
     font-size: 1.1rem;
-    line-height: 1.6;
+    line-height: 1.3;
     max-width: 480px;
+}
+
+
+.hero-text h3 {
+  margin: 1.5rem 0 0.5rem 0;
+  font-weight: 700;
+  color: #2d6b3a;
+}
+
+.hero-text ul {
+  padding-left: 2rem;
+  padding-bottom: 0.8rem;
 }
 
 .hero-collage {
@@ -788,79 +877,6 @@ html,body {
 .item5 { grid-column: 2 / 4; grid-row: 3 / 4; }
 
 
-/*---- logo sliders ----*/
-
-.logo-slider-section {
-  padding: 40px 0;
-  background: #ffffff; /* optional */
-}
-
-.logo-slider-section h2{
-    font-size: 3rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-      text-align: center;
-}
-
-.slider {
-  background: #ffffff;
-  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.15);
-  height: 100px;
-  overflow: hidden;
-  position: relative;
-  max-width: 1200px;
-  margin: 0 auto;
-  border-radius: 10px;
-}
-
-/* Fade edges */
-.slider::before,
-.slider::after {
-  content: "";
-  position: absolute;
-  width: 200px;
-  height: 100px;
-  z-index: 2;
-  background: linear-gradient(to right, white 0%, transparent 100%);
-  top: 0;
-}
-
-.slider::after {
-  right: 0;
-  transform: rotate(180deg);
-}
-
-.slider::before {
-  left: 0;
-}
-
-/* Track */
-.slider .slide-track {
-  display: flex;
-  width: calc(250px * 14);
-  animation: scroll 40s linear infinite;
-}
-
-/* Individual slide */
-.slider .slide {
-  height: 100px;
-  width: 250px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.slider .slide img {
-  width: 250px;
-  height: 100px;
-  object-fit: contain;
-}
-
-/* Animation */
-@keyframes scroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(calc(-250px * 7)); }
-}
 
 
 /*---- our team section ----*/
@@ -868,9 +884,10 @@ html,body {
 .our-team {
   display: grid;
   grid-template-columns: 1fr 2fr;
-  padding: 5rem 6rem;
+  padding: 10rem 6rem;
   align-items: center;
   gap: 3rem;
+  background-color: #ffffff;
 }
 
 .team-left h2 {
@@ -879,7 +896,7 @@ html,body {
 }
 
 .team-left p {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   line-height: 1.6;
   max-width: 350px;
 }
@@ -968,6 +985,83 @@ html,body {
   }
 }
 
+
+
+/*---- logo sliders ----*/
+
+.logo-slider-section {
+  background: #ffffff;
+  padding-bottom: 200px; 
+}
+
+.logo-slider-section h2{
+    font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      text-align: center;
+}
+
+.slider {
+  background: #ffffff;
+  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.15);
+  height: 100px;
+  overflow: hidden;
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  border-radius: 10px;
+}
+
+
+/* Fade edges */
+.slider::before,
+.slider::after {
+  content: "";
+  position: absolute;
+  width: 200px;
+  height: 100px;
+  z-index: 2;
+  background: linear-gradient(to right, white 0%, transparent 100%);
+  top: 0;
+}
+
+
+.slider::after {
+  right: 0;
+  transform: rotate(180deg);
+}
+
+.slider::before {
+  left: 0;
+}
+
+/* Track */
+.slider .slide-track {
+  display: flex;
+  width: calc(250px * 14);
+  animation: scroll 40s linear infinite;
+}
+
+/* Individual slide */
+.slider .slide {
+  height: 100px;
+  width: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.slider .slide img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+}
+
+/* Animation */
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(-250px * 7)); }
+}
 
 
 
@@ -1107,10 +1201,18 @@ html,body {
 /*---- content ----*/
 
 .hero-inner {
-    position:relative; z-index:20; width:100%;
-    display:grid; grid-template-columns: 1fr 460px; gap:2rem; align-items:center;
-    padding:3.5rem 1rem;
+    position: relative;
+    z-index: 20;
+    width: 100%;
+    display: flex; 
+    flex-direction: column;      
+    align-items: center;        
+    justify-content: center;     
+    text-align: center;          
+    padding: 3.5rem 1rem;
+    gap: 1rem;                   
 }
+
 
 .hero-copy h1{
     font-size: clamp(1.8rem, 3.6vw, 3.2rem);
@@ -1119,8 +1221,7 @@ html,body {
     margin-bottom:.4rem;
     font-weight:800;
     letter-spacing:-0.02em;
-    text-align: center;
-}
+  }
 .hero-copy h1 span{ color:var(--accent-2); text-align: center;}
 .hero-copy p{ color: rgba(255,255,255,0.9); max-width:46ch; margin-bottom:1rem; font-weight:500; text-align: center ;}
 .hero-cta {
@@ -1147,6 +1248,7 @@ html,body {
     justify-content: center;
     border-radius: 15px;
 }
+
 
 .portal-grid {
     max-width: 1150px;
@@ -1237,10 +1339,8 @@ html,body {
   background: #305b43;
   color: #d1dbd5;
   position: relative;
-  overflow: hidden;
   padding: 60px 0;
-  margin-top: 200px;
-  overflow: hidden;
+  margin-top: 100px;
 }
 
 /* GIANT BG WORD */
@@ -1386,3 +1486,11 @@ html,body {
   .header-socials{ display:none; }
   .footer-inner{ flex-direction:column; text-align:center; gap:10px; }
 }
+
+#screen-shader {
+    width: 100% !important;
+    height: 100% !important;
+    top: 0 !important;
+    left: 0 !important;
+}
+
