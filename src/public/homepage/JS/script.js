@@ -56,24 +56,6 @@ window.addEventListener('scroll', () => {
     $(document).ready(function() {
 
 
-//----------->carousel
-let index = 0;
-const slides = document.querySelectorAll(".carousel-slide");
-const track = document.querySelector(".carousel-track");
-
-function updateCarousel() {
-  track.style.transform = `translateX(-${index * 100}%)`;
-}
-
-document.getElementById("next").addEventListener("click", () => {
-  index = (index + 1) % slides.length;
-  updateCarousel();
-});
-
-document.getElementById("prev").addEventListener("click", () => {
-  index = (index - 1 + slides.length) % slides.length;
-  updateCarousel();
-});
 
     });
 
