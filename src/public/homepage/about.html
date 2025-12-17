@@ -3,47 +3,52 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>About Us</title>
-  <link rel="stylesheet" href="/homepage/CSS/style.css" />
+  <title>Contact Us</title>
+  <link rel="stylesheet" href="CSS/style.css" />
 </head>
 <body class="about-page">
 
 
-      <!-----------------------
-           NAVIGATION BAR 
-     ------------------------->
-  <header class="site-header" style="background-color: white;">
-    <div class="container header-inner" style="background-color: white;">
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="container header-inner">
       <nav class="main-nav">
         <div class="nav-left">
-          <a href="/homepage/index.html" class="nav-link">Home</a>
-          <a href="/homepage/courses.html" class="nav-link">Courses</a>
-          <a href="/homepage/projects.html" class="nav-link">Projects</a>
+          <a href="index.html" class="nav-link" data-translate="nav-home">Home</a>
+          <a href="courses.html" class="nav-link" data-translate="nav-courses">Courses</a>
+          <a href="projects.html" class="nav-link" data-translate="nav-projects">Projects</a>
         </div>
 
         <!-- centered circle logo -->
         <div class="logo-circle">
-          <img src="/images/logo no bg 2.png" alt="PBC logo">
+          <img src="images/logo no bg 2.png" alt="PBC logo">
         </div>
 
         <div class="nav-right">
-          <a href="/homepage/about.html" class="nav-link active">About Us</a>
-          <a href="/homepage/Portal.html" class="nav-link">Portals</a>
-          <a href="/homepage/contact.html" class="nav-link">Contact</a>
+          <a href="about.html" class="nav-link active" data-translate="nav-about">About Us</a>
+          <a href="Portal.html" class="nav-link" data-translate="nav-portals">Portals</a>
+          <a href="contact.html" class="nav-link" data-translate="nav-contact">Contact</a>
+          <div class="language-dropdown">
+            <button class="lang-btn">EN ▾</button>
+            <ul class="lang-menu">
+              <li data-lang="en">English</li>
+              <li data-lang="nl">Dutch</li>
+              <li data-lang="es">Spanish</li>
+            </ul>
         </div>
+        </div>
+        
       </nav>
 
     </div>
   </header>
-
-
 
    <!--HERO-->
  <section class="sub-hero" style="
   position: relative;
   width: 100%;
   height: 700px;
-  background-image: url('/homepage/images/wavy hero.png');
+  background-image: url('images/wavy hero.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -51,34 +56,38 @@
   align-items: center;
   justify-content: center;
   text-align: center;
+  margin-bottom: -280px;
   color: white;
-  padding: 0 5%;
-  margin-bottom: -280px; /* overlaps into next section */
   z-index: 1;
-">  
-
-<div class="sub-hero-inner">
-    <h1> About Us </h1>
-    <p> Get to know the story behind Hofi Korsou </p>
+">  <div class="sub-hero-inner">
+    <h1 data-translate="hero-about-h"> About Us </h1>
+    <p data-translate="hero-about-p"> Get to know more about Green recovery space </p>
   </div>
 </section>
 
 
   <section class="about-hero">
     <div class="hero-text">
-      <h1>What is Hofi Korsou</h1>
-      <p>
-        This is your hero section intro text. You can explain your brand, your mission,
-        and what makes you unique. Keep it simple, clean, and inviting.
+      <h1 data-translate="what-is-h">What is Green Recovery Space</h1>
+      <p data-translate="what-is-p1">
+        The Green Recovery Space is a recovery-oriented community environment located in nature, designed to support mental wellbeing, emotional healing and personal growth. It provides a non-clinical, low-threshold and nature-based setting where individuals can participate in activities that promote resilience, connection and recovery. 
       </p>
+      <h3 what-is-h3>The Green Recovery Space focuses on:</h3> 
+          <ul>
+            <li what-is-b1>Nature-based healing (walking, mindfulness, outdoor activities)</li>
+            <li what-is-b2>support and shared lived experience</li>
+            <li what-is-b3>Recovery-oriented workshops</li>
+            <li what-is-b4>safe, peaceful environment for reflection and empowerment</li>
+          </ul>
+        <p data-translate="what-is-p2">It was created as a supportive space where people can work on their mental health while being surrounded by nature, reducing stress and strengthening wellbeing.</p>
     </div>
 
     <div class="hero-collage">
-      <div class="collage-item item1" style="background-image:url('/homepage/images/hofi korsou.jpg');"></div>
-      <div class="collage-item item2" style="background-image:url('/homepage/images/hofi korsou.jpg');"></div>
-      <div class="collage-item item3" style="background-image:url('/homepage/images/hofi korsou.jpg');"></div>
-      <div class="collage-item item4" style="background-image:url('/homepage/images/hofi korsou.jpg');"></div>
-      <div class="collage-item item5" style="background-image:url('/homepage/images/hofi korsou.jpg');"></div>
+      <div class="collage-item item1" style="background-image:url('images/hofi korsou.jpg');"></div>
+      <div class="collage-item item2" style="background-image:url('images/hofi korsou.jpg');"></div>
+      <div class="collage-item item3" style="background-image:url('images/hofi korsou.jpg');"></div>
+      <div class="collage-item item4" style="background-image:url('images/hofi korsou.jpg');"></div>
+      <div class="collage-item item5" style="background-image:url('images/hofi korsou.jpg');"></div>
     </div>
   </section>
 
@@ -87,10 +96,9 @@
 
   <section class="our-team">
   <div class="team-left">
-    <h2>Meet Our Team</h2>
-    <p>
-      Lorem, ipsum dolor sit amet consectetur adipisicing elit. Blanditiis fugiat doloremque atque saepe officia, amet maiores consequuntur deserunt nulla a laudantium sequi distinctio quaerat, nisi eos ad ipsa ullam itaque?
-    </p>
+    <h2 data-translate="team-h">Meet Our Team</h2>
+    <p data-translate="team-p1">Our team is made up of dedicated professionals, creatives, and community advocates who share one goal: improving mental well-being through care, education, and meaningful projects.</p>
+    <p data-translate="team-p2" style="margin-top: 15px;">Each member brings unique expertise, but we are all guided by the same commitment: supporting mental health with dignity and respect.</p>   
   </div>
 
   <div class="team-right">
@@ -148,29 +156,31 @@
 <!--COLABORATORS SLIDER-->
 
 <section class="logo-slider-section">
-    <h2>Meet Our collaborators</h2>
-  </div>
+    <h2 data-translate="collab-h">Meet Our collaborators</h2>
   <div class="slider">
     <div class="slide-track">
-      <div class="slide"><img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/557257/1.png" /></div>
-      <div class="slide"><img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/557257/2.png" /></div>
-      <div class="slide"><img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/557257/3.png" /></div>
-      <div class="slide"><img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/557257/4.png" /></div>
-      <div class="slide"><img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/557257/5.png" /></div>
-      <div class="slide"><img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/557257/6.png" /></div>
-      <div class="slide"><img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/557257/7.png" /></div>
+      <div class="slide"><img src="https://www.fundashonroat.com/wp-content/uploads/2020/01/cropped-logo.png" /></div>
+      <div class="slide"><img src="https://www.mentalhealthcaribbean.com/wp-content/themes/mhc/images/logo.png" /></div>
+      <div class="slide"><img src="https://www.uoc.cw/assets/frontend/uoc/images/logo-university-of-curacao-color.png" /></div>
+      <div class="slide"><img src="https://opleiding.com/wp-content/uploads/Windesheim_logopay-off_ZG_RGB-DEF-1.png" /></div>
+      <div class="slide"><img src="https://stichtingjohannesbosco.com/wp-content/uploads/2019/12/logo-2.png" /></div>
+      <div class="slide"><img src="https://upload.wikimedia.org/wikipedia/commons/8/89/Cura%C3%A7ao_wapen.svg" /></div>
+      <div class="slide"><img src="https://zahragroupco.com/wp-content/uploads/2021/07/Zahra-logo-sm.png" /></div>
+      <div class="slide"><img style="width: 250px; padding-left: 100px;" src="https://www.zonmw.nl/themes/custom/zonmw/assets/images/logo-color-dark.svg" /></div>
 
       <!-- duplicates for seamless loop -->
-      <div class="slide"><img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/557257/1.png" /></div>
-      <div class="slide"><img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/557257/2.png" /></div>
-      <div class="slide"><img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/557257/3.png" /></div>
-      <div class="slide"><img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/557257/4.png" /></div>
-      <div class="slide"><img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/557257/5.png" /></div>
-      <div class="slide"><img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/557257/6.png" /></div>
-      <div class="slide"><img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/557257/7.png" /></div>
+      
+      <div class="slide"><img src="https://www.fundashonroat.com/wp-content/uploads/2020/01/cropped-logo.png" /></div>
+      <div class="slide"><img src="https://www.mentalhealthcaribbean.com/wp-content/themes/mhc/images/logo.png" /></div>
+      <div class="slide"><img src="https://www.uoc.cw/assets/frontend/uoc/images/logo-university-of-curacao-color.png" /></div>
+      <div class="slide"><img src="https://opleiding.com/wp-content/uploads/Windesheim_logopay-off_ZG_RGB-DEF-1.png" /></div>
+      <div class="slide"><img src="https://stichtingjohannesbosco.com/wp-content/uploads/2019/12/logo-2.png" /></div>
+      <div class="slide"><img src="https://upload.wikimedia.org/wikipedia/commons/8/89/Cura%C3%A7ao_wapen.svg" /></div>
+      <div class="slide"><img src="https://zahragroupco.com/wp-content/uploads/2021/07/Zahra-logo-sm.png" /></div>
+      <div class="slide"><img src="https://www.zonmw.nl/themes/custom/zonmw/assets/images/logo-color-dark.svg" /></div>
     </div>
   </div>
-  <h3 style="text-align: center; margin-top: 20px;">Want to work with us?</h3>
+  <h3 data-translate="collab-p" style="text-align: center; margin-top: 20px;">Want to work with us?</h3>
   <div style="text-align: center; margin-top: 10px;">
   <button class="project-btn" style="background-color: #c9eeb39c; margin-left: 45%;">
       <span class="IconContainer">
@@ -178,16 +188,15 @@
               <path d="M21.883 12l-7.527 6.235.644.765 9-7.521-9-7.479-.645.764 7.529 6.236h-21.884v1h21.883z"/>
           </svg>
       </span>
-      <p class="text">Get in Touch</p>
+      <p style="font-size: small;" data-translate="get-in-touch" class="text">Get in Touch</p>
   </button>
 </div>
+</section>
 
 
 
-      <!-----------------------
-            FOOTER 
-     ------------------------->  
-<footer class="fancy-footer">
+<!-- FOOTER -->
+  <footer class="fancy-footer">
   <div class="footer-background-word">Hofi Korsou</div>
 
   <div class="footer-container">
@@ -195,41 +204,41 @@
 
       <!-- LOGO + TEXT -->
       <div class="footer-col-wide">
-        <img src="/homepage/images/logo no bg.png" alt="logo" class="footer-logo" />
+        <img src="images/logo no bg.png" alt="logo" class="footer-logo" />
       </div>
 
       <!-- COL 1 -->
       <div class="footer-col">
-        <h3>Company</h3>
+        <h3 data-translate="col-com">Company</h3>
         <ul>
-          <li><a href="/homepage/about.html">About Us</a></li>
-          <li><a href="/homepage/contact.html">Contact Us</a></li>
+          <li><a data-translate="nav-about" href="about.html">About Us</a></li>
+          <li><a data-translate="nav-contact" href="contact.html">Contact Us</a></li>
         </ul>
       </div>
 
       <!-- COL 2 -->
       <div class="footer-col">
-        <h3>Portals</h3>
+        <h3 data-translate="col-por">Portals</h3>
         <ul>
-          <li><a href="#">Students</a></li>
-          <li><a href="#">Teachers</a></li>
-          <li><a href="#">Guests#</a></li>
+          <li><a data-translate="Students" href="#">Students</a></li>
+          <li><a data-translate="Teachers" href="#">Teachers</a></li>
+          <li><a data-translate="Managers" href="#">Managers</a></li>
         </ul>
       </div>
 
       <!-- COL 3 -->
        <div class="footer-col">
-        <h3>Knowledge</h3>
+        <h3 data-translate="col-know">Knowledge</h3>
         <ul>
-          <li><a href="/homepage/courses.html">Courses</a></li>
-          <li><a href="/homepage/projects.html">Projects</a></li>
+          <li><a data-translate="nav-courses" href="#">Courses</a></li>
+          <li><a data-translate="nav-projects" href="#">Projects</a></li>
         </ul>
       </div>
 
 
       <!-- COL 4 -->
       <div class="footer-col">
-        <h3>Legal</h3>
+        <h3 data-translate="col-legal">Legal</h3>
         <ul>
           <li><a href="#">Privacy Policy</a></li>
           <li><a href="#">Terms of Service</a></li>
@@ -252,6 +261,8 @@
     </div>
   </div>
 </footer>
+
+  <script src="/JS/lang-translation.js"></script>
 
 
 </body>
