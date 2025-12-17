@@ -4,32 +4,38 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Projects</title>
-  <link rel="stylesheet" href="/homepage/CSS/style.css" />
+  <link rel="stylesheet" href="CSS/style.css" />
 </head>
 <body class="project-page">
 
 
-      <!-----------------------
-           NAVIGATION BAR 
-     ------------------------->
-  <header class="site-header" style="background-color: white;">
-    <div class="container header-inner" style="background-color: white;">
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="container header-inner">
       <nav class="main-nav">
         <div class="nav-left">
-          <a href="/homepage/index.html" class="nav-link">Home</a>
-          <a href="/homepage/courses.html" class="nav-link">Courses</a>
-          <a href="/homepage/projects.html" class="nav-link active">Projects</a>
+          <a href="index.html" class="nav-link" data-translate="nav-home">Home</a>
+          <a href="courses.html" class="nav-link" data-translate="nav-courses">Courses</a>
+          <a href="projects.html" class="nav-link active" data-translate="nav-projects">Projects</a>
         </div>
 
         <!-- centered circle logo -->
         <div class="logo-circle">
-          <img src="/images/logo no bg 2.png" alt="PBC logo">
+          <img src="images/logo no bg 2.png" alt="PBC logo">
         </div>
 
         <div class="nav-right">
-          <a href="/homepage/about.html" class="nav-link">About Us</a>
-          <a href="/homepage/Portal.html" class="nav-link">Portals</a>
-          <a href="/homepage/contact.html" class="nav-link">Contact</a>
+          <a href="about.html" class="nav-link" data-translate="nav-about">About Us</a>
+          <a href="Portal.html" class="nav-link" data-translate="nav-portals">Portals</a>
+          <a href="contact.html" class="nav-link" data-translate="nav-contact">Contact</a>
+        <div class="language-dropdown">
+            <button class="lang-btn">EN ▾</button>
+            <ul class="lang-menu">
+              <li data-lang="en">English</li>
+              <li data-lang="nl">Dutch</li>
+              <li data-lang="es">Spanish</li>
+            </ul>
+        </div>
         </div>
       </nav>
 
@@ -38,12 +44,12 @@
 
 
 
-  <!--HERO-->
+   <!--HERO-->
  <section class="sub-hero" style="
   position: relative;
   width: 100%;
   height: 700px;
-  background-image: url('/homepage/images/wavy hero.png');
+  background-image: url('images/wavy hero.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -56,11 +62,10 @@
   margin-bottom: -280px; /* overlaps into next section */
   z-index: 1;
 ">
-
   <div class="sub-hero-inner">
-    <h1> Explore Our Projects </h1>
-    <p> Want to work on a project with us? </p>
-    <a href="/homepage/contact.html" class="project-hero-cta">Get in Touch</a>
+    <h1 data-translate="hero-projects-h"> Explore Our Projects </h1>
+    <p data-translate="hero-projects-p"> Want to work on a project with us? </p>
+    <a data-translate="hero-cta" href="contact.html" class="project-hero-cta">Get in Touch</a>
   </div>
 </section>
 
@@ -68,7 +73,7 @@
 
 <!-- PROJECTS GRID -->
 <section class="projects-section">
-  <h2 class="section-title">Featured Projects</h2>
+  <h2 data-translate="project-title" class="section-title">Featured Projects</h2>
 
   <div class="projects-grid">
 
@@ -78,7 +83,7 @@
         <span>workshop</span>
       </div>
       <h3>Green Recovery Space</h3>
-      <p>An accessible and safe place where people can meet, get information, and work on their well-being.</p>
+      <p data-translate="project-card-p">An accessible and safe place where people can meet, get information, and work on their well-being.</p>
       <div class="project-image">
         <img src="https://wijzijnmind.nl/uploads/media/max-width/05/6795-Green%20recovery%201.jpg?v=1-0" alt="Green Recovery Space image" />
         <button class="project-btn" style="margin-left: 5%;">
@@ -87,7 +92,7 @@
                     <path d="M21.883 12l-7.527 6.235.644.765 9-7.521-9-7.479-.645.764 7.529 6.236h-21.884v1h21.883z"/>
                 </svg>
             </span>
-            <p class="text">Read More</p>
+            <p data-translate="read-more" class="text">Read More</p>
         </button>
 
 
@@ -100,7 +105,7 @@
         <span>workshop</span>
       </div>
       <h3>Green Recovery Space</h3>
-      <p>An accessible and safe place where people can meet, get information, and work on their well-being.</p>
+      <p data-translate="project-card-p">An accessible and safe place where people can meet, get information, and work on their well-being.</p>
       <div class="project-image">
         <img src="https://wijzijnmind.nl/uploads/media/max-width/05/6795-Green%20recovery%201.jpg?v=1-0" alt="Green Recovery Space image" />
         <button class="project-btn" style="margin-left: 5%;">
@@ -109,7 +114,7 @@
                     <path d="M21.883 12l-7.527 6.235.644.765 9-7.521-9-7.479-.645.764 7.529 6.236h-21.884v1h21.883z"/>
                 </svg>
             </span>
-            <p class="text">Read More</p>
+            <p data-translate="read-more" class="text">Read More</p>
         </button>
       </div>
     </div>
@@ -120,7 +125,7 @@
         <span>workshop</span>
       </div>
       <h3>Green Recovery Space</h3>
-      <p>An accessible and safe place where people can meet, get information, and work on their well-being.</p>
+      <p data-translate="project-card-p">An accessible and safe place where people can meet, get information, and work on their well-being.</p>
       <div class="project-image">
         <img src="https://wijzijnmind.nl/uploads/media/max-width/05/6795-Green%20recovery%201.jpg?v=1-0" alt="Green Recovery Space image" />
         <button class="project-btn" style="margin-left: 5%;">
@@ -129,7 +134,7 @@
                     <path d="M21.883 12l-7.527 6.235.644.765 9-7.521-9-7.479-.645.764 7.529 6.236h-21.884v1h21.883z"/>
                 </svg>
             </span>
-            <p class="text">Read More</p>
+            <p data-translate="read-more" class="text">Read More</p>
         </button>
       </div>
     </div>
@@ -140,7 +145,7 @@
         <span>workshop</span>
       </div>
       <h3>Green Recovery Space</h3>
-      <p>An accessible and safe place where people can meet, get information, and work on their well-being.</p>
+      <p data-translate="project-card-p">An accessible and safe place where people can meet, get information, and work on their well-being.</p>
       <div class="project-image">
         <img src="https://wijzijnmind.nl/uploads/media/max-width/05/6795-Green%20recovery%201.jpg?v=1-0" alt="Green Recovery Space image" />
         <button class="project-btn" style="margin-left: 5%;">
@@ -149,21 +154,19 @@
                     <path d="M21.883 12l-7.527 6.235.644.765 9-7.521-9-7.479-.645.764 7.529 6.236h-21.884v1h21.883z"/>
                 </svg>
             </span>
-            <p class="text">Read More</p>
+            <p data-translate="read-more" class="text">Read More</p>
         </button>
       </div>
     </div>
 
   </div>
 </section>
- 
 
 
 
-      <!-----------------------
-            FOOTER 
-     ------------------------->  
-<footer class="fancy-footer">
+
+<!-- FOOTER -->
+  <footer class="fancy-footer">
   <div class="footer-background-word">Hofi Korsou</div>
 
   <div class="footer-container">
@@ -171,41 +174,41 @@
 
       <!-- LOGO + TEXT -->
       <div class="footer-col-wide">
-        <img src="/homepage/images/logo no bg.png" alt="logo" class="footer-logo" />
+        <img src="images/logo no bg.png" alt="logo" class="footer-logo" />
       </div>
 
       <!-- COL 1 -->
       <div class="footer-col">
-        <h3>Company</h3>
+        <h3 data-translate="col-com">Company</h3>
         <ul>
-          <li><a href="/homepage/about.html">About Us</a></li>
-          <li><a href="/homepage/contact.html">Contact Us</a></li>
+          <li><a data-translate="nav-about" href="about.html">About Us</a></li>
+          <li><a data-translate="nav-contact" href="contact.html">Contact Us</a></li>
         </ul>
       </div>
 
       <!-- COL 2 -->
       <div class="footer-col">
-        <h3>Portals</h3>
+        <h3 data-translate="col-por">Portals</h3>
         <ul>
-          <li><a href="#">Students</a></li>
-          <li><a href="#">Teachers</a></li>
-          <li><a href="#">Guests#</a></li>
+          <li><a data-translate="Students" href="#">Students</a></li>
+          <li><a data-translate="Teachers" href="#">Teachers</a></li>
+          <li><a data-translate="Managers" href="#">Managers</a></li>
         </ul>
       </div>
 
       <!-- COL 3 -->
        <div class="footer-col">
-        <h3>Knowledge</h3>
+        <h3 data-translate="col-know">Knowledge</h3>
         <ul>
-          <li><a href="/homepage/courses.html">Courses</a></li>
-          <li><a href="/homepage/projects.html">Projects</a></li>
+          <li><a data-translate="nav-courses" href="#">Courses</a></li>
+          <li><a data-translate="nav-projects" href="#">Projects</a></li>
         </ul>
       </div>
 
 
       <!-- COL 4 -->
       <div class="footer-col">
-        <h3>Legal</h3>
+        <h3 data-translate="col-legal">Legal</h3>
         <ul>
           <li><a href="#">Privacy Policy</a></li>
           <li><a href="#">Terms of Service</a></li>
@@ -229,6 +232,7 @@
   </div>
 </footer>
 
+<script src="/JS/lang-translation.js"></script>
 
 <!-- FontAwesome Icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
