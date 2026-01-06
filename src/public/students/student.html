@@ -1,108 +1,147 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Student Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css">
 </head>
 
-<body class="min-h-screen bg-white font-sans">
+<body class="min-h-screen bg-[var(--soft-green-light)] text-[var(--text-dark)] overflow-x-hidden">
 
-  <!-- Topbar -->
-  <header class="sticky top-0 z-40 bg-green-500/60 backdrop-blur border-b border-green-500/60">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <img src="project caribbean 1.png" class="w-10 h-10 rounded-lg object-contain" alt="Logo">
-        <span class="font-semibold text-gray-900 text-lg">Student Portal</span>
-      </div>
-
-      <div class="flex items-center gap-3">
-        <span id="userName" class="text-sm text-gray-900 font-medium"></span>
-
-        <button id="logoutBtn"
-          class="text-sm px-3 py-1.5 rounded-lg bg-white/70 hover:bg-white transition border border-green-600/20">
-          Logout
-        </button>
-
-        <img
-          id="userAvatar"
-          src="https://ui-avatars.com/api/?name=S&background=E5E7EB&color=111827"
-          alt="Avatar"
-          class="w-8 h-8 rounded-full ring-1 ring-gray-200"
-        />
-      </div>
+<!-- ===== TOPBAR ===== -->
+ <header class="sticky top-0 z-50 bg-[var(--soft-green-dark)] backdrop-blur border-b border-[var(--border-light)]">
+  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <img src="logo.png" class="w-10 h-10 rounded-lg object-contain" alt="Logo">
+      <button id="menuBtn" class="lg:hidden text-2xl hover:text-[var(--soft-green)] transition">☰</button>
+      <h1 class="font-semibold text-lg">Student Portal</h1>
     </div>
-  </header>
 
-  <!-- Layout -->
-  <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 px-4 py-6">
+    <div class="flex items-center gap-2">
+      <span id="userName" class="text-sm"></span>
+      <div class="w-8 h-8 rounded-full bg-[var(--soft-green)]" id="userAvatar"></div>
+    </div>
+  </div>
+</header>
 
-    <!-- Sidebar -->
-    <aside class="lg:col-span-3 space-y-6">
-      <nav class="bg-white rounded-2xl border border-gray-100 p-3 shadow-sm">
-        <ul class="space-y-1">
-          <li><a href="student.html" class="block px-3 py-2 rounded-xl text-sm text-gray-700 hover:bg-gray-100">Dashboard</a></li>
-          <li><a href="my courses.html" class="block px-3 py-2 rounded-xl text-sm text-gray-700 hover:bg-gray-100">My courses</a></li>
-          <li><a href="schedule.html" class="block px-3 py-2 rounded-xl text-sm text-gray-700 hover:bg-gray-100">Schedule</a></li>
-          <li><a href="enroll in courses.html" class="block px-3 py-2 rounded-xl text-sm text-gray-700 hover:bg-gray-100">Enroll in Courses</a></li>
-          <li><a href="assignments.html" class="block px-3 py-2 rounded-xl text-sm text-gray-700 hover:bg-gray-100">Assignments</a></li>
-          <li><a href="news.html" class="block px-3 py-2 rounded-xl text-sm text-gray-700 hover:bg-gray-100">News</a></li>
-        </ul>
+<div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 px-4 py-6">
 
-        <div class="mt-4 grid grid-cols-2 gap-3">
-          <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm text-center">
-            <p class="text-sm text-gray-500">Active courses</p>
-            <p id="activeCoursesCount" class="text-2xl font-semibold text-gray-900">0</p>
-          </div>
-          <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm text-center">
-            <p class="text-sm text-gray-500">Homework</p>
-            <p id="homeworkCount" class="text-2xl font-semibold text-gray-900">0</p>
-          </div>
-        </div>
-      </nav>
-    </aside>
+<!-- ===== SIDEBAR ===== -->
+<aside id="sidebar"
+  class="lg:col-span-3 fixed lg:static top-0 left-0 h-full lg:h-auto
+  bg-[var(--soft-green-light)] lg:rounded-2xl border-r lg:border
+  border-[var(--border-light)] p-3 shadow-md transform -translate-x-full
+  lg:translate-x-0 transition-transform duration-300 z-40 flex flex-col justify-between">
 
-    <!-- Main content -->
-    <main class="lg:col-span-9 space-y-6">
+  <div>
+    <nav>
+      <ul class="space-y-1 mt-4">
+        <li><a href="#" data-page="dashboard" class="nav-item active">Dashboard</a></li>
+        <li><a href="#" data-page="courses" class="nav-item">My Courses</a></li>
+        <li><a href="#" data-page="assignments" class="nav-item">Assignments</a></li>
+        <li><a href="#" data-page="enroll" class="nav-item">Enroll in Courses</a></li>
+        <li><a href="#" data-page="schedule" class="nav-item">Schedule</a></li>
+        <li><a href="#" data-page="news" class="nav-item">News</a></li>
+      </ul>
+    </nav>
 
-      <!-- Hero Section -->
-      <section class="bg-green-500/60 rounded-2xl p-6 text-black shadow-sm">
-        <h1 class="text-2xl font-semibold">Welcome, student!</h1>
-        <p class="text-black/80 mt-1">Your courses and homework come from the same server as Instructor/Manager.</p>
+    <div class="mt-6 grid grid-cols-2 gap-3">
+      <section class="stat-box">
+        <p class="text-sm">Active Courses</p>
+        <p id="activeCoursesCount" class="stat-number">0</p>
       </section>
 
-      <!-- Courses Section (FROM API) -->
-      <section class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-        <div class="flex items-center justify-between mb-3">
-          <h2 class="text-lg font-semibold text-gray-900">Courses</h2>
-          <button id="refreshBtn" class="text-sm px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 transition">
-            Refresh
-          </button>
-        </div>
-
-        <div id="coursesGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          <!-- JS injects cards here -->
-        </div>
+      <section class="stat-box">
+        <p class="text-sm">Total Courses</p>
+        <p id="totalCoursesCount" class="stat-number">0</p>
       </section>
+    </div>
+  </div>
+</aside>
 
-      <!-- Homework Section (FROM API) -->
-      <section class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-        <h2 class="text-lg font-semibold text-gray-900 mb-3">Homework</h2>
-        <div id="homeworkList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- JS injects homework cards here -->
-        </div>
-      </section>
+<div id="overlay" class="fixed inset-0 bg-black/40 hidden z-30 lg:hidden"></div>
 
-    </main>
+<!-- ===== MAIN CONTENT ===== -->
+<main class="lg:col-span-9 space-y-6">
+
+<!-- Dashboard -->
+<section id="dashboard" class="page-section fade-in">
+  <div class="hero-box">
+    <h2 class="text-2xl font-semibold">Welcome, student!</h2>
+    <p class="opacity-80 mt-1">Manage your courses, assignments, and more.</p>
+  </div>
+  <div class="content-box mt-6">
+  <div id="continueCourses" class="grid sm:grid-cols-2 gap-4"></div>
+  </div>
+</section>
+
+<!-- My Courses -->
+<section id="courses" class="page-section hidden fade-in"></section>
+
+<!-- Assignments -->
+<section id="assignments" class="page-section hidden fade-in">
+  <div class="content-box min-h-[60vh]">
+    <h2 class="text-xl font-semibold mb-4 text-center">Assignments</h2>
+    <div id="assignmentsList" class="grid md:grid-cols-2 gap-4"></div>
+  </div>
+</section>
+
+<!-- Enroll -->
+<section id="enroll" class="page-section hidden fade-in"></section>
+
+<section id="schedule" class="page-section hidden fade-in">
+  <div class="content-box min-h-[60vh]">
+    <h2 class="text-2xl font-semibold mb-4 text-center">Schedule</h2>
+
+    <div class="bg-white p-4 rounded-xl shadow">
+      <div class="flex justify-between items-center mb-2">
+        <button id="prevMonth">‹</button>
+        <span id="monthYear" class="font-semibold"></span>
+        <button id="nextMonth">›</button>
+      </div>
+
+      <div class="grid grid-cols-7 text-center text-sm font-semibold">
+        <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+      </div>
+
+      <div id="calendarDays" class="grid grid-cols-7 gap-1 mt-2"></div>
+    </div>
+
+    <div class="mt-4 bg-white p-4 rounded-xl shadow">
+      <h3 class="font-semibold mb-2">Your Plans</h3>
+      <div id="plansList" class="text-sm space-y-2"></div>
+    </div>
   </div>
 
-  <!-- Footer -->
-  <footer class="max-w-7xl mx-auto px-4 pb-10 text-center text-xs text-gray-500">
-    © 2025 Student Portal · Privacy · Terms
-  </footer>
+  <!-- Modal -->
+  <div id="planModal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center">
+    <div class="bg-white p-4 rounded-xl w-72">
+      <h4 id="modalDate" class="font-semibold mb-2"></h4>
+      <textarea id="planInput" class="w-full border rounded p-2 h-24"></textarea>
+      <div class="flex justify-end gap-2 mt-3">
+        <button id="deletePlan" class="text-red-500">Delete</button>
+        <button id="savePlan" class="text-blue-600">Save</button>
+      </div>
+    </div>
+  </div>
+</section>
+  
+<!-- News -->
+<section id="news" class="page-section hidden fade-in">
+  <div class="content-box min-h-[60vh] text-center">
+    <h2 class="text-2xl font-semibold mb-4">News</h2>
+  </div>
+</section>
 
+</main>
+</div>
 
-  <script src="./script.js"></script>
+<footer class="w-full py-6 text-center text-xs border-t border-[var(--border-light)] opacity-80">
+  © <span id="y"></span> Student Portal · Privacy · Terms
+</footer>
+
+<script src="script.js"></script>
 </body>
 </html>
