@@ -1,6 +1,7 @@
 // manager.js
 (() => {
   const API_BASE = "/api"; // server runs at same origin; adjust if needed
+  const LOGIN_PATH = "/homepage/login.html"; // IMPORTANT: match your server routes
 
   // helpers
   const qs = s => document.querySelector(s);
@@ -33,15 +34,25 @@
   }
   function closeModal() { const el = qs("#modalBg"); if (el) el.remove(); }
 
+  // logout helper
+  function logout() {
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("role");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("userAvatar");
+    location.href = LOGIN_PATH;
+  }
+
   // auth + init
   document.addEventListener("DOMContentLoaded", init);
   async function init() {
-    if (!localStorage.getItem("isLoggedIn")) { location.href = "/login.html"; return; }
+    if (!localStorage.getItem("isLoggedIn")) { location.href = LOGIN_PATH; return; }
+
     // Optionally enforce role === 'manager'
     const role = localStorage.getItem("role");
     if (role && role !== "manager") {
-      // if not manager, still let them in if you want — currently block
-      // location.href = "/login.html";
+      // If you want to block non-managers:
+      // location.href = LOGIN_PATH; return;
     }
 
     // topbar name/avatar
@@ -73,14 +84,23 @@
     setupProfileDropdown();
     setupNavigation();
     bindButtons();
+
+    // sidebar logout link (if you added it in HTML)
+    qs("#sidebarLogout")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      logout();
+    });
+
     await loadDashboard(); // initial load
-    document.getElementById("y").textContent = new Date().getFullYear();
+    const y = qs("#y");
+    if (y) y.textContent = new Date().getFullYear();
   }
 
   // profile dropdown (logout only)
   function setupProfileDropdown() {
     const wrap = qs("#topAvatarWrap");
     if (!wrap) return;
+
     // create menu if missing
     if (!qs("#profileMenu")) {
       const menu = document.createElement("div");
@@ -89,15 +109,10 @@
       menu.style.minWidth = "160px";
       menu.innerHTML = `<div class="py-1"><button id="pm-logout" class="w-full text-left px-4 py-2 hover:bg-[#4E4A69]">Logout</button></div>`;
       wrap.appendChild(menu);
+
       qs("#userAvatar")?.addEventListener("click", () => menu.classList.toggle("hidden"));
-      menu.querySelector("#pm-logout").addEventListener("click", () => {
-        localStorage.removeItem("isLoggedIn");
-        localStorage.removeItem("role");
-        // keep optionally the name/avatar if you want, but we clear here
-        localStorage.removeItem("userName");
-        localStorage.removeItem("userAvatar");
-        location.href = "/login.html";
-      });
+      menu.querySelector("#pm-logout").addEventListener("click", logout);
+
       document.addEventListener("click", (e) => {
         if (!wrap.contains(e.target) && !menu.contains(e.target)) menu.classList.add("hidden");
       });
@@ -108,12 +123,15 @@
   function setupNavigation() {
     const items = qsa(".nav-item");
     const pages = qsa(".page-section");
+
     items.forEach(it => it.addEventListener("click", async (e) => {
       e.preventDefault();
       const page = it.dataset.page;
+
       pages.forEach(p => p.classList.add("hidden"));
       const target = qs(`#${page}`);
       if (target) target.classList.remove("hidden");
+
       items.forEach(n => n.classList.remove("active"));
       it.classList.add("active");
 
@@ -123,9 +141,10 @@
       if (page === "submitted-homework") await loadHomework();
       if (page === "submitted-courses") await loadCourses();
       if (page === "projects") await renderProjectsFull();
+
+      // ✅ NEW: Users page
+      if (page === "users") await loadUsers();
     }));
-    // make dashboard default shown
-    // note: initial loadDashboard already called during init
   }
 
   // wire create buttons
@@ -133,73 +152,72 @@
     qs("#createProjectBtn")?.addEventListener("click", openCreateProjectModal);
     qs("#createCourseBtn")?.addEventListener("click", openCreateCourseModal);
     qs("#openCreateHw")?.addEventListener("click", openCreateHomeworkModal);
-    qs("#createProjectBtn")?.addEventListener("click", openCreateProjectModal);
-    qs("#createCourseBtn")?.addEventListener("click", openCreateCourseModal);
-    qs("#openCreateHw")?.addEventListener("click", openCreateHomeworkModal);
+
+    // ✅ Users refresh button (if present in HTML)
+    qs("#refreshUsersBtn")?.addEventListener("click", loadUsers);
   }
 
   // ----------------- DASHBOARD LOAD -----------------
   async function loadDashboard() {
-  try {
-    const [coursesRes, hwRes, projectsRes] = await Promise.all([
-      fetch(`${API_BASE}/courses`),
-      fetch(`${API_BASE}/homework`),
-      fetch(`${API_BASE}/projects`)
-    ]);
+    try {
+      const [coursesRes, hwRes, projectsRes] = await Promise.all([
+        fetch(`${API_BASE}/courses`),
+        fetch(`${API_BASE}/homework`),
+        fetch(`${API_BASE}/projects`)
+      ]);
 
-    const courses = await safeJson(coursesRes);
-    const homework = await safeJson(hwRes);
-    const projects = await safeJson(projectsRes);
+      const courses = await safeJson(coursesRes);
+      const homework = await safeJson(hwRes);
+      const projects = await safeJson(projectsRes);
 
-    // Dashboard stats
-    qs("#activeCoursesCount").textContent = courses.length;
-    qs("#toGradeCount").textContent = homework.length;
+      // Dashboard stats
+      qs("#activeCoursesCount").textContent = courses.length;
+      qs("#toGradeCount").textContent = homework.length;
 
-    // ====== RENDER COURSES ON DASHBOARD ======
-    const courseBox = qs("#courses");
-    courseBox.innerHTML = courses.map(c => `
-      <div class="bg-white p-4 rounded-xl shadow border flex justify-between items-center">
-        <div>
-          <h3 class="font-semibold">${escapeHtml(c.title)}</h3>
-          <p class="text-sm text-[#3E3B59]">${escapeHtml(c.description || "")}</p>
+      // ====== RENDER COURSES ON DASHBOARD ======
+      const courseBox = qs("#courses");
+      courseBox.innerHTML = courses.map(c => `
+        <div class="bg-white p-4 rounded-xl shadow border flex justify-between items-center">
+          <div>
+            <h3 class="font-semibold">${escapeHtml(c.title)}</h3>
+            <p class="text-sm text-[#3E3B59]">${escapeHtml(c.description || "")}</p>
+          </div>
+          <button data-id="${c.id}" class="btn-del-course px-3 py-1 rounded bg-red-100 text-red-600">🗑</button>
         </div>
-        <button data-id="${c.id}" class="btn-del-course px-3 py-1 rounded bg-red-100 text-red-600">🗑</button>
-      </div>
-    `).join("");
+      `).join("");
 
-    // ====== RENDER PROJECTS ON DASHBOARD ======
-    const projBox = qs("#dashboardProjects");
-    projBox.innerHTML = projects.map(p => `
-      <div class="bg-white p-4 rounded-xl shadow border flex justify-between items-center">
-        <div>
-          <h3 class="font-semibold">${escapeHtml(p.title)}</h3>
-          <p class="text-sm text-[#3E3B59]">${escapeHtml(p.description || "")}</p>
+      // ====== RENDER PROJECTS ON DASHBOARD ======
+      const projBox = qs("#dashboardProjects");
+      projBox.innerHTML = projects.map(p => `
+        <div class="bg-white p-4 rounded-xl shadow border flex justify-between items-center">
+          <div>
+            <h3 class="font-semibold">${escapeHtml(p.title)}</h3>
+            <p class="text-sm text-[#3E3B59]">${escapeHtml(p.description || "")}</p>
+          </div>
+          <button data-id="${p.id}" class="btn-del-project px-3 py-1 rounded bg-red-100 text-red-600">🗑</button>
         </div>
-        <button data-id="${p.id}" class="btn-del-project px-3 py-1 rounded bg-red-100 text-red-600">🗑</button>
-      </div>
-    `).join("");
+      `).join("");
 
-    // ===== DELETE COURSE HANDLERS =====
-    qsa(".btn-del-course").forEach(btn => btn.addEventListener("click", async e => {
-      const id = e.currentTarget.dataset.id;
-      if (!confirm("Delete course?")) return;
-      await fetch(`${API_BASE}/courses/${id}`, { method: "DELETE" });
-      loadDashboard();
-    }));
+      // ===== DELETE COURSE HANDLERS =====
+      qsa(".btn-del-course").forEach(btn => btn.addEventListener("click", async e => {
+        const id = e.currentTarget.dataset.id;
+        if (!confirm("Delete course?")) return;
+        await fetch(`${API_BASE}/courses/${id}`, { method: "DELETE" });
+        loadDashboard();
+      }));
 
-    // ===== DELETE PROJECT HANDLERS =====
-    qsa(".btn-del-project").forEach(btn => btn.addEventListener("click", async e => {
-      const id = e.currentTarget.dataset.id;
-      if (!confirm("Delete project?")) return;
-      await fetch(`${API_BASE}/projects/${id}`, { method: "DELETE" });
-      loadDashboard();
-    }));
+      // ===== DELETE PROJECT HANDLERS =====
+      qsa(".btn-del-project").forEach(btn => btn.addEventListener("click", async e => {
+        const id = e.currentTarget.dataset.id;
+        if (!confirm("Delete project?")) return;
+        await fetch(`${API_BASE}/projects/${id}`, { method: "DELETE" });
+        loadDashboard();
+      }));
 
-  } catch (err) {
-    console.error("loadDashboard error:", err);
+    } catch (err) {
+      console.error("loadDashboard error:", err);
+    }
   }
-}
-
 
   // ----------------- COURSES -----------------
   async function openCreateCourseModal() {
@@ -467,7 +485,7 @@
         </tr>
       `).join("");
 
-      qsa(".btn-edit-grade").forEach(btn => btn.addEventListener("click", (e) => {
+      qsa(".btn-edit-grade").forEach(btn => btn.addEventListener("click", () => {
         const id = btn.dataset.id;
         const current = btn.dataset.grade;
         openEditGradeModal(id, current);
@@ -497,9 +515,85 @@
     });
   }
 
+  // ----------------- USERS (NEW) -----------------
+  async function loadUsers() {
+    const table = qs("#usersTable");
+    if (!table) { toast("Users table missing in HTML", "#b91c1c"); return; }
+
+    try {
+      const role = localStorage.getItem("role") || "";
+      const res = await fetch(`${API_BASE}/users`, {
+        headers: { "x-role": role }
+      });
+
+      const data = await safeJson(res);
+      if (!Array.isArray(data)) {
+        toast("Failed to load users", "#b91c1c");
+        table.innerHTML = "";
+        return;
+      }
+
+      table.innerHTML = data.map(u => `
+        <tr class="border-t">
+          <td class="px-6 py-3">${escapeHtml(u.username)}</td>
+          <td class="px-6 py-3">${escapeHtml(u.name || "")}</td>
+          <td class="px-6 py-3">${escapeHtml(u.role)}</td>
+          <td class="px-6 py-3 text-right">
+            <button class="btn-del-user px-3 py-1 rounded bg-red-100 text-red-600"
+              data-username="${escapeHtml(u.username)}">Delete</button>
+          </td>
+        </tr>
+      `).join("");
+
+      qsa(".btn-del-user").forEach(btn => btn.addEventListener("click", async () => {
+        const username = btn.dataset.username;
+
+        // optional safety: don’t delete root quickly
+        if (!confirm(`Delete user "${username}"?`)) return;
+
+        const del = await fetch(`${API_BASE}/users/${encodeURIComponent(username)}`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ role: localStorage.getItem("role") })
+        });
+
+        const out = await safeJson(del);
+        if (!out?.success) {
+          toast(out?.message || "Delete failed", "#b91c1c");
+          return;
+        }
+        toast("User deleted", "#b91c1c");
+        loadUsers();
+      }));
+    } catch (err) {
+      console.error("loadUsers error:", err);
+      toast("Failed to load users", "#b91c1c");
+    }
+  }
+
+  // ----------------- PLACEHOLDER FOR LOAD COURSES PAGE -----------------
+  async function loadCourses() {
+    // If you already have this implemented elsewhere, remove this placeholder.
+    // This prevents errors if navigation calls loadCourses().
+    try {
+      const res = await fetch(`${API_BASE}/courses`);
+      const data = await safeJson(res);
+      const box = qs("#submitted-courses-list");
+      if (!box) return;
+      box.innerHTML = (data || []).map(c => `
+        <div class="bg-white p-4 rounded-xl shadow border">
+          <div class="font-semibold">${escapeHtml(c.title)}</div>
+          <div class="text-sm text-[#3E3B59]">${escapeHtml(c.description || "")}</div>
+        </div>
+      `).join("");
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   // ----------------- UTIL -----------------
   async function safeJson(res) {
-    if (!res.ok) return [];
+    if (!res || !res.ok) return [];
     try { return await res.json(); } catch (e) { return []; }
   }
 
