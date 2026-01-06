@@ -1,90 +1,136 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // ----- AUTH GUARD (prevents redirect loops) -----
   const LOGIN_PATH = "/homepage/login.html";
-  const role = localStorage.getItem("role");
-  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
 
-  if (!isLoggedIn) {
+  // ---- Auth guard (prevents redirect loops) ----
+  const isLoginPage = window.location.pathname.endsWith("login.html");
+  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+  const role = localStorage.getItem("role");
+
+  if (!isLoginPage && (!isLoggedIn || role !== "student")) {
+    // not logged in or wrong role -> kick to login
     window.location.href = LOGIN_PATH;
     return;
   }
 
-  // If a non-student tries to open student pages, send them to their portal
-  if (role !== "student") {
-    const go =
-      role === "instructor" ? "/instructor/" : role === "manager" ? "/manager/" : LOGIN_PATH;
-    window.location.href = go;
-    return;
-  }
-
-  // ----- LOGOUT (works even if button is missing; you can add it later) -----
-  const logoutBtn = document.getElementById("logoutBtn") || document.getElementById("logoutBtn2");
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", () => {
-      localStorage.removeItem("isLoggedIn");
-      localStorage.removeItem("role");
-      localStorage.removeItem("userName");
-      window.location.href = LOGIN_PATH;
-    });
-  }
-
-  // ----- Show user name if you have an element -----
+  // ---- UI: name + avatar ----
   const userNameEl = document.getElementById("userName");
-  if (userNameEl) userNameEl.textContent = localStorage.getItem("userName") || "Student";
+  const avatarEl = document.getElementById("userAvatar");
+  const logoutBtn = document.getElementById("logoutBtn");
 
-  // ----- LOAD + RENDER COURSES -----
-  async function loadCourses() {
-    const container =
-      document.getElementById("coursesList") ||
-      document.getElementById("courses") ||
-      document.getElementById("myCourses");
+  const name = localStorage.getItem("userName") || "Student";
+  if (userNameEl) userNameEl.textContent = name;
 
-    if (!container) return;
-
-    const res = await fetch("/api/courses");
-    const courses = await res.json();
-
-    container.innerHTML = courses
-      .map(
-        (c) => `
-        <div class="bg-white border border-black/10 rounded-xl p-4 shadow-sm">
-          <h3 class="font-semibold">${c.title}</h3>
-          <p class="text-sm opacity-80">${c.description || ""}</p>
-        </div>
-      `
-      )
-      .join("");
+  if (avatarEl) {
+    avatarEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+      name
+    )}&background=E5E7EB&color=111827`;
   }
 
-  // ----- LOAD + RENDER HOMEWORK -----
-  async function loadHomework() {
-    const container =
-      document.getElementById("homeworkList") ||
-      document.getElementById("homework-list") ||
-      document.getElementById("assignments");
+  logoutBtn?.addEventListener("click", () => {
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("role");
+    localStorage.removeItem("userName");
+    window.location.href = LOGIN_PATH;
+  });
 
-    if (!container) return;
+  // ---- Elements ----
+  const coursesGrid = document.getElementById("coursesGrid");
+  const homeworkList = document.getElementById("homeworkList");
+  const activeCoursesCount = document.getElementById("activeCoursesCount");
+  const homeworkCount = document.getElementById("homeworkCount");
+  const refreshBtn = document.getElementById("refreshBtn");
 
-    const res = await fetch("/api/homework");
-    const hw = await res.json();
+  refreshBtn?.addEventListener("click", loadAll);
 
-    container.innerHTML = hw
-      .map(
-        (h) => `
-        <div class="bg-white border border-black/10 rounded-xl p-4 shadow-sm">
-          <h3 class="font-semibold">${h.title}</h3>
-          <p class="text-sm opacity-80">${h.description || ""}</p>
-          <p class="text-xs opacity-60 mt-2">
-            Course: ${h.course || h.course_id || "N/A"} • Submitted by: ${h.submitted_by || "N/A"}
-          </p>
-        </div>
-      `
-      )
-      .join("");
+  // ---- Helpers ----
+  function escapeHtml(str) {
+    return String(str ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
   }
 
-  // Load everything on page load
-  loadCourses();
-  loadHomework();
+  function courseCard(c) {
+    const title = escapeHtml(c.title);
+    const desc = escapeHtml(c.description || "");
+    return `
+      <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+        <h4 class="font-semibold text-gray-900 leading-tight">${title}</h4>
+        <p class="text-sm text-gray-600 mt-1">${desc}</p>
+
+        <div class="mt-3 w-full bg-gray-200 rounded-full h-3">
+          <div class="h-3 rounded-full bg-indigo-600" style="width: 0%"></div>
+        </div>
+        <p class="text-sm text-gray-600 mt-2">0% Complete</p>
+
+        <button
+          class="mt-4 w-full bg-gray-100 hover:bg-green-500/60 text-black font-medium py-2 rounded-xl transition-colors duration-200">
+          Continue
+        </button>
+      </div>
+    `;
+  }
+
+  function homeworkCard(h) {
+    const title = escapeHtml(h.title);
+    const desc = escapeHtml(h.description || "");
+    const by = escapeHtml(h.submitted_by || "N/A");
+    const course = escapeHtml(h.course || h.course_title || "N/A");
+
+    return `
+      <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+        <h4 class="font-semibold text-gray-900 leading-tight">${title}</h4>
+        <p class="text-sm text-gray-600 mt-1">${desc}</p>
+        <p class="text-xs text-gray-500 mt-3">Course: ${course} · By: ${by}</p>
+
+        <button class="mt-4 w-full bg-gray-100 hover:bg-green-500/60 text-black font-medium py-2 rounded-xl transition">
+          View
+        </button>
+      </div>
+    `;
+  }
+
+  async function loadAll() {
+    try {
+      // same API used by instructor/manager
+      const [coursesRes, hwRes] = await Promise.all([
+        fetch("/api/courses"),
+        fetch("/api/homework"),
+      ]);
+
+      const courses = await coursesRes.json();
+      const hw = await hwRes.json();
+
+      // counts
+      if (activeCoursesCount) activeCoursesCount.textContent = courses.length;
+      if (homeworkCount) homeworkCount.textContent = hw.length;
+
+      // render courses
+      if (coursesGrid) {
+        coursesGrid.innerHTML =
+          courses.length > 0
+            ? courses.map(courseCard).join("")
+            : `<p class="text-sm text-gray-500">No courses yet.</p>`;
+      }
+
+      // render homework
+      if (homeworkList) {
+        homeworkList.innerHTML =
+          hw.length > 0
+            ? hw.map(homeworkCard).join("")
+            : `<p class="text-sm text-gray-500">No homework yet.</p>`;
+      }
+    } catch (err) {
+      console.error("Student load error:", err);
+      if (coursesGrid) {
+        coursesGrid.innerHTML =
+          `<p class="text-sm text-red-600">Failed to load courses/homework. Check server console.</p>`;
+      }
+    }
+  }
+
+  // initial load
+  loadAll();
 });
-
