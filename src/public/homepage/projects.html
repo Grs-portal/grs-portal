@@ -14,9 +14,9 @@
     <div class="container header-inner">
       <nav class="main-nav">
         <div class="nav-left">
-          <a href="/homepage/index.html" class="nav-link" data-translate="nav-home">Home</a>
-          <a href="/homepage/courses.html" class="nav-link" data-translate="nav-courses">Courses</a>
-          <a href="/homepage/projects.html" class="nav-link active" data-translate="nav-projects">Projects</a>
+          <a href="index.html" class="nav-link" data-translate="nav-home">Home</a>
+          <a href="courses.html" class="nav-link" data-translate="nav-courses">Courses</a>
+          <a href="projects.html" class="nav-link active" data-translate="nav-projects">Projects</a>
         </div>
 
         <!-- centered circle logo -->
@@ -25,9 +25,9 @@
         </div>
 
         <div class="nav-right">
-          <a href="/homepage/about.html" class="nav-link" data-translate="nav-about">About Us</a>
-          <a href="/homepage/Portal.html" class="nav-link" data-translate="nav-portals">Portals</a>
-          <a href="/homepage/contact.html" class="nav-link" data-translate="nav-contact">Contact</a>
+          <a href="about.html" class="nav-link" data-translate="nav-about">About Us</a>
+          <a href="Portal.html" class="nav-link" data-translate="nav-portals">Portals</a>
+          <a href="contact.html" class="nav-link" data-translate="nav-contact">Contact</a>
         <div class="language-dropdown">
             <button class="lang-btn">EN ▾</button>
             <ul class="lang-menu">
@@ -45,28 +45,27 @@
 
 
    <!--HERO-->
- <section class="sub-hero" style="
-  position: relative;
-  width: 100%;
-  height: 700px;
-  background-image: url('/homepage/images/wavy hero.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  color: white;
-  padding: 0 5%;
-  margin-bottom: -280px; /* overlaps into next section */
-  z-index: 1;
-">
-  <div class="sub-hero-inner">
-    <h1 data-translate="hero-projects-h"> Explore Our Projects </h1>
-    <p data-translate="hero-projects-p"> Want to work on a project with us? </p>
-    <a data-translate="hero-cta" href="contact.html" class="project-hero-cta">Get in Touch</a>
+<section class="hero sub-hero" aria-label="Courses hero">
+
+  <!-- background layers -->
+    <div class="hero__layer" id="layer-back" style="background-image: url('https://images.unsplash.com/photo-1501004318641-b39e6451bec6?q=80&w=1600&auto=format&fit=crop&ixlib=rb-4.0.3&s=2e6f5f3af9d98f3d5d4898b0b1b8a7b2'); filter:contrast(.98) saturate(.9)"></div>
+    <div class="hero__layer" id="layer-mid" style="background-image: url('https://images.unsplash.com/photo-1501004318641-b39e6451bec6?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=2e6f5f3af9d98f3d5d4898b0b1b8a7b2'); opacity:.18; transform:scale(1.02)"></div>
+    <div class="hero__tint" aria-hidden="true"></div>
+
+  <div class="container hero-inner">
+    <div class="hero-copy">
+      <h1 data-translate="hero-courses-h" style="color: #4d8658;">Explore Our Projects</h1>
+      <p data-translate="hero-courses-p" style="color: #fff;">
+         Want to work on a project with us? 
+      </p>
+    </div>
   </div>
+
+  <!-- wavy divider -->
+  <svg class="hero-wave" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0,40 C220,110 440,0 720,40 C1000,80 1220,10 1440,50 L1440,120 L0,120 Z" fill="#fff"></path>
+  </svg>
+
 </section>
 
 
@@ -86,7 +85,7 @@
       <p data-translate="project-card-p">An accessible and safe place where people can meet, get information, and work on their well-being.</p>
       <div class="project-image">
         <img src="https://wijzijnmind.nl/uploads/media/max-width/05/6795-Green%20recovery%201.jpg?v=1-0" alt="Green Recovery Space image" />
-        <button class="project-btn" style="margin-left: 5%;">
+        <button class="project-btn" style="margin-left: 5%; background:  rgba(188, 207, 190, 0.5);">
             <span class="IconContainer">
                 <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
                     <path d="M21.883 12l-7.527 6.235.644.765 9-7.521-9-7.479-.645.764 7.529 6.236h-21.884v1h21.883z"/>
@@ -108,7 +107,7 @@
       <p data-translate="project-card-p">An accessible and safe place where people can meet, get information, and work on their well-being.</p>
       <div class="project-image">
         <img src="https://wijzijnmind.nl/uploads/media/max-width/05/6795-Green%20recovery%201.jpg?v=1-0" alt="Green Recovery Space image" />
-        <button class="project-btn" style="margin-left: 5%;">
+        <button class="project-btn" style="margin-left: 5%; background:  rgba(188, 207, 190, 0.5);">
             <span class="IconContainer">
                 <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
                     <path d="M21.883 12l-7.527 6.235.644.765 9-7.521-9-7.479-.645.764 7.529 6.236h-21.884v1h21.883z"/>
@@ -128,7 +127,7 @@
       <p data-translate="project-card-p">An accessible and safe place where people can meet, get information, and work on their well-being.</p>
       <div class="project-image">
         <img src="https://wijzijnmind.nl/uploads/media/max-width/05/6795-Green%20recovery%201.jpg?v=1-0" alt="Green Recovery Space image" />
-        <button class="project-btn" style="margin-left: 5%;">
+        <button class="project-btn" style="margin-left: 5%; background:  rgba(188, 207, 190, 0.5);">
             <span class="IconContainer">
                 <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
                     <path d="M21.883 12l-7.527 6.235.644.765 9-7.521-9-7.479-.645.764 7.529 6.236h-21.884v1h21.883z"/>
@@ -148,7 +147,7 @@
       <p data-translate="project-card-p">An accessible and safe place where people can meet, get information, and work on their well-being.</p>
       <div class="project-image">
         <img src="https://wijzijnmind.nl/uploads/media/max-width/05/6795-Green%20recovery%201.jpg?v=1-0" alt="Green Recovery Space image" />
-        <button class="project-btn" style="margin-left: 5%;">
+        <button class="project-btn" style="margin-left: 5%; background:  rgba(188, 207, 190, 0.5);">
             <span class="IconContainer">
                 <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
                     <path d="M21.883 12l-7.527 6.235.644.765 9-7.521-9-7.479-.645.764 7.529 6.236h-21.884v1h21.883z"/>
@@ -191,8 +190,8 @@
         <h3 data-translate="col-por">Portals</h3>
         <ul>
           <li><a data-translate="Students" href="/homepage/login.html">Students</a></li>
-          <li><a data-translate="Teachers" href="/homepage/login.html">Teachers</a></li>
-          <li><a data-translate="Managers" href="/homepage/login.html">Managers</a></li>
+          <li><a data-translate="Teachers" href="/homepage/login.htm">Teachers</a></li>
+          <li><a data-translate="Managers" href="/homepage/login.htm">Managers</a></li>
         </ul>
       </div>
 
@@ -201,7 +200,7 @@
         <h3 data-translate="col-know">Knowledge</h3>
         <ul>
           <li><a data-translate="nav-courses" href="/homepage/courses.html">Courses</a></li>
-          <li><a data-translate="nav-projects" href="#/homepage/projects.html">Projects</a></li>
+          <li><a data-translate="nav-projects" href="/homepage/projects.html">Projects</a></li>
         </ul>
       </div>
 
@@ -229,7 +228,7 @@
         <a href="#" class="social"><i class="fab fa-email"></i></a>
       </div>
     </div>
-  </div>
+  </div> 
 </footer>
 
 <script src="/homepage/JS/lang-translation.js"></script>
@@ -241,4 +240,3 @@
 
 </body>
 </html>
-
