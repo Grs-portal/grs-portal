@@ -25,137 +25,124 @@ if (!fs.existsSync(path.join(rootDir, "public"))) {
 
 const publicDir = path.join(rootDir, "public");
 console.log("✅ Serving static files from:", publicDir);
-
-// Serve all frontend files from /public
 app.use(express.static(publicDir));
 
-// ---------------- IN-MEMORY DATABASE ----------------
-let accounts = [
-  { username: "root", password: "1234", role: "instructor", name: "Instructor Root" },
-  { username: "manager", password: "9999", role: "manager", name: "Project Manager" },
-  { username: "student", password: "1234", role: "student", name: "Student" },
-];
+// ---------------- SIMPLE FILE DB (PERSISTENT) ----------------
+const DATA_FILE = path.join(__dirname, "data.json");
 
-let courses = [{ id: 1, title: "Intro to Programming", description: "Learn JS basics" }];
+function defaultData() {
+  return {
+    accounts: [
+      { username: "root", password: "1234", role: "instructor", name: "Instructor Root" },
+      { username: "manager", password: "9999", role: "manager", name: "Project Manager" },
+      { username: "student", password: "1234", role: "student", name: "Student" },
+    ],
+    courses: [{ id: 1, title: "Intro to Programming", description: "Learn JS basics" }],
+    homework: [
+      {
+        id: 1,
+        title: "Week 1 Assignment",
+        description: "Intro tasks",
+        submitted_by: "John Doe",
+        course: "Intro to Programming",
+      },
+    ],
+    students: [{ enrollment_id: 1, name: "John Doe", course: "Intro to Programming", grade: 9 }],
+  };
+}
 
-let homework = [
-  {
-    id: 1,
-    title: "Week 1 Assignment",
-    description: "Intro tasks",
-    submitted_by: "John Doe",
-    course: "Intro to Programming",
-  },
-];
-
-let students = [{ enrollment_id: 1, name: "John Doe", course: "Intro to Programming", grade: 9 }];
-
-// ---------------- REGISTER ----------------
-app.post("/api/register", (req, res) => {
-  const { username, password, role, name, course } = req.body || {};
-
-  // Basic validation
-  if (!username || !password || !role) {
-    return res.status(400).json({
-      success: false,
-      message: "username, password, and role are required",
-    });
+function loadData() {
+  try {
+    if (!fs.existsSync(DATA_FILE)) {
+      fs.writeFileSync(DATA_FILE, JSON.stringify(defaultData(), null, 2));
+    }
+    return JSON.parse(fs.readFileSync(DATA_FILE, "utf-8"));
+  } catch (e) {
+    console.error("❌ Failed to load data.json, using defaults:", e);
+    return defaultData();
   }
+}
 
-  const allowedRoles = new Set(["student", "instructor", "manager"]);
-  if (!allowedRoles.has(role)) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid role",
-    });
-  }
+function saveData() {
+  fs.writeFileSync(DATA_FILE, JSON.stringify(db, null, 2));
+}
 
-  // Unique username
-  if (accounts.some((a) => a.username === username)) {
-    return res.status(409).json({
-      success: false,
-      message: "Username already exists",
-    });
-  }
-
-  const displayName = (name || username).trim();
-
-  // Create account
-  const newAccount = { username, password, role, name: displayName };
-  accounts.push(newAccount);
-
-  // If student, also create student record
-  if (role === "student") {
-    const studentCourse =
-      (course && String(course).trim()) || "Intro to Programming";
-
-    const newStudent = {
-      enrollment_id: Date.now(), // simple unique id
-      username,                  // links to accounts
-      name: displayName,
-      course: studentCourse,
-      grade: null,
-    };
-
-    students.push(newStudent);
-  }
-
-  return res.json({
-    success: true,
-    message: "Registered successfully",
-    account: { username, role, name: displayName },
-  });
-});
-
-// ---------------- MANAGER: DELETE USER ----------------
-app.delete("/api/users/:username", (req, res) => {
-  const { username } = req.params;
-  const { role } = req.body; // sent from frontend
-
-  if (role !== "manager") {
-    return res.status(403).json({ success: false, message: "Forbidden" });
-  }
-
-  accounts = accounts.filter(a => a.username !== username);
-  students = students.filter(s => s.username !== username);
-
-  res.json({ success: true });
-});
+let db = loadData();
 
 // ---------------- API ROUTES ----------------
 
 // Courses
-app.get("/api/courses", (req, res) => res.json(courses));
+app.get("/api/courses", (req, res) => res.json(db.courses));
+
 app.post("/api/courses", (req, res) => {
-  const newCourse = { id: Date.now(), ...req.body };
-  courses.push(newCourse);
+  const { title, description = "" } = req.body || {};
+  if (!title) return res.status(400).json({ success: false, message: "Title required" });
+
+  const newCourse = { id: Date.now(), title, description };
+  db.courses.push(newCourse);
+  saveData();
   res.json(newCourse);
 });
+
 app.delete("/api/courses/:id", (req, res) => {
-  courses = courses.filter((c) => String(c.id) !== String(req.params.id));
+  db.courses = db.courses.filter((c) => String(c.id) !== String(req.params.id));
+  saveData();
   res.json({ success: true });
 });
 
 // Homework
-app.get("/api/homework", (req, res) => res.json(homework));
+app.get("/api/homework", (req, res) => res.json(db.homework));
+
 app.post("/api/homework", (req, res) => {
-  const newHW = { id: Date.now(), ...req.body };
-  homework.push(newHW);
+  const { title, description = "", course, submitted_by = "" } = req.body || {};
+  if (!title || !course) {
+    return res.status(400).json({ success: false, message: "Title and course required" });
+  }
+
+  const newHW = { id: Date.now(), title, description, course, submitted_by };
+  db.homework.push(newHW);
+  saveData();
   res.json(newHW);
 });
+
 app.delete("/api/homework/:id", (req, res) => {
-  homework = homework.filter((h) => String(h.id) !== String(req.params.id));
+  db.homework = db.homework.filter((h) => String(h.id) !== String(req.params.id));
+  saveData();
   res.json({ success: true });
 });
 
-// Students
-app.get("/api/students", (req, res) => res.json(students));
+// Students (Grades list)
+app.get("/api/students", (req, res) => res.json(db.students));
+
 app.put("/api/students/:id", (req, res) => {
   const id = Number(req.params.id);
-  const idx = students.findIndex((s) => s.enrollment_id === id);
+  const idx = db.students.findIndex((s) => s.enrollment_id === id);
   if (idx === -1) return res.status(404).json({ error: "Student not found" });
-  students[idx] = { ...students[idx], ...req.body };
-  res.json(students[idx]);
+
+  db.students[idx] = { ...db.students[idx], ...req.body };
+  saveData();
+  res.json(db.students[idx]);
+});
+
+// ---------------- USERS (Accounts) API ----------------
+// List users (NO passwords returned)
+app.get("/api/users", (req, res) => {
+  const safe = db.accounts.map(({ password, ...rest }) => rest);
+  res.json(safe);
+});
+
+// Delete user (manager will use this)
+app.delete("/api/users/:username", (req, res) => {
+  const username = req.params.username;
+
+  // protect critical accounts (optional)
+  if (username === "root" || username === "manager") {
+    return res.status(403).json({ success: false, message: "Cannot delete protected account" });
+  }
+
+  db.accounts = db.accounts.filter((a) => a.username !== username);
+  saveData();
+  res.json({ success: true });
 });
 
 // ---------------- AUTH ----------------
@@ -163,77 +150,73 @@ app.post("/api/login", (req, res) => {
   const { username, password } = req.body || {};
   if (!username || !password) return res.status(400).json({ success: false });
 
-  const user = accounts.find((a) => a.username === username && a.password === password);
+  const user = db.accounts.find(
+    (a) => a.username === username.trim() && a.password === password.trim()
+  );
+
   if (!user) return res.status(401).json({ success: false });
 
-  // IMPORTANT:
-  // Use paths WITHOUT trailing slashes to avoid redirect loops.
   const redirect =
-    user.role === "instructor"
-      ? "/instructor"
-      : user.role === "manager"
-      ? "/manager"
-      : "/students";
+    user.role === "instructor" ? "/instructor" :
+    user.role === "manager" ? "/manager" :
+    "/students";
 
   res.json({ success: true, role: user.role, name: user.name, redirect });
 });
 
-// ---------------- PAGE HELPERS ----------------
+app.post("/api/register", (req, res) => {
+  const { username, password, role = "student", name = username, course = "" } = req.body || {};
+
+  if (!username || !password || !name) {
+    return res.status(400).json({ success: false, message: "Missing fields" });
+  }
+
+  const cleanUsername = String(username).trim();
+  const cleanPassword = String(password).trim();
+
+  if (db.accounts.find((a) => a.username === cleanUsername)) {
+    return res.status(400).json({ success: false, message: "Username already exists" });
+  }
+
+  const newAcc = {
+    username: cleanUsername,
+    password: cleanPassword,
+    role,
+    name: String(name).trim(),
+  };
+
+  db.accounts.push(newAcc);
+
+  // If student, ALSO add them to grade list automatically
+  if (role === "student") {
+    const newStudent = {
+      enrollment_id: Date.now(),
+      name: newAcc.name,
+      course: course || "Unassigned",
+      grade: null,
+    };
+    db.students.push(newStudent);
+  }
+
+  saveData();
+  res.json({ success: true });
+});
+
+// ---------------- PAGE ROUTES ----------------
 function sendFirstExisting(res, ...relativeCandidates) {
   for (const rel of relativeCandidates) {
     const abs = path.join(publicDir, rel);
     if (fs.existsSync(abs)) return res.sendFile(abs);
   }
-  return res.status(404).send("Not found: " + relativeCandidates.join(" OR "));
+  res.status(404).send("Not found: " + relativeCandidates.join(" OR "));
 }
 
-// ---------------- PAGE ROUTES ----------------
-
-// Homepage
-app.get("/", (req, res) => {
-  sendFirstExisting(res, "homepage/index.html", "index.html");
-});
-
-// Login: supports both /homepage/login.html AND /login
-app.get("/homepage/login.html", (req, res) => {
-  sendFirstExisting(res, "homepage/login.html", "login.html");
-});
-app.get("/login", (req, res) => res.redirect(302, "/homepage/login.html"));
-app.get("/login.html", (req, res) => res.redirect(302, "/homepage/login.html"));
-
-// Register:
-// Your error was "Cannot GET /homepage/register.html"
-// In your repo, register.html is in public root, so we map both URLs:
-app.get("/register.html", (req, res) => {
-  sendFirstExisting(res, "register.html");
-});
-app.get("/homepage/register.html", (req, res) => {
-  // points to the same file (public/register.html)
-  sendFirstExisting(res, "register.html");
-});
-
-// Instructor portal
-app.get("/instructor", (req, res) => {
-  sendFirstExisting(res, "instructor/index.html", "instructor/instructor.html");
-});
-app.get("/instructor/", (req, res) => res.redirect(301, "/instructor"));
-
-// Manager portal
-app.get("/manager", (req, res) => {
-  sendFirstExisting(res, "manager/index.html", "manager/manager.html");
-});
-app.get("/manager/", (req, res) => res.redirect(301, "/manager"));
-
-// Student portal
-// Your repo has students/student.html, so we serve that as the main students page:
-app.get("/students", (req, res) => {
-  sendFirstExisting(res, "students/student.html", "students/index.html");
-});
-app.get("/students/", (req, res) => res.redirect(301, "/students"));
+app.get("/", (req, res) => sendFirstExisting(res, "homepage/index.html"));
+app.get("/instructor", (req, res) => sendFirstExisting(res, "instructor/index.html"));
+app.get("/manager", (req, res) => sendFirstExisting(res, "manager/index.html"));
+app.get("/students", (req, res) => sendFirstExisting(res, "students/index.html"));
+app.get("/homepage/login.html", (req, res) => sendFirstExisting(res, "homepage/login.html"));
+app.get("/homepage/register.html", (req, res) => sendFirstExisting(res, "homepage/register.html", "register.html"));
 
 // ---------------- START ----------------
-app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-});
-
-
+app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
