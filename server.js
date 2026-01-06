@@ -14,7 +14,6 @@ app.use(express.json());
 // ---------------- DETERMINE PUBLIC ROOT ----------------
 let rootDir = __dirname;
 
-// If /public not in root, try /src/public
 if (!fs.existsSync(path.join(rootDir, "public"))) {
   if (fs.existsSync(path.join(__dirname, "src", "public"))) {
     rootDir = path.join(__dirname, "src");
@@ -49,9 +48,7 @@ let homework = [
   },
 ];
 
-let students = [
-  { enrollment_id: 1, name: "John Doe", course: "Intro to Programming", grade: 9 },
-];
+let students = [{ enrollment_id: 1, name: "John Doe", course: "Intro to Programming", grade: 9 }];
 
 // ---------------- API ROUTES ----------------
 
@@ -105,33 +102,49 @@ app.post("/api/login", (req, res) => {
   res.json({ success: true, role: user.role, name: user.name, redirect });
 });
 
+// ---------------- PAGE HELPERS ----------------
+function sendFirstExisting(res, ...relativeCandidates) {
+  for (const rel of relativeCandidates) {
+    const abs = path.join(publicDir, rel);
+    if (fs.existsSync(abs)) return res.sendFile(abs);
+  }
+  res.status(404).send("Not found: " + relativeCandidates.join(" OR "));
+}
+
 // ---------------- PAGE ROUTES ----------------
-// IMPORTANT: these files MUST exist under /public exactly like these paths
 
+// Homepage
 app.get("/", (req, res) => {
-  res.sendFile(path.join(publicDir, "homepage", "index.html"));
+  sendFirstExisting(res, "homepage/index.html");
 });
 
-// login page (so /homepage/login.html always works)
+// Login (your JS uses /homepage/login.html, but we also add /login + /login.html to prevent loops)
 app.get("/homepage/login.html", (req, res) => {
-  res.sendFile(path.join(publicDir, "homepage", "login.html"));
+  sendFirstExisting(res, "homepage/login.html", "login.html");
+});
+app.get("/login", (req, res) => res.redirect(302, "/homepage/login.html"));
+app.get("/login.html", (req, res) => res.redirect(302, "/homepage/login.html"));
+
+// Register (you have register.html in public root)
+app.get("/register.html", (req, res) => {
+  sendFirstExisting(res, "register.html");
 });
 
-// Instructor
+// Instructor portal
 app.get("/instructor", (req, res) => {
-  res.sendFile(path.join(publicDir, "instructor", "index.html"));
+  sendFirstExisting(res, "instructor/index.html", "instructor/instructor.html");
 });
 app.get("/instructor/", (req, res) => res.redirect(301, "/instructor"));
 
-// Manager
+// Manager portal
 app.get("/manager", (req, res) => {
-  res.sendFile(path.join(publicDir, "manager", "index.html"));
+  sendFirstExisting(res, "manager/index.html", "manager/manager.html");
 });
 app.get("/manager/", (req, res) => res.redirect(301, "/manager"));
 
-// Students
+// Student portal (IMPORTANT: your repo likely uses students/student.html)
 app.get("/students", (req, res) => {
-  res.sendFile(path.join(publicDir, "students", "index.html"));
+  sendFirstExisting(res, "students/index.html", "students/student.html", "students/student_portal.html");
 });
 app.get("/students/", (req, res) => res.redirect(301, "/students"));
 
