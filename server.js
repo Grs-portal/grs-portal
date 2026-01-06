@@ -50,6 +50,63 @@ let homework = [
 
 let students = [{ enrollment_id: 1, name: "John Doe", course: "Intro to Programming", grade: 9 }];
 
+// ---------------- REGISTER ----------------
+app.post("/api/register", (req, res) => {
+  const { username, password, role, name, course } = req.body || {};
+
+  // Basic validation
+  if (!username || !password || !role) {
+    return res.status(400).json({
+      success: false,
+      message: "username, password, and role are required",
+    });
+  }
+
+  const allowedRoles = new Set(["student", "instructor", "manager"]);
+  if (!allowedRoles.has(role)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid role",
+    });
+  }
+
+  // Unique username
+  if (accounts.some((a) => a.username === username)) {
+    return res.status(409).json({
+      success: false,
+      message: "Username already exists",
+    });
+  }
+
+  const displayName = (name || username).trim();
+
+  // Create account
+  const newAccount = { username, password, role, name: displayName };
+  accounts.push(newAccount);
+
+  // If student, also create student record
+  if (role === "student") {
+    const studentCourse =
+      (course && String(course).trim()) || "Intro to Programming";
+
+    const newStudent = {
+      enrollment_id: Date.now(), // simple unique id
+      username,                  // links to accounts
+      name: displayName,
+      course: studentCourse,
+      grade: null,
+    };
+
+    students.push(newStudent);
+  }
+
+  return res.json({
+    success: true,
+    message: "Registered successfully",
+    account: { username, role, name: displayName },
+  });
+});
+
 // ---------------- API ROUTES ----------------
 
 // Courses
@@ -163,3 +220,4 @@ app.get("/students/", (req, res) => res.redirect(301, "/students"));
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
 });
+
