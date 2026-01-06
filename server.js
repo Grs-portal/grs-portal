@@ -113,10 +113,10 @@ app.post("/api/login", (req, res) => {
 
   const redirect =
     user.role === "instructor"
-      ? "/instructor/"
+      ? "/instructor"
       : user.role === "manager"
-      ? "/manager/"
-      : "/students/";
+      ? "/manager"
+      : "/students";
 
   res.json({
     success: true,
@@ -126,9 +126,21 @@ app.post("/api/login", (req, res) => {
   });
 });
 
-// ---------------- ROUTES ----------------
+// ---------------- STATIC PAGE ROUTES ----------------
 app.get("/", (req, res) => {
   res.sendFile(path.join(rootDir, "public", "homepage", "index.html"));
+});
+
+app.get("/instructor", (req, res) => {
+  res.sendFile(path.join(rootDir, "public", "instructor", "index.html"));
+});
+
+app.get("/manager", (req, res) => {
+  res.sendFile(path.join(rootDir, "public", "manager", "index.html"));
+});
+
+app.get("/students", (req, res) => {
+  res.sendFile(path.join(rootDir, "public", "students", "index.html"));
 });
 
 // ---------------- START ----------------
