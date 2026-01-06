@@ -3,142 +3,145 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Register | Portal</title>
+  <title>Register Account</title>
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <style>
-    .fade-in { animation: fadeIn 0.5s ease-in-out; }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    body {
-      background: url('Screenshot 2025-11-05 104653.png') no-repeat center center fixed;
-      background-size: cover;
-      position: relative;
-    }
-    body::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 24, 48, 0.85);
-      z-index: 0;
-    }
-  </style>
 </head>
 
-<body class="flex items-center justify-center min-h-screen relative text-[#E0E1DD]">
+<body class="min-h-screen flex items-center justify-center bg-slate-900 text-white">
 
-<div class="fade-in relative z-10 w-full max-w-md bg-[#1B263B]/90 backdrop-blur-lg p-8 rounded-2xl shadow-xl border border-[#415A77]/50">
+  <div class="w-full max-w-md bg-slate-800 p-8 rounded-2xl shadow-xl">
+    <h1 class="text-2xl font-semibold text-center mb-6">Create Account</h1>
 
-  <h1 class="text-2xl font-semibold mb-4 text-center">Create Account</h1>
+    <form id="registerForm" class="space-y-4">
 
-  <form id="registerForm" class="space-y-4">
+      <!-- ROLE -->
+      <select id="role" class="w-full p-2 rounded bg-slate-700">
+        <option value="student">Student</option>
+        <option value="instructor">Instructor</option>
+        <option value="manager">Manager</option>
+      </select>
 
-    <select id="role" class="w-full px-4 py-2 rounded-lg bg-[#273B54] border border-[#415A77]/70">
-      <option value="student">Student</option>
-      <option value="instructor">Instructor</option>
-      <option value="manager">Manager</option>
-    </select>
+      <!-- FULL NAME -->
+      <input
+        id="name"
+        type="text"
+        placeholder="Full name"
+        class="w-full p-2 rounded bg-slate-700"
+        required
+      />
 
-    <input id="name" placeholder="Full name"
-      class="w-full px-4 py-2 rounded-lg bg-[#273B54] border border-[#415A77]/70" required />
+      <!-- USERNAME -->
+      <input
+        id="username"
+        type="text"
+        placeholder="Username"
+        class="w-full p-2 rounded bg-slate-700"
+        required
+      />
 
-    <input id="username" placeholder="Username"
-      class="w-full px-4 py-2 rounded-lg bg-[#273B54] border border-[#415A77]/70" required />
+      <!-- PASSWORD -->
+      <div class="relative">
+        <input
+          id="password"
+          type="password"
+          placeholder="Password"
+          class="w-full p-2 rounded bg-slate-700 pr-10"
+          required
+        />
+        <button
+          type="button"
+          id="togglePwd"
+          class="absolute right-2 top-2 text-sm opacity-70"
+        >👁</button>
+      </div>
 
-    <!-- PASSWORD WITH EYE -->
-    <div class="relative">
-      <input id="password" type="password" placeholder="Password"
-        class="w-full px-4 py-2 rounded-lg bg-[#273B54] border border-[#415A77]/70 pr-10" required />
-      <button type="button" id="togglePwd"
-        class="absolute right-3 top-1/2 -translate-y-1/2 text-[#AAB5C5]">
-        👁️
+      <!-- STUDENT COURSE (only for students) -->
+      <div id="studentCourseWrap">
+        <input
+          id="course"
+          type="text"
+          placeholder="Course (students only)"
+          class="w-full p-2 rounded bg-slate-700"
+        />
+      </div>
+
+      <button
+        type="submit"
+        class="w-full bg-green-500 hover:bg-green-600 py-2 rounded font-semibold"
+      >
+        Register
       </button>
-    </div>
 
-    <div id="studentCourseWrap" class="hidden">
-      <input id="course" placeholder="Course (optional)"
-        class="w-full px-4 py-2 rounded-lg bg-[#273B54] border border-[#415A77]/70" />
-    </div>
+      <p id="msg" class="text-center text-sm mt-2"></p>
+    </form>
 
-    <button class="w-full bg-[#415A77] hover:bg-[#778DA9] py-2 rounded-lg">
-      Register
-    </button>
+    <p class="text-center mt-4 text-sm opacity-80">
+      Already have an account?
+      <a href="/homepage/login.html" class="underline">Login</a>
+    </p>
+  </div>
 
-    <p id="msg" class="text-sm text-center"></p>
-  </form>
+  <!-- REGISTER SCRIPT -->
+  <script>
+    const pwd = document.getElementById("password");
+    const togglePwd = document.getElementById("togglePwd");
+    const role = document.getElementById("role");
+    const courseWrap = document.getElementById("studentCourseWrap");
+    const msg = document.getElementById("msg");
 
-  <p class="text-center mt-4 text-sm">
-    Already have an account?
-    <a href="login.html" class="underline">Login</a>
-  </p>
-</div>
-
-<script>
-  const pwd = document.getElementById("password");
-  const togglePwd = document.getElementById("togglePwd");
-  const role = document.getElementById("role");
-  const courseWrap = document.getElementById("studentCourseWrap");
-  const msg = document.getElementById("msg");
-
-  togglePwd.onclick = () => {
-    pwd.type = pwd.type === "password" ? "text" : "password";
-  };
-
-  role.onchange = () => {
-    courseWrap.classList.toggle("hidden", role.value !== "student");
-  };
-
-  document.getElementById("registerForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const payload = {
-      role: role.value,
-      name: document.getElementById("name").value.trim(),
-      username: document.getElementById("username").value.trim(),
-      password: document.getElementById("password").value.trim(),
-      course: document.getElementById("course")?.value.trim()
+    togglePwd.onclick = () => {
+      pwd.type = pwd.type === "password" ? "text" : "password";
     };
 
-    if (!payload.name || !payload.username || !payload.password) {
-      msg.textContent = "Please fill all required fields.";
-      msg.className = "text-red-400 text-center";
-      return;
-    }
+    role.onchange = () => {
+      courseWrap.classList.toggle("hidden", role.value !== "student");
+    };
 
-    try {
-      const res = await fetch("/api/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
+    document.getElementById("registerForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-      const data = await res.json();
+      const payload = {
+        role: role.value,
+        name: document.getElementById("name").value.trim(),
+        username: document.getElementById("username").value.trim(),
+        password: document.getElementById("password").value.trim(),
+        course: document.getElementById("course")?.value.trim()
+      };
 
-      if (!data.success) {
-        msg.textContent = data.message || "Registration failed";
+      if (!payload.name || !payload.username || !payload.password) {
+        msg.textContent = "Please fill all required fields.";
         msg.className = "text-red-400 text-center";
         return;
       }
 
-      msg.textContent = "Account created! Redirecting to login...";
-      msg.className = "text-green-400 text-center";
+      try {
+        const res = await fetch("/api/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
 
-      setTimeout(() => {
-        window.location.href = "/homepage/login.html";
-      }, 900);
+        const data = await res.json();
 
-    } catch (err) {
-      console.error(err);
-      msg.textContent = "Server error";
-      msg.className = "text-red-400 text-center";
-    }
-  });
-</script>
+        if (!data.success) {
+          msg.textContent = data.message || "Registration failed";
+          msg.className = "text-red-400 text-center";
+          return;
+        }
 
+        msg.textContent = "Account created! Redirecting...";
+        msg.className = "text-green-400 text-center";
 
+        setTimeout(() => {
+          window.location.href = "/homepage/login.html";
+        }, 900);
+
+      } catch (err) {
+        console.error(err);
+        msg.textContent = "Server error";
+        msg.className = "text-red-400 text-center";
+      }
+    });
+  </script>
 </body>
 </html>
-
