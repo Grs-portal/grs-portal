@@ -6,16 +6,16 @@
   <title>Contact Us</title>
   <link rel="stylesheet" href="/homepage/CSS/style.css" />
 </head>
-<body class="contact-page">
+<body class="contact-page" style="background-color: #003329;">
 
   <!-- HEADER -->
   <header class="site-header">
     <div class="container header-inner">
       <nav class="main-nav">
         <div class="nav-left">
-          <a href="/homepage/index.html" class="nav-link" data-translate="nav-home">Home</a>
-          <a href="/homepage/courses.html" class="nav-link" data-translate="nav-courses">Courses</a>
-          <a href="/homepage/projects.html" class="nav-link" data-translate="nav-projects">Projects</a>
+          <a href="index.html" class="nav-link" data-translate="nav-home">Home</a>
+          <a href="courses.html" class="nav-link" data-translate="nav-courses">Courses</a>
+          <a href="projects.html" class="nav-link" data-translate="nav-projects">Projects</a>
         </div>
 
         <!-- centered circle logo -->
@@ -24,9 +24,9 @@
         </div>
 
         <div class="nav-right">
-          <a href="/homepage/about.html" class="nav-link" data-translate="nav-about">About Us</a>
-          <a href="/homepage/Portal.html" class="nav-link" data-translate="nav-portals">Portals</a>
-          <a href="/homepage/contact.html" class="nav-link active" data-translate="nav-contact">Contact</a>
+          <a href="about.html" class="nav-link" data-translate="nav-about">About Us</a>
+          <a href="Portal.html" class="nav-link" data-translate="nav-portals">Portals</a>
+          <a href="contact.html" class="nav-link active" data-translate="nav-contact">Contact</a>
         <div class="language-dropdown">
             <button class="lang-btn">EN ▾</button>
             <ul class="lang-menu">
@@ -44,28 +44,29 @@
 
 
    <!--HERO-->
-  <section class="sub-hero" style="
-  position: relative;
-  width: 100%;
-  height: 700px;
-  background-image: url('/homepage/images/wavy hero.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  color: white;
-  padding: 0 5%;
-  margin-bottom: -300px; /* overlaps into next section */
-  z-index: 1;
-">
-  <div class="courses-hero-inner">
-    <h1 data-translate="hero-contact-h" style="margin-top: -160px;"> Get in Touch with Us </h1>
-    <p data-translate="hero-contact-p"> Here you will find our contact information </p>
+<section class="hero sub-hero" aria-label="Courses hero">
+
+  <!-- background layers -->
+    <div class="hero__layer" id="layer-back" style="background-image: url('https://images.unsplash.com/photo-1501004318641-b39e6451bec6?q=80&w=1600&auto=format&fit=crop&ixlib=rb-4.0.3&s=2e6f5f3af9d98f3d5d4898b0b1b8a7b2'); filter:contrast(.98) saturate(.9)"></div>
+    <div class="hero__layer" id="layer-mid" style="background-image: url('https://images.unsplash.com/photo-1501004318641-b39e6451bec6?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=2e6f5f3af9d98f3d5d4898b0b1b8a7b2'); opacity:.18; transform:scale(1.02)"></div>
+    <div class="hero__tint" aria-hidden="true"></div>
+
+  <div class="container hero-inner">
+    <div class="hero-copy">
+      <h1 data-translate="hero-courses-h" style="color: #4d8658;"> Explore Our Projects </h1>
+      <p data-translate="hero-courses-p" style="color: #fff;">
+          Here you will find our contact information
+      </p>
+    </div>
   </div>
+
+  <!-- wavy divider -->
+  <svg class="hero-wave" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0,40 C220,110 440,0 720,40 C1000,80 1220,10 1440,50 L1440,120 L0,120 Z" fill="#003329"></path>
+  </svg>
+
 </section>
+
 
 <section class="contact-info">
   <div class="contact-grid">
@@ -134,15 +135,15 @@
 
       <!-- LOGO + TEXT -->
       <div class="footer-col-wide">
-        <img src="images/logo no bg.png" alt="logo" class="footer-logo" />
+        <img src="/homepage/images/logo no bg.png" alt="logo" class="footer-logo" />
       </div>
 
       <!-- COL 1 -->
       <div class="footer-col">
         <h3 data-translate="col-com">Company</h3>
         <ul>
-          <li><a data-translate="nav-about" href="/homepage/about.html">About Us</a></li>
-          <li><a data-translate="nav-contact" href="/homepage/contact.html">Contact Us</a></li>
+          <li><a data-translate="nav-about" href="about.html">About Us</a></li>
+          <li><a data-translate="nav-contact" href="contact.html">Contact Us</a></li>
         </ul>
       </div>
 
@@ -150,9 +151,9 @@
       <div class="footer-col">
         <h3 data-translate="col-por">Portals</h3>
         <ul>
-          <li><a data-translate="Students" href="/homepage/login.html">Students</a></li>
-          <li><a data-translate="Teachers" href="/homepage/login.htm">Teachers</a></li>
-          <li><a data-translate="Managers" href="/homepage/login.htm">Managers</a></li>
+          <li><a data-translate="Students" href="#">Students</a></li>
+          <li><a data-translate="Teachers" href="#">Teachers</a></li>
+          <li><a data-translate="Managers" href="#">Managers</a></li>
         </ul>
       </div>
 
@@ -160,8 +161,8 @@
        <div class="footer-col">
         <h3 data-translate="col-know">Knowledge</h3>
         <ul>
-          <li><a data-translate="nav-courses" href="/homepage/courses.html">Courses</a></li>
-          <li><a data-translate="nav-projects" href="/homepage/projects.html">Projects</a></li>
+          <li><a data-translate="nav-courses" href="#">Courses</a></li>
+          <li><a data-translate="nav-projects" href="#">Projects</a></li>
         </ul>
       </div>
 
@@ -192,7 +193,7 @@
   </div>
 </footer>
 
-  <script src="/JS/lang-translation.js"></script>
+  <script src="/homepage/JS/lang-translation.js"></script>
 
 
 <!-- FontAwesome Icons -->
@@ -201,5 +202,3 @@
 
 </body>
 </html>
-
-
