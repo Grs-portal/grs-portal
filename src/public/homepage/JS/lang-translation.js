@@ -71,7 +71,7 @@ const translations = {
 
     "hero-about-h": "About Us",
     "hero-about-p": "Get to know more about Green recovery space ",
-    "what-is-h": "What is Green Recovey Space",
+    "what-is-h": "What is Green Recovery Space",
     "what-is-p1": "The Green Recovery Space is a recovery-oriented community environment located in nature, designed to support mental wellbeing, emotional healing and personal growth. It provides a non-clinical, low-threshold and nature-based setting where individuals can participate in activities that promote resilience, connection and recovery.",
     "what-is-h3": "The Green Recovery Space focuses on:",
     "what-is-b1": "Nature-based healing (walking, mindfulness, outdoor activities)",
