@@ -16,9 +16,7 @@
     body {
       background: url('Screenshot 2025-11-05 104653.png') no-repeat center center fixed;
       background-size: cover;
-      font-family: 'Inter', sans-serif;
       position: relative;
-      overflow: hidden;
     }
     body::before {
       content: "";
@@ -32,125 +30,86 @@
 
 <body class="flex items-center justify-center min-h-screen relative text-[#E0E1DD]">
 
-  <!-- Form Card -->
-  <div class="fade-in relative z-10 w-full max-w-md bg-[#1B263B]/90 backdrop-blur-lg p-8 rounded-2xl shadow-xl border border-[#415A77]/50">
-    <h1 class="text-2xl font-semibold mb-2 text-center text-[#E0E1DD]">Create Account</h1>
-    <p class="text-sm text-center mb-6 text-[#AAB5C5]">
-      Choose your role and create login credentials.
-    </p>
+<div class="fade-in relative z-10 w-full max-w-md bg-[#1B263B]/90 backdrop-blur-lg p-8 rounded-2xl shadow-xl border border-[#415A77]/50">
 
-    <form id="registerForm" class="flex flex-col gap-4">
-      <!-- Role -->
-      <div>
-        <label class="block text-sm mb-1 text-[#AAB5C5]">Role</label>
-        <select id="role"
-          class="w-full px-4 py-2 border border-[#415A77]/70 rounded-lg bg-[#273B54] text-[#E0E1DD] focus:outline-none focus:ring-2 focus:ring-[#778DA9]"
-          required>
-          <option value="student">Student</option>
-          <option value="instructor">Instructor</option>
-          <option value="manager">Manager</option>
-        </select>
-      </div>
+  <h1 class="text-2xl font-semibold mb-4 text-center">Create Account</h1>
 
-      <!-- Display Name -->
-      <div>
-        <label class="block text-sm mb-1 text-[#AAB5C5]">Full name</label>
-        <input type="text" id="name" placeholder="e.g. John Doe"
-          class="w-full px-4 py-2 border border-[#415A77]/70 rounded-lg bg-[#273B54] text-[#E0E1DD] placeholder-[#AAB5C5]/70 focus:outline-none focus:ring-2 focus:ring-[#778DA9]"
-          required />
-      </div>
+  <form id="registerForm" class="space-y-4">
 
-      <!-- Username -->
-      <div>
-        <label class="block text-sm mb-1 text-[#AAB5C5]">Username</label>
-        <input type="text" id="username" placeholder="e.g. john"
-          class="w-full px-4 py-2 border border-[#415A77]/70 rounded-lg bg-[#273B54] text-[#E0E1DD] placeholder-[#AAB5C5]/70 focus:outline-none focus:ring-2 focus:ring-[#778DA9]"
-          required />
-      </div>
+    <select id="role" class="w-full px-4 py-2 rounded-lg bg-[#273B54] border border-[#415A77]/70">
+      <option value="student">Student</option>
+      <option value="instructor">Instructor</option>
+      <option value="manager">Manager</option>
+    </select>
 
-      <!-- Password -->
-      <div>
-        <label class="block text-sm mb-1 text-[#AAB5C5]">Password</label>
-        <input type="password" id="password" placeholder="Create a password"
-          class="w-full px-4 py-2 border border-[#415A77]/70 rounded-lg bg-[#273B54] text-[#E0E1DD] placeholder-[#AAB5C5]/70 focus:outline-none focus:ring-2 focus:ring-[#778DA9]"
-          required />
-      </div>
+    <input id="name" placeholder="Full name"
+      class="w-full px-4 py-2 rounded-lg bg-[#273B54] border border-[#415A77]/70" required />
 
-      <!-- Student course (optional, only shows for students) -->
-      <div id="studentCourseWrap" class="hidden">
-        <label class="block text-sm mb-1 text-[#AAB5C5]">Course (optional)</label>
-        <input type="text" id="course" placeholder="e.g. Intro to Programming"
-          class="w-full px-4 py-2 border border-[#415A77]/70 rounded-lg bg-[#273B54] text-[#E0E1DD] placeholder-[#AAB5C5]/70 focus:outline-none focus:ring-2 focus:ring-[#778DA9]" />
-        <p class="text-xs text-[#AAB5C5] mt-1">If you leave this empty, the server will assign a default course.</p>
-      </div>
+    <input id="username" placeholder="Username"
+      class="w-full px-4 py-2 rounded-lg bg-[#273B54] border border-[#415A77]/70" required />
 
-      <button type="submit"
-        class="bg-[#415A77] hover:bg-[#778DA9] text-[#E0E1DD] py-2 rounded-lg font-medium transition">
-        Register
+    <!-- PASSWORD WITH EYE -->
+    <div class="relative">
+      <input id="password" type="password" placeholder="Password"
+        class="w-full px-4 py-2 rounded-lg bg-[#273B54] border border-[#415A77]/70 pr-10" required />
+      <button type="button" id="togglePwd"
+        class="absolute right-3 top-1/2 -translate-y-1/2 text-[#AAB5C5]">
+        👁️
       </button>
+    </div>
 
-      <p id="msg" class="text-sm text-center text-[#AAB5C5]"></p>
-    </form>
+    <div id="studentCourseWrap" class="hidden">
+      <input id="course" placeholder="Course (optional)"
+        class="w-full px-4 py-2 rounded-lg bg-[#273B54] border border-[#415A77]/70" />
+    </div>
 
-    <p class="text-sm text-center mt-6 text-[#AAB5C5]">
-      Already have an account?
-      <a href="login.html" class="text-[#E0E1DD] font-medium hover:underline">Back to Login</a>
-    </p>
-  </div>
+    <button class="w-full bg-[#415A77] hover:bg-[#778DA9] py-2 rounded-lg">
+      Register
+    </button>
 
-  <script>
-    const form = document.getElementById("registerForm");
-    const roleEl = document.getElementById("role");
-    const studentCourseWrap = document.getElementById("studentCourseWrap");
-    const msg = document.getElementById("msg");
+    <p id="msg" class="text-sm text-center"></p>
+  </form>
 
-    function toggleStudentCourse() {
-      const isStudent = roleEl.value === "student";
-      studentCourseWrap.classList.toggle("hidden", !isStudent);
-    }
-    roleEl.addEventListener("change", toggleStudentCourse);
-    toggleStudentCourse();
+  <p class="text-center mt-4 text-sm">
+    Already have an account?
+    <a href="login.html" class="underline">Login</a>
+  </p>
+</div>
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      msg.textContent = "";
+<script>
+  const pwd = document.getElementById("password");
+  document.getElementById("togglePwd").onclick = () => {
+    pwd.type = pwd.type === "password" ? "text" : "password";
+  };
 
-      const role = roleEl.value;
-      const name = document.getElementById("name").value.trim();
-      const username = document.getElementById("username").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const course = document.getElementById("course")?.value.trim();
+  const role = document.getElementById("role");
+  const courseWrap = document.getElementById("studentCourseWrap");
+  role.onchange = () => courseWrap.classList.toggle("hidden", role.value !== "student");
 
-      try {
-        const res = await fetch("/api/register", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            role,
-            name,
-            username,
-            password,
-            course: role === "student" ? course : undefined
-          })
-        });
+  document.getElementById("registerForm").onsubmit = async e => {
+    e.preventDefault();
 
-        const data = await res.json().catch(() => ({}));
+    const body = {
+      role: role.value,
+      name: name.value.trim(),
+      username: username.value.trim(),
+      password: password.value.trim(),
+      course: course.value?.trim()
+    };
 
-        if (!res.ok || !data.success) {
-          msg.textContent = data.message || "Register failed. Try a different username.";
-          return;
-        }
-
-        msg.textContent = "✅ Registered! Redirecting to login...";
-        setTimeout(() => {
-          window.location.href = "login.html";
-        }, 900);
-
-      } catch (err) {
-        console.error("Register error:", err);
-        msg.textContent = "Server error. Check console.";
-      }
+    const res = await fetch("/api/register", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify(body)
     });
-  </script>
+
+    const data = await res.json();
+    if (!data.success) return msg.textContent = data.message || "Failed";
+
+    msg.textContent = "Registered! Redirecting...";
+    setTimeout(() => location.href = "login.html", 800);
+  };
+</script>
+
 </body>
 </html>
