@@ -5,143 +5,110 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Student Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="style.css">
 </head>
 
-<body class="min-h-screen bg-[var(--soft-green-light)] text-[var(--text-dark)] overflow-x-hidden">
+<body class="min-h-screen bg-gray-50 font-sans text-gray-900">
 
-<!-- ===== TOPBAR ===== -->
- <header class="sticky top-0 z-50 bg-[var(--soft-green-dark)] backdrop-blur border-b border-[var(--border-light)]">
-  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <img src="logo.png" class="w-10 h-10 rounded-lg object-contain" alt="Logo">
-      <button id="menuBtn" class="lg:hidden text-2xl hover:text-[var(--soft-green)] transition">☰</button>
-      <h1 class="font-semibold text-lg">Student Portal</h1>
+  <!-- Topbar -->
+  <header class="sticky top-0 z-40 bg-green-500/60 backdrop-blur border-b border-green-500/60">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img src="project caribbean 1.png" class="w-10 h-10 rounded-lg object-contain" alt="Logo">
+        <span class="font-semibold text-gray-900 text-lg">Student Portal</span>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <span id="studentName" class="text-sm font-medium text-gray-900"></span>
+
+        <img
+          src="https://ui-avatars.com/api/?name=S&background=E5E7EB&color=111827"
+          alt="Avatar"
+          class="w-8 h-8 rounded-full ring-1 ring-gray-200"
+        />
+
+        <button id="logoutBtn"
+          class="px-3 py-1.5 rounded-lg bg-white/70 hover:bg-white text-sm font-medium border border-white/60">
+          Logout
+        </button>
+      </div>
     </div>
+  </header>
 
-    <div class="flex items-center gap-2">
-      <span id="userName" class="text-sm"></span>
-      <div class="w-8 h-8 rounded-full bg-[var(--soft-green)]" id="userAvatar"></div>
-    </div>
-  </div>
-</header>
+  <!-- Layout -->
+  <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 px-4 py-6">
 
-<div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 px-4 py-6">
+    <!-- Sidebar -->
+    <aside class="lg:col-span-3 space-y-6">
+      <nav class="bg-white rounded-2xl border border-gray-200 p-3 shadow-sm">
+        <ul class="space-y-1">
+          <li><a href="#" data-page="dashboard" class="nav-link block px-3 py-2 rounded-xl text-sm hover:bg-gray-100 bg-gray-100">Dashboard</a></li>
+          <li><a href="#" data-page="courses" class="nav-link block px-3 py-2 rounded-xl text-sm hover:bg-gray-100">My Courses</a></li>
+          <li><a href="#" data-page="assignments" class="nav-link block px-3 py-2 rounded-xl text-sm hover:bg-gray-100">Assignments</a></li>
+          <li><a href="#" data-page="news" class="nav-link block px-3 py-2 rounded-xl text-sm hover:bg-gray-100">News</a></li>
+        </ul>
 
-<!-- ===== SIDEBAR ===== -->
-<aside id="sidebar"
-  class="lg:col-span-3 fixed lg:static top-0 left-0 h-full lg:h-auto
-  bg-[var(--soft-green-light)] lg:rounded-2xl border-r lg:border
-  border-[var(--border-light)] p-3 shadow-md transform -translate-x-full
-  lg:translate-x-0 transition-transform duration-300 z-40 flex flex-col justify-between">
+        <div class="mt-4 grid grid-cols-2 gap-3">
+          <div class="bg-gray-50 rounded-2xl border border-gray-200 p-4 shadow-sm text-center">
+            <p class="text-sm text-gray-500">Active courses</p>
+            <p id="activeCoursesCount" class="text-2xl font-semibold text-gray-900">0</p>
+          </div>
+          <div class="bg-gray-50 rounded-2xl border border-gray-200 p-4 shadow-sm text-center">
+            <p class="text-sm text-gray-500">Assignments</p>
+            <p id="assignmentCount" class="text-2xl font-semibold text-gray-900">0</p>
+          </div>
+        </div>
+      </nav>
+    </aside>
 
-  <div>
-    <nav>
-      <ul class="space-y-1 mt-4">
-        <li><a href="#" data-page="dashboard" class="nav-item active">Dashboard</a></li>
-        <li><a href="#" data-page="courses" class="nav-item">My Courses</a></li>
-        <li><a href="#" data-page="assignments" class="nav-item">Assignments</a></li>
-        <li><a href="#" data-page="enroll" class="nav-item">Enroll in Courses</a></li>
-        <li><a href="#" data-page="schedule" class="nav-item">Schedule</a></li>
-        <li><a href="#" data-page="news" class="nav-item">News</a></li>
-      </ul>
-    </nav>
+    <!-- Main content -->
+    <main class="lg:col-span-9 space-y-6">
 
-    <div class="mt-6 grid grid-cols-2 gap-3">
-      <section class="stat-box">
-        <p class="text-sm">Active Courses</p>
-        <p id="activeCoursesCount" class="stat-number">0</p>
+      <!-- DASHBOARD -->
+      <section id="dashboard" class="page">
+        <section class="bg-green-500/60 rounded-2xl p-6 text-black shadow-sm">
+          <h1 class="text-2xl font-semibold">Welcome!</h1>
+          <p class="text-black/80 mt-1">Quick overview of your courses and assignments.</p>
+        </section>
+
+        <section class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm mt-6">
+          <h2 class="text-lg font-semibold mb-3">Your Courses</h2>
+          <div id="courseCardsDashboard" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+        </section>
       </section>
 
-      <section class="stat-box">
-        <p class="text-sm">Total Courses</p>
-        <p id="totalCoursesCount" class="stat-number">0</p>
+      <!-- COURSES PAGE -->
+      <section id="courses" class="page hidden">
+        <section class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+          <h2 class="text-xl font-semibold mb-4">My Courses</h2>
+          <div id="courseCardsFull" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+        </section>
       </section>
-    </div>
-  </div>
-</aside>
 
-<div id="overlay" class="fixed inset-0 bg-black/40 hidden z-30 lg:hidden"></div>
+      <!-- ASSIGNMENTS PAGE -->
+      <section id="assignments" class="page hidden">
+        <section class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+          <h2 class="text-xl font-semibold mb-4">Assignments</h2>
+          <div id="assignmentList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </section>
+      </section>
 
-<!-- ===== MAIN CONTENT ===== -->
-<main class="lg:col-span-9 space-y-6">
+      <!-- NEWS PAGE -->
+      <section id="news" class="page hidden">
+        <section class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm text-center min-h-[40vh]">
+          <h2 class="text-xl font-semibold mb-2">News</h2>
+          <p class="text-gray-600">Coming soon.</p>
+        </section>
+      </section>
 
-<!-- Dashboard -->
-<section id="dashboard" class="page-section fade-in">
-  <div class="hero-box">
-    <h2 class="text-2xl font-semibold">Welcome, student!</h2>
-    <p class="opacity-80 mt-1">Manage your courses, assignments, and more.</p>
-  </div>
-  <div class="content-box mt-6">
-  <div id="continueCourses" class="grid sm:grid-cols-2 gap-4"></div>
-  </div>
-</section>
-
-<!-- My Courses -->
-<section id="courses" class="page-section hidden fade-in"></section>
-
-<!-- Assignments -->
-<section id="assignments" class="page-section hidden fade-in">
-  <div class="content-box min-h-[60vh]">
-    <h2 class="text-xl font-semibold mb-4 text-center">Assignments</h2>
-    <div id="assignmentsList" class="grid md:grid-cols-2 gap-4"></div>
-  </div>
-</section>
-
-<!-- Enroll -->
-<section id="enroll" class="page-section hidden fade-in"></section>
-
-<section id="schedule" class="page-section hidden fade-in">
-  <div class="content-box min-h-[60vh]">
-    <h2 class="text-2xl font-semibold mb-4 text-center">Schedule</h2>
-
-    <div class="bg-white p-4 rounded-xl shadow">
-      <div class="flex justify-between items-center mb-2">
-        <button id="prevMonth">‹</button>
-        <span id="monthYear" class="font-semibold"></span>
-        <button id="nextMonth">›</button>
-      </div>
-
-      <div class="grid grid-cols-7 text-center text-sm font-semibold">
-        <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
-      </div>
-
-      <div id="calendarDays" class="grid grid-cols-7 gap-1 mt-2"></div>
-    </div>
-
-    <div class="mt-4 bg-white p-4 rounded-xl shadow">
-      <h3 class="font-semibold mb-2">Your Plans</h3>
-      <div id="plansList" class="text-sm space-y-2"></div>
-    </div>
+    </main>
   </div>
 
-  <!-- Modal -->
-  <div id="planModal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center">
-    <div class="bg-white p-4 rounded-xl w-72">
-      <h4 id="modalDate" class="font-semibold mb-2"></h4>
-      <textarea id="planInput" class="w-full border rounded p-2 h-24"></textarea>
-      <div class="flex justify-end gap-2 mt-3">
-        <button id="deletePlan" class="text-red-500">Delete</button>
-        <button id="savePlan" class="text-blue-600">Save</button>
-      </div>
-    </div>
-  </div>
-</section>
-  
-<!-- News -->
-<section id="news" class="page-section hidden fade-in">
-  <div class="content-box min-h-[60vh] text-center">
-    <h2 class="text-2xl font-semibold mb-4">News</h2>
-  </div>
-</section>
+  <!-- Footer -->
+  <footer class="max-w-7xl mx-auto px-4 pb-10 text-center text-xs text-gray-500">
+    © <span id="y"></span> Student Portal · Privacy · Terms
+  </footer>
 
-</main>
-</div>
+ <script src="./script.js"></script>
 
-<footer class="w-full py-6 text-center text-xs border-t border-[var(--border-light)] opacity-80">
-  © <span id="y"></span> Student Portal · Privacy · Terms
-</footer>
-
-<script src="script.js"></script>
 </body>
 </html>
