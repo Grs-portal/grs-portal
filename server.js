@@ -213,10 +213,11 @@ function sendFirstExisting(res, ...relativeCandidates) {
 
 app.get("/", (req, res) => sendFirstExisting(res, "homepage/index.html"));
 app.get("/instructor", (req, res) => sendFirstExisting(res, "instructor/index.html"));
-app.get("/manager", (req, res) => sendFirstExisting(res, "manager/index.html"));
-app.get("/students", (req, res) => sendFirstExisting(res, "students/index.html"));
+app.get("/manager", (req, res) => sendFirstExisting(res, "manager/manager.html"));
+app.get("/students", (req, res) => sendFirstExisting(res, "students/student.html"));
 app.get("/homepage/login.html", (req, res) => sendFirstExisting(res, "homepage/login.html"));
 app.get("/homepage/register.html", (req, res) => sendFirstExisting(res, "homepage/register.html", "register.html"));
 
 // ---------------- START ----------------
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+
