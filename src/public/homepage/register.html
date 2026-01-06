@@ -78,38 +78,67 @@
 
 <script>
   const pwd = document.getElementById("password");
-  document.getElementById("togglePwd").onclick = () => {
+  const togglePwd = document.getElementById("togglePwd");
+  const role = document.getElementById("role");
+  const courseWrap = document.getElementById("studentCourseWrap");
+  const msg = document.getElementById("msg");
+
+  togglePwd.onclick = () => {
     pwd.type = pwd.type === "password" ? "text" : "password";
   };
 
-  const role = document.getElementById("role");
-  const courseWrap = document.getElementById("studentCourseWrap");
-  role.onchange = () => courseWrap.classList.toggle("hidden", role.value !== "student");
+  role.onchange = () => {
+    courseWrap.classList.toggle("hidden", role.value !== "student");
+  };
 
-  document.getElementById("registerForm").onsubmit = async e => {
+  document.getElementById("registerForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const body = {
+    const payload = {
       role: role.value,
-      name: name.value.trim(),
-      username: username.value.trim(),
-      password: password.value.trim(),
-      course: course.value?.trim()
+      name: document.getElementById("name").value.trim(),
+      username: document.getElementById("username").value.trim(),
+      password: document.getElementById("password").value.trim(),
+      course: document.getElementById("course")?.value.trim()
     };
 
-    const res = await fetch("/api/register", {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify(body)
-    });
+    if (!payload.name || !payload.username || !payload.password) {
+      msg.textContent = "Please fill all required fields.";
+      msg.className = "text-red-400 text-center";
+      return;
+    }
 
-    const data = await res.json();
-    if (!data.success) return msg.textContent = data.message || "Failed";
+    try {
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
 
-    msg.textContent = "Registered! Redirecting...";
-    setTimeout(() => location.href = "login.html", 800);
-  };
+      const data = await res.json();
+
+      if (!data.success) {
+        msg.textContent = data.message || "Registration failed";
+        msg.className = "text-red-400 text-center";
+        return;
+      }
+
+      msg.textContent = "Account created! Redirecting to login...";
+      msg.className = "text-green-400 text-center";
+
+      setTimeout(() => {
+        window.location.href = "/homepage/login.html";
+      }, 900);
+
+    } catch (err) {
+      console.error(err);
+      msg.textContent = "Server error";
+      msg.className = "text-red-400 text-center";
+    }
+  });
 </script>
+
 
 </body>
 </html>
+
