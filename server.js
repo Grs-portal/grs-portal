@@ -23,8 +23,9 @@ if (!fs.existsSync(path.join(rootDir, "public"))) {
   }
 }
 
-console.log("Serving static files from:", path.join(rootDir, "public"));
-app.use(express.static(path.join(rootDir, "public")));
+const publicDir = path.join(rootDir, "public");
+console.log("Serving static files from:", publicDir);
+app.use(express.static(publicDir)); // serves /public/*
 
 // ---------------- IN-MEMORY DATABASE ----------------
 let accounts = [
@@ -33,28 +34,24 @@ let accounts = [
   { username: "student", password: "1234", role: "student", name: "Student" }
 ];
 
-let courses = [
-  { id: 1, title: "Intro to Programming", description: "Learn JS basics" },
-];
+let courses = [{ id: 1, title: "Intro to Programming", description: "Learn JS basics" }];
 
 let homework = [
-  {
-    id: 1,
-    title: "Week 1 Assignment",
-    description: "Intro tasks",
-    submitted_by: "John Doe",
-    course: "Intro to Programming",
-  },
+  { id: 1, title: "Week 1 Assignment", description: "Intro tasks", submitted_by: "John Doe", course: "Intro to Programming" },
 ];
 
 let students = [
-  {
-    enrollment_id: 1,
-    name: "John Doe",
-    course: "Intro to Programming",
-    grade: 9,
-  },
+  { enrollment_id: 1, name: "John Doe", course: "Intro to Programming", grade: 9 },
 ];
+
+// ---------------- HELPERS ----------------
+function sendFirstExisting(res, candidates) {
+  for (const rel of candidates) {
+    const abs = path.join(publicDir, rel);
+    if (fs.existsSync(abs)) return res.sendFile(abs);
+  }
+  return res.status(404).send("Not Found (page file missing in public/)");
+}
 
 // ---------------- API ROUTES ----------------
 
@@ -98,49 +95,62 @@ app.put("/api/students/:id", (req, res) => {
 // ---------------- AUTH ----------------
 app.post("/api/login", (req, res) => {
   const { username, password } = req.body || {};
+  if (!username || !password) return res.status(400).json({ success: false });
 
-  if (!username || !password) {
-    return res.status(400).json({ success: false });
-  }
-
-  const user = accounts.find(
-    (a) => a.username === username && a.password === password
-  );
-
-  if (!user) {
-    return res.status(401).json({ success: false });
-  }
+  const user = accounts.find((a) => a.username === username && a.password === password);
+  if (!user) return res.status(401).json({ success: false });
 
   const redirect =
     user.role === "instructor"
-      ? "/instructor"
+      ? "/instructor/"
       : user.role === "manager"
-      ? "/manager"
-      : "/students";
+      ? "/manager/"
+      : "/students/";
 
-  res.json({
-    success: true,
-    role: user.role,
-    name: user.name,
-    redirect,
-  });
+  res.json({ success: true, role: user.role, name: user.name, redirect });
 });
 
-// ---------------- STATIC PAGE ROUTES ----------------
+// ---------------- PAGE ROUTES ----------------
+
+// homepage
 app.get("/", (req, res) => {
-  res.sendFile(path.join(rootDir, "public", "homepage", "index.html"));
+  sendFirstExisting(res, [
+    "homepage/index.html",
+    "index.html",
+  ]);
 });
 
-app.get("/instructor", (req, res) => {
-  res.sendFile(path.join(rootDir, "public", "instructor", "index.html"));
+// instructor
+app.get("/instructor", (req, res) => res.redirect(301, "/instructor/"));
+app.get("/instructor/", (req, res) => {
+  sendFirstExisting(res, [
+    "instructor/index.html",
+    "homepage/instructor/index.html",
+    "instructor.html",
+    "homepage/instructor.html",
+  ]);
 });
 
-app.get("/manager", (req, res) => {
-  res.sendFile(path.join(rootDir, "public", "manager", "index.html"));
+// manager
+app.get("/manager", (req, res) => res.redirect(301, "/manager/"));
+app.get("/manager/", (req, res) => {
+  sendFirstExisting(res, [
+    "manager/index.html",
+    "homepage/manager/index.html",
+    "manager.html",
+    "homepage/manager.html",
+  ]);
 });
 
-app.get("/students", (req, res) => {
-  res.sendFile(path.join(rootDir, "public", "students", "index.html"));
+// students
+app.get("/students", (req, res) => res.redirect(301, "/students/"));
+app.get("/students/", (req, res) => {
+  sendFirstExisting(res, [
+    "students/index.html",
+    "homepage/students/index.html",
+    "students.html",
+    "homepage/students.html",
+  ]);
 });
 
 // ---------------- START ----------------
