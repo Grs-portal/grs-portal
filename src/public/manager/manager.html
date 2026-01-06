@@ -18,7 +18,6 @@
       --text-dark: #1A1A1A;
     }
 
-    /* Sidebar Nav */
     .nav-item {
       display: block;
       padding: 10px 14px;
@@ -37,7 +36,6 @@
       color: white;
     }
 
-    /* Sections */
     .soft-card {
       background: white;
       border: 1px solid var(--soft-green-dark);
@@ -85,8 +83,7 @@
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
 
       <div class="flex items-center gap-3">
-        <button id="menuBtn"
-          class="lg:hidden text-2xl focus:outline-none hover:opacity-70 transition">☰</button>
+        <button id="menuBtn" class="lg:hidden text-2xl focus:outline-none hover:opacity-70 transition">☰</button>
         <h1 class="font-semibold text-lg">Project Manager Portal</h1>
       </div>
 
@@ -96,6 +93,15 @@
         <div id="topAvatarWrap" class="relative">
           <div id="userAvatar"
             class="w-10 h-10 rounded-full bg-white border border-[var(--soft-green-dark)] flex items-center justify-center font-bold cursor-pointer shadow-sm">
+          </div>
+
+          <!-- ✅ Profile dropdown -->
+          <div id="profileMenu"
+            class="hidden absolute right-0 mt-2 w-44 bg-white border border-[var(--soft-green-dark)] rounded-xl shadow-lg overflow-hidden z-50">
+            <button id="logoutBtn"
+              class="w-full text-left px-4 py-3 text-sm hover:bg-[var(--soft-green-light)]">
+              Logout
+            </button>
           </div>
         </div>
       </div>
@@ -117,7 +123,8 @@
           <li><a data-page="submitted-homework" class="nav-item" href="#">Submitted Homework</a></li>
           <li><a data-page="submitted-courses" class="nav-item" href="#">Submitted Courses</a></li>
           <li><a data-page="create-homework" class="nav-item" href="#">Create Homework</a></li>
-          <li><a data-page="news" class="nav-item" href="#">News</a></li>
+          <li><a data-page="users" class="nav-item" href="#">Users</a></li> <!-- ✅ NEW -->
+          <li><a id="sidebarLogout" class="nav-item" href="#">Logout</a></li> <!-- ✅ NEW -->
         </ul>
       </nav>
 
@@ -141,7 +148,6 @@
 
       <!-- Dashboard -->
       <div id="dashboard" class="page-section">
-
         <section class="header-box mb-6">
           <h2 class="text-2xl font-semibold">Welcome, Manager!</h2>
           <p class="opacity-80 mt-1">Manage all courses, homework, projects, and grading.</p>
@@ -158,7 +164,6 @@
           <div id="dashboardProjects" class="grid gap-4"></div>
           <button id="createProjectBtn" class="btn-primary mt-4">+ Create Project</button>
         </section>
-
       </div>
 
       <!-- Projects Page -->
@@ -200,6 +205,26 @@
       <div id="create-homework" class="page-section hidden soft-card text-center">
         <h2 class="text-xl font-semibold mb-4">Create Homework</h2>
         <button id="openCreateHw" class="btn-primary">+ Add Homework</button>
+      </div>
+
+      <!-- ✅ Users Page -->
+      <div id="users" class="page-section hidden soft-card overflow-auto">
+        <div class="flex items-center justify-between gap-3 mb-4">
+          <h2 class="text-xl font-semibold">Users</h2>
+          <button id="refreshUsersBtn" class="btn-primary">Refresh</button>
+        </div>
+
+        <table class="min-w-full text-sm">
+          <thead class="bg-[var(--soft-green)] text-[var(--text-dark)] uppercase text-xs">
+            <tr>
+              <th class="px-6 py-3">Username</th>
+              <th class="px-6 py-3">Name</th>
+              <th class="px-6 py-3">Role</th>
+              <th class="px-6 py-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="usersTable"></tbody>
+        </table>
       </div>
 
     </main>
