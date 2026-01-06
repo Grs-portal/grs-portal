@@ -94,10 +94,14 @@ app.post("/api/login", (req, res) => {
   const user = accounts.find((a) => a.username === username && a.password === password);
   if (!user) return res.status(401).json({ success: false });
 
+  // IMPORTANT:
+  // Use paths WITHOUT trailing slashes to avoid redirect loops.
   const redirect =
-    user.role === "instructor" ? "/instructor" :
-    user.role === "manager" ? "/manager" :
-    "/students";
+    user.role === "instructor"
+      ? "/instructor"
+      : user.role === "manager"
+      ? "/manager"
+      : "/students";
 
   res.json({ success: true, role: user.role, name: user.name, redirect });
 });
@@ -108,25 +112,31 @@ function sendFirstExisting(res, ...relativeCandidates) {
     const abs = path.join(publicDir, rel);
     if (fs.existsSync(abs)) return res.sendFile(abs);
   }
-  res.status(404).send("Not found: " + relativeCandidates.join(" OR "));
+  return res.status(404).send("Not found: " + relativeCandidates.join(" OR "));
 }
 
 // ---------------- PAGE ROUTES ----------------
 
 // Homepage
 app.get("/", (req, res) => {
-  sendFirstExisting(res, "homepage/index.html");
+  sendFirstExisting(res, "homepage/index.html", "index.html");
 });
 
-// Login (your JS uses /homepage/login.html, but we also add /login + /login.html to prevent loops)
+// Login: supports both /homepage/login.html AND /login
 app.get("/homepage/login.html", (req, res) => {
   sendFirstExisting(res, "homepage/login.html", "login.html");
 });
 app.get("/login", (req, res) => res.redirect(302, "/homepage/login.html"));
 app.get("/login.html", (req, res) => res.redirect(302, "/homepage/login.html"));
 
-// Register (you have register.html in public root)
+// Register:
+// Your error was "Cannot GET /homepage/register.html"
+// In your repo, register.html is in public root, so we map both URLs:
 app.get("/register.html", (req, res) => {
+  sendFirstExisting(res, "register.html");
+});
+app.get("/homepage/register.html", (req, res) => {
+  // points to the same file (public/register.html)
   sendFirstExisting(res, "register.html");
 });
 
@@ -142,9 +152,10 @@ app.get("/manager", (req, res) => {
 });
 app.get("/manager/", (req, res) => res.redirect(301, "/manager"));
 
-// Student portal (IMPORTANT: your repo likely uses students/student.html)
+// Student portal
+// Your repo has students/student.html, so we serve that as the main students page:
 app.get("/students", (req, res) => {
-  sendFirstExisting(res, "students/index.html", "students/student.html", "students/student_portal.html");
+  sendFirstExisting(res, "students/student.html", "students/index.html");
 });
 app.get("/students/", (req, res) => res.redirect(301, "/students"));
 
