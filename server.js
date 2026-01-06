@@ -107,6 +107,21 @@ app.post("/api/register", (req, res) => {
   });
 });
 
+// ---------------- MANAGER: DELETE USER ----------------
+app.delete("/api/users/:username", (req, res) => {
+  const { username } = req.params;
+  const { role } = req.body; // sent from frontend
+
+  if (role !== "manager") {
+    return res.status(403).json({ success: false, message: "Forbidden" });
+  }
+
+  accounts = accounts.filter(a => a.username !== username);
+  students = students.filter(s => s.username !== username);
+
+  res.json({ success: true });
+});
+
 // ---------------- API ROUTES ----------------
 
 // Courses
@@ -220,4 +235,5 @@ app.get("/students/", (req, res) => res.redirect(301, "/students"));
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
 });
+
 
