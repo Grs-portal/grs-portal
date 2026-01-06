@@ -14,27 +14,23 @@ app.use(express.json());
 // ---------------- DETERMINE PUBLIC ROOT ----------------
 let rootDir = __dirname;
 
-// Check if public folder exists here or in src/
 if (!fs.existsSync(path.join(rootDir, "public"))) {
   if (fs.existsSync(path.join(__dirname, "src", "public"))) {
     rootDir = path.join(__dirname, "src");
   } else {
-    console.error("❌ Could not find public/ folder. Make sure it exists in root or src/");
+    console.error("❌ Could not find public/ folder.");
     process.exit(1);
   }
 }
 
 console.log("Serving static files from:", path.join(rootDir, "public"));
-
-// Serve all frontend files from /public
 app.use(express.static(path.join(rootDir, "public")));
 
 // ---------------- IN-MEMORY DATABASE ----------------
-// NOTE: Replace with real DB and hashed passwords in production
 let accounts = [
   { username: "root", password: "1234", role: "instructor", name: "Instructor Root" },
-  { username: "manager", password: "9999", role: "manager", name: "Project Manager" }
-  { username: "student", password: "1234", role: "student", name: "student" }
+  { username: "manager", password: "9999", role: "manager", name: "Project Manager" },
+  { username: "student", password: "1234", role: "student", name: "Student" }
 ];
 
 let courses = [
@@ -99,53 +95,43 @@ app.put("/api/students/:id", (req, res) => {
   }
 });
 
-// ---------------- AUTH ROUTES ----------------
+// ---------------- AUTH ----------------
 app.post("/api/login", (req, res) => {
   const { username, password } = req.body || {};
+
   if (!username || !password) {
-    return res.status(400).json({ success: false, message: "Missing username or password" });
+    return res.status(400).json({ success: false });
   }
 
-  const user = accounts.find((a) => a.username === username && a.password === password);
+  const user = accounts.find(
+    (a) => a.username === username && a.password === password
+  );
+
   if (!user) {
-    return res.status(401).json({ success: false, message: "Invalid credentials" });
+    return res.status(401).json({ success: false });
   }
 
-  // Simple redirect based on role
-  const redirect = user.role === "instructor" ? "/instructor/" : "/manager/" : "/students/";
-  res.json({ success: true, role: user.role, name: user.name, redirect });
+  const redirect =
+    user.role === "instructor"
+      ? "/instructor/"
+      : user.role === "manager"
+      ? "/manager/"
+      : "/students/";
+
+  res.json({
+    success: true,
+    role: user.role,
+    name: user.name,
+    redirect,
+  });
 });
 
-app.post("/api/register", (req, res) => {
-  const { username, password, role = "instructor", name = username } = req.body || {};
-  if (!username || !password) {
-    return res.status(400).json({ success: false, message: "Missing username or password" });
-  }
-  if (accounts.find((a) => a.username === username)) {
-    return res.status(400).json({ success: false, message: "Username taken" });
-  }
-
-  const newAcc = { username, password, role, name };
-  accounts.push(newAcc);
-  res.json({ success: true, message: "Account created", account: { username, role, name } });
-});
-
-// ---------------- STATIC ROUTES ----------------
-
-// Homepage
+// ---------------- ROUTES ----------------
 app.get("/", (req, res) => {
   res.sendFile(path.join(rootDir, "public", "homepage", "index.html"));
 });
 
-// Instructor portal
-app.get("/instructor/", (req, res) => res.redirect("/instructor"));
-app.get("/manager/", (req, res) => res.redirect("/manager"));
-app.get("/students/", (req, res) => res.redirect("/students"));
-
-
-// ---------------- START SERVER ----------------
+// ---------------- START ----------------
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
 });
-
-
