@@ -17,13 +17,42 @@
       --panel-2: rgba(255,255,255,.85);
     }
 
-    /* Background: soft, not noisy */
+    /* ✅ Animated Gradient Background (Option B) */
     body{
       color: var(--text-dark);
+      background: linear-gradient(-45deg,
+        #f2fbf0,
+        #e6f5e2,
+        #d9f0d3,
+        #f7fff6,
+        #eaf6e6
+      );
+      background-size: 500% 500%;
+      animation: gradientMove 22s ease-in-out infinite;
+    }
+
+    @keyframes gradientMove{
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* ✅ Soft spotlight blobs on top (still subtle, looks premium) */
+    body::before{
+      content:"";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
       background:
-        radial-gradient(900px 420px at 18% 8%, rgba(191,227,180,.55), transparent 55%),
-        radial-gradient(900px 420px at 90% 12%, rgba(169,214,157,.40), transparent 55%),
-        linear-gradient(180deg, #f2fbf0 0%, #e6f5e2 55%, #f2fbf0 100%);
+        radial-gradient(900px 420px at 18% 8%, rgba(191,227,180,.40), transparent 60%),
+        radial-gradient(900px 420px at 90% 12%, rgba(169,214,157,.28), transparent 62%);
+      z-index: -1;
+      filter: saturate(1.05);
+    }
+
+    /* Accessibility: reduce motion */
+    @media (prefers-reduced-motion: reduce){
+      body{ animation: none; }
     }
 
     /* Reusable UI */
