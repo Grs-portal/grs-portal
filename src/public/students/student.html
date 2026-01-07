@@ -7,60 +7,142 @@
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
-    /* Better page background */
-body{
-  background:
-    radial-gradient(900px 420px at 15% 10%, rgba(191,227,180,.55), transparent 60%),
-    radial-gradient(820px 420px at 90% 15%, rgba(169,214,157,.45), transparent 55%),
-    linear-gradient(180deg, #eaf6e6 0%, #dff0db 40%, #eaf6e6 100%);
-}
+    :root{
+      --soft-green: #BFE3B4;
+      --soft-green-light: #EAF6E6;
+      --soft-green-dark: #A9D69D;
+      --border-light: rgba(25, 50, 25, .15);
+      --text-dark: #172217;
+      --panel: rgba(255,255,255,.72);
+      --panel-2: rgba(255,255,255,.85);
+    }
 
-/* Panels should not be pure white */
-.panel,
-.content-box{
-  background: rgba(255,255,255,.55) !important;
-  backdrop-filter: blur(10px);
-}
+    /* Background: soft, not noisy */
+    body{
+      color: var(--text-dark);
+      background:
+        radial-gradient(900px 420px at 18% 8%, rgba(191,227,180,.55), transparent 55%),
+        radial-gradient(900px 420px at 90% 12%, rgba(169,214,157,.40), transparent 55%),
+        linear-gradient(180deg, #f2fbf0 0%, #e6f5e2 55%, #f2fbf0 100%);
+    }
 
-/* Cards slightly less bright */
-.card,
-.bg-white{
-  background: rgba(255,255,255,.82) !important;
-}
+    /* Reusable UI */
+    .panel{
+      background: var(--panel);
+      border: 1px solid var(--border-light);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.06);
+      backdrop-filter: blur(10px);
+    }
 
+    .card{
+      background: var(--panel-2);
+      border: 1px solid var(--border-light);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 8px 22px rgba(0,0,0,.06);
+    }
+
+    .hero{
+      background: linear-gradient(135deg, rgba(191,227,180,.85), rgba(169,214,157,.85));
+      border: 1px solid var(--border-light);
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 10px 26px rgba(0,0,0,.06);
+    }
+
+    .muted{ opacity:.78; }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:.5rem;
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-weight: 800;
+      background: rgba(255,255,255,.7);
+      border: 1px solid var(--border-light);
+      transition: .15s;
+    }
+    .btn:hover{ background: rgba(255,255,255,.95); }
+
+    .nav-item{
+      display:block;
+      padding: 10px 12px;
+      border-radius: 14px;
+      font-weight: 800;
+      border: 1px solid transparent;
+      transition: .15s;
+      opacity: .92;
+    }
+    .nav-item:hover{
+      background: rgba(255,255,255,.55);
+      border-color: var(--border-light);
+      opacity: 1;
+    }
+    .nav-item.active{
+      background: rgba(23,34,23,.92);
+      color: #e9f7e6;
+      border-color: rgba(23,34,23,.2);
+      opacity: 1;
+    }
+
+    .stat-box{
+      background: rgba(255,255,255,.60);
+      border: 1px solid var(--border-light);
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    /* Topbar glass */
+    .topbar{
+      background: rgba(255,255,255,.45);
+      border-bottom: 1px solid var(--border-light);
+      backdrop-filter: blur(12px);
+    }
+
+    /* Sidebar glass */
+    .sidebar{
+      background: rgba(255,255,255,.38);
+      border-right: 1px solid var(--border-light);
+      backdrop-filter: blur(12px);
+    }
   </style>
 </head>
 
-<body class="min-h-screen bg-[var(--soft-green-light)] text-[var(--text-dark)] overflow-x-hidden">
+<body class="min-h-screen overflow-x-hidden">
 
   <!-- TOPBAR -->
-  <header class="sticky top-0 z-50 bg-[var(--soft-green-dark)] border-b border-[var(--border-light)]">
+  <header class="sticky top-0 z-50 topbar">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <button id="menuBtn" class="lg:hidden text-2xl hover:opacity-75 transition">☰</button>
-        <div class="w-10 h-10 rounded-xl bg-white/40 border border-white/30 flex items-center justify-center font-black">
+
+        <div class="w-10 h-10 rounded-2xl bg-white/60 border border-[var(--border-light)] flex items-center justify-center font-black">
           S
         </div>
+
         <div class="leading-tight">
-          <div class="font-semibold">Student Portal</div>
-          <div class="text-xs opacity-70">Hofi Korsou</div>
+          <div class="font-extrabold">Student Portal</div>
+          <div class="text-xs muted">Hofi Korsou</div>
         </div>
       </div>
 
       <div class="flex items-center gap-2">
-        <span id="userName" class="text-sm font-semibold"></span>
+        <span id="userName" class="text-sm font-extrabold"></span>
 
         <div id="topAvatarWrap" class="relative">
           <div id="userAvatar"
             class="w-9 h-9 rounded-full bg-[var(--soft-green)] border border-[var(--border-light)]
-                   flex items-center justify-center font-bold cursor-pointer select-none">
+                   flex items-center justify-center font-extrabold cursor-pointer select-none shadow-sm">
           </div>
 
           <div id="profileMenu"
-            class="hidden absolute right-0 mt-2 w-44 bg-white border border-[var(--border-light)]
-                   rounded-2xl shadow-lg overflow-hidden">
-            <button id="logoutBtn"
-              class="w-full text-left px-4 py-3 text-sm hover:bg-[var(--soft-green-light)]">
+            class="hidden absolute right-0 mt-2 w-44 bg-white/90 border border-[var(--border-light)]
+                   rounded-2xl shadow-lg overflow-hidden backdrop-blur">
+            <button id="logoutBtn" class="w-full text-left px-4 py-3 text-sm hover:bg-black/5 font-bold">
               Logout
             </button>
           </div>
@@ -74,13 +156,12 @@ body{
     <!-- SIDEBAR -->
     <aside id="sidebar"
       class="lg:col-span-3 fixed lg:static top-0 left-0 h-full lg:h-auto w-72 lg:w-auto
-             bg-[var(--soft-green-light)] lg:rounded-2xl border-r lg:border border-[var(--border-light)]
-             p-3 shadow-md transform -translate-x-full lg:translate-x-0
+             sidebar lg:rounded-2xl p-3 shadow-md transform -translate-x-full lg:translate-x-0
              transition-transform duration-300 z-40 flex flex-col justify-between">
 
       <div>
         <div class="px-3 pt-3">
-          <div class="text-xs uppercase tracking-wider opacity-60">Navigation</div>
+          <div class="text-xs uppercase tracking-wider muted font-extrabold">Navigation</div>
         </div>
 
         <nav class="mt-2">
@@ -95,20 +176,20 @@ body{
 
         <div class="mt-5 grid grid-cols-2 gap-3 px-2">
           <section class="stat-box">
-            <p class="text-xs uppercase tracking-wider opacity-70">Courses</p>
-            <p id="activeCoursesCount" class="text-2xl font-black leading-tight">0</p>
+            <p class="text-[11px] uppercase tracking-wider muted font-extrabold">Courses</p>
+            <p id="activeCoursesCount" class="text-2xl font-extrabold leading-tight">0</p>
           </section>
           <section class="stat-box">
-            <p class="text-xs uppercase tracking-wider opacity-70">Assignments</p>
-            <p id="homeworkCount" class="text-2xl font-black leading-tight">0</p>
+            <p class="text-[11px] uppercase tracking-wider muted font-extrabold">Assignments</p>
+            <p id="homeworkCount" class="text-2xl font-extrabold leading-tight">0</p>
           </section>
         </div>
       </div>
 
       <div class="p-2">
         <button id="sidebarLogout"
-          class="w-full rounded-2xl border border-[var(--border-light)] bg-white/50 hover:bg-white/70
-                 px-4 py-3 text-left font-semibold transition">
+          class="w-full rounded-2xl border border-[var(--border-light)] bg-white/70 hover:bg-white
+                 px-4 py-3 text-left font-extrabold transition shadow-sm">
           🚪 Logout
         </button>
       </div>
@@ -122,14 +203,16 @@ body{
       <!-- DASHBOARD -->
       <section id="dashboard" class="page-section">
         <div class="hero">
-          <h2 class="text-2xl font-black">Welcome back!</h2>
-          <p class="mt-1 muted">Your courses and assignments update live from the same system as Instructor/Manager.</p>
+          <h2 class="text-2xl font-extrabold">Welcome back!</h2>
+          <p class="mt-1 muted">
+            Your courses and assignments update live from the same system as Instructor/Manager.
+          </p>
         </div>
 
         <div class="panel mt-6">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-black">Continue</h3>
-            <a href="#" data-page="courses" class="text-sm font-semibold underline opacity-80 hover:opacity-100">
+            <h3 class="text-lg font-extrabold">Continue</h3>
+            <a href="#" data-page="courses" class="text-sm font-extrabold underline muted hover:opacity-100">
               View all
             </a>
           </div>
@@ -142,7 +225,7 @@ body{
       <section id="courses" class="page-section hidden">
         <div class="panel">
           <div class="flex items-center justify-between mb-4">
-            <h2 class="text-xl font-black">My Courses</h2>
+            <h2 class="text-xl font-extrabold">My Courses</h2>
             <button id="refreshCoursesBtn" class="btn">Refresh</button>
           </div>
           <div id="coursesGridFull" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
@@ -153,7 +236,7 @@ body{
       <section id="assignments" class="page-section hidden">
         <div class="panel">
           <div class="flex items-center justify-between mb-4">
-            <h2 class="text-xl font-black">Assignments</h2>
+            <h2 class="text-xl font-extrabold">Assignments</h2>
             <button id="refreshAssignmentsBtn" class="btn">Refresh</button>
           </div>
           <div id="assignmentsList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
@@ -164,7 +247,7 @@ body{
       <section id="schedule" class="page-section hidden">
         <div class="panel min-h-[50vh] flex items-center justify-center">
           <div class="text-center">
-            <div class="text-2xl font-black">Schedule</div>
+            <div class="text-2xl font-extrabold">Schedule</div>
             <div class="muted text-sm mt-1">Coming soon.</div>
           </div>
         </div>
@@ -174,7 +257,7 @@ body{
       <section id="news" class="page-section hidden">
         <div class="panel min-h-[50vh] flex items-center justify-center">
           <div class="text-center">
-            <div class="text-2xl font-black">News</div>
+            <div class="text-2xl font-extrabold">News</div>
             <div class="muted text-sm mt-1">Coming soon.</div>
           </div>
         </div>
@@ -190,4 +273,3 @@ body{
   <script src="/students/script.js"></script>
 </body>
 </html>
-
