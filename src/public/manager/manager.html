@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Project Manager Portal</title>
 
-  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
@@ -19,16 +18,19 @@
     }
 
     .nav-item {
-      display: block;
-      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
       border-radius: 12px;
-      font-weight: 500;
+      font-weight: 600;
       transition: 0.15s;
       color: var(--text-dark);
     }
 
     .nav-item:hover {
-      background: rgba(191, 227, 180, 0.45);
+      background: rgba(191, 227, 180, 0.55);
+      transform: translateX(2px);
     }
 
     .nav-item.active {
@@ -56,9 +58,9 @@
       background: var(--soft-green-dark);
       color: white;
       padding: 10px 18px;
-      border-radius: 10px;
+      border-radius: 12px;
       transition: 0.15s;
-      font-weight: 600;
+      font-weight: 700;
     }
 
     .btn-primary:hover {
@@ -68,10 +70,18 @@
     .stat-box {
       background: white;
       border: 1px solid var(--soft-green-dark);
-      padding: 18px;
+      padding: 16px;
       border-radius: 16px;
       text-align: center;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
+    }
+
+    .side-title {
+      font-size: 12px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      opacity: .7;
+      margin: 10px 6px 6px;
     }
   </style>
 </head>
@@ -95,7 +105,6 @@
             class="w-10 h-10 rounded-full bg-white border border-[var(--soft-green-dark)] flex items-center justify-center font-bold cursor-pointer shadow-sm">
           </div>
 
-          <!-- ✅ Profile dropdown -->
           <div id="profileMenu"
             class="hidden absolute right-0 mt-2 w-44 bg-white border border-[var(--soft-green-dark)] rounded-xl shadow-lg overflow-hidden z-50">
             <button id="logoutBtn"
@@ -113,22 +122,38 @@
 
     <!-- Sidebar -->
     <aside id="sidebar"
-      class="lg:col-span-3 fixed lg:static top-0 left-0 h-full lg:h-auto w-64 lg:w-auto bg-[var(--soft-green-light)] border-r border-[var(--soft-green-dark)] p-4 shadow-md transform -translate-x-full lg:translate-x-0 transition-transform duration-300 z-40 rounded-r-2xl lg:rounded-2xl">
+      class="lg:col-span-3 fixed lg:static top-0 left-0 h-full lg:h-auto w-72 lg:w-auto
+      bg-white/70 backdrop-blur border-r border-[var(--soft-green-dark)]
+      p-4 shadow-md transform -translate-x-full lg:translate-x-0 transition-transform duration-300
+      z-40 rounded-r-2xl lg:rounded-2xl">
 
+      <div class="flex items-center justify-between">
+        <div class="font-bold">Menu</div>
+        <span class="text-xs opacity-70">Manager</span>
+      </div>
+
+      <div class="side-title">Navigation</div>
       <nav>
-        <ul class="space-y-2 mt-2">
-          <li><a data-page="dashboard" class="nav-item active" href="#">Dashboard</a></li>
-          <li><a data-page="projects" class="nav-item" href="#">Projects</a></li>
-          <li><a data-page="students" class="nav-item" href="#">Students & Grades</a></li>
-          <li><a data-page="submitted-homework" class="nav-item" href="#">Submitted Homework</a></li>
-          <li><a data-page="submitted-courses" class="nav-item" href="#">Submitted Courses</a></li>
-          <li><a data-page="create-homework" class="nav-item" href="#">Create Homework</a></li>
-          <li><a data-page="users" class="nav-item" href="#">Users</a></li> <!-- ✅ NEW -->
-          <li><a id="sidebarLogout" class="nav-item" href="#">Logout</a></li> <!-- ✅ NEW -->
+        <ul class="space-y-2">
+          <li><a data-page="dashboard" class="nav-item active" href="#">📊 Dashboard</a></li>
+          <li><a data-page="projects" class="nav-item" href="#">🧩 Projects</a></li>
+          <li><a data-page="students" class="nav-item" href="#">🎓 Students & Grades</a></li>
+          <li><a data-page="submitted-homework" class="nav-item" href="#">📥 Submitted Homework</a></li>
+          <li><a data-page="submitted-courses" class="nav-item" href="#">📚 Courses</a></li>
         </ul>
       </nav>
 
-      <div class="mt-6 grid grid-cols-2 gap-4">
+      <div class="side-title">Create</div>
+      <nav>
+        <ul class="space-y-2">
+          <li><a data-page="create-homework" class="nav-item" href="#">➕ Create Homework</a></li>
+          <li><a data-page="create-course" class="nav-item" href="#">➕ Create Course</a></li>
+          <li><a data-page="users" class="nav-item" href="#">👥 Users</a></li>
+          <li><a id="sidebarLogout" class="nav-item" href="#" style="background: rgba(0,0,0,0.05);">🚪 Logout</a></li>
+        </ul>
+      </nav>
+
+      <div class="mt-6 grid grid-cols-2 gap-3">
         <section class="stat-box">
           <p class="text-sm opacity-70">Active</p>
           <p id="activeCoursesCount" class="text-xl font-bold">0</p>
@@ -143,7 +168,7 @@
 
     <div id="overlay" class="fixed inset-0 bg-black/40 hidden z-30 lg:hidden"></div>
 
-    <!-- Main Content -->
+    <!-- Main -->
     <main class="lg:col-span-9 space-y-6">
 
       <!-- Dashboard -->
@@ -156,20 +181,18 @@
         <section class="soft-card mb-6">
           <h3 class="text-xl font-semibold mb-3">All Courses</h3>
           <div id="courses" class="grid gap-4"></div>
-          <button id="createCourseBtn" class="btn-primary mt-4">+ Create Course</button>
+          <!-- ✅ removed create course button from dashboard -->
         </section>
 
         <section class="soft-card">
           <h3 class="text-xl font-semibold mb-3">Projects</h3>
           <div id="dashboardProjects" class="grid gap-4"></div>
-          <button id="createProjectBtn" class="btn-primary mt-4">+ Create Project</button>
         </section>
       </div>
 
-      <!-- Projects Page -->
+      <!-- Projects -->
       <div id="projects" class="page-section hidden soft-card">
         <h2 class="text-xl font-semibold mb-4">Projects</h2>
-        <div id="projectsControls" class="mb-4"></div>
         <div id="projectsFullList" class="space-y-3"></div>
       </div>
 
@@ -195,9 +218,9 @@
         <div id="homework-list" class="grid gap-4"></div>
       </div>
 
-      <!-- Courses Submitted -->
+      <!-- Courses list -->
       <div id="submitted-courses" class="page-section hidden soft-card">
-        <h2 class="text-xl font-semibold mb-4">Submitted Courses</h2>
+        <h2 class="text-xl font-semibold mb-4">Courses</h2>
         <div id="submitted-courses-list"></div>
       </div>
 
@@ -207,30 +230,34 @@
         <button id="openCreateHw" class="btn-primary">+ Add Homework</button>
       </div>
 
-    <!-- ✅ Users Page -->
-<div id="users" class="page-section hidden soft-card overflow-auto">
-  <div class="flex items-center justify-between gap-3 mb-4">
-    <h2 class="text-xl font-semibold">Users</h2>
+      <!-- ✅ Create Course (NEW PAGE) -->
+      <div id="create-course" class="page-section hidden soft-card text-center">
+        <h2 class="text-xl font-semibold mb-4">Create Course</h2>
+        <button id="openCreateCourse" class="btn-primary">+ Add Course</button>
+      </div>
 
-    <div class="flex gap-2">
-      <button id="refreshUsersBtn" class="btn-primary">Refresh</button>
-      <button id="createUserBtn" class="btn-primary">+ Create User</button>
-    </div>
-  </div>
+      <!-- Users -->
+      <div id="users" class="page-section hidden soft-card overflow-auto">
+        <div class="flex items-center justify-between gap-3 mb-4">
+          <h2 class="text-xl font-semibold">Users</h2>
+          <div class="flex gap-2">
+            <button id="createUserBtn" class="btn-primary">+ Create User</button>
+            <button id="refreshUsersBtn" class="btn-primary">Refresh</button>
+          </div>
+        </div>
 
-  <table class="min-w-full text-sm">
-    <thead class="bg-[var(--soft-green)] text-[var(--text-dark)] uppercase text-xs">
-      <tr>
-        <th class="px-6 py-3">Username</th>
-        <th class="px-6 py-3">Name</th>
-        <th class="px-6 py-3">Role</th>
-        <th class="px-6 py-3 text-right">Actions</th>
-      </tr>
-    </thead>
-    <tbody id="usersTable"></tbody>
-  </table>
-</div>
-
+        <table class="min-w-full text-sm">
+          <thead class="bg-[var(--soft-green)] text-[var(--text-dark)] uppercase text-xs">
+            <tr>
+              <th class="px-6 py-3">Username</th>
+              <th class="px-6 py-3">Name</th>
+              <th class="px-6 py-3">Role</th>
+              <th class="px-6 py-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="usersTable"></tbody>
+        </table>
+      </div>
 
     </main>
   </div>
@@ -239,9 +266,6 @@
     © <span id="y"></span> Project Manager Portal · Privacy · Terms
   </footer>
 
-  <!-- JS -->
   <script src="manager.js"></script>
-
 </body>
 </html>
-
