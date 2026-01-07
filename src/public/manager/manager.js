@@ -1,4 +1,4 @@
-// manager.js  ✅ FIXED (ready to paste)
+// manager.js  
 (() => {
   const API = "/api";
   const LOGIN = "/homepage/login.html";
@@ -421,3 +421,4 @@
     }
   }
 })();
+
