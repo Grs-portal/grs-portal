@@ -34,6 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ---------- UI: name + avatar + logout ----------
   const name = localStorage.getItem("userName") || "Student";
+
   const userNameEl = qs("#userName");
   const avatarEl = qs("#userAvatar");
 
@@ -54,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
     logout();
   });
 
-  // Profile dropdown toggle (if present)
+  // Profile dropdown
   const topWrap = qs("#topAvatarWrap");
   const profileMenu = qs("#profileMenu");
   avatarEl?.addEventListener("click", () => profileMenu?.classList.toggle("hidden"));
@@ -93,7 +94,6 @@ document.addEventListener("DOMContentLoaded", () => {
     sidebar?.classList.add("-translate-x-full");
     overlay?.classList.add("hidden");
 
-    // load data when switching pages
     if (id === "dashboard") renderDashboard();
     if (id === "courses") renderCoursesPage();
     if (id === "assignments") renderAssignmentsPage();
@@ -108,31 +108,33 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ---------- Elements ----------
-  const continueCourses = qs("#continueCourses"); // dashboard grid
-  const coursesSection = qs("#courses"); // full courses page (section itself)
+  const continueCourses = qs("#continueCourses");
+  const coursesGridFull = qs("#coursesGridFull");
   const assignmentsList = qs("#assignmentsList");
 
   const activeCoursesCount = qs("#activeCoursesCount");
-  const totalCoursesCount = qs("#totalCoursesCount"); // in your new HTML
-  const homeworkCount = qs("#homeworkCount"); // if you still have it somewhere
+  const homeworkCount = qs("#homeworkCount");
 
-  qs("#refreshBtn")?.addEventListener("click", () => loadAll(true));
-  qs("#refreshAssignmentsBtn")?.addEventListener("click", () => loadAll(true));
+  // refresh buttons from the HTML I sent
+  qs("#refreshCoursesBtn")?.addEventListener("click", () => loadAll(true).then(renderCoursesPage));
+  qs("#refreshAssignmentsBtn")?.addEventListener("click", () => loadAll(true).then(renderAssignmentsPage));
 
-  // ---------- Card UI ----------
+  // ---------- Cards ----------
   function courseCard(c) {
     const title = escapeHtml(c.title);
     const desc = escapeHtml(c.description || "");
 
     return `
-      <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-        <h4 class="font-semibold leading-tight">${title}</h4>
+      <div class="card">
+        <h4 class="font-black leading-tight">${title}</h4>
         <p class="text-sm opacity-80 mt-1">${desc}</p>
-        <div class="mt-3 w-full bg-gray-200 rounded-full h-2.5">
-          <div class="h-2.5 rounded-full bg-indigo-600" style="width: 0%"></div>
+
+        <div class="mt-3 w-full bg-black/10 rounded-full h-2.5">
+          <div class="h-2.5 rounded-full bg-black/60" style="width: 0%"></div>
         </div>
         <p class="text-xs opacity-70 mt-2">0% Complete</p>
-        <button class="mt-4 w-full bg-gray-100 hover:bg-[rgba(191,227,180,.65)] text-black font-semibold py-2 rounded-xl transition">
+
+        <button class="mt-4 w-full rounded-xl bg-[var(--soft-green)] hover:bg-[var(--soft-green-dark)] text-[var(--text-dark)] font-black py-2 transition">
           Continue
         </button>
       </div>
@@ -143,28 +145,29 @@ document.addEventListener("DOMContentLoaded", () => {
     const title = escapeHtml(h.title);
     const desc = escapeHtml(h.description || "");
     const by = escapeHtml(h.submitted_by || "N/A");
-    const course = escapeHtml(h.course || h.course_title || "N/A");
+    const course = escapeHtml(h.course || "N/A");
 
     return `
-      <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-        <h4 class="font-semibold leading-tight">${title}</h4>
+      <div class="card">
+        <h4 class="font-black leading-tight">${title}</h4>
         <p class="text-sm opacity-80 mt-1">${desc}</p>
         <p class="text-xs opacity-70 mt-3">Course: ${course} · By: ${by}</p>
-        <button class="mt-4 w-full bg-gray-100 hover:bg-[rgba(191,227,180,.65)] text-black font-semibold py-2 rounded-xl transition">
+
+        <button class="mt-4 w-full rounded-xl bg-white/70 hover:bg-white text-[var(--text-dark)] font-black py-2 transition border border-black/10">
           View
         </button>
       </div>
     `;
   }
 
-  // ---------- Data cache ----------
-  let cacheCourses = null;
-  let cacheHomework = null;
+  // ---------- Data ----------
+  let cacheCourses = [];
+  let cacheHomework = [];
 
   async function loadAll(force = false) {
-    try {
-      if (!force && Array.isArray(cacheCourses) && Array.isArray(cacheHomework)) return;
+    if (!force && cacheCourses.length && cacheHomework.length) return;
 
+    try {
       const [coursesRes, hwRes] = await Promise.all([
         fetch("/api/courses"),
         fetch("/api/homework"),
@@ -174,15 +177,12 @@ document.addEventListener("DOMContentLoaded", () => {
       cacheHomework = (await hwRes.json()) || [];
 
       if (activeCoursesCount) activeCoursesCount.textContent = cacheCourses.length;
-      if (totalCoursesCount) totalCoursesCount.textContent = cacheCourses.length;
       if (homeworkCount) homeworkCount.textContent = cacheHomework.length;
     } catch (err) {
-      console.error("Student load error:", err);
-      // no visible grey text on purpose
+      console.error(err);
       cacheCourses = [];
       cacheHomework = [];
       if (activeCoursesCount) activeCoursesCount.textContent = "0";
-      if (totalCoursesCount) totalCoursesCount.textContent = "0";
       if (homeworkCount) homeworkCount.textContent = "0";
     }
   }
@@ -190,49 +190,26 @@ document.addEventListener("DOMContentLoaded", () => {
   // ---------- Render ----------
   async function renderDashboard() {
     await loadAll();
-
-    // show a "continue" grid (you can later filter/enrolled only if you add that system)
     if (continueCourses) {
-      continueCourses.innerHTML = (cacheCourses || []).slice(0, 4).map(courseCard).join("");
+      continueCourses.innerHTML = cacheCourses.slice(0, 4).map(courseCard).join("");
     }
   }
 
   async function renderCoursesPage() {
     await loadAll();
-
-    if (!coursesSection) return;
-
-    // full courses list inside the section
-    coursesSection.innerHTML = `
-      <div class="content-box min-h-[60vh]">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-2xl font-semibold">My Courses</h2>
-          <button id="refreshCoursesBtn" class="btn-primary">Refresh</button>
-        </div>
-
-        <div id="coursesGridFull" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
-      </div>
-    `;
-
-    const grid = qs("#coursesGridFull");
-    if (grid) grid.innerHTML = (cacheCourses || []).map(courseCard).join("");
-
-    // refresh handler (since we injected the button)
-    qs("#refreshCoursesBtn")?.addEventListener("click", async () => {
-      await loadAll(true);
-      const g = qs("#coursesGridFull");
-      if (g) g.innerHTML = (cacheCourses || []).map(courseCard).join("");
-    });
+    if (coursesGridFull) {
+      coursesGridFull.innerHTML = cacheCourses.map(courseCard).join("");
+    }
   }
 
   async function renderAssignmentsPage() {
     await loadAll();
-
     if (assignmentsList) {
-      assignmentsList.innerHTML = (cacheHomework || []).map(homeworkCard).join("");
+      assignmentsList.innerHTML = cacheHomework.map(homeworkCard).join("");
     }
   }
 
   // ---------- Boot ----------
+  qs("#y") && (qs("#y").textContent = new Date().getFullYear());
   showPage("dashboard");
 });
