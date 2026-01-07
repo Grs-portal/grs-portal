@@ -28,6 +28,8 @@ console.log("✅ Serving static files from:", publicDir);
 app.use(express.static(publicDir));
 
 // ---------------- SIMPLE FILE DB (PERSISTENT) ----------------
+// IMPORTANT for Render: writeable path should be local project dir. This is fine for dev/testing.
+// In production, Render filesystem may reset on deploy — but for now it works.
 const DATA_FILE = path.join(__dirname, "data.json");
 
 function defaultData() {
@@ -47,7 +49,11 @@ function defaultData() {
         course: "Intro to Programming",
       },
     ],
-    students: [{ enrollment_id: 1, name: "John Doe", course: "Intro to Programming", grade: 9 }],
+    // This is the "grades table"
+    students: [
+      { enrollment_id: 1, username: "student", name: "Student", course: "Unassigned", grade: null },
+      { enrollment_id: 2, username: null, name: "John Doe", course: "Intro to Programming", grade: 9 },
+    ],
   };
 }
 
@@ -63,22 +69,42 @@ function loadData() {
   }
 }
 
+let db = loadData();
+
 function saveData() {
-  fs.writeFileSync(DATA_FILE, JSON.stringify(db, null, 2));
+  try {
+    fs.writeFileSync(DATA_FILE, JSON.stringify(db, null, 2));
+  } catch (e) {
+    console.error("❌ Failed to save data.json:", e);
+  }
 }
 
-let db = loadData();
+// ---------------- HELPERS ----------------
+function requireManager(req, res) {
+  const role = String(req.headers["x-role"] || req.query.role || "").trim();
+  if (role !== "manager") {
+    res.status(403).json({ success: false, message: "Forbidden (manager only)" });
+    return false;
+  }
+  return true;
+}
+
+function safeUser(u) {
+  if (!u) return null;
+  const { password, ...rest } = u;
+  return rest;
+}
 
 // ---------------- API ROUTES ----------------
 
-// Courses
+// ===== COURSES =====
 app.get("/api/courses", (req, res) => res.json(db.courses));
 
 app.post("/api/courses", (req, res) => {
   const { title, description = "" } = req.body || {};
   if (!title) return res.status(400).json({ success: false, message: "Title required" });
 
-  const newCourse = { id: Date.now(), title, description };
+  const newCourse = { id: Date.now(), title: String(title).trim(), description: String(description || "").trim() };
   db.courses.push(newCourse);
   saveData();
   res.json(newCourse);
@@ -90,7 +116,7 @@ app.delete("/api/courses/:id", (req, res) => {
   res.json({ success: true });
 });
 
-// Homework
+// ===== HOMEWORK =====
 app.get("/api/homework", (req, res) => res.json(db.homework));
 
 app.post("/api/homework", (req, res) => {
@@ -99,7 +125,14 @@ app.post("/api/homework", (req, res) => {
     return res.status(400).json({ success: false, message: "Title and course required" });
   }
 
-  const newHW = { id: Date.now(), title, description, course, submitted_by };
+  const newHW = {
+    id: Date.now(),
+    title: String(title).trim(),
+    description: String(description || "").trim(),
+    course: String(course).trim(),
+    submitted_by: String(submitted_by || "").trim(),
+  };
+
   db.homework.push(newHW);
   saveData();
   res.json(newHW);
@@ -111,133 +144,102 @@ app.delete("/api/homework/:id", (req, res) => {
   res.json({ success: true });
 });
 
-// Students (Grades list)
+// ===== STUDENTS / GRADES TABLE =====
 app.get("/api/students", (req, res) => res.json(db.students));
 
 app.put("/api/students/:id", (req, res) => {
   const id = Number(req.params.id);
-  const idx = db.students.findIndex((s) => s.enrollment_id === id);
-  if (idx === -1) return res.status(404).json({ error: "Student not found" });
+  const idx = db.students.findIndex((s) => Number(s.enrollment_id) === id);
+  if (idx === -1) return res.status(404).json({ success: false, message: "Student not found" });
 
   db.students[idx] = { ...db.students[idx], ...req.body };
   saveData();
   res.json(db.students[idx]);
 });
 
-// ---------------- USERS (Accounts) API ----------------
-// List users (NO passwords returned)
+// ===== USERS (ACCOUNTS) =====
+// list users (manager only, no passwords)
 app.get("/api/users", (req, res) => {
-  const safe = db.accounts.map(({ password, ...rest }) => rest);
-  res.json(safe);
+  if (!requireManager(req, res)) return;
+  res.json(db.accounts.map(safeUser));
 });
 
-// Delete user (manager will use this)
-app.delete("/api/users/:username", (req, res) => {
-  const username = req.params.username;
-
-  // protect critical accounts (optional)
-  if (username === "root" || username === "manager") {
-    return res.status(403).json({ success: false, message: "Cannot delete protected account" });
-  }
-
-  db.accounts = db.accounts.filter((a) => a.username !== username);
-  saveData();
-  res.json({ success: true });
-});
-
-// ---------------- AUTH + USERS ----------------
-
-// ---------------- USERS (MANAGER ADMIN) ----------------
-
-// List users (manager only)
-app.get("/api/users", (req, res) => {
-  const role = req.headers["x-role"] || req.query.role || "";
-  if (role !== "manager") return res.status(403).json({ success: false, message: "Forbidden" });
-
-  // don't send passwords to frontend
-  const safe = accounts.map(({ password, ...rest }) => rest);
-  res.json(safe);
-});
-
-// Create user (manager only)
+// create user (manager only)
 app.post("/api/users", (req, res) => {
-  const roleHeader = req.headers["x-role"] || "";
-  if (roleHeader !== "manager") return res.status(403).json({ success: false, message: "Forbidden" });
+  if (!requireManager(req, res)) return;
 
   const { username, password, role, name } = req.body || {};
-  if (!username || !password || !role) {
+  const u = String(username || "").trim();
+  const p = String(password || "").trim();
+  const r = String(role || "").trim();
+  const n = String(name || u).trim();
+
+  if (!u || !p || !r) {
     return res.status(400).json({ success: false, message: "Missing username/password/role" });
   }
 
   const allowedRoles = ["student", "instructor", "manager"];
-  if (!allowedRoles.includes(role)) {
+  if (!allowedRoles.includes(r)) {
     return res.status(400).json({ success: false, message: "Invalid role" });
   }
 
-  if (accounts.find(a => a.username === username)) {
+  if (db.accounts.some((a) => a.username === u)) {
     return res.status(400).json({ success: false, message: "Username already exists" });
   }
 
-  const newUser = {
-    username,
-    password,          // NOTE: plaintext for now (fine for testing, not production)
-    role,
-    name: name || username
-  };
+  const newUser = { username: u, password: p, role: r, name: n };
+  db.accounts.push(newUser);
 
-  accounts.push(newUser);
-
-  // if student, also create a "student record" so they show in grades table
-  if (role === "student") {
-    students.push({
+  // If student: ensure they appear in grades table too
+  if (r === "student") {
+    db.students.push({
       enrollment_id: Date.now(),
-      name: newUser.name,
+      username: u,
+      name: n,
       course: "Unassigned",
       grade: null,
-      username: newUser.username
     });
   }
 
-  res.json({
-    success: true,
-    message: "User created",
-    user: { username: newUser.username, role: newUser.role, name: newUser.name }
-  });
+  saveData();
+  res.json({ success: true, user: safeUser(newUser) });
 });
 
-// Delete user (manager only)
+// delete user (manager only)
 app.delete("/api/users/:username", (req, res) => {
-  const roleHeader = req.headers["x-role"] || "";
-  if (roleHeader !== "manager") return res.status(403).json({ success: false, message: "Forbidden" });
+  if (!requireManager(req, res)) return;
 
-  const uname = req.params.username;
+  const uname = String(req.params.username || "").trim();
+  if (!uname) return res.status(400).json({ success: false, message: "Missing username" });
 
-  if (uname === "root") {
-    return res.status(400).json({ success: false, message: "Cannot delete root" });
+  // protect these accounts
+  if (uname === "root" || uname === "manager") {
+    return res.status(403).json({ success: false, message: "Cannot delete protected account" });
   }
 
-  const before = accounts.length;
-  accounts = accounts.filter(a => a.username !== uname);
+  const before = db.accounts.length;
+  db.accounts = db.accounts.filter((a) => a.username !== uname);
 
-  // remove from students list too (if exists)
-  students = students.filter(s => s.username !== uname);
+  // also remove from grades table if it exists there
+  db.students = db.students.filter((s) => s.username !== uname);
 
-  if (accounts.length === before) {
+  if (db.accounts.length === before) {
     return res.status(404).json({ success: false, message: "User not found" });
   }
 
+  saveData();
   res.json({ success: true });
 });
 
+// ===== AUTH =====
 app.post("/api/login", (req, res) => {
   const { username, password } = req.body || {};
-  if (!username || !password) return res.status(400).json({ success: false });
+  const u = String(username || "").trim();
+  const p = String(password || "").trim();
+  if (!u || !p) return res.status(400).json({ success: false, message: "Missing credentials" });
 
-  const user = db.accounts.find(
-    (a) => a.username === username.trim() && a.password === password.trim()
-  );
-
-  if (!user) return res.status(401).json({ success: false });
+  const user = db.accounts.find((a) => a.username === u && a.password === p);
+  if (!user) return res.status(401).json({ success: false, message: "Invalid credentials" });
 
   const redirect =
     user.role === "instructor" ? "/instructor" :
@@ -247,38 +249,30 @@ app.post("/api/login", (req, res) => {
   res.json({ success: true, role: user.role, name: user.name, redirect });
 });
 
+// OPTIONAL: register endpoint (if you still use it)
 app.post("/api/register", (req, res) => {
-  const { username, password, role = "student", name = username, course = "" } = req.body || {};
+  const { username, password, role = "student", name } = req.body || {};
+  const u = String(username || "").trim();
+  const p = String(password || "").trim();
+  const r = String(role || "").trim();
+  const n = String(name || u).trim();
 
-  if (!username || !password || !name) {
-    return res.status(400).json({ success: false, message: "Missing fields" });
-  }
-
-  const cleanUsername = String(username).trim();
-  const cleanPassword = String(password).trim();
-
-  if (db.accounts.find((a) => a.username === cleanUsername)) {
+  if (!u || !p) return res.status(400).json({ success: false, message: "Missing fields" });
+  if (db.accounts.some((a) => a.username === u)) {
     return res.status(400).json({ success: false, message: "Username already exists" });
   }
 
-  const newAcc = {
-    username: cleanUsername,
-    password: cleanPassword,
-    role,
-    name: String(name).trim(),
-  };
+  const newUser = { username: u, password: p, role: r, name: n };
+  db.accounts.push(newUser);
 
-  db.accounts.push(newAcc);
-
-  // If student, ALSO add them to grade list automatically
-  if (role === "student") {
-    const newStudent = {
+  if (r === "student") {
+    db.students.push({
       enrollment_id: Date.now(),
-      name: newAcc.name,
-      course: course || "Unassigned",
+      username: u,
+      name: n,
+      course: "Unassigned",
       grade: null,
-    };
-    db.students.push(newStudent);
+    });
   }
 
   saveData();
@@ -295,13 +289,12 @@ function sendFirstExisting(res, ...relativeCandidates) {
 }
 
 app.get("/", (req, res) => sendFirstExisting(res, "homepage/index.html"));
-app.get("/instructor", (req, res) => sendFirstExisting(res, "instructor/index.html"));
-app.get("/manager", (req, res) => sendFirstExisting(res, "manager/manager.html"));
-app.get("/students", (req, res) => sendFirstExisting(res, "students/student.html"));
 app.get("/homepage/login.html", (req, res) => sendFirstExisting(res, "homepage/login.html"));
 app.get("/homepage/register.html", (req, res) => sendFirstExisting(res, "homepage/register.html", "register.html"));
 
+app.get("/instructor", (req, res) => sendFirstExisting(res, "instructor/index.html", "instructor/instructor.html"));
+app.get("/manager", (req, res) => sendFirstExisting(res, "manager/index.html", "manager/manager.html"));
+app.get("/students", (req, res) => sendFirstExisting(res, "students/index.html", "students/student.html"));
+
 // ---------------- START ----------------
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
-
-
