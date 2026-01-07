@@ -38,10 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const avatarEl = qs("#userAvatar");
 
   if (userNameEl) userNameEl.textContent = name;
-  if (avatarEl) {
-    // new HTML uses a DIV, so put initials
-    avatarEl.textContent = initials(name);
-  }
+  if (avatarEl) avatarEl.textContent = initials(name);
 
   function logout() {
     localStorage.removeItem("isLoggedIn");
@@ -51,7 +48,6 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.replace(LOGIN_PATH);
   }
 
-  // Dropdown + sidebar logout (both supported)
   qs("#logoutBtn")?.addEventListener("click", logout);
   qs("#sidebarLogout")?.addEventListener("click", (e) => {
     e.preventDefault();
@@ -82,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
     overlay?.classList.add("hidden");
   });
 
-  // ---------- Navigation (pages) ----------
+  // ---------- Navigation ----------
   const pages = qsa(".page-section");
   const navItems = qsa(".nav-item");
 
@@ -99,7 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // load data when switching pages
     if (id === "dashboard") renderDashboard();
-    if (id === "my-courses") renderCoursesPage();
+    if (id === "courses") renderCoursesPage();
     if (id === "assignments") renderAssignmentsPage();
   }
 
@@ -111,20 +107,15 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // ---------- Elements (we support both old + new IDs) ----------
-  // Dashboard containers (old IDs kept)
-  const coursesGrid = qs("#coursesGrid");
-  const homeworkList = qs("#homeworkList");
-
-  // Optional containers in the new layout
-  const coursesGrid2 = qs("#coursesGrid2");
+  // ---------- Elements ----------
+  const continueCourses = qs("#continueCourses"); // dashboard grid
+  const coursesSection = qs("#courses"); // full courses page (section itself)
   const assignmentsList = qs("#assignmentsList");
 
-  // Counters
   const activeCoursesCount = qs("#activeCoursesCount");
-  const homeworkCount = qs("#homeworkCount");
+  const totalCoursesCount = qs("#totalCoursesCount"); // in your new HTML
+  const homeworkCount = qs("#homeworkCount"); // if you still have it somewhere
 
-  // Refresh buttons
   qs("#refreshBtn")?.addEventListener("click", () => loadAll(true));
   qs("#refreshAssignmentsBtn")?.addEventListener("click", () => loadAll(true));
 
@@ -134,15 +125,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const desc = escapeHtml(c.description || "");
 
     return `
-      <div class="card">
+      <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
         <h4 class="font-semibold leading-tight">${title}</h4>
         <p class="text-sm opacity-80 mt-1">${desc}</p>
-
         <div class="mt-3 w-full bg-gray-200 rounded-full h-2.5">
           <div class="h-2.5 rounded-full bg-indigo-600" style="width: 0%"></div>
         </div>
         <p class="text-xs opacity-70 mt-2">0% Complete</p>
-
         <button class="mt-4 w-full bg-gray-100 hover:bg-[rgba(191,227,180,.65)] text-black font-semibold py-2 rounded-xl transition">
           Continue
         </button>
@@ -157,11 +146,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const course = escapeHtml(h.course || h.course_title || "N/A");
 
     return `
-      <div class="card">
+      <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
         <h4 class="font-semibold leading-tight">${title}</h4>
         <p class="text-sm opacity-80 mt-1">${desc}</p>
         <p class="text-xs opacity-70 mt-3">Course: ${course} · By: ${by}</p>
-
         <button class="mt-4 w-full bg-gray-100 hover:bg-[rgba(191,227,180,.65)] text-black font-semibold py-2 rounded-xl transition">
           View
         </button>
@@ -170,12 +158,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ---------- Data cache ----------
-  let cacheCourses = [];
-  let cacheHomework = [];
+  let cacheCourses = null;
+  let cacheHomework = null;
 
   async function loadAll(force = false) {
     try {
-      if (!force && cacheCourses.length && cacheHomework.length) return;
+      if (!force && Array.isArray(cacheCourses) && Array.isArray(cacheHomework)) return;
 
       const [coursesRes, hwRes] = await Promise.all([
         fetch("/api/courses"),
@@ -185,69 +173,66 @@ document.addEventListener("DOMContentLoaded", () => {
       cacheCourses = (await coursesRes.json()) || [];
       cacheHomework = (await hwRes.json()) || [];
 
-      // counters
       if (activeCoursesCount) activeCoursesCount.textContent = cacheCourses.length;
+      if (totalCoursesCount) totalCoursesCount.textContent = cacheCourses.length;
       if (homeworkCount) homeworkCount.textContent = cacheHomework.length;
-
     } catch (err) {
       console.error("Student load error:", err);
-      // show error inside dashboard area if possible
-      if (coursesGrid) {
-        coursesGrid.innerHTML =
-          `<p class="text-sm text-red-600">Failed to load courses/homework. Check server console.</p>`;
-      }
+      // no visible grey text on purpose
+      cacheCourses = [];
+      cacheHomework = [];
+      if (activeCoursesCount) activeCoursesCount.textContent = "0";
+      if (totalCoursesCount) totalCoursesCount.textContent = "0";
+      if (homeworkCount) homeworkCount.textContent = "0";
     }
   }
 
-  // ---------- Render functions ----------
+  // ---------- Render ----------
   async function renderDashboard() {
     await loadAll();
 
-    if (coursesGrid) {
-      coursesGrid.innerHTML =
-        cacheCourses.length > 0
-          ? cacheCourses.map(courseCard).join("")
-          : `<p class="text-sm opacity-70">No courses yet.</p>`;
-    }
-
-    if (homeworkList) {
-      homeworkList.innerHTML =
-        cacheHomework.length > 0
-          ? cacheHomework.map(homeworkCard).join("")
-          : `<p class="text-sm opacity-70">No homework yet.</p>`;
+    // show a "continue" grid (you can later filter/enrolled only if you add that system)
+    if (continueCourses) {
+      continueCourses.innerHTML = (cacheCourses || []).slice(0, 4).map(courseCard).join("");
     }
   }
 
   async function renderCoursesPage() {
     await loadAll();
 
-    // Put courses into the courses page container if present
-    if (coursesGrid2) {
-      coursesGrid2.innerHTML = `
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          ${
-            cacheCourses.length > 0
-              ? cacheCourses.map(courseCard).join("")
-              : `<p class="text-sm opacity-70">No courses yet.</p>`
-          }
+    if (!coursesSection) return;
+
+    // full courses list inside the section
+    coursesSection.innerHTML = `
+      <div class="content-box min-h-[60vh]">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-2xl font-semibold">My Courses</h2>
+          <button id="refreshCoursesBtn" class="btn-primary">Refresh</button>
         </div>
-      `;
-    }
+
+        <div id="coursesGridFull" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+      </div>
+    `;
+
+    const grid = qs("#coursesGridFull");
+    if (grid) grid.innerHTML = (cacheCourses || []).map(courseCard).join("");
+
+    // refresh handler (since we injected the button)
+    qs("#refreshCoursesBtn")?.addEventListener("click", async () => {
+      await loadAll(true);
+      const g = qs("#coursesGridFull");
+      if (g) g.innerHTML = (cacheCourses || []).map(courseCard).join("");
+    });
   }
 
   async function renderAssignmentsPage() {
     await loadAll();
 
-    // Put homework into assignmentsList if present
     if (assignmentsList) {
-      assignmentsList.innerHTML =
-        cacheHomework.length > 0
-          ? cacheHomework.map(homeworkCard).join("")
-          : `<p class="text-sm opacity-70">No homework yet.</p>`;
+      assignmentsList.innerHTML = (cacheHomework || []).map(homeworkCard).join("");
     }
   }
 
   // ---------- Boot ----------
-  // Ensure dashboard is shown by default (if your HTML doesn't already)
   showPage("dashboard");
 });
