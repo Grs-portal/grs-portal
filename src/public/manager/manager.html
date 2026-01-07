@@ -207,25 +207,30 @@
         <button id="openCreateHw" class="btn-primary">+ Add Homework</button>
       </div>
 
-      <!-- ✅ Users Page -->
-      <div id="users" class="page-section hidden soft-card overflow-auto">
-        <div class="flex items-center justify-between gap-3 mb-4">
-          <h2 class="text-xl font-semibold">Users</h2>
-          <button id="refreshUsersBtn" class="btn-primary">Refresh</button>
-        </div>
+    <!-- ✅ Users Page -->
+<div id="users" class="page-section hidden soft-card overflow-auto">
+  <div class="flex items-center justify-between gap-3 mb-4">
+    <h2 class="text-xl font-semibold">Users</h2>
 
-        <table class="min-w-full text-sm">
-          <thead class="bg-[var(--soft-green)] text-[var(--text-dark)] uppercase text-xs">
-            <tr>
-              <th class="px-6 py-3">Username</th>
-              <th class="px-6 py-3">Name</th>
-              <th class="px-6 py-3">Role</th>
-              <th class="px-6 py-3 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="usersTable"></tbody>
-        </table>
-      </div>
+    <div class="flex gap-2">
+      <button id="refreshUsersBtn" class="btn-primary">Refresh</button>
+      <button id="createUserBtn" class="btn-primary">+ Create User</button>
+    </div>
+  </div>
+
+  <table class="min-w-full text-sm">
+    <thead class="bg-[var(--soft-green)] text-[var(--text-dark)] uppercase text-xs">
+      <tr>
+        <th class="px-6 py-3">Username</th>
+        <th class="px-6 py-3">Name</th>
+        <th class="px-6 py-3">Role</th>
+        <th class="px-6 py-3 text-right">Actions</th>
+      </tr>
+    </thead>
+    <tbody id="usersTable"></tbody>
+  </table>
+</div>
+
 
     </main>
   </div>
@@ -239,3 +244,4 @@
 
 </body>
 </html>
+
