@@ -7,71 +7,27 @@
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
-    :root{
-      --soft-green:#BFE3B4;
-      --soft-green-light:#E6F5E2;
-      --soft-green-dark:#A9D69D;
-      --text-dark:#1C1820;
-      --border-light:#A5C8A1;
-    }
+    /* Better page background */
+body{
+  background:
+    radial-gradient(900px 420px at 15% 10%, rgba(191,227,180,.55), transparent 60%),
+    radial-gradient(820px 420px at 90% 15%, rgba(169,214,157,.45), transparent 55%),
+    linear-gradient(180deg, #eaf6e6 0%, #dff0db 40%, #eaf6e6 100%);
+}
 
-    .nav-item{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      padding:10px 12px;
-      border-radius:12px;
-      color:var(--text-dark);
-      transition:.15s;
-      font-weight:600;
-      font-size:.95rem;
-    }
-    .nav-item:hover{ background:rgba(191,227,180,.35); }
-    .nav-item.active{ background:var(--text-dark); color:var(--soft-green); }
+/* Panels should not be pure white */
+.panel,
+.content-box{
+  background: rgba(255,255,255,.55) !important;
+  backdrop-filter: blur(10px);
+}
 
-    .stat-box{
-      background:rgba(255,255,255,.55);
-      border:1px solid var(--border-light);
-      padding:14px;
-      border-radius:16px;
-    }
+/* Cards slightly less bright */
+.card,
+.bg-white{
+  background: rgba(255,255,255,.82) !important;
+}
 
-    .hero{
-      background:linear-gradient(to bottom right,var(--soft-green),var(--soft-green-dark));
-      border:1px solid rgba(0,0,0,.06);
-      box-shadow:0 2px 10px rgba(0,0,0,.08);
-      border-radius:18px;
-      padding:22px;
-      color:var(--text-dark);
-    }
-
-    .panel{
-      background:rgba(255,255,255,.65);
-      border:1px solid var(--border-light);
-      border-radius:18px;
-      padding:18px;
-      box-shadow:0 2px 8px rgba(0,0,0,.06);
-    }
-
-    .card{
-      background:white;
-      border:1px solid rgba(165,200,161,.55);
-      border-radius:16px;
-      padding:14px;
-      box-shadow:0 1px 6px rgba(0,0,0,.06);
-    }
-
-    .btn{
-      background:var(--text-dark);
-      color:var(--soft-green);
-      border-radius:12px;
-      padding:9px 14px;
-      font-weight:700;
-      transition:.15s;
-    }
-    .btn:hover{ background:#3a363d; }
-
-    .muted{ color:rgba(28,24,32,.65); }
   </style>
 </head>
 
@@ -234,3 +190,4 @@
   <script src="/students/script.js"></script>
 </body>
 </html>
+
