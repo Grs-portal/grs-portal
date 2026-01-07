@@ -1,108 +1,334 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Student Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --soft-green: #BFE3B4;
+      --soft-green-light: #E6F5E2;
+      --soft-green-dark: #A9D69D;
+      --text-dark: #1C1820;
+      --border-light: #A5C8A1;
+    }
+
+    .nav-item{
+      display:block;
+      padding:10px 14px;
+      border-radius:12px;
+      color:var(--text-dark);
+      font-weight:600;
+      transition:.15s;
+    }
+    .nav-item:hover{ background:rgba(191,227,180,.35); }
+    .nav-item.active{ background:var(--text-dark); color:var(--soft-green); }
+
+    .stat-box{
+      background:rgba(255,255,255,.55);
+      border:1px solid var(--border-light);
+      padding:14px;
+      border-radius:16px;
+      box-shadow:0 2px 6px rgba(0,0,0,.05);
+    }
+
+    .hero-box{
+      background:linear-gradient(to bottom right, var(--soft-green), var(--soft-green-dark));
+      padding:22px;
+      border-radius:18px;
+      color:var(--text-dark);
+      box-shadow:0 3px 10px rgba(0,0,0,.10);
+    }
+
+    .content-box{
+      background:rgba(255,255,255,.6);
+      padding:22px;
+      border-radius:18px;
+      border:1px solid var(--border-light);
+      box-shadow:0 2px 8px rgba(0,0,0,.06);
+    }
+
+    .btn-primary{
+      background:var(--text-dark);
+      color:var(--soft-green);
+      border-radius:12px;
+      padding:8px 14px;
+      transition:.15s;
+      font-weight:700;
+    }
+    .btn-primary:hover{ background:#3a363d; }
+
+    .card{
+      background:white;
+      border:1px solid rgba(165,200,161,.6);
+      border-radius:16px;
+      padding:14px;
+      box-shadow:0 2px 6px rgba(0,0,0,.06);
+    }
+
+    .fade-in { animation: fadeIn .25s ease; }
+    @keyframes fadeIn { from {opacity:0; transform:translateY(6px)} to {opacity:1; transform:translateY(0)} }
+  </style>
 </head>
 
-<body class="min-h-screen bg-white font-sans">
+<body class="min-h-screen bg-[var(--soft-green-light)] text-[var(--text-dark)] overflow-x-hidden">
 
-  <!-- Topbar -->
-  <header class="sticky top-0 z-40 bg-green-500/60 backdrop-blur border-b border-green-500/60">
+  <!-- ===== TOPBAR ===== -->
+  <header class="sticky top-0 z-50 bg-[var(--soft-green-dark)] backdrop-blur border-b border-[var(--border-light)]">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <img src="project caribbean 1.png" class="w-10 h-10 rounded-lg object-contain" alt="Logo">
-        <span class="font-semibold text-gray-900 text-lg">Student Portal</span>
-      </div>
 
       <div class="flex items-center gap-3">
-        <span id="userName" class="text-sm text-gray-900 font-medium"></span>
-
-        <button id="logoutBtn"
-          class="text-sm px-3 py-1.5 rounded-lg bg-white/70 hover:bg-white transition border border-green-600/20">
-          Logout
-        </button>
-
-        <img
-          id="userAvatar"
-          src="https://ui-avatars.com/api/?name=S&background=E5E7EB&color=111827"
-          alt="Avatar"
-          class="w-8 h-8 rounded-full ring-1 ring-gray-200"
-        />
+        <button id="menuBtn" class="lg:hidden text-2xl hover:text-[var(--soft-green)] transition">☰</button>
+        <div class="w-10 h-10 rounded-xl bg-white/50 border border-white/40 flex items-center justify-center">
+          <span class="text-xl">🎓</span>
+        </div>
+        <h1 class="font-semibold text-lg">Student Portal</h1>
       </div>
+
+      <div class="flex items-center gap-2">
+        <span id="userName" class="text-sm font-medium"></span>
+
+        <div id="topAvatarWrap" class="relative">
+          <div id="userAvatar" class="w-9 h-9 rounded-full bg-[var(--soft-green)] border border-white/40 flex items-center justify-center font-bold cursor-pointer shadow-sm"></div>
+
+          <!-- dropdown -->
+          <div id="profileMenu" class="hidden absolute right-0 mt-2 w-44 bg-white border border-[var(--border-light)] rounded-xl shadow-lg overflow-hidden z-50">
+            <button id="logoutBtn" class="w-full text-left px-4 py-3 text-sm hover:bg-[var(--soft-green-light)]">
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+
     </div>
   </header>
 
-  <!-- Layout -->
   <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 px-4 py-6">
 
-    <!-- Sidebar -->
-    <aside class="lg:col-span-3 space-y-6">
-      <nav class="bg-white rounded-2xl border border-gray-100 p-3 shadow-sm">
-        <ul class="space-y-1">
-          <li><a href="student.html" class="block px-3 py-2 rounded-xl text-sm text-gray-700 hover:bg-gray-100">Dashboard</a></li>
-          <li><a href="my courses.html" class="block px-3 py-2 rounded-xl text-sm text-gray-700 hover:bg-gray-100">My courses</a></li>
-          <li><a href="schedule.html" class="block px-3 py-2 rounded-xl text-sm text-gray-700 hover:bg-gray-100">Schedule</a></li>
-          <li><a href="enroll in courses.html" class="block px-3 py-2 rounded-xl text-sm text-gray-700 hover:bg-gray-100">Enroll in Courses</a></li>
-          <li><a href="assignments.html" class="block px-3 py-2 rounded-xl text-sm text-gray-700 hover:bg-gray-100">Assignments</a></li>
-          <li><a href="news.html" class="block px-3 py-2 rounded-xl text-sm text-gray-700 hover:bg-gray-100">News</a></li>
-        </ul>
+    <!-- ===== SIDEBAR ===== -->
+    <aside id="sidebar"
+      class="lg:col-span-3 fixed lg:static top-0 left-0 h-full lg:h-auto w-72 lg:w-auto
+      bg-[var(--soft-green-light)] lg:rounded-2xl border-r lg:border border-[var(--border-light)]
+      p-3 shadow-md transform -translate-x-full lg:translate-x-0 transition-transform duration-300 z-40
+      flex flex-col justify-between">
 
-        <div class="mt-4 grid grid-cols-2 gap-3">
-          <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm text-center">
-            <p class="text-sm text-gray-500">Active courses</p>
-            <p id="activeCoursesCount" class="text-2xl font-semibold text-gray-900">0</p>
-          </div>
-          <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm text-center">
-            <p class="text-sm text-gray-500">Homework</p>
-            <p id="homeworkCount" class="text-2xl font-semibold text-gray-900">0</p>
-          </div>
+      <div>
+        <div class="px-3 pt-2 pb-3">
+          <div class="text-xs uppercase tracking-wider opacity-70">Navigation</div>
         </div>
-      </nav>
+
+        <nav>
+          <ul class="space-y-1">
+            <li><a href="#" data-page="dashboard" class="nav-item active">Dashboard</a></li>
+            <li><a href="#" data-page="my-courses" class="nav-item">My Courses</a></li>
+            <li><a href="#" data-page="assignments" class="nav-item">Assignments</a></li>
+            <li><a href="#" data-page="schedule" class="nav-item">Schedule</a></li>
+            <li><a href="#" data-page="news" class="nav-item">News</a></li>
+          </ul>
+        </nav>
+
+        <div class="mt-6 grid grid-cols-2 gap-3 px-1">
+          <section class="stat-box">
+            <p class="text-sm opacity-80">Active courses</p>
+            <p id="activeCoursesCount" class="text-2xl font-extrabold">0</p>
+          </section>
+          <section class="stat-box">
+            <p class="text-sm opacity-80">Homework</p>
+            <p id="homeworkCount" class="text-2xl font-extrabold">0</p>
+          </section>
+        </div>
+      </div>
+
+      <div class="mt-6 px-1 pb-2">
+        <button id="sidebarLogout" class="w-full nav-item text-left bg-white/50 border border-[var(--border-light)]">
+          Logout
+        </button>
+      </div>
     </aside>
 
-    <!-- Main content -->
+    <div id="overlay" class="fixed inset-0 bg-black/40 hidden z-30 lg:hidden"></div>
+
+    <!-- ===== MAIN ===== -->
     <main class="lg:col-span-9 space-y-6">
 
-      <!-- Hero Section -->
-      <section class="bg-green-500/60 rounded-2xl p-6 text-black shadow-sm">
-        <h1 class="text-2xl font-semibold">Welcome, student!</h1>
-        <p class="text-black/80 mt-1">Your courses and homework come from the same server as Instructor/Manager.</p>
-      </section>
-
-      <!-- Courses Section (FROM API) -->
-      <section class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-        <div class="flex items-center justify-between mb-3">
-          <h2 class="text-lg font-semibold text-gray-900">Courses</h2>
-          <button id="refreshBtn" class="text-sm px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 transition">
-            Refresh
-          </button>
+      <!-- Dashboard -->
+      <section id="dashboard" class="page-section fade-in">
+        <div class="hero-box">
+          <h2 class="text-2xl font-semibold">Welcome, student!</h2>
+          <p class="opacity-80 mt-1">
+            Your courses and homework come from the same server as Instructor/Manager.
+          </p>
         </div>
 
-        <div id="coursesGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          <!-- JS injects cards here -->
+        <div class="content-box mt-6">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-semibold">Quick access</h3>
+            <button id="refreshBtn" class="btn-primary">Refresh</button>
+          </div>
+
+          <!-- Same ID as old: coursesGrid -->
+          <div id="coursesGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+        </div>
+
+        <div class="content-box mt-6">
+          <h3 class="text-lg font-semibold mb-3">Latest homework</h3>
+
+          <!-- Same ID as old: homeworkList -->
+          <div id="homeworkList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </div>
       </section>
 
-      <!-- Homework Section (FROM API) -->
-      <section class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-        <h2 class="text-lg font-semibold text-gray-900 mb-3">Homework</h2>
-        <div id="homeworkList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- JS injects homework cards here -->
+      <!-- My Courses (full list, reuse same grid id if you want) -->
+      <section id="my-courses" class="page-section hidden fade-in">
+        <div class="content-box">
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-xl font-semibold text-center w-full">My Courses</h2>
+          </div>
+
+          <!-- Reuse the same grid so your existing JS doesn't break -->
+          <div class="mt-4" id="coursesGrid2">
+            <!-- optional: JS can fill this; if you don't have logic yet, it stays empty -->
+          </div>
+
+          <p class="text-xs opacity-70 mt-4 text-center">
+            (If you want, I can update students/script.js so this page shows a full course list too.)
+          </p>
+        </div>
+      </section>
+
+      <!-- Assignments (full homework list) -->
+      <section id="assignments" class="page-section hidden fade-in">
+        <div class="content-box min-h-[60vh]">
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-xl font-semibold">Assignments</h2>
+            <button id="refreshAssignmentsBtn" class="btn-primary">Refresh</button>
+          </div>
+
+          <!-- Optional second container; your current JS uses homeworkList -->
+          <div id="assignmentsList" class="grid md:grid-cols-2 gap-4"></div>
+          <p class="text-xs opacity-70 mt-4">
+            If your current JS only fills <code>homeworkList</code>, I’ll adjust it to also fill <code>assignmentsList</code>.
+          </p>
+        </div>
+      </section>
+
+      <!-- Schedule (placeholder nice card) -->
+      <section id="schedule" class="page-section hidden fade-in">
+        <div class="content-box min-h-[60vh]">
+          <h2 class="text-2xl font-semibold mb-4 text-center">Schedule</h2>
+          <div class="card">
+            <p class="opacity-80 text-sm">
+              Schedule feature can go here later (calendar, plans, reminders).
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- News -->
+      <section id="news" class="page-section hidden fade-in">
+        <div class="content-box min-h-[60vh] text-center">
+          <h2 class="text-2xl font-semibold mb-4">News</h2>
+          <div class="card text-left">
+            <p class="text-sm opacity-80">Coming soon.</p>
+          </div>
         </div>
       </section>
 
     </main>
   </div>
 
-  <!-- Footer -->
-  <footer class="max-w-7xl mx-auto px-4 pb-10 text-center text-xs text-gray-500">
-    © 2025 Student Portal · Privacy · Terms
+  <footer class="w-full py-6 text-center text-xs border-t border-[var(--border-light)] opacity-80">
+    © <span id="y"></span> Student Portal · Privacy · Terms
   </footer>
 
+  <script>
+    // UI-only behavior (doesn't touch your API logic)
+    document.getElementById("y").textContent = new Date().getFullYear();
 
+    const qs = (s) => document.querySelector(s);
+    const qsa = (s) => Array.from(document.querySelectorAll(s));
+
+    const sidebar = qs("#sidebar");
+    const overlay = qs("#overlay");
+    const menuBtn = qs("#menuBtn");
+
+    // mobile sidebar
+    menuBtn?.addEventListener("click", () => {
+      sidebar?.classList.toggle("-translate-x-full");
+      overlay?.classList.toggle("hidden");
+    });
+    overlay?.addEventListener("click", () => {
+      sidebar?.classList.add("-translate-x-full");
+      overlay?.classList.add("hidden");
+    });
+
+    // navigation (single page sections)
+    const items = qsa(".nav-item");
+    const pages = qsa(".page-section");
+
+    function showPage(id) {
+      pages.forEach(p => p.classList.add("hidden"));
+      qs("#" + id)?.classList.remove("hidden");
+      items.forEach(i => i.classList.remove("active"));
+      items.find(i => i.dataset.page === id)?.classList.add("active");
+
+      // close on mobile
+      sidebar?.classList.add("-translate-x-full");
+      overlay?.classList.add("hidden");
+    }
+
+    items.forEach(it => {
+      it.addEventListener("click", (e) => {
+        e.preventDefault();
+        showPage(it.dataset.page);
+      });
+    });
+
+    // profile dropdown + logout (your script.js can also do this; this won't break it)
+    const topWrap = qs("#topAvatarWrap");
+    const profileMenu = qs("#profileMenu");
+    const logoutBtn = qs("#logoutBtn");
+    const sidebarLogout = qs("#sidebarLogout");
+
+    qs("#userAvatar")?.addEventListener("click", () => profileMenu?.classList.toggle("hidden"));
+    document.addEventListener("click", (e) => {
+      if (!topWrap) return;
+      if (!topWrap.contains(e.target)) profileMenu?.classList.add("hidden");
+    });
+
+    function logout() {
+      localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("role");
+      localStorage.removeItem("userName");
+      localStorage.removeItem("userAvatar");
+      window.location.href = "/homepage/login.html";
+    }
+
+    logoutBtn?.addEventListener("click", logout);
+    sidebarLogout?.addEventListener("click", logout);
+
+    // display name/avatar letters (if your script.js already does this, that's fine)
+    const name = localStorage.getItem("userName") || "Student";
+    const userNameEl = qs("#userName");
+    const avatarEl = qs("#userAvatar");
+    if (userNameEl) userNameEl.textContent = name;
+    if (avatarEl && !avatarEl.style.backgroundImage) {
+      avatarEl.textContent = name.split(" ").map(w => w[0] || "").join("").slice(0,2).toUpperCase();
+    }
+
+    // wire refresh button (your existing students/script.js likely also binds it; this is just a safe trigger)
+    qs("#refreshBtn")?.addEventListener("click", () => {
+      // If your student script exposes a refresh function later, you can call it here.
+      // For now, clicking refresh should still work via your existing students/script.js listener.
+    });
+
+    // nice default
+    showPage("dashboard");
+  </script>
+
+  <!-- Keep your existing student JS (API rendering) -->
   <script src="./script.js"></script>
 </body>
 </html>
