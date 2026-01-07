@@ -7,21 +7,24 @@
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
-    :root {
-      --soft-green: #BFE3B4;
-      --soft-green-light: #E6F5E2;
-      --soft-green-dark: #A9D69D;
-      --text-dark: #1C1820;
-      --border-light: #A5C8A1;
+    :root{
+      --soft-green:#BFE3B4;
+      --soft-green-light:#E6F5E2;
+      --soft-green-dark:#A9D69D;
+      --text-dark:#1C1820;
+      --border-light:#A5C8A1;
     }
 
     .nav-item{
-      display:block;
-      padding:10px 14px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
       border-radius:12px;
       color:var(--text-dark);
-      font-weight:600;
       transition:.15s;
+      font-weight:600;
+      font-size:.95rem;
     }
     .nav-item:hover{ background:rgba(191,227,180,.35); }
     .nav-item.active{ background:var(--text-dark); color:var(--soft-green); }
@@ -31,207 +34,192 @@
       border:1px solid var(--border-light);
       padding:14px;
       border-radius:16px;
-      box-shadow:0 2px 6px rgba(0,0,0,.05);
     }
 
-    .hero-box{
-      background:linear-gradient(to bottom right, var(--soft-green), var(--soft-green-dark));
-      padding:22px;
+    .hero{
+      background:linear-gradient(to bottom right,var(--soft-green),var(--soft-green-dark));
+      border:1px solid rgba(0,0,0,.06);
+      box-shadow:0 2px 10px rgba(0,0,0,.08);
       border-radius:18px;
+      padding:22px;
       color:var(--text-dark);
-      box-shadow:0 3px 10px rgba(0,0,0,.10);
     }
 
-    .content-box{
-      background:rgba(255,255,255,.6);
-      padding:22px;
-      border-radius:18px;
+    .panel{
+      background:rgba(255,255,255,.65);
       border:1px solid var(--border-light);
+      border-radius:18px;
+      padding:18px;
       box-shadow:0 2px 8px rgba(0,0,0,.06);
     }
 
-    .btn-primary{
+    .card{
+      background:white;
+      border:1px solid rgba(165,200,161,.55);
+      border-radius:16px;
+      padding:14px;
+      box-shadow:0 1px 6px rgba(0,0,0,.06);
+    }
+
+    .btn{
       background:var(--text-dark);
       color:var(--soft-green);
       border-radius:12px;
-      padding:8px 14px;
-      transition:.15s;
+      padding:9px 14px;
       font-weight:700;
+      transition:.15s;
     }
-    .btn-primary:hover{ background:#3a363d; }
+    .btn:hover{ background:#3a363d; }
 
-    .card{
-      background:white;
-      border:1px solid rgba(165,200,161,.6);
-      border-radius:16px;
-      padding:14px;
-      box-shadow:0 2px 6px rgba(0,0,0,.06);
-    }
-
-    .fade-in { animation: fadeIn .25s ease; }
-    @keyframes fadeIn { from {opacity:0; transform:translateY(6px)} to {opacity:1; transform:translateY(0)} }
+    .muted{ color:rgba(28,24,32,.65); }
   </style>
 </head>
 
 <body class="min-h-screen bg-[var(--soft-green-light)] text-[var(--text-dark)] overflow-x-hidden">
 
-  <!-- ===== TOPBAR ===== -->
-  <header class="sticky top-0 z-50 bg-[var(--soft-green-dark)] backdrop-blur border-b border-[var(--border-light)]">
+  <!-- TOPBAR -->
+  <header class="sticky top-0 z-50 bg-[var(--soft-green-dark)] border-b border-[var(--border-light)]">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-
       <div class="flex items-center gap-3">
-        <button id="menuBtn" class="lg:hidden text-2xl hover:text-[var(--soft-green)] transition">☰</button>
-        <div class="w-10 h-10 rounded-xl bg-white/50 border border-white/40 flex items-center justify-center">
-          <span class="text-xl">🎓</span>
+        <button id="menuBtn" class="lg:hidden text-2xl hover:opacity-75 transition">☰</button>
+        <div class="w-10 h-10 rounded-xl bg-white/40 border border-white/30 flex items-center justify-center font-black">
+          S
         </div>
-        <h1 class="font-semibold text-lg">Student Portal</h1>
+        <div class="leading-tight">
+          <div class="font-semibold">Student Portal</div>
+          <div class="text-xs opacity-70">Hofi Korsou</div>
+        </div>
       </div>
 
       <div class="flex items-center gap-2">
-        <span id="userName" class="text-sm font-medium"></span>
+        <span id="userName" class="text-sm font-semibold"></span>
 
         <div id="topAvatarWrap" class="relative">
-          <div id="userAvatar" class="w-9 h-9 rounded-full bg-[var(--soft-green)] border border-white/40 flex items-center justify-center font-bold cursor-pointer shadow-sm"></div>
+          <div id="userAvatar"
+            class="w-9 h-9 rounded-full bg-[var(--soft-green)] border border-[var(--border-light)]
+                   flex items-center justify-center font-bold cursor-pointer select-none">
+          </div>
 
-          <!-- dropdown -->
-          <div id="profileMenu" class="hidden absolute right-0 mt-2 w-44 bg-white border border-[var(--border-light)] rounded-xl shadow-lg overflow-hidden z-50">
-            <button id="logoutBtn" class="w-full text-left px-4 py-3 text-sm hover:bg-[var(--soft-green-light)]">
+          <div id="profileMenu"
+            class="hidden absolute right-0 mt-2 w-44 bg-white border border-[var(--border-light)]
+                   rounded-2xl shadow-lg overflow-hidden">
+            <button id="logoutBtn"
+              class="w-full text-left px-4 py-3 text-sm hover:bg-[var(--soft-green-light)]">
               Logout
             </button>
           </div>
         </div>
       </div>
-
     </div>
   </header>
 
-  <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 px-4 py-6">
+  <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 px-4 py-6 relative">
 
-    <!-- ===== SIDEBAR ===== -->
+    <!-- SIDEBAR -->
     <aside id="sidebar"
       class="lg:col-span-3 fixed lg:static top-0 left-0 h-full lg:h-auto w-72 lg:w-auto
-      bg-[var(--soft-green-light)] lg:rounded-2xl border-r lg:border border-[var(--border-light)]
-      p-3 shadow-md transform -translate-x-full lg:translate-x-0 transition-transform duration-300 z-40
-      flex flex-col justify-between">
+             bg-[var(--soft-green-light)] lg:rounded-2xl border-r lg:border border-[var(--border-light)]
+             p-3 shadow-md transform -translate-x-full lg:translate-x-0
+             transition-transform duration-300 z-40 flex flex-col justify-between">
 
       <div>
-        <div class="px-3 pt-2 pb-3">
-          <div class="text-xs uppercase tracking-wider opacity-70">Navigation</div>
+        <div class="px-3 pt-3">
+          <div class="text-xs uppercase tracking-wider opacity-60">Navigation</div>
         </div>
 
-        <nav>
+        <nav class="mt-2">
           <ul class="space-y-1">
-            <li><a href="#" data-page="dashboard" class="nav-item active">Dashboard</a></li>
-            <li><a href="#" data-page="courses" class="nav-item">My Courses</a></li>
-            <li><a href="#" data-page="assignments" class="nav-item">Assignments</a></li>
-            <li><a href="#" data-page="schedule" class="nav-item">Schedule</a></li>
-            <li><a href="#" data-page="news" class="nav-item">News</a></li>
+            <li><a href="#" data-page="dashboard" class="nav-item active">🏠 Dashboard</a></li>
+            <li><a href="#" data-page="courses" class="nav-item">📚 My Courses</a></li>
+            <li><a href="#" data-page="assignments" class="nav-item">📝 Assignments</a></li>
+            <li><a href="#" data-page="schedule" class="nav-item">🗓 Schedule</a></li>
+            <li><a href="#" data-page="news" class="nav-item">📰 News</a></li>
           </ul>
         </nav>
 
-        <div class="mt-6 grid grid-cols-2 gap-3 px-1">
+        <div class="mt-5 grid grid-cols-2 gap-3 px-2">
           <section class="stat-box">
-            <p class="text-sm opacity-80">Active courses</p>
-            <p id="activeCoursesCount" class="text-2xl font-extrabold">0</p>
+            <p class="text-xs uppercase tracking-wider opacity-70">Courses</p>
+            <p id="activeCoursesCount" class="text-2xl font-black leading-tight">0</p>
           </section>
           <section class="stat-box">
-            <p class="text-sm opacity-80">Homework</p>
-            <p id="homeworkCount" class="text-2xl font-extrabold">0</p>
+            <p class="text-xs uppercase tracking-wider opacity-70">Assignments</p>
+            <p id="homeworkCount" class="text-2xl font-black leading-tight">0</p>
           </section>
         </div>
       </div>
 
-      <div class="mt-6 px-1 pb-2">
-        <button id="sidebarLogout" class="w-full nav-item text-left bg-white/50 border border-[var(--border-light)]">
-          Logout
+      <div class="p-2">
+        <button id="sidebarLogout"
+          class="w-full rounded-2xl border border-[var(--border-light)] bg-white/50 hover:bg-white/70
+                 px-4 py-3 text-left font-semibold transition">
+          🚪 Logout
         </button>
       </div>
     </aside>
 
     <div id="overlay" class="fixed inset-0 bg-black/40 hidden z-30 lg:hidden"></div>
 
-    <!-- ===== MAIN ===== -->
+    <!-- MAIN -->
     <main class="lg:col-span-9 space-y-6">
 
-      <!-- Dashboard -->
-      <section id="dashboard" class="page-section fade-in">
-        <div class="hero-box">
-          <h2 class="text-2xl font-semibold">Welcome, student!</h2>
-          <p class="opacity-80 mt-1">
-            Your courses and homework come from the same server as Instructor/Manager.
-          </p>
+      <!-- DASHBOARD -->
+      <section id="dashboard" class="page-section">
+        <div class="hero">
+          <h2 class="text-2xl font-black">Welcome back!</h2>
+          <p class="mt-1 muted">Your courses and assignments update live from the same system as Instructor/Manager.</p>
         </div>
 
-        <div class="content-box mt-6">
-          <div class="flex items-center justify-between mb-3">
-            <h3 class="text-lg font-semibold">Quick access</h3>
-            <button id="refreshBtn" class="btn-primary">Refresh</button>
+        <div class="panel mt-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-black">Continue</h3>
+            <a href="#" data-page="courses" class="text-sm font-semibold underline opacity-80 hover:opacity-100">
+              View all
+            </a>
           </div>
 
-          <!-- Same ID as old: coursesGrid -->
-          <div id="coursesGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
-        </div>
-
-        <div class="content-box mt-6">
-          <h3 class="text-lg font-semibold mb-3">Latest homework</h3>
-
-          <!-- Same ID as old: homeworkList -->
-          <div id="homeworkList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+          <div id="continueCourses" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </div>
       </section>
 
-      <!-- My Courses (full list, reuse same grid id if you want) -->
-      <section id="my-courses" class="page-section hidden fade-in">
-        <div class="content-box">
-          <div class="flex items-center justify-between mb-3">
-            <h2 class="text-xl font-semibold text-center w-full">My Courses</h2>
+      <!-- COURSES -->
+      <section id="courses" class="page-section hidden">
+        <div class="panel">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-black">My Courses</h2>
+            <button id="refreshCoursesBtn" class="btn">Refresh</button>
           </div>
-
-          <!-- Reuse the same grid so your existing JS doesn't break -->
-          <div class="mt-4" id="coursesGrid2">
-            <!-- optional: JS can fill this; if you don't have logic yet, it stays empty -->
-          </div>
-
-          <p class="text-xs opacity-70 mt-4 text-center">
-            (If you want, I can update students/script.js so this page shows a full course list too.)
-          </p>
+          <div id="coursesGridFull" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
         </div>
       </section>
 
-      <!-- Assignments (full homework list) -->
-      <section id="assignments" class="page-section hidden fade-in">
-        <div class="content-box min-h-[60vh]">
-          <div class="flex items-center justify-between mb-3">
-            <h2 class="text-xl font-semibold">Assignments</h2>
-            <button id="refreshAssignmentsBtn" class="btn-primary">Refresh</button>
+      <!-- ASSIGNMENTS -->
+      <section id="assignments" class="page-section hidden">
+        <div class="panel">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-black">Assignments</h2>
+            <button id="refreshAssignmentsBtn" class="btn">Refresh</button>
           </div>
-
-          <!-- Optional second container; your current JS uses homeworkList -->
-          <div id="assignmentsList" class="grid md:grid-cols-2 gap-4"></div>
-          <p class="text-xs opacity-70 mt-4">
-            If your current JS only fills <code>homeworkList</code>, I’ll adjust it to also fill <code>assignmentsList</code>.
-          </p>
+          <div id="assignmentsList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </div>
       </section>
 
-      <!-- Schedule (placeholder nice card) -->
-      <section id="schedule" class="page-section hidden fade-in">
-        <div class="content-box min-h-[60vh]">
-          <h2 class="text-2xl font-semibold mb-4 text-center">Schedule</h2>
-          <div class="card">
-            <p class="opacity-80 text-sm">
-              Schedule feature can go here later (calendar, plans, reminders).
-            </p>
+      <!-- SCHEDULE -->
+      <section id="schedule" class="page-section hidden">
+        <div class="panel min-h-[50vh] flex items-center justify-center">
+          <div class="text-center">
+            <div class="text-2xl font-black">Schedule</div>
+            <div class="muted text-sm mt-1">Coming soon.</div>
           </div>
         </div>
       </section>
 
-      <!-- News -->
-      <section id="news" class="page-section hidden fade-in">
-        <div class="content-box min-h-[60vh] text-center">
-          <h2 class="text-2xl font-semibold mb-4">News</h2>
-          <div class="card text-left">
-            <p class="text-sm opacity-80">Coming soon.</p>
+      <!-- NEWS -->
+      <section id="news" class="page-section hidden">
+        <div class="panel min-h-[50vh] flex items-center justify-center">
+          <div class="text-center">
+            <div class="text-2xl font-black">News</div>
+            <div class="muted text-sm mt-1">Coming soon.</div>
           </div>
         </div>
       </section>
@@ -243,93 +231,6 @@
     © <span id="y"></span> Student Portal · Privacy · Terms
   </footer>
 
-  <script>
-    // UI-only behavior (doesn't touch your API logic)
-    document.getElementById("y").textContent = new Date().getFullYear();
-
-    const qs = (s) => document.querySelector(s);
-    const qsa = (s) => Array.from(document.querySelectorAll(s));
-
-    const sidebar = qs("#sidebar");
-    const overlay = qs("#overlay");
-    const menuBtn = qs("#menuBtn");
-
-    // mobile sidebar
-    menuBtn?.addEventListener("click", () => {
-      sidebar?.classList.toggle("-translate-x-full");
-      overlay?.classList.toggle("hidden");
-    });
-    overlay?.addEventListener("click", () => {
-      sidebar?.classList.add("-translate-x-full");
-      overlay?.classList.add("hidden");
-    });
-
-    // navigation (single page sections)
-    const items = qsa(".nav-item");
-    const pages = qsa(".page-section");
-
-    function showPage(id) {
-      pages.forEach(p => p.classList.add("hidden"));
-      qs("#" + id)?.classList.remove("hidden");
-      items.forEach(i => i.classList.remove("active"));
-      items.find(i => i.dataset.page === id)?.classList.add("active");
-
-      // close on mobile
-      sidebar?.classList.add("-translate-x-full");
-      overlay?.classList.add("hidden");
-    }
-
-    items.forEach(it => {
-      it.addEventListener("click", (e) => {
-        e.preventDefault();
-        showPage(it.dataset.page);
-      });
-    });
-
-    // profile dropdown + logout (your script.js can also do this; this won't break it)
-    const topWrap = qs("#topAvatarWrap");
-    const profileMenu = qs("#profileMenu");
-    const logoutBtn = qs("#logoutBtn");
-    const sidebarLogout = qs("#sidebarLogout");
-
-    qs("#userAvatar")?.addEventListener("click", () => profileMenu?.classList.toggle("hidden"));
-    document.addEventListener("click", (e) => {
-      if (!topWrap) return;
-      if (!topWrap.contains(e.target)) profileMenu?.classList.add("hidden");
-    });
-
-    function logout() {
-      localStorage.removeItem("isLoggedIn");
-      localStorage.removeItem("role");
-      localStorage.removeItem("userName");
-      localStorage.removeItem("userAvatar");
-      window.location.href = "/homepage/login.html";
-    }
-
-    logoutBtn?.addEventListener("click", logout);
-    sidebarLogout?.addEventListener("click", logout);
-
-    // display name/avatar letters (if your script.js already does this, that's fine)
-    const name = localStorage.getItem("userName") || "Student";
-    const userNameEl = qs("#userName");
-    const avatarEl = qs("#userAvatar");
-    if (userNameEl) userNameEl.textContent = name;
-    if (avatarEl && !avatarEl.style.backgroundImage) {
-      avatarEl.textContent = name.split(" ").map(w => w[0] || "").join("").slice(0,2).toUpperCase();
-    }
-
-    // wire refresh button (your existing students/script.js likely also binds it; this is just a safe trigger)
-    qs("#refreshBtn")?.addEventListener("click", () => {
-      // If your student script exposes a refresh function later, you can call it here.
-      // For now, clicking refresh should still work via your existing students/script.js listener.
-    });
-
-    // nice default
-    showPage("dashboard");
-  </script>
-
-  <!-- Keep your existing student JS (API rendering) -->
-  <script src="./script.js"></script>
+  <script src="/students/script.js"></script>
 </body>
 </html>
-
