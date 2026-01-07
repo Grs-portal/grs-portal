@@ -145,7 +145,90 @@ app.delete("/api/users/:username", (req, res) => {
   res.json({ success: true });
 });
 
-// ---------------- AUTH ----------------
+// ---------------- AUTH + USERS ----------------
+
+// ---------------- USERS (MANAGER ADMIN) ----------------
+
+// List users (manager only)
+app.get("/api/users", (req, res) => {
+  const role = req.headers["x-role"] || req.query.role || "";
+  if (role !== "manager") return res.status(403).json({ success: false, message: "Forbidden" });
+
+  // don't send passwords to frontend
+  const safe = accounts.map(({ password, ...rest }) => rest);
+  res.json(safe);
+});
+
+// Create user (manager only)
+app.post("/api/users", (req, res) => {
+  const roleHeader = req.headers["x-role"] || "";
+  if (roleHeader !== "manager") return res.status(403).json({ success: false, message: "Forbidden" });
+
+  const { username, password, role, name } = req.body || {};
+  if (!username || !password || !role) {
+    return res.status(400).json({ success: false, message: "Missing username/password/role" });
+  }
+
+  const allowedRoles = ["student", "instructor", "manager"];
+  if (!allowedRoles.includes(role)) {
+    return res.status(400).json({ success: false, message: "Invalid role" });
+  }
+
+  if (accounts.find(a => a.username === username)) {
+    return res.status(400).json({ success: false, message: "Username already exists" });
+  }
+
+  const newUser = {
+    username,
+    password,          // NOTE: plaintext for now (fine for testing, not production)
+    role,
+    name: name || username
+  };
+
+  accounts.push(newUser);
+
+  // if student, also create a "student record" so they show in grades table
+  if (role === "student") {
+    students.push({
+      enrollment_id: Date.now(),
+      name: newUser.name,
+      course: "Unassigned",
+      grade: null,
+      username: newUser.username
+    });
+  }
+
+  res.json({
+    success: true,
+    message: "User created",
+    user: { username: newUser.username, role: newUser.role, name: newUser.name }
+  });
+});
+
+// Delete user (manager only)
+app.delete("/api/users/:username", (req, res) => {
+  const roleHeader = req.headers["x-role"] || "";
+  if (roleHeader !== "manager") return res.status(403).json({ success: false, message: "Forbidden" });
+
+  const uname = req.params.username;
+
+  if (uname === "root") {
+    return res.status(400).json({ success: false, message: "Cannot delete root" });
+  }
+
+  const before = accounts.length;
+  accounts = accounts.filter(a => a.username !== uname);
+
+  // remove from students list too (if exists)
+  students = students.filter(s => s.username !== uname);
+
+  if (accounts.length === before) {
+    return res.status(404).json({ success: false, message: "User not found" });
+  }
+
+  res.json({ success: true });
+});
+
 app.post("/api/login", (req, res) => {
   const { username, password } = req.body || {};
   if (!username || !password) return res.status(400).json({ success: false });
@@ -220,4 +303,5 @@ app.get("/homepage/register.html", (req, res) => sendFirstExisting(res, "homepag
 
 // ---------------- START ----------------
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+
 
