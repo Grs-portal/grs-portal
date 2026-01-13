@@ -3,33 +3,50 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
+const multer = require("multer");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ---------------- MIDDLEWARES ----------------
 app.use(cors());
 app.use(express.json());
 
-// ---------------- DETERMINE PUBLIC ROOT ----------------
+// ---------- PUBLIC DIR ----------
 let rootDir = __dirname;
-
 if (!fs.existsSync(path.join(rootDir, "public"))) {
-  if (fs.existsSync(path.join(__dirname, "src", "public"))) {
-    rootDir = path.join(__dirname, "src");
-  } else {
+  if (fs.existsSync(path.join(__dirname, "src", "public"))) rootDir = path.join(__dirname, "src");
+  else {
     console.error("❌ Could not find public/ folder (root/public or root/src/public).");
     process.exit(1);
   }
 }
-
 const publicDir = path.join(rootDir, "public");
-console.log("✅ Serving static files from:", publicDir);
 app.use(express.static(publicDir));
 
-// ---------------- SIMPLE FILE DB (PERSISTENT) ----------------
-// IMPORTANT for Render: writeable path should be local project dir. This is fine for dev/testing.
-// In production, Render filesystem may reset on deploy — but for now it works.
+// ---------- UPLOADS (PDF ONLY) ----------
+const uploadsDir = path.join(__dirname, "uploads");
+if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir);
+
+const storage = multer.diskStorage({
+  destination: (_, __, cb) => cb(null, uploadsDir),
+  filename: (_, file, cb) => {
+    const safe = file.originalname.replace(/[^\w.\-]+/g, "_");
+    cb(null, `${Date.now()}_${safe}`);
+  },
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB
+  fileFilter: (_, file, cb) => {
+    const ok = file.mimetype === "application/pdf" || file.originalname.toLowerCase().endsWith(".pdf");
+    cb(ok ? null : new Error("Only PDF files allowed"), ok);
+  },
+});
+
+app.use("/uploads", express.static(uploadsDir));
+
+// ---------- FILE DB ----------
 const DATA_FILE = path.join(__dirname, "data.json");
 
 function defaultData() {
@@ -39,253 +56,309 @@ function defaultData() {
       { username: "manager", password: "9999", role: "manager", name: "Project Manager" },
       { username: "student", password: "1234", role: "student", name: "Student" },
     ],
-    courses: [{ id: 1, title: "Intro to Programming", description: "Learn JS basics" }],
+    courses: [
+      { id: 1, title: "Intro to Programming", description: "Learn JS basics", delivery: "online", submitted_by: "Instructor Root", attachments: [] }
+    ],
     homework: [
-      {
-        id: 1,
-        title: "Week 1 Assignment",
-        description: "Intro tasks",
-        submitted_by: "John Doe",
-        course: "Intro to Programming",
-      },
+      { id: 1, title: "Week 1 Assignment", description: "Intro tasks", course: "Intro to Programming", submitted_by: "Instructor Root", attachments: [] },
     ],
-    // This is the "grades table"
     students: [
-      { enrollment_id: 1, username: "student", name: "Student", course: "Unassigned", grade: null },
-      { enrollment_id: 2, username: null, name: "John Doe", course: "Intro to Programming", grade: 9 },
+      { enrollment_id: 1, name: "John Doe", course: "Intro to Programming", grade: 9, username: "johndoe" }
     ],
+    notifications: [], // {id, type, message, createdAt}
+    nextNotifId: 1
   };
 }
 
 function loadData() {
   try {
-    if (!fs.existsSync(DATA_FILE)) {
-      fs.writeFileSync(DATA_FILE, JSON.stringify(defaultData(), null, 2));
-    }
+    if (!fs.existsSync(DATA_FILE)) fs.writeFileSync(DATA_FILE, JSON.stringify(defaultData(), null, 2));
     return JSON.parse(fs.readFileSync(DATA_FILE, "utf-8"));
   } catch (e) {
     console.error("❌ Failed to load data.json, using defaults:", e);
     return defaultData();
   }
 }
-
 let db = loadData();
+function saveData() { fs.writeFileSync(DATA_FILE, JSON.stringify(db, null, 2)); }
 
-function saveData() {
-  try {
-    fs.writeFileSync(DATA_FILE, JSON.stringify(db, null, 2));
-  } catch (e) {
-    console.error("❌ Failed to save data.json:", e);
-  }
+// ---------- HELPERS ----------
+function actorFromReq(req) {
+  const role = String(req.headers["x-role"] || "").trim();
+  const username = String(req.headers["x-username"] || "").trim();
+  const name = String(req.headers["x-name"] || "").trim();
+  return { role, username, name };
 }
 
-// ---------------- HELPERS ----------------
-function requireManager(req, res) {
-  const role = String(req.headers["x-role"] || req.query.role || "").trim();
-  if (role !== "manager") {
-    res.status(403).json({ success: false, message: "Forbidden (manager only)" });
-    return false;
-  }
-  return true;
-}
-
-function safeUser(u) {
-  if (!u) return null;
-  const { password, ...rest } = u;
-  return rest;
-}
-
-// ---------------- API ROUTES ----------------
-
-// ===== COURSES =====
-app.get("/api/courses", (req, res) => res.json(db.courses));
-
-app.post("/api/courses", (req, res) => {
-  const { title, description = "" } = req.body || {};
-  if (!title) return res.status(400).json({ success: false, message: "Title required" });
-
-  const newCourse = { id: Date.now(), title: String(title).trim(), description: String(description || "").trim() };
-  db.courses.push(newCourse);
-  saveData();
-  res.json(newCourse);
-});
-
-app.delete("/api/courses/:id", (req, res) => {
-  db.courses = db.courses.filter((c) => String(c.id) !== String(req.params.id));
-  saveData();
-  res.json({ success: true });
-});
-
-// ===== HOMEWORK =====
-app.get("/api/homework", (req, res) => res.json(db.homework));
-
-app.post("/api/homework", (req, res) => {
-  const { title, description = "", course, submitted_by = "" } = req.body || {};
-  if (!title || !course) {
-    return res.status(400).json({ success: false, message: "Title and course required" });
-  }
-
-  const newHW = {
-    id: Date.now(),
-    title: String(title).trim(),
-    description: String(description || "").trim(),
-    course: String(course).trim(),
-    submitted_by: String(submitted_by || "").trim(),
+function requireRole(roles) {
+  return (req, res, next) => {
+    const { role } = actorFromReq(req);
+    if (!roles.includes(role)) return res.status(403).json({ success: false, message: "Forbidden" });
+    next();
   };
+}
 
-  db.homework.push(newHW);
-  saveData();
-  res.json(newHW);
+function pushNotif(type, message) {
+  db.notifications.push({
+    id: db.nextNotifId++,
+    type,
+    message,
+    createdAt: Date.now()
+  });
+  // keep last 200
+  if (db.notifications.length > 200) db.notifications = db.notifications.slice(-200);
+}
+
+// ---------- AUTH ----------
+app.post("/api/login", (req, res) => {
+  const { username, password } = req.body || {};
+  if (!username || !password) return res.status(400).json({ success: false });
+
+  const u = db.accounts.find(a => a.username === String(username).trim() && a.password === String(password).trim());
+  if (!u) return res.status(401).json({ success: false });
+
+  const redirect = u.role === "instructor" ? "/instructor" : u.role === "manager" ? "/manager" : "/students";
+  res.json({ success: true, role: u.role, name: u.name, username: u.username, redirect });
 });
 
-app.delete("/api/homework/:id", (req, res) => {
-  db.homework = db.homework.filter((h) => String(h.id) !== String(req.params.id));
-  saveData();
-  res.json({ success: true });
+// NOTE: your register page is info-only now, but we keep API for manager-created users.
+app.post("/api/register", (req, res) => {
+  return res.status(403).json({ success: false, message: "Online registration disabled" });
 });
 
-// ===== STUDENTS / GRADES TABLE =====
-app.get("/api/students", (req, res) => res.json(db.students));
-
-app.put("/api/students/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const idx = db.students.findIndex((s) => Number(s.enrollment_id) === id);
-  if (idx === -1) return res.status(404).json({ success: false, message: "Student not found" });
-
-  db.students[idx] = { ...db.students[idx], ...req.body };
-  saveData();
-  res.json(db.students[idx]);
+// ---------- USERS (MANAGER) ----------
+app.get("/api/users", requireRole(["manager"]), (req, res) => {
+  const safe = db.accounts.map(({ password, ...rest }) => rest);
+  res.json(safe);
 });
 
-// ===== USERS (ACCOUNTS) =====
-// list users (manager only, no passwords)
-app.get("/api/users", (req, res) => {
-  if (!requireManager(req, res)) return;
-  res.json(db.accounts.map(safeUser));
-});
-
-// create user (manager only)
-app.post("/api/users", (req, res) => {
-  if (!requireManager(req, res)) return;
-
+app.post("/api/users", requireRole(["manager"]), (req, res) => {
   const { username, password, role, name } = req.body || {};
-  const u = String(username || "").trim();
-  const p = String(password || "").trim();
-  const r = String(role || "").trim();
-  const n = String(name || u).trim();
+  if (!username || !password || !role) return res.status(400).json({ success: false, message: "Missing fields" });
 
-  if (!u || !p || !r) {
-    return res.status(400).json({ success: false, message: "Missing username/password/role" });
-  }
-
-  const allowedRoles = ["student", "instructor", "manager"];
-  if (!allowedRoles.includes(r)) {
-    return res.status(400).json({ success: false, message: "Invalid role" });
-  }
-
-  if (db.accounts.some((a) => a.username === u)) {
+  const uname = String(username).trim();
+  if (db.accounts.find(a => a.username === uname)) {
     return res.status(400).json({ success: false, message: "Username already exists" });
   }
 
-  const newUser = { username: u, password: p, role: r, name: n };
-  db.accounts.push(newUser);
+  const allowed = ["student", "instructor", "manager"];
+  if (!allowed.includes(role)) return res.status(400).json({ success: false, message: "Invalid role" });
 
-  // If student: ensure they appear in grades table too
-  if (r === "student") {
+  const newAcc = { username: uname, password: String(password).trim(), role, name: String(name || uname).trim() };
+  db.accounts.push(newAcc);
+
+  if (role === "student") {
     db.students.push({
       enrollment_id: Date.now(),
-      username: u,
-      name: n,
+      name: newAcc.name,
       course: "Unassigned",
       grade: null,
+      username: newAcc.username
     });
   }
 
+  pushNotif("user_created", `User created: ${newAcc.username} (${newAcc.role})`);
   saveData();
-  res.json({ success: true, user: safeUser(newUser) });
+  res.json({ success: true, user: { username: newAcc.username, role: newAcc.role, name: newAcc.name } });
 });
 
-// delete user (manager only)
-app.delete("/api/users/:username", (req, res) => {
-  if (!requireManager(req, res)) return;
-
-  const uname = String(req.params.username || "").trim();
-  if (!uname) return res.status(400).json({ success: false, message: "Missing username" });
-
-  // protect these accounts
-  if (uname === "root" || uname === "manager") {
+app.delete("/api/users/:username", requireRole(["manager"]), (req, res) => {
+  const uname = String(req.params.username || "");
+  if (["root", "manager"].includes(uname)) {
     return res.status(403).json({ success: false, message: "Cannot delete protected account" });
   }
 
   const before = db.accounts.length;
-  db.accounts = db.accounts.filter((a) => a.username !== uname);
+  db.accounts = db.accounts.filter(a => a.username !== uname);
+  db.students = db.students.filter(s => s.username !== uname);
 
-  // also remove from grades table if it exists there
-  db.students = db.students.filter((s) => s.username !== uname);
+  if (db.accounts.length === before) return res.status(404).json({ success: false, message: "User not found" });
 
-  if (db.accounts.length === before) {
-    return res.status(404).json({ success: false, message: "User not found" });
-  }
-
+  pushNotif("user_deleted", `User deleted: ${uname}`);
   saveData();
   res.json({ success: true });
 });
 
-// ===== AUTH =====
-app.post("/api/login", (req, res) => {
-  const { username, password } = req.body || {};
-  const u = String(username || "").trim();
-  const p = String(password || "").trim();
-  if (!u || !p) return res.status(400).json({ success: false, message: "Missing credentials" });
+// ---------- COURSES ----------
+app.get("/api/courses", (req, res) => res.json(db.courses));
 
-  const user = db.accounts.find((a) => a.username === u && a.password === p);
-  if (!user) return res.status(401).json({ success: false, message: "Invalid credentials" });
+app.post("/api/courses", requireRole(["manager", "instructor"]), upload.array("pdfs", 5), (req, res) => {
+  const { name } = actorFromReq(req);
+  const title = String(req.body.title || "").trim();
+  const description = String(req.body.description || "").trim();
+  const delivery = String(req.body.delivery || "online").trim();
 
-  const redirect =
-    user.role === "instructor" ? "/instructor" :
-    user.role === "manager" ? "/manager" :
-    "/students";
+  if (!title) return res.status(400).json({ success: false, message: "Title required" });
+  if (!["in_person", "online", "hybrid"].includes(delivery)) {
+    return res.status(400).json({ success: false, message: "Invalid delivery" });
+  }
 
-  res.json({ success: true, role: user.role, name: user.name, redirect });
+  const attachments = (req.files || []).map(f => ({
+    originalName: f.originalname,
+    filename: f.filename,
+    url: `/uploads/${f.filename}`,
+    uploadedAt: Date.now()
+  }));
+
+  const course = {
+    id: Date.now(),
+    title,
+    description,
+    delivery,
+    submitted_by: name || "Unknown",
+    attachments
+  };
+
+  db.courses.push(course);
+  pushNotif("course_created", `Course created: ${title}`);
+  saveData();
+  res.json(course);
 });
 
-// OPTIONAL: register endpoint (if you still use it)
-app.post("/api/register", (req, res) => {
-  const { username, password, role = "student", name } = req.body || {};
-  const u = String(username || "").trim();
-  const p = String(password || "").trim();
-  const r = String(role || "").trim();
-  const n = String(name || u).trim();
+app.put("/api/courses/:id", requireRole(["manager", "instructor"]), upload.array("pdfs", 5), (req, res) => {
+  const id = String(req.params.id);
+  const idx = db.courses.findIndex(c => String(c.id) === id);
+  if (idx === -1) return res.status(404).json({ success: false, message: "Course not found" });
 
-  if (!u || !p) return res.status(400).json({ success: false, message: "Missing fields" });
-  if (db.accounts.some((a) => a.username === u)) {
-    return res.status(400).json({ success: false, message: "Username already exists" });
+  const title = req.body.title != null ? String(req.body.title).trim() : db.courses[idx].title;
+  const description = req.body.description != null ? String(req.body.description).trim() : db.courses[idx].description;
+  const delivery = req.body.delivery != null ? String(req.body.delivery).trim() : db.courses[idx].delivery;
+
+  if (!title) return res.status(400).json({ success: false, message: "Title required" });
+  if (!["in_person", "online", "hybrid"].includes(delivery)) {
+    return res.status(400).json({ success: false, message: "Invalid delivery" });
   }
 
-  const newUser = { username: u, password: p, role: r, name: n };
-  db.accounts.push(newUser);
+  const newFiles = (req.files || []).map(f => ({
+    originalName: f.originalname,
+    filename: f.filename,
+    url: `/uploads/${f.filename}`,
+    uploadedAt: Date.now()
+  }));
 
-  if (r === "student") {
-    db.students.push({
-      enrollment_id: Date.now(),
-      username: u,
-      name: n,
-      course: "Unassigned",
-      grade: null,
-    });
-  }
+  db.courses[idx] = {
+    ...db.courses[idx],
+    title,
+    description,
+    delivery,
+    attachments: [...(db.courses[idx].attachments || []), ...newFiles]
+  };
 
+  pushNotif("course_updated", `Course updated: ${db.courses[idx].title}`);
+  saveData();
+  res.json(db.courses[idx]);
+});
+
+app.delete("/api/courses/:id", requireRole(["manager", "instructor"]), (req, res) => {
+  const id = String(req.params.id);
+  const course = db.courses.find(c => String(c.id) === id);
+  db.courses = db.courses.filter(c => String(c.id) !== id);
+  pushNotif("course_deleted", `Course deleted: ${course?.title || id}`);
   saveData();
   res.json({ success: true });
 });
 
-// ---------------- PAGE ROUTES ----------------
-function sendFirstExisting(res, ...relativeCandidates) {
-  for (const rel of relativeCandidates) {
-    const abs = path.join(publicDir, rel);
+// ---------- HOMEWORK ----------
+app.get("/api/homework", (req, res) => res.json(db.homework));
+
+app.post("/api/homework", requireRole(["manager", "instructor"]), upload.array("pdfs", 5), (req, res) => {
+  const { name } = actorFromReq(req);
+  const title = String(req.body.title || "").trim();
+  const description = String(req.body.description || "").trim();
+  const course = String(req.body.course || "").trim();
+
+  if (!title || !course) return res.status(400).json({ success: false, message: "Title and course required" });
+
+  const attachments = (req.files || []).map(f => ({
+    originalName: f.originalname,
+    filename: f.filename,
+    url: `/uploads/${f.filename}`,
+    uploadedAt: Date.now()
+  }));
+
+  const hw = {
+    id: Date.now(),
+    title,
+    description,
+    course,
+    submitted_by: name || "Unknown",
+    attachments
+  };
+
+  db.homework.push(hw);
+  pushNotif("homework_created", `Homework created: ${title}`);
+  saveData();
+  res.json(hw);
+});
+
+app.put("/api/homework/:id", requireRole(["manager", "instructor"]), upload.array("pdfs", 5), (req, res) => {
+  const id = String(req.params.id);
+  const idx = db.homework.findIndex(h => String(h.id) === id);
+  if (idx === -1) return res.status(404).json({ success: false, message: "Homework not found" });
+
+  const title = req.body.title != null ? String(req.body.title).trim() : db.homework[idx].title;
+  const description = req.body.description != null ? String(req.body.description).trim() : db.homework[idx].description;
+  const course = req.body.course != null ? String(req.body.course).trim() : db.homework[idx].course;
+
+  if (!title || !course) return res.status(400).json({ success: false, message: "Title and course required" });
+
+  const newFiles = (req.files || []).map(f => ({
+    originalName: f.originalname,
+    filename: f.filename,
+    url: `/uploads/${f.filename}`,
+    uploadedAt: Date.now()
+  }));
+
+  db.homework[idx] = {
+    ...db.homework[idx],
+    title,
+    description,
+    course,
+    attachments: [...(db.homework[idx].attachments || []), ...newFiles]
+  };
+
+  pushNotif("homework_updated", `Homework updated: ${db.homework[idx].title}`);
+  saveData();
+  res.json(db.homework[idx]);
+});
+
+app.delete("/api/homework/:id", requireRole(["manager", "instructor"]), (req, res) => {
+  const id = String(req.params.id);
+  const hw = db.homework.find(h => String(h.id) === id);
+  db.homework = db.homework.filter(h => String(h.id) !== id);
+  pushNotif("homework_deleted", `Homework deleted: ${hw?.title || id}`);
+  saveData();
+  res.json({ success: true });
+});
+
+// ---------- STUDENTS (GRADES) ----------
+app.get("/api/students", (req, res) => res.json(db.students));
+
+app.put("/api/students/:id", requireRole(["manager", "instructor"]), (req, res) => {
+  const id = Number(req.params.id);
+  const idx = db.students.findIndex(s => s.enrollment_id === id);
+  if (idx === -1) return res.status(404).json({ success: false, message: "Student not found" });
+
+  db.students[idx] = { ...db.students[idx], ...req.body };
+  pushNotif("grade_updated", `Grade updated for ${db.students[idx].name}`);
+  saveData();
+  res.json(db.students[idx]);
+});
+
+// ---------- NOTIFICATIONS ----------
+app.get("/api/notifications", (req, res) => {
+  const since = Number(req.query.since || 0);
+  const out = db.notifications.filter(n => n.id > since);
+  res.json(out);
+});
+
+// ---------- PAGES ----------
+function sendFirstExisting(res, ...rel) {
+  for (const r of rel) {
+    const abs = path.join(publicDir, r);
     if (fs.existsSync(abs)) return res.sendFile(abs);
   }
-  res.status(404).send("Not found: " + relativeCandidates.join(" OR "));
+  res.status(404).send("Not found");
 }
 
 app.get("/", (req, res) => sendFirstExisting(res, "homepage/index.html"));
@@ -296,5 +369,4 @@ app.get("/instructor", (req, res) => sendFirstExisting(res, "instructor/index.ht
 app.get("/manager", (req, res) => sendFirstExisting(res, "manager/index.html", "manager/manager.html"));
 app.get("/students", (req, res) => sendFirstExisting(res, "students/index.html", "students/student.html"));
 
-// ---------------- START ----------------
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
