@@ -39,7 +39,16 @@ function defaultData() {
       { username: "manager", password: "9999", role: "manager", name: "Project Manager" },
       { username: "student", password: "1234", role: "student", name: "Student" },
     ],
-    
+    courses: [{ id: 1, title: "Intro to Programming", description: "Learn JS basics" }],
+    homework: [
+      {
+        id: 1,
+        title: "Week 1 Assignment",
+        description: "Intro tasks",
+        submitted_by: "John Doe",
+        course: "Intro to Programming",
+      },
+    ],
     // This is the "grades table"
     students: [
       { enrollment_id: 1, username: "student", name: "Student", course: "Unassigned", grade: null },
@@ -289,4 +298,3 @@ app.get("/students", (req, res) => sendFirstExisting(res, "students/index.html",
 
 // ---------------- START ----------------
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
-
