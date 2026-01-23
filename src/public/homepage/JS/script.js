@@ -10,6 +10,9 @@ let blob2 = document.getElementById('blob2'); // FIXED
 let blob3 = document.getElementById('blob3'); // FIXED
 let missiontext1 = document.getElementById('missiontext1');
 let missiontext2 = document.getElementById('missiontext2');
+let boxleft = document.getElementById('boxleft');
+let boxcenter = document.getElementById('boxcenter');
+let boxright = document.getElementById('boxright');
 
 
 window.addEventListener('scroll', () => {
@@ -36,13 +39,13 @@ window.addEventListener('scroll', () => {
        MISSION SECTION 
     ------------------------------------------ */
     // blob1 → slide right into view
-    blob1.style.transform = `translateX(${value * 0.5}px)`;
+    blob1.style.transform = `translateX(${value * 0.4}px)`;
 
     // mission text: → slides with blob1
-    missiontext1.style.transform = `translateY(${-value * 0.4}px)`;
+    missiontext1.style.transform = `translateY(${-value * 0.3}px)`;
 
         // mission text: → slides with blob1
-    missiontext2.style.transform = `translateY(${-value * 0.4}px)`;
+    missiontext2.style.transform = `translateY(${-value * 0.3}px)`;
 
 
     // blob2 → rise into view
@@ -52,6 +55,31 @@ window.addEventListener('scroll', () => {
     blob3.style.transform = `translateX(${-value * 0.3}px)`;
 
 
+    const infoSection = document.querySelector(".info-box");
+
+window.addEventListener("scroll", () => {
+  const rect = infoSection.getBoundingClientRect();
+  const windowHeight = window.innerHeight;
+
+  // progress from 0 → 1 while section is visible
+  const progress = Math.min(
+    Math.max((windowHeight - rect.top) / windowHeight, 0),
+    1
+  );
+
+  const moveAmount = 120; // how much boxes move inward
+
+  boxleft.style.transform = `
+    translateY(-50%)
+    translateX(${progress * moveAmount}px)
+  `;
+
+  boxright.style.transform = `
+    translateY(-50%)
+    translateX(${-progress * moveAmount}px)
+  `;
+});
+
 
     $(document).ready(function() {
 
@@ -59,4 +87,51 @@ window.addEventListener('scroll', () => {
 
     });
 
+    
+
+// mission 
+
+});$(document).ready(function() {
+  var $owl = $('.owl-carousel');
+
+  $owl.children().each(function(index) {
+    $(this).attr('data-position', index);
+  });
+
+  $owl.owlCarousel({
+    center: true,
+    loop: true,
+    items: 1,              // 1 main visible card
+    margin: 10,
+    autoplay: true,
+    autoplayTimeout: 2500,
+    autoplayHoverPause: true,
+    smartSpeed: 600,
+    stagePadding: 60,      // <-- THIS MAKES SIDE CARDS VISIBLE
+    responsive: {
+      0: { items: 1, stagePadding: 40 },
+      480: { items: 1, stagePadding: 60 },
+      768: { items: 3, stagePadding: 0 }  // desktop/tablet
+    }
+  });
+
+  $(document).on('click', '.owl-item>div', function() {
+    var speed = 300;
+    $owl.trigger('to.owl.carousel', [$(this).data('position'), speed]);
+  });
 });
+
+
+const hamburger = document.getElementById('hamburger');
+const navMenu = document.getElementById('nav-menu');
+
+hamburger.addEventListener('click', () => {
+  hamburger.classList.toggle('active');
+  navMenu.classList.toggle('active');
+});
+
+
+
+
+
+
