@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="CSS/style.css">
+  <title>Understanding Anxiety</title>
+  <style>
+    /* --- General Reset & Body --- */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #e6f2e6; /* soft green background */
+      color: #003329; /* dark green text */
+      line-height: 1.7;
+    }
+
+    /* --- Header --- */
+    .title {
+      margin-top: 80px;
+      text-align: center;
+      padding: 0px 20px 20px;
+    }
+
+    .title h1 {
+      font-size: 2.8rem;
+      margin-bottom: 10px;
+    }
+
+    .title p {
+      font-size: 1.2rem;
+      color: #4d7d4d; /* lighter green subtitle */
+    }
+
+    /* --- Article Section --- */
+    .article {
+      max-width: 900px;
+      margin: 40px auto;
+      background-color: #f0f9f0; /* slightly lighter card color */
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    .images-grid {
+      display: flex;      
+      gap: 20px;
+
+    }
+
+    .what-is-column {
+      flex: 50%;
+    }
+
+
+    .article img {
+      width: 100%;
+      height: 100%;
+      border-radius: 15px;
+      margin-bottom: 25px;
+      object-fit: cover;
+    }
+
+    #what-is1 {
+      align-items: center;
+      justify-content: left;
+    }
+
+    #what-is2 {
+      align-items: center;
+      justify-content: right;
+    }
+
+
+    .article h2 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      color: #1a4d1a;
+    }
+
+    .article p {
+      font-size: 1.1rem;
+      margin-bottom: 25px;
+      color: #003329;
+    }
+
+    /* --- Highlight Box --- */
+    .highlight {
+      background-color: #d9f0d9;
+      padding: 20px;
+      border-left: 5px solid #4d7d4d;
+      border-radius: 10px;
+      margin-bottom: 25px;
+      font-weight: 500;
+    }
+
+    /* --- Footer --- */
+    footer {
+      text-align: center;
+      padding: 40px 20px;
+      color: #2e6b2e;
+      font-size: 0.95rem;
+    }
+
+    /* --- Responsive --- */
+    @media (max-width: 600px) {
+      .article {
+        padding: 20px;
+      }
+      header h1 {
+        font-size: 2rem;
+      }
+      header p {
+        font-size: 1rem;
+      }
+    }
+
+  </style>
+</head>
+<body>
+
+  <!--══✿══╡°˖✧᯽ NAVIGATION BAR ᯽✧˖°╞══✿══-->
+
+
+  <header class="site-header" style="background-color: white;">
+    <div class="container header-inner" style="background-color: white;">
+      <nav class="main-nav">
+        <div class="nav-left">
+          <a href="index.html" class="nav-link" data-translate="nav-home">Home</a>
+          <a href="courses.html" class="nav-link" data-translate="nav-courses">Courses</a>
+          <a href="projects.html" class="nav-link" data-translate="nav-projects">Projects</a>
+        </div>
+
+        <!-- ... ✿°•∘ɷ∘•°✿ ..  logo circle  -->
+
+        <div class="logo-circle">
+          <img src="/images/HK logo no bg.png" alt="PBC logo">
+        </div>
+
+        <div class="nav-right">     
+          <a href="about.html" class="nav-link" data-translate="nav-about">About Us</a>
+          <a href="Portal.html" class="nav-link" data-translate="nav-portals">Portals</a>
+          <a href="contact.html" class="nav-link" data-translate="nav-contact">Contact</a>
+        <div class="language-dropdown">
+            <button class="lang-btn">EN ▾</button>
+            <ul class="lang-menu">
+              <li data-lang="en">English</li>
+              <li data-lang="nl">Dutch</li>
+              <li data-lang="es">Spanish</li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+
+    </div>
+  </header>
+
+  <section class="title">
+    <h1>Understanding Anxiety</h1>
+    <p>A gentle guide to recognize, cope, and seek support</p>
+  </section>
+
+  <section class="article">    
+    
+    <h2>What is Anxiety?</h2>
+    <p>Anxiety is a common mental health condition that affects how a person thinks, feels, and responds to everyday situations. While occasional anxiety is a normal reaction to stress, anxiety disorders involve persistent and excessive worry that can interfere with daily life. Symptoms may include constant nervousness, racing thoughts, restlessness, difficulty concentrating, rapid heartbeat, or a sense of impending danger. Understanding anxiety helps reduce fear around it and reinforces that it is a real condition, not something someone can simply “snap out of.”</p>
+
+    <div class="images-grid">
+      <div class="what-is-column">
+        <img id="what-is2" src="https://images.ctfassets.net/qr4fhhcghyn4/59ea3078cfd0e0b6f9aa3c21bf91dbef2c202143/da424b6900af4336043bd79a4de4f0b0/girl-sitting-on-couch.jpg?w=3840&q=75&fm=webp">
+      </div>
+      <div class="what-is-column">
+        <img id="what-is1" src="https://dims.healthgrades.com/dims3/MMH/e6d233e/2147483647/strip/true/crop/726x406+0+39/resize/800x447!/quality/75/?url=https%3A%2F%2Fucmscdn.healthgrades.com%2Fee%2Fb1%2Ff35218ac4ee78b6071cbbe9cd385%2Fimage-getty-470621641.jpg">
+      </div>
+    </div>
+
+    <h2 style="margin-top: 20px; margin-bottom: 10px;">Causes and Triggers</h2>
+    <p>Anxiety can develop from a mix of genetic, psychological, and environmental factors. Stressful life experiences, trauma, ongoing pressure, or major life changes can trigger anxiety symptoms. Brain chemistry, personality traits, and learned behaviors also play a role. Sometimes anxiety appears without a clear cause, which can be frustrating and confusing. Recognizing personal triggers is an important step toward managing anxiety more effectively and regaining a sense of control.</p>
+    <img src="https://www.betterliferecovery.com/wp-content/uploads/Symptoms-of-Anxiety-Disorder-1024x576.jpg">
+
+    <h2>Seeking Help and Recovery</h2>
+    <p>Anxiety is treatable, and many people find relief with the right support. Therapy, such as cognitive behavioral therapy (CBT), can help identify thought patterns that fuel anxiety and teach practical coping strategies. Medication may also be helpful for some individuals. Alongside professional support, techniques like mindfulness, regular exercise, healthy routines, and breathing exercises can reduce symptoms over time. Recovery is not always linear, but progress is possible, and support makes a real difference.</p>
+    <img src="https://i.pinimg.com/1200x/68/56/87/685687400362e77b2ae051111c856b89.jpg" alt="Seeking support concept">
+
+    <div class="highlight">
+      Remember: Anxiety does not define you. Help is available, and you deserve to feel safe, supported, and understood.
+  </section>
+
+  <footer>
+    &copy; 2026 Green Recovery Space | Compassionate Support for Mental Health
+  </footer>
+
+</body>
+</html>
