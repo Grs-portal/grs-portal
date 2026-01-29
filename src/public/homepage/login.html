@@ -50,11 +50,10 @@
     </form>
 
     <p class="text-center mt-4 text-white/80">
-      Info About Registry 
+      Info About Registry
       <a href="register.html" class="text-yellow-300 font-semibold hover:underline">Here</a>
     </p>
   </div>
-
 
   <!-- ======================= LOGIN SCRIPT ======================= -->
   <script>
@@ -78,10 +77,14 @@
         return;
       }
 
-      // SAVE LOGIN DATA
+      // ✅ SAVE LOGIN DATA
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("role", data.role);
       localStorage.setItem("userName", data.name);
+
+      // ✅ IMPORTANT (needed for notifications + audit trail)
+      // Prefer backend username if provided, else use typed-in username.
+      localStorage.setItem("username", data.username || username);
 
       // REDIRECT BASED ON BACKEND RETURN
       window.location.href = data.redirect;
