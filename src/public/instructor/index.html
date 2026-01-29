@@ -98,6 +98,27 @@
         <h1 class="font-semibold text-lg">Instructor Portal</h1>
       </div>
 
+      <div class="relative" id="notifWrap">
+  <button id="notifBtn"
+    class="relative w-10 h-10 rounded-full bg-white/60 border border-black/10 flex items-center justify-center">
+    🔔
+    <span id="notifBadge"
+      class="hidden absolute -top-1 -right-1 text-[11px] font-black px-1.5 py-0.5 rounded-full bg-red-600 text-white">0</span>
+  </button>
+
+  <div id="notifMenu"
+    class="hidden absolute right-0 mt-2 w-80 max-w-[90vw] bg-white rounded-2xl border border-black/10 shadow-lg overflow-hidden z-50">
+    <div class="flex items-center justify-between px-4 py-3 border-b border-black/10">
+      <div class="font-extrabold">Notifications</div>
+      <button id="notifReadAll" class="text-xs font-bold underline opacity-80 hover:opacity-100">
+        Mark all read
+      </button>
+    </div>
+    <div id="notifList" class="max-h-80 overflow-auto"></div>
+  </div>
+</div>
+
+
       <div class="flex items-center gap-2" id="topRight">
         <span id="userName" class="text-sm font-medium"></span>
         <div id="topAvatarWrap" class="relative">
@@ -243,3 +264,4 @@
   <script src="script.js"></script>
 </body>
 </html>
+
