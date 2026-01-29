@@ -3,16 +3,23 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
-const multer = require("multer");
+
+// Multer (uploads)
+let multer = null;
+try {
+  multer = require("multer");
+} catch (e) {
+  console.warn("⚠️ multer not installed. Uploads will be disabled until you install it.");
+}
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-/* ---------------- MIDDLEWARES ---------------- */
+// ---------------- MIDDLEWARES ----------------
 app.use(cors());
 app.use(express.json());
 
-/* ---------------- DETERMINE PUBLIC ROOT ---------------- */
+// ---------------- DETERMINE PUBLIC ROOT ----------------
 let rootDir = __dirname;
 
 if (!fs.existsSync(path.join(rootDir, "public"))) {
@@ -23,42 +30,12 @@ if (!fs.existsSync(path.join(rootDir, "public"))) {
     process.exit(1);
   }
 }
+
 const publicDir = path.join(rootDir, "public");
+console.log("✅ Serving static files from:", publicDir);
 app.use(express.static(publicDir));
 
-/* ---------------- UPLOADS ---------------- */
-const uploadsDir = path.join(__dirname, "uploads");
-if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
-
-// serve uploaded files
-app.use("/uploads", express.static(uploadsDir));
-
-// multer storage
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadsDir),
-  filename: (req, file, cb) => {
-    const safe = file.originalname.replace(/[^\w.\-]+/g, "_");
-    cb(null, `${Date.now()}_${safe}`);
-  }
-});
-const upload = multer({
-  storage,
-  limits: { fileSize: 15 * 1024 * 1024 }, // 15MB
-  fileFilter: (req, file, cb) => {
-    // allow pdf + common docs/images (adjust if you want)
-    const ok = [
-      "application/pdf",
-      "image/png",
-      "image/jpeg",
-      "application/msword",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    ];
-    if (!ok.includes(file.mimetype)) return cb(new Error("File type not allowed"));
-    cb(null, true);
-  }
-});
-
-/* ---------------- SIMPLE FILE DB ---------------- */
+// ---------------- SIMPLE FILE DB ----------------
 const DATA_FILE = path.join(__dirname, "data.json");
 
 function defaultData() {
@@ -66,37 +43,20 @@ function defaultData() {
     accounts: [
       { username: "root", password: "1234", role: "instructor", name: "Instructor Root" },
       { username: "manager", password: "9999", role: "manager", name: "Project Manager" },
-      { username: "student", password: "1234", role: "student", name: "Student" }
+      { username: "student", password: "1234", role: "student", name: "Student" },
     ],
-    courses: [
-      {
-        id: 1,
-        title: "Intro to Programming",
-        description: "Learn JS basics",
-        location_type: "in-person", // "in-person" | "online" | "hybrid"
-        location_detail: "Room 2",
-        created_by: "root",
-        attachment: null, // { url, originalName, mime, size }
-        created_at: Date.now(),
-        updated_at: Date.now()
-      }
-    ],
+    courses: [{ id: 1, title: "Intro to Programming", description: "Learn JS basics", locationType: "in-person" }],
     homework: [
       {
         id: 1,
         title: "Week 1 Assignment",
         description: "Intro tasks",
-        course_id: 1,
-        submitted_by: "root",
-        attachment: null,
-        created_at: Date.now(),
-        updated_at: Date.now()
-      }
+        submitted_by: "John Doe",
+        course: "Intro to Programming",
+      },
     ],
-    students: [
-      { enrollment_id: 1, username: "student", name: "Student", course: "Intro to Programming", grade: 9 }
-    ],
-    notifications: []
+    students: [{ enrollment_id: 1, name: "John Doe", course: "Intro to Programming", grade: 9 }],
+    notifications: [] // ✅ NEW
   };
 }
 
@@ -118,18 +78,409 @@ function saveData() {
   fs.writeFileSync(DATA_FILE, JSON.stringify(db, null, 2));
 }
 
-function notify(type, message) {
-  db.notifications.unshift({
-    id: Date.now(),
-    type, // "create" | "update" | "delete"
-    message,
-    at: Date.now()
-  });
-  db.notifications = db.notifications.slice(0, 100);
-  saveData();
+// ---------------- HELPERS ----------------
+function actorFromReq(req) {
+  return {
+    byUsername: String(req.headers["x-username"] || "").trim(),
+    byRole: String(req.headers["x-role"] || "").trim(),
+    byName: String(req.headers["x-name"] || "").trim(),
+  };
 }
 
-/* ---------------- AUTH (simple) ---------------- */
+function addNotification({ type, action, message, byRole, byName, byUsername, targetType, targetId }) {
+  const n = {
+    id: Date.now(),
+    ts: new Date().toISOString(),
+    type,
+    action,
+    message,
+    byRole,
+    byName,
+    byUsername,
+    targetType,
+    targetId,
+    readBy: []
+  };
+  db.notifications.unshift(n);
+  db.notifications = db.notifications.slice(0, 200);
+  saveData();
+  return n;
+}
+
+function requireRole(req, res, allowedRoles = []) {
+  const role = String(req.headers["x-role"] || req.query.role || "").trim();
+  if (!allowedRoles.includes(role)) {
+    return res.status(403).json({ success: false, message: "Forbidden" });
+  }
+  return role;
+}
+
+function safeNoPassword(a) {
+  const { password, ...rest } = a;
+  return rest;
+}
+
+// ---------------- UPLOADS ----------------
+const uploadsDir = path.join(__dirname, "uploads");
+if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+
+// serve uploaded files
+app.use("/uploads", express.static(uploadsDir));
+
+let upload = null;
+if (multer) {
+  const storage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, uploadsDir),
+    filename: (req, file, cb) => {
+      const safe = file.originalname.replace(/[^\w.\-]+/g, "_");
+      cb(null, `${Date.now()}_${safe}`);
+    }
+  });
+
+  upload = multer({
+    storage,
+    limits: { fileSize: 15 * 1024 * 1024 }, // 15MB
+  });
+}
+
+// Upload endpoint (PDF)
+app.post("/api/upload", (req, res) => {
+  if (!upload) return res.status(500).json({ success: false, message: "Uploads not enabled (multer missing)" });
+
+  upload.single("file")(req, res, (err) => {
+    if (err) return res.status(400).json({ success: false, message: err.message });
+
+    if (!req.file) return res.status(400).json({ success: false, message: "No file uploaded" });
+
+    const ext = path.extname(req.file.originalname).toLowerCase();
+    if (ext !== ".pdf") {
+      // delete non-pdf
+      try { fs.unlinkSync(req.file.path); } catch {}
+      return res.status(400).json({ success: false, message: "Only PDF allowed" });
+    }
+
+    return res.json({
+      success: true,
+      url: `/uploads/${req.file.filename}`,
+      originalName: req.file.originalname
+    });
+  });
+});
+
+// ---------------- API ROUTES ----------------
+
+// ---------- NOTIFICATIONS ----------
+app.get("/api/notifications", (req, res) => {
+  const username = String(req.query.username || "").trim();
+  const role = String(req.query.role || "").trim();
+  if (!username || !role) return res.status(400).json({ success: false, message: "username+role required" });
+  if (!["instructor", "manager"].includes(role)) return res.status(403).json({ success: false, message: "Forbidden" });
+
+  const items = db.notifications.slice(0, 50).map(n => ({
+    ...n,
+    unread: !n.readBy.includes(username)
+  }));
+
+  res.json({ success: true, items });
+});
+
+app.post("/api/notifications/read-all", (req, res) => {
+  const { username, role } = req.body || {};
+  if (!username || !role) return res.status(400).json({ success: false });
+  if (!["instructor", "manager"].includes(role)) return res.status(403).json({ success: false, message: "Forbidden" });
+
+  db.notifications.forEach(n => {
+    if (!n.readBy.includes(username)) n.readBy.push(username);
+  });
+  saveData();
+  res.json({ success: true });
+});
+
+// ---------- COURSES ----------
+app.get("/api/courses", (req, res) => res.json(db.courses));
+
+app.post("/api/courses", (req, res) => {
+  const { title, description = "", locationType = "in-person", pdfUrl = "", pdfName = "" } = req.body || {};
+  if (!title) return res.status(400).json({ success: false, message: "Title required" });
+
+  const a = actorFromReq(req);
+
+  const newCourse = {
+    id: Date.now(),
+    title,
+    description,
+    locationType, // "in-person" | "online" | "hybrid"
+    pdfUrl,
+    pdfName,
+    createdBy: a.byName || a.byUsername || "Unknown",
+    createdByUsername: a.byUsername || "",
+    createdByRole: a.byRole || "",
+    createdAt: new Date().toISOString()
+  };
+
+  db.courses.push(newCourse);
+  saveData();
+
+  addNotification({
+    type: "course",
+    action: "created",
+    message: `Course created: "${newCourse.title}"`,
+    ...a,
+    targetType: "course",
+    targetId: newCourse.id
+  });
+
+  res.json(newCourse);
+});
+
+app.put("/api/courses/:id", (req, res) => {
+  const id = String(req.params.id);
+  const idx = db.courses.findIndex(c => String(c.id) === id);
+  if (idx === -1) return res.status(404).json({ success: false, message: "Course not found" });
+
+  const a = actorFromReq(req);
+
+  db.courses[idx] = {
+    ...db.courses[idx],
+    ...req.body,
+    updatedBy: a.byName || a.byUsername || "Unknown",
+    updatedByUsername: a.byUsername || "",
+    updatedByRole: a.byRole || "",
+    updatedAt: new Date().toISOString()
+  };
+
+  saveData();
+
+  addNotification({
+    type: "course",
+    action: "updated",
+    message: `Course updated: "${db.courses[idx].title}"`,
+    ...a,
+    targetType: "course",
+    targetId: id
+  });
+
+  res.json(db.courses[idx]);
+});
+
+app.delete("/api/courses/:id", (req, res) => {
+  const id = String(req.params.id);
+  const before = db.courses.length;
+  db.courses = db.courses.filter(c => String(c.id) !== id);
+  saveData();
+
+  const a = actorFromReq(req);
+  if (db.courses.length !== before) {
+    addNotification({
+      type: "course",
+      action: "deleted",
+      message: `Course deleted (id: ${id})`,
+      ...a,
+      targetType: "course",
+      targetId: id
+    });
+  }
+
+  res.json({ success: true });
+});
+
+// ---------- HOMEWORK ----------
+app.get("/api/homework", (req, res) => res.json(db.homework));
+
+app.post("/api/homework", (req, res) => {
+  const { title, description = "", course, submitted_by, pdfUrl = "", pdfName = "" } = req.body || {};
+  if (!title || !course) return res.status(400).json({ success: false, message: "Title and course required" });
+
+  const a = actorFromReq(req);
+  const autoBy = a.byName || a.byUsername || "Unknown";
+
+  const newHW = {
+    id: Date.now(),
+    title,
+    description,
+    course,
+    submitted_by: (submitted_by && String(submitted_by).trim()) || autoBy,
+    pdfUrl,
+    pdfName,
+    createdBy: autoBy,
+    createdByUsername: a.byUsername || "",
+    createdByRole: a.byRole || "",
+    createdAt: new Date().toISOString()
+  };
+
+  db.homework.push(newHW);
+  saveData();
+
+  addNotification({
+    type: "homework",
+    action: "created",
+    message: `Homework created: "${newHW.title}" (${newHW.course})`,
+    ...a,
+    targetType: "homework",
+    targetId: newHW.id
+  });
+
+  res.json(newHW);
+});
+
+app.put("/api/homework/:id", (req, res) => {
+  const id = String(req.params.id);
+  const idx = db.homework.findIndex(h => String(h.id) === id);
+  if (idx === -1) return res.status(404).json({ success: false, message: "Homework not found" });
+
+  const a = actorFromReq(req);
+
+  db.homework[idx] = {
+    ...db.homework[idx],
+    ...req.body,
+    updatedBy: a.byName || a.byUsername || "Unknown",
+    updatedByUsername: a.byUsername || "",
+    updatedByRole: a.byRole || "",
+    updatedAt: new Date().toISOString()
+  };
+
+  saveData();
+
+  addNotification({
+    type: "homework",
+    action: "updated",
+    message: `Homework updated: "${db.homework[idx].title}" (${db.homework[idx].course})`,
+    ...a,
+    targetType: "homework",
+    targetId: id
+  });
+
+  res.json(db.homework[idx]);
+});
+
+app.delete("/api/homework/:id", (req, res) => {
+  const id = String(req.params.id);
+  const before = db.homework.length;
+  db.homework = db.homework.filter(h => String(h.id) !== id);
+  saveData();
+
+  const a = actorFromReq(req);
+  if (db.homework.length !== before) {
+    addNotification({
+      type: "homework",
+      action: "deleted",
+      message: `Homework deleted (id: ${id})`,
+      ...a,
+      targetType: "homework",
+      targetId: id
+    });
+  }
+
+  res.json({ success: true });
+});
+
+// ---------- STUDENTS ----------
+app.get("/api/students", (req, res) => res.json(db.students));
+
+app.put("/api/students/:id", (req, res) => {
+  const id = Number(req.params.id);
+  const idx = db.students.findIndex((s) => s.enrollment_id === id);
+  if (idx === -1) return res.status(404).json({ error: "Student not found" });
+
+  db.students[idx] = { ...db.students[idx], ...req.body };
+  saveData();
+  res.json(db.students[idx]);
+});
+
+// ---------- USERS (MANAGER ADMIN) ----------
+app.get("/api/users", (req, res) => {
+  const role = requireRole(req, res, ["manager"]);
+  if (!role) return;
+  res.json(db.accounts.map(safeNoPassword));
+});
+
+app.post("/api/users", (req, res) => {
+  const role = requireRole(req, res, ["manager"]);
+  if (!role) return;
+
+  const { username, password, role: newRole, name } = req.body || {};
+  if (!username || !password || !newRole) {
+    return res.status(400).json({ success: false, message: "Missing username/password/role" });
+  }
+
+  const allowedRoles = ["student", "instructor", "manager"];
+  if (!allowedRoles.includes(newRole)) {
+    return res.status(400).json({ success: false, message: "Invalid role" });
+  }
+
+  const cleanUsername = String(username).trim();
+  if (db.accounts.find(a => a.username === cleanUsername)) {
+    return res.status(400).json({ success: false, message: "Username already exists" });
+  }
+
+  const newUser = {
+    username: cleanUsername,
+    password: String(password),
+    role: newRole,
+    name: String(name || cleanUsername).trim(),
+    avatarUrl: "" // for later profile picture saving
+  };
+
+  db.accounts.push(newUser);
+
+  if (newRole === "student") {
+    db.students.push({
+      enrollment_id: Date.now(),
+      name: newUser.name,
+      course: "Unassigned",
+      grade: null,
+      username: newUser.username
+    });
+  }
+
+  saveData();
+
+  const a = actorFromReq(req);
+  addNotification({
+    type: "user",
+    action: "created",
+    message: `User created: "${newUser.username}" (${newUser.role})`,
+    ...a,
+    targetType: "user",
+    targetId: newUser.username
+  });
+
+  res.json({ success: true, user: safeNoPassword(newUser) });
+});
+
+app.delete("/api/users/:username", (req, res) => {
+  const role = requireRole(req, res, ["manager"]);
+  if (!role) return;
+
+  const uname = String(req.params.username || "").trim();
+  if (["root", "manager"].includes(uname)) {
+    return res.status(403).json({ success: false, message: "Cannot delete protected account" });
+  }
+
+  const before = db.accounts.length;
+  db.accounts = db.accounts.filter(a => a.username !== uname);
+  db.students = db.students.filter(s => s.username !== uname);
+
+  if (db.accounts.length === before) {
+    return res.status(404).json({ success: false, message: "User not found" });
+  }
+
+  saveData();
+
+  const a = actorFromReq(req);
+  addNotification({
+    type: "user",
+    action: "deleted",
+    message: `User deleted: "${uname}"`,
+    ...a,
+    targetType: "user",
+    targetId: uname
+  });
+
+  res.json({ success: true });
+});
+
+// ---------- AUTH ----------
 app.post("/api/login", (req, res) => {
   const { username, password } = req.body || {};
   if (!username || !password) return res.status(400).json({ success: false });
@@ -137,6 +488,7 @@ app.post("/api/login", (req, res) => {
   const user = db.accounts.find(
     (a) => a.username === String(username).trim() && a.password === String(password).trim()
   );
+
   if (!user) return res.status(401).json({ success: false });
 
   const redirect =
@@ -147,221 +499,26 @@ app.post("/api/login", (req, res) => {
   res.json({ success: true, role: user.role, name: user.name, username: user.username, redirect });
 });
 
-/* ---------------- NOTIFICATIONS ---------------- */
-app.get("/api/notifications", (req, res) => res.json(db.notifications));
-
-/* ---------------- COURSES ---------------- */
-// list
-app.get("/api/courses", (req, res) => res.json(db.courses));
-
-// create (multipart + optional file)
-app.post("/api/courses", upload.single("file"), (req, res) => {
-  const { title, description = "", created_by = "unknown", location_type = "in-person", location_detail = "" } = req.body || {};
-  if (!title) return res.status(400).json({ success: false, message: "Title required" });
-
-  const attachment = req.file
-    ? {
-        url: `/uploads/${req.file.filename}`,
-        originalName: req.file.originalname,
-        mime: req.file.mimetype,
-        size: req.file.size
-      }
-    : null;
-
-  const newCourse = {
-    id: Date.now(),
-    title,
-    description,
-    location_type,
-    location_detail,
-    created_by,
-    attachment,
-    created_at: Date.now(),
-    updated_at: Date.now()
-  };
-
-  db.courses.push(newCourse);
-  notify("create", `Course created: "${title}" by ${created_by}`);
-  res.json({ success: true, course: newCourse });
+// OPTIONAL: disable online register (since you changed it to info page)
+app.post("/api/register", (req, res) => {
+  return res.status(403).json({ success: false, message: "Online registration disabled. Visit Hofi Korsou." });
 });
 
-// edit (multipart + optional file replace)
-app.put("/api/courses/:id", upload.single("file"), (req, res) => {
-  const id = String(req.params.id);
-  const idx = db.courses.findIndex(c => String(c.id) === id);
-  if (idx === -1) return res.status(404).json({ success: false, message: "Course not found" });
-
-  const before = db.courses[idx];
-
-  const { title, description, location_type, location_detail, updated_by = "unknown" } = req.body || {};
-
-  // replace attachment if uploaded
-  let attachment = before.attachment;
-  if (req.file) {
-    // delete old file if exists
-    if (before.attachment?.url) {
-      const oldPath = path.join(__dirname, before.attachment.url.replace("/uploads/", "uploads/"));
-      if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
-    }
-    attachment = {
-      url: `/uploads/${req.file.filename}`,
-      originalName: req.file.originalname,
-      mime: req.file.mimetype,
-      size: req.file.size
-    };
-  }
-
-  db.courses[idx] = {
-    ...before,
-    title: title ?? before.title,
-    description: description ?? before.description,
-    location_type: location_type ?? before.location_type,
-    location_detail: location_detail ?? before.location_detail,
-    attachment,
-    updated_at: Date.now()
-  };
-
-  notify("update", `Course updated: "${db.courses[idx].title}" by ${updated_by}`);
-  res.json({ success: true, course: db.courses[idx] });
-});
-
-// delete
-app.delete("/api/courses/:id", (req, res) => {
-  const id = String(req.params.id);
-  const course = db.courses.find(c => String(c.id) === id);
-  if (!course) return res.json({ success: true }); // idempotent
-
-  // remove file if exists
-  if (course.attachment?.url) {
-    const filePath = path.join(__dirname, course.attachment.url.replace("/uploads/", "uploads/"));
-    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-  }
-
-  db.courses = db.courses.filter(c => String(c.id) !== id);
-  notify("delete", `Course deleted: "${course.title}"`);
-  res.json({ success: true });
-});
-
-/* ---------------- HOMEWORK ---------------- */
-app.get("/api/homework", (req, res) => {
-  // include course title for convenience
-  const out = db.homework.map(h => {
-    const c = db.courses.find(x => String(x.id) === String(h.course_id));
-    return { ...h, course_title: c?.title || "" };
-  });
-  res.json(out);
-});
-
-// create homework with optional file
-app.post("/api/homework", upload.single("file"), (req, res) => {
-  const { title, description = "", course_id, submitted_by = "unknown" } = req.body || {};
-  if (!title || !course_id) return res.status(400).json({ success: false, message: "Title and course_id required" });
-
-  const attachment = req.file
-    ? {
-        url: `/uploads/${req.file.filename}`,
-        originalName: req.file.originalname,
-        mime: req.file.mimetype,
-        size: req.file.size
-      }
-    : null;
-
-  const hw = {
-    id: Date.now(),
-    title,
-    description,
-    course_id: Number(course_id),
-    submitted_by,
-    attachment,
-    created_at: Date.now(),
-    updated_at: Date.now()
-  };
-
-  db.homework.push(hw);
-  notify("create", `Homework created: "${title}" by ${submitted_by}`);
-  res.json({ success: true, homework: hw });
-});
-
-// edit homework
-app.put("/api/homework/:id", upload.single("file"), (req, res) => {
-  const id = String(req.params.id);
-  const idx = db.homework.findIndex(h => String(h.id) === id);
-  if (idx === -1) return res.status(404).json({ success: false, message: "Homework not found" });
-
-  const before = db.homework[idx];
-  const { title, description, course_id, updated_by = "unknown" } = req.body || {};
-
-  let attachment = before.attachment;
-  if (req.file) {
-    if (before.attachment?.url) {
-      const oldPath = path.join(__dirname, before.attachment.url.replace("/uploads/", "uploads/"));
-      if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
-    }
-    attachment = {
-      url: `/uploads/${req.file.filename}`,
-      originalName: req.file.originalname,
-      mime: req.file.mimetype,
-      size: req.file.size
-    };
-  }
-
-  db.homework[idx] = {
-    ...before,
-    title: title ?? before.title,
-    description: description ?? before.description,
-    course_id: course_id ? Number(course_id) : before.course_id,
-    attachment,
-    updated_at: Date.now()
-  };
-
-  notify("update", `Homework updated: "${db.homework[idx].title}" by ${updated_by}`);
-  res.json({ success: true, homework: db.homework[idx] });
-});
-
-// delete homework
-app.delete("/api/homework/:id", (req, res) => {
-  const id = String(req.params.id);
-  const hw = db.homework.find(h => String(h.id) === id);
-  if (!hw) return res.json({ success: true });
-
-  if (hw.attachment?.url) {
-    const filePath = path.join(__dirname, hw.attachment.url.replace("/uploads/", "uploads/"));
-    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-  }
-
-  db.homework = db.homework.filter(h => String(h.id) !== id);
-  notify("delete", `Homework deleted: "${hw.title}"`);
-  res.json({ success: true });
-});
-
-/* ---------------- STUDENTS ---------------- */
-app.get("/api/students", (req, res) => res.json(db.students));
-app.put("/api/students/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const idx = db.students.findIndex(s => s.enrollment_id === id);
-  if (idx === -1) return res.status(404).json({ success: false, message: "Student not found" });
-
-  db.students[idx] = { ...db.students[idx], ...req.body };
-  saveData();
-  res.json({ success: true, student: db.students[idx] });
-});
-
-/* ---------------- PAGE ROUTES ---------------- */
+// ---------------- PAGE ROUTES ----------------
 function sendFirstExisting(res, ...relativeCandidates) {
   for (const rel of relativeCandidates) {
     const abs = path.join(publicDir, rel);
     if (fs.existsSync(abs)) return res.sendFile(abs);
   }
-  res.status(404).send("Not found");
+  res.status(404).send("Not found: " + relativeCandidates.join(" OR "));
 }
 
 app.get("/", (req, res) => sendFirstExisting(res, "homepage/index.html"));
+app.get("/instructor", (req, res) => sendFirstExisting(res, "instructor/index.html"));
+app.get("/manager", (req, res) => sendFirstExisting(res, "manager/manager.html"));
+app.get("/students", (req, res) => sendFirstExisting(res, "students/student.html"));
 app.get("/homepage/login.html", (req, res) => sendFirstExisting(res, "homepage/login.html"));
 app.get("/homepage/register.html", (req, res) => sendFirstExisting(res, "homepage/register.html", "register.html"));
 
-app.get("/instructor", (req, res) => sendFirstExisting(res, "instructor/index.html", "instructor/instructor.html"));
-app.get("/manager", (req, res) => sendFirstExisting(res, "manager/index.html", "manager/manager.html"));
-app.get("/students", (req, res) => sendFirstExisting(res, "students/student.html", "students/index.html"));
-
-/* ---------------- START ---------------- */
+// ---------------- START ----------------
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
