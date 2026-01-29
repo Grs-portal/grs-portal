@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Instructor Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="style.css">
 
   <style>
     :root {
@@ -13,42 +12,39 @@
       --soft-green-light: #E6F5E2;
       --soft-green-dark: #A9D69D;
       --text-dark: #1C1820;
+      --text-light: #ffffff;
       --border-light: #A5C8A1;
     }
 
+    body {
+      background:
+        radial-gradient(900px 420px at 18% 8%, rgba(191,227,180,.55), transparent 55%),
+        radial-gradient(900px 420px at 90% 12%, rgba(169,214,157,.40), transparent 55%),
+        linear-gradient(180deg, #f2fbf0 0%, #e6f5e2 55%, #f2fbf0 100%);
+    }
+
     .nav-item {
-      display:flex;
-      align-items:center;
-      gap:10px;
-      padding:10px 12px;
+      display:block;
+      padding:10px 14px;
       border-radius:12px;
       color:var(--text-dark);
-      font-weight:600;
+      font-weight:700;
       transition:0.15s;
     }
     .nav-item:hover {
-      background:rgba(191,227,180,0.55);
-      transform: translateX(2px);
+      background:rgba(191,227,180,0.35);
     }
     .nav-item.active {
-      background:var(--soft-green-dark);
-      color:white;
-    }
-
-    .side-title {
-      font-size:12px;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-      opacity:.7;
-      margin:10px 6px 6px;
+      background: rgba(28,24,32,.92);
+      color: #e9f7e6;
     }
 
     .stat-box {
-      background:white;
-      border:1px solid var(--border-light);
-      padding:14px;
+      background: rgba(255,255,255,.6);
+      border: 1px solid rgba(0,0,0,.08);
+      padding:16px;
       border-radius:16px;
-      box-shadow:0 2px 6px rgba(0,0,0,0.06);
+      backdrop-filter: blur(10px);
     }
 
     .hero-box {
@@ -56,84 +52,95 @@
       padding:24px;
       border-radius:18px;
       color:var(--text-dark);
-      box-shadow:0 3px 10px rgba(0,0,0,0.12);
+      box-shadow:0 10px 26px rgba(0,0,0,0.08);
+      border:1px solid rgba(0,0,0,.08);
     }
 
     .content-box {
-      background:white;
-      padding:22px;
+      background: rgba(255,255,255,.72);
+      padding:24px;
       border-radius:18px;
-      border:1px solid var(--border-light);
-      box-shadow:0 2px 8px rgba(0,0,0,0.08);
+      border:1px solid rgba(0,0,0,.08);
+      box-shadow:0 10px 26px rgba(0,0,0,0.06);
+      backdrop-filter: blur(10px);
     }
 
     .table-head {
-      background:var(--soft-green);
+      background: rgba(191,227,180,.85);
       color:var(--text-dark);
       text-transform:uppercase;
       font-size:0.75rem;
     }
 
     .btn-primary {
-      background:var(--text-dark);
-      color:var(--soft-green);
-      border-radius:12px;
-      padding:10px 18px;
+      background: rgba(28,24,32,.92);
+      color: #e9f7e6;
+      border-radius:14px;
+      padding:10px 16px;
+      font-weight:800;
       transition:0.15s;
-      font-weight:700;
     }
-    .btn-primary:hover {
-      background:#3a363d;
-    }
+    .btn-primary:hover { opacity:.92; }
   </style>
 </head>
 
-<body class="min-h-screen bg-[var(--soft-green-light)] text-[var(--text-dark)] overflow-x-hidden">
+<body class="min-h-screen text-[var(--text-dark)] overflow-x-hidden">
 
   <!-- Topbar -->
-  <header class="sticky top-0 z-50 bg-[var(--soft-green)] shadow-md border-b border-[var(--border-light)]">
+  <header class="sticky top-0 z-50 bg-white/45 backdrop-blur border-b border-black/10">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+
       <div class="flex items-center gap-3">
         <button id="menuBtn" class="lg:hidden text-2xl focus:outline-none hover:opacity-70 transition">☰</button>
-        <h1 class="font-semibold text-lg">Instructor Portal</h1>
+        <h1 class="font-extrabold text-lg">Instructor Portal</h1>
       </div>
 
-      <div class="relative" id="notifWrap">
-  <button id="notifBtn"
-    class="relative w-10 h-10 rounded-full bg-white/60 border border-black/10 flex items-center justify-center">
-    🔔
-    <span id="notifBadge"
-      class="hidden absolute -top-1 -right-1 text-[11px] font-black px-1.5 py-0.5 rounded-full bg-red-600 text-white">0</span>
-  </button>
+      <div class="flex items-center gap-2">
+        <span id="userName" class="text-sm font-bold"></span>
 
-  <div id="notifMenu"
-    class="hidden absolute right-0 mt-2 w-80 max-w-[90vw] bg-white rounded-2xl border border-black/10 shadow-lg overflow-hidden z-50">
-    <div class="flex items-center justify-between px-4 py-3 border-b border-black/10">
-      <div class="font-extrabold">Notifications</div>
-      <button id="notifReadAll" class="text-xs font-bold underline opacity-80 hover:opacity-100">
-        Mark all read
-      </button>
-    </div>
-    <div id="notifList" class="max-h-80 overflow-auto"></div>
-  </div>
-</div>
+        <!-- 🔔 Notifications (matches your JS ids) -->
+        <div class="relative" id="notifWrap">
+          <button id="notifBtn"
+            class="w-10 h-10 rounded-xl bg-white/60 border border-black/10 flex items-center justify-center hover:bg-white transition"
+            title="Notifications">
+            🔔
+            <span id="notifBadge"
+              class="hidden absolute -top-1 -right-1 text-[11px] px-1.5 py-0.5 rounded-full bg-red-500 text-white font-extrabold">
+              0
+            </span>
+          </button>
 
+          <div id="notifMenu"
+            class="hidden absolute right-0 mt-2 w-80 max-w-[90vw] bg-white/95 border border-black/10 rounded-2xl shadow-xl overflow-hidden">
+            <div class="px-4 py-3 flex items-center justify-between border-b border-black/10">
+              <div class="font-extrabold">Notifications</div>
+              <button id="notifReadAll"
+                class="text-xs font-extrabold px-2 py-1 rounded-lg bg-slate-100 hover:bg-slate-200">
+                Mark all read
+              </button>
+            </div>
+            <div id="notifList" class="max-h-80 overflow-auto"></div>
+            <div class="px-4 py-3 text-xs text-slate-500 border-t border-black/10">
+              Uploads • edits • deletes
+            </div>
+          </div>
+        </div>
 
-      <div class="flex items-center gap-2" id="topRight">
-        <span id="userName" class="text-sm font-medium"></span>
+        <!-- Avatar + dropdown -->
         <div id="topAvatarWrap" class="relative">
-          <div class="w-10 h-10 rounded-full bg-white border border-[var(--border-light)] flex items-center justify-center font-bold cursor-pointer shadow-sm"
-               id="userAvatar"></div>
+          <div id="userAvatar"
+            class="w-10 h-10 rounded-full bg-[var(--soft-green)] border border-black/10 flex items-center justify-center font-extrabold cursor-pointer select-none">
+          </div>
 
-          <!-- Profile dropdown -->
           <div id="profileMenu"
-               class="hidden absolute right-0 mt-2 w-44 bg-white border border-[var(--border-light)] rounded-xl shadow-lg overflow-hidden z-50">
+            class="hidden absolute right-0 mt-2 w-44 bg-white/95 border border-black/10 rounded-2xl shadow-lg overflow-hidden">
             <button id="logoutBtn"
-              class="w-full text-left px-4 py-3 text-sm hover:bg-[var(--soft-green-light)]">
+              class="w-full text-left px-4 py-3 text-sm hover:bg-black/5 font-bold">
               Logout
             </button>
           </div>
         </div>
+
       </div>
     </div>
   </header>
@@ -142,46 +149,43 @@
 
     <!-- Sidebar -->
     <aside id="sidebar"
-      class="lg:col-span-3 fixed lg:static top-0 left-0
-      h-full lg:h-auto w-72 lg:w-auto bg-white/70 backdrop-blur
-      rounded-none lg:rounded-2xl border-r lg:border border-[var(--border-light)]
-      p-4 shadow-md transform -translate-x-full lg:translate-x-0
-      transition-transform duration-300 ease-in-out z-40">
+      class="lg:col-span-3 fixed lg:static top-0 left-0 lg:left-auto
+      h-full lg:h-auto bg-white/35 backdrop-blur
+      rounded-none lg:rounded-2xl border-r lg:border border-black/10
+      p-3 shadow-md transform -translate-x-full lg:translate-x-0
+      transition-transform duration-300 ease-in-out z-40 flex flex-col justify-between">
 
-      <div class="flex items-center justify-between">
-        <div class="font-bold">Menu</div>
-        <span class="text-xs opacity-70">Instructor</span>
+      <div>
+        <nav>
+          <ul class="space-y-1 mt-4">
+            <li><a href="#" data-page="dashboard" class="nav-item active">Dashboard</a></li>
+            <li><a href="#" data-page="students" class="nav-item">Students & Grades</a></li>
+            <li><a href="#" data-page="submitted" class="nav-item">Submitted Homework</a></li>
+            <li><a href="#" data-page="create-course" class="nav-item">Create Course</a></li>
+            <li><a href="#" data-page="create-homework" class="nav-item">Create Homework</a></li>
+            <li><a href="#" data-page="news" class="nav-item">News</a></li>
+          </ul>
+        </nav>
+
+        <div class="mt-6 grid grid-cols-2 gap-3">
+          <section class="stat-box">
+            <p class="text-sm opacity-70">Active courses</p>
+            <p id="activeCoursesCount" class="text-2xl font-extrabold">0</p>
+          </section>
+
+          <section class="stat-box">
+            <p class="text-sm opacity-70">To grade</p>
+            <p id="toGradeCount" class="text-2xl font-extrabold">0</p>
+          </section>
+        </div>
       </div>
 
-      <div class="side-title">Navigation</div>
-      <nav>
-        <ul class="space-y-2">
-          <li><a href="#" data-page="dashboard" class="nav-item active">📊 Dashboard</a></li>
-          <li><a href="#" data-page="students" class="nav-item">🎓 Students & Grades</a></li>
-          <li><a href="#" data-page="submitted" class="nav-item">📥 Submitted Homework</a></li>
-          <li><a href="#" data-page="news" class="nav-item">📰 News</a></li>
-        </ul>
-      </nav>
-
-      <div class="side-title">Create</div>
-      <nav>
-        <ul class="space-y-2">
-          <li><a href="#" data-page="create-homework" class="nav-item">➕ Create Homework</a></li>
-          <li><a href="#" data-page="create-course" class="nav-item">➕ Create Course</a></li>
-          <li><a id="sidebarLogout" href="#" class="nav-item" style="background: rgba(0,0,0,0.05);">🚪 Logout</a></li>
-        </ul>
-      </nav>
-
-      <div class="mt-6 grid grid-cols-2 gap-3">
-        <section class="stat-box text-center">
-          <p class="text-sm opacity-70">Active courses</p>
-          <p id="activeCoursesCount" class="text-xl font-bold">0</p>
-        </section>
-
-        <section class="stat-box text-center">
-          <p class="text-sm opacity-70">To grade</p>
-          <p id="toGradeCount" class="text-xl font-bold">0</p>
-        </section>
+      <div class="p-2">
+        <button id="sidebarLogout"
+          class="w-full rounded-2xl border border-black/10 bg-white/70 hover:bg-white
+                 px-4 py-3 text-left font-extrabold transition shadow-sm">
+          🚪 Logout
+        </button>
       </div>
     </aside>
 
@@ -193,12 +197,12 @@
       <!-- Dashboard -->
       <div id="dashboard" class="page-section">
         <section class="hero-box">
-          <h2 class="text-2xl font-semibold">Welcome, Teacher!</h2>
+          <h2 class="text-2xl font-extrabold">Welcome, Teacher!</h2>
           <p class="mt-1 opacity-80">Manage your courses, homework, and grading from here.</p>
         </section>
 
         <section class="content-box mt-6">
-          <h3 class="text-lg font-semibold mb-3">My Courses</h3>
+          <h3 class="text-lg font-extrabold mb-3">My Courses</h3>
           <div id="courses" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </section>
       </div>
@@ -206,7 +210,7 @@
       <!-- Students -->
       <div id="students" class="page-section hidden">
         <section class="content-box">
-          <h2 class="text-xl font-semibold mb-4 text-center">Students & Grades</h2>
+          <h2 class="text-xl font-extrabold mb-4 text-center">Students & Grades</h2>
           <div class="overflow-x-auto">
             <table class="min-w-full text-sm text-left">
               <thead class="table-head">
@@ -226,7 +230,7 @@
       <!-- Submitted Homework -->
       <div id="submitted" class="page-section hidden">
         <section class="content-box text-center min-h-[60vh]">
-          <h2 class="text-xl font-semibold mb-4">Submitted Homework</h2>
+          <h2 class="text-xl font-extrabold mb-4">Submitted Homework</h2>
           <div id="homework-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </section>
       </div>
@@ -234,7 +238,7 @@
       <!-- Create Course -->
       <div id="create-course" class="page-section hidden">
         <section class="content-box text-center min-h-[60vh]">
-          <h2 class="text-2xl font-semibold mb-4">Create Course</h2>
+          <h2 class="text-2xl font-extrabold mb-4">Create Course</h2>
           <button id="addCourseBtn" class="btn-primary">+ Add Course</button>
         </section>
       </div>
@@ -242,7 +246,7 @@
       <!-- Create Homework -->
       <div id="create-homework" class="page-section hidden">
         <section class="content-box text-center min-h-[60vh]">
-          <h2 class="text-2xl font-semibold mb-4">Create Homework</h2>
+          <h2 class="text-2xl font-extrabold mb-4">Create Homework</h2>
           <button id="addHomeworkBtn" class="btn-primary">+ Add Homework</button>
         </section>
       </div>
@@ -250,18 +254,18 @@
       <!-- News -->
       <div id="news" class="page-section hidden">
         <section class="content-box min-h-[60vh] text-center">
-          <h2 class="text-2xl font-semibold mb-4">News</h2>
+          <h2 class="text-2xl font-extrabold mb-4">News</h2>
         </section>
       </div>
 
     </main>
   </div>
 
-  <footer class="w-full py-6 text-center text-xs border-t border-[var(--border-light)] opacity-80">
+  <footer class="w-full py-6 text-center text-xs border-t border-black/10 opacity-80">
     © <span id="y"></span> Instructor Portal · Privacy · Terms
   </footer>
 
-  <script src="script.js"></script>
+  <!-- ✅ IMPORTANT: load your JS (absolute path so it always loads) -->
+  <script src="/instructor/script.js"></script>
 </body>
 </html>
-
