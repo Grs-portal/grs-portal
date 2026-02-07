@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Course</title>
+  <link rel="stylesheet" href="CSS/style.css" />
+</head>
+
+<body class="course-page">
+
+      <!--══✿══╡°˖✧᯽ NAVIGATION BAR ᯽✧˖°╞══✿══-->
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <nav class="main-nav">
+        <div class="nav-left">
+          <a href="index.html" class="nav-link" data-translate="nav-home">Home</a>
+          <a href="forwho.html" class="nav-link" data-translate="nav-forwho">For Who?</a>
+          <a href="green recovery space.html" class="nav-link" data-translate="nav-grs">Green Recovery Space</a>
+          <a href="courses.html" class="nav-link active" data-translate="nav-courses">Courses</a>
+        </div>
+
+        <!-- ... ✿°•∘ɷ∘•°✿ ..  logo circle  -->
+
+        <div class="logo-circle">
+          <img src="/images/Logo HK.jpg" alt="PBC logo">
+        </div>
+
+        <div class="nav-right">          
+          <a href="projects.html" class="nav-link" data-translate="nav-projects">Projects</a>
+          <a href="about.html" class="nav-link" data-translate="nav-about">About Us</a>
+          <a href="Portal.html" class="nav-link" data-translate="nav-portals">Portals</a>
+          <a href="contact.html" class="nav-link" data-translate="nav-contact">Contact</a>
+        <div class="language-dropdown">
+            <button class="lang-btn">EN ▾</button>
+            <ul class="lang-menu">
+              <li data-lang="en">English</li>
+              <li data-lang="nl">Dutch</li>
+              <li data-lang="es">Spanish</li>
+            </ul>
+        </div>
+        </div>
+      </nav>
+
+    </div>
+  </header>
+
+
+  <main class="course-page">
+
+    <!--══✿══╡°˖✧᯽  HERO ᯽✧˖°╞══✿══-->
+
+    <section class="course-hero">
+      <img id="courseCover" alt="">
+    </section>
+
+    <section class="course-content">
+      <h1 id="courseTitle"></h1>
+      <p id="courseDescription"></p>
+
+      <div class="teacher-block">
+        <img id="teacherPhoto" alt="">
+        <span id="teacherName"></span>
+      </div>
+
+      <div class="course-info"></div>
+    </section>
+
+    <section class="chapters-section">
+      <div id="chaptersGrid" class="chapters-grid"></div>
+    </section>
+
+    <section class="reviews-section">
+      <div id="reviewsList"></div>
+    </section>
+
+  </main>
+
+  <script src="/JS/lang-translation.js"></script>
+  <script src="/JS/courses.js"></script>
+</body>
+</html>
