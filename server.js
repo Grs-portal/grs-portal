@@ -196,7 +196,11 @@ app.post("/api/notifications/read-all", (req, res) => {
   res.json({ success: true });
 });
 
-// ---------- COURSES ----------
+
+
+
+    /* ══✿══╡°˖✧᯽   COURSES PAGES    ᯽✧˖°╞══✿══*/
+
 app.get("/api/courses", (req, res) => res.json(db.courses));
 
 app.post("/api/courses", (req, res) => {
@@ -205,18 +209,24 @@ app.post("/api/courses", (req, res) => {
 
   const a = actorFromReq(req);
 
-  const newCourse = {
-    id: Date.now(),
-    title,
-    description,
-    locationType, // "in-person" | "online" | "hybrid"
-    pdfUrl,
-    pdfName,
-    createdBy: a.byName || a.byUsername || "Unknown",
-    createdByUsername: a.byUsername || "",
-    createdByRole: a.byRole || "",
-    createdAt: new Date().toISOString()
-  };
+const newCourse = {
+  id: Date.now(),
+  title,
+  description,
+  cover: "/images/course-placeholder.jpg",
+  duration: "—",
+  teacher: {
+    name: a.byName || "Staff",
+    photo: "/images/teacher-placeholder.jpg"
+  },
+  chapters: [],
+  reviews: [],
+  locationType,
+  pdfUrl,
+  pdfName,
+  createdBy: a.byName || a.byUsername || "Unknown",
+  createdAt: new Date().toISOString()
+};
 
   db.courses.push(newCourse);
   saveData();
@@ -283,6 +293,8 @@ app.delete("/api/courses/:id", (req, res) => {
 
   res.json({ success: true });
 });
+
+
 
 // ---------- HOMEWORK ----------
 app.get("/api/homework", (req, res) => res.json(db.homework));
