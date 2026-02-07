@@ -199,7 +199,7 @@ app.post("/api/notifications/read-all", (req, res) => {
 
 
 
-    /* ══✿══╡°˖✧᯽   COURSES PAGES    ᯽✧˖°╞══✿══*/
+/* ════════════════✿══╡°˖✧‿୨˚̣̣̣͙୧ COURSES PAGE ୨˚̣̣̣͙୧‿✧˖°╞══✿════════════════ */
 
 app.get("/api/courses", (req, res) => res.json(db.courses));
 
@@ -534,3 +534,4 @@ app.get("/homepage/register.html", (req, res) => sendFirstExisting(res, "homepag
 
 // ---------------- START ----------------
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+
