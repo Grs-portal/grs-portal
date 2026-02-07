@@ -1,7 +1,11 @@
+
+
+/* ══✿══╡°˖✧᯽  ENGLISH TRANSLATION ᯽✧˖°╞══✿══ */
+
 const translations = {
   en: {
 
-// -------------> HOME <---------------
+// ... ✿°•∘ɷ∘•°✿ .. HOME ... ✿°•∘ɷ∘•°✿ ..
 
     "nav-home": "Home",
     "nav-courses": "Courses",
@@ -23,14 +27,14 @@ const translations = {
     "mission-p": "The mission of the Green Recovery Space at Hòfi Kòrsou is to provide a safe, natural and healing environment where individuals can work on their mental wellbeing, personal recovery and emotional resilience. Through nature-based activities, peer support and accessible learning opportunities.",
     "learn-more": "Learn more -→",
 
-    "courses-h": "Our Courses",
-    "courses-p": "Learn more about the amazing courses that we offer.",
+    "courses-h": "For Who?",
+    "courses-p": "Have doupts as to if you can fit into Green Recovery Space?",
 
-    "projects-h": "Our Projects",
-    "projects-p": "Learn more about our projects & workshops that we offer.",
+    "projects-h": "Green Recovery Space",
+    "projects-p": "Learn more about Green Recovery Space.",
 
-    "mental-h": "Mental Health Awareness",
-    "mental-p": "Learn more about mental health",
+    "mental-h": "Program & Registration",
+    "mental-p": "Want to form part of our program? Register here >>",
 
     "depression-h": "Depression",
     "depression-p": "Feelings of deep sadness and loss of interest that affect daily life.",
@@ -44,7 +48,7 @@ const translations = {
     "read-more": "Read More",
 
 
-    //------------> COURSES <-------------
+    // ... ✿°•∘ɷ∘•°✿ .. COURSES ... ✿°•∘ɷ∘•°✿ ..
 
     "all": "All",
     "duration": "Duration",
@@ -55,7 +59,7 @@ const translations = {
     "hero-courses-p": "Improve your skills with our curated selection of courses designed to help you learn and grow.",
 
     
-    //------------> PROJECTS <-------------
+    // ... ✿°•∘ɷ∘•°✿ .. PROJECTS ... ✿°•∘ɷ∘•°✿ ..
 
     "hero-projects-h": " Explore Our Projects ",
     "hero-projects-p": " Want to work on a project with us? ",
@@ -67,7 +71,7 @@ const translations = {
 
 
 
-    //------------> ABOUT US  <-------------
+    // ... ✿°•∘ɷ∘•°✿ .. ABOUT US  ... ✿°•∘ɷ∘•°✿ ..
 
     "what-is-h": "What do we believe in?",
     "what-is-p1": "At the Green Recovery Space, we believe that recovery starts with humanity, space, and trust. On this page, you can read what we stand for, how we work, and who is involved with us.",
@@ -130,7 +134,7 @@ const translations = {
 
 
 
-    //------------> CONTACT  <-------------
+    // ... ✿°•∘ɷ∘•°✿ .. CONTACT  ... ✿°•∘ɷ∘•°✿ ..
 
     "hero-contact-h": "Get in Touch with Us",
     "hero-contact-p": " Here you will find our contact information ",
@@ -142,9 +146,13 @@ const translations = {
 
   },
 
+
+  /* ══✿══╡°˖✧᯽  DUTCH TRANSLATION ᯽✧˖°╞══✿══ */
+
+
   nl: {
 
-    // -------------> HOME <---------------
+    // ... ✿°•∘ɷ∘•°✿ .. HOME ... ✿°•∘ɷ∘•°✿ ..
 
     "nav-home": "Home",
     "nav-courses": "Cursussen",
@@ -185,7 +193,8 @@ const translations = {
 
     "read-more": "Lees Meer",
 
-    //------------> COURSES <-------------
+
+    // ... ✿°•∘ɷ∘•°✿ .. COURSES ... ✿°•∘ɷ∘•°✿ ..
     "all": "Alle",
     "duration": "Duur",
     "any": "Elk",
@@ -196,7 +205,7 @@ const translations = {
 
 
 
-    //------------> PROJECTS <-------------
+    // ... ✿°•∘ɷ∘•°✿ .. PROJECTS ... ✿°•∘ɷ∘•°✿ ..
   
     "hero-projects-h": " Ontdek onze projecten ",
     "hero-projects-p": " Wil je met ons aan een project werken? ",
@@ -208,7 +217,7 @@ const translations = {
 
 
 
-    //------------> ABOUT US  <-------------
+    // ... ✿°•∘ɷ∘•°✿ .. ABOUT US  ... ✿°•∘ɷ∘•°✿ ..
  
     "what-is-h": "Wat geloof Green Recovery Space in?",
     "what-is-p1": "Bij de Green Recovery Space geloven we dat herstel begint bij menselijkheid, ruimte en vertrouwen. Op deze pagina lees je waar we voor staan, hoe we werken en wie er bij ons betrokken zijn.",
@@ -268,7 +277,7 @@ const translations = {
     
     "contact-about": "Wilt u eerst kennismaken of heeft u vragen? <br> U bent van harte welkom om contact met ons op te nemen of even langs te komen.",
 
-    //------------> CONTACT  <-------------
+    // ... ✿°•∘ɷ∘•°✿ .. CONTACT  ... ✿°•∘ɷ∘•°✿ ..
 
     
     "hero-contact-h": "Neem contact met ons op",
@@ -281,9 +290,13 @@ const translations = {
 
   },
 
+
+  /* ══✿══╡°˖✧᯽  SPANISH TRANSLATION ᯽✧˖°╞══✿══ */
+
+
   es: {
 
-    // -------------> HOME <---------------
+    // ... ✿°•∘ɷ∘•°✿ .. HOME ... ✿°•∘ɷ∘•°✿ ..
 
   "nav-home": "Inicio",
   "nav-courses": "Cursos",
@@ -324,7 +337,7 @@ const translations = {
 
   "read-more": "Leer más",
 
-  //------------> COURSES <-------------
+  // ... ✿°•∘ɷ∘•°✿ .. COURSES ... ✿°•∘ɷ∘•°✿ ..
 
   "all": "Todos",
   "duration": "Duración",
@@ -334,7 +347,7 @@ const translations = {
   "hero-courses-h": "Explora Nuestros Cursos",
   "hero-courses-p": "Mejora tus habilidades con nuestra selección de cursos diseñados para ayudarte a aprender y crecer.",
 
-  //------------> PROJECTS <-------------
+  // ... ✿°•∘ɷ∘•°✿ .. PROJECTS ... ✿°•∘ɷ∘•°✿ ..
 
   "hero-projects-h": "Explora Nuestros Proyectos",
   "hero-projects-p": "¿Quieres trabajar en un proyecto con nosotros?",
@@ -343,7 +356,7 @@ const translations = {
   "project-title": "Proyectos Destacados",
   "project-card-p": "Un lugar accesible y seguro donde las personas pueden reunirse, obtener información y trabajar en su bienestar.",
 
-  //------------> ABOUT US  <-------------
+  // ... ✿°•∘ɷ∘•°✿ .. ABOUT US  ... ✿°•∘ɷ∘•°✿ ..
 
 
   "what-is-h": "¿Qué es Green Recovery Space?",
@@ -404,7 +417,7 @@ const translations = {
   "contact-about": "¿Quieres conocernos primero o tienes alguna pregunta?<br>No dudes en contactarnos o visitarnos.",
 
 
-  //------------> CONTACT  <-------------
+  // ... ✿°•∘ɷ∘•°✿ .. CONTACT  ... ✿°•∘ɷ∘•°✿ ..
 
   "hero-contact-h": "Ponte en Contacto con Nosotros",
   "hero-contact-p": "Aquí encontrarás nuestra información de contacto",
@@ -415,6 +428,7 @@ const translations = {
 }
 
 
+/* ══✿══╡°˖✧᯽  TRANSLATION FUNCTION ᯽✧˖°╞══✿══ */
 
 
 };
@@ -433,11 +447,11 @@ function setLanguage(lang) {
   localStorage.setItem("language", lang);
 }
 
-// Load saved language
+// ... ✿°•∘ɷ∘•°✿ .. Load saved language
 const savedLang = localStorage.getItem("language") || "en";
 setLanguage(savedLang);
 
-// Dropdown click handling
+// ... ✿°•∘ɷ∘•°✿ .. Dropdown click handling
 document.querySelectorAll(".lang-menu li").forEach(item => {
   item.addEventListener("click", () => {
     setLanguage(item.dataset.lang);
