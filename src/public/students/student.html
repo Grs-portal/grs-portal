@@ -4,329 +4,270 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Student Portal</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <!-- Inter font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
-  :root{
-    --soft-green: #BFE3B4;
-    --soft-green-light: #E3F3DE;
-    --soft-green-dark: #9FCB99;
-    --border-light: rgba(25, 50, 25, .18);
-    --text-dark: #162116;
-
-    --panel: rgba(255,255,255,.78);
-    --panel-2: rgba(255,255,255,.9);
-  }
-
-  /* 🌿 STRONGER GREEN + CLEAR ANIMATION */
-  body{
-    color: var(--text-dark);
-    background: linear-gradient(
-      -45deg,
-      #e0f2db,
-      #cfeacd,
-      #bfe3b4,
-      #d9f0d3,
-      #c5e6bf
-    );
-    background-size: 600% 600%;
-    animation: greenFlow 18s ease-in-out infinite;
-  }
-
-  @keyframes greenFlow{
-    0%   { background-position: 0% 50%; }
-    50%  { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-
-  /* 🌿 Floating green glow blobs */
-  body::before,
-  body::after{
-    content:"";
-    position: fixed;
-    inset: -20%;
-    pointer-events: none;
-    z-index: -1;
-  }
-
-  body::before{
-    background:
-      radial-gradient(500px 380px at 15% 20%, rgba(159,203,153,.55), transparent 70%),
-      radial-gradient(600px 420px at 80% 10%, rgba(191,227,180,.55), transparent 75%);
-    animation: blobMove 26s ease-in-out infinite alternate;
-  }
-
-  body::after{
-    background:
-      radial-gradient(520px 400px at 70% 75%, rgba(169,214,157,.45), transparent 70%);
-    animation: blobMove2 32s ease-in-out infinite alternate;
-  }
-
-  @keyframes blobMove{
-    from { transform: translate(0,0); }
-    to   { transform: translate(120px, -80px); }
-  }
-
-  @keyframes blobMove2{
-    from { transform: translate(0,0); }
-    to   { transform: translate(-100px, 90px); }
-  }
-
-  /* Accessibility */
-  @media (prefers-reduced-motion: reduce){
-    body, body::before, body::after{
-      animation: none !important;
+    :root{
+      --soft-green:#BFE3B4;
+      --soft-green-dark:#A9D69D;
+      --text-dark:#1C1820;
+      --border: rgba(0,0,0,.10);
     }
-  }
 
-  /* Panels */
-  .panel{
-    background: var(--panel);
-    border: 1px solid var(--border-light);
-    border-radius: 18px;
-    padding: 18px;
-    box-shadow: 0 10px 28px rgba(0,0,0,.08);
-    backdrop-filter: blur(10px);
-  }
+    html, body{
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      color: var(--text-dark);
+    }
 
-  .card{
-    background: var(--panel-2);
-    border: 1px solid var(--border-light);
-    border-radius: 18px;
-    padding: 16px;
-    box-shadow: 0 8px 22px rgba(0,0,0,.08);
-  }
+    body{
+      background:
+        radial-gradient(900px 420px at 18% 8%, rgba(191,227,180,.55), transparent 55%),
+        radial-gradient(900px 420px at 90% 12%, rgba(169,214,157,.40), transparent 55%),
+        linear-gradient(180deg, #f2fbf0 0%, #e6f5e2 55%, #f2fbf0 100%);
+    }
 
-  .hero{
-    background: linear-gradient(
-      135deg,
-      rgba(191,227,180,.95),
-      rgba(159,203,153,.95)
-    );
-    border: 1px solid var(--border-light);
-    border-radius: 18px;
-    padding: 20px;
-    box-shadow: 0 10px 26px rgba(0,0,0,.10);
-  }
+    .title-strong{ font-weight:700; letter-spacing:-0.01em; }
+    .subtitle{ font-weight:500; opacity:.8; }
 
-  .muted{ opacity:.8; }
+    .glass{
+      background: rgba(255,255,255,.70);
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 26px rgba(0,0,0,0.06);
+      backdrop-filter: blur(12px);
+    }
 
-  .btn{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    gap:.5rem;
-    padding: 10px 14px;
-    border-radius: 14px;
-    font-weight: 800;
-    background: rgba(255,255,255,.8);
-    border: 1px solid var(--border-light);
-    transition: .15s;
-  }
-  .btn:hover{
-    background: rgba(255,255,255,1);
-    transform: translateY(-1px);
-  }
+    .hero{
+      background: linear-gradient(to bottom right, var(--soft-green), var(--soft-green-dark));
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 26px rgba(0,0,0,0.08);
+    }
 
-  .nav-item{
-    display:block;
-    padding: 10px 12px;
-    border-radius: 14px;
-    font-weight: 800;
-    transition: .15s;
-    opacity: .92;
-  }
+    .nav-item{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border-radius:14px;
+      color: var(--text-dark);
+      font-weight:600;
+      transition:150ms;
+    }
+    .nav-item:hover{ background: rgba(191,227,180,0.35); }
+    .nav-item.active{
+      background: rgba(28,24,32,.92);
+      color: #e9f7e6;
+    }
 
-  .nav-item:hover{
-    background: rgba(255,255,255,.65);
-  }
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 14px;
+      border-radius:16px;
+      font-weight:600;
+      border: 1px solid rgba(0,0,0,.10);
+      background: rgba(255,255,255,.75);
+      transition:150ms;
+    }
+    .btn:hover{ background: rgba(255,255,255,.95); }
 
-  .nav-item.active{
-    background: rgba(22,33,22,.95);
-    color: #e8f7e6;
-  }
-
-  .stat-box{
-    background: rgba(255,255,255,.65);
-    border: 1px solid var(--border-light);
-    border-radius: 18px;
-    padding: 14px;
-  }
-
-  /* Glass bars */
-  .topbar{
-    background: rgba(255,255,255,.55);
-    border-bottom: 1px solid var(--border-light);
-    backdrop-filter: blur(14px);
-  }
-
-  .sidebar{
-    background: rgba(255,255,255,.45);
-    border-right: 1px solid var(--border-light);
-    backdrop-filter: blur(14px);
-  }
-</style>
+    .card{
+      background: rgba(255,255,255,.85);
+      border: 1px solid rgba(0,0,0,.10);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 10px 24px rgba(0,0,0,.06);
+    }
+  </style>
 </head>
 
 <body class="min-h-screen overflow-x-hidden">
 
-  <!-- TOPBAR -->
-  <header class="sticky top-0 z-50 topbar">
+  <!-- Topbar -->
+  <header class="sticky top-0 z-50 border-b glass">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+
       <div class="flex items-center gap-3">
-        <button id="menuBtn" class="lg:hidden text-2xl hover:opacity-75 transition">☰</button>
-
-        <div class="w-10 h-10 rounded-2xl bg-white/60 border border-[var(--border-light)] flex items-center justify-center font-black">
-          S
-        </div>
-
-        <div class="leading-tight">
-          <div class="font-extrabold">Student Portal</div>
-          <div class="text-xs muted">Hofi Korsou</div>
+        <button id="menuBtn" class="lg:hidden text-2xl leading-none hover:opacity-70 transition" aria-label="Open menu">☰</button>
+        <div>
+          <div class="title-strong text-[15px]">Student Portal</div>
+          <div class="text-xs subtitle">Courses • Assignments • Schedule</div>
         </div>
       </div>
 
-      <div class="flex items-center gap-2">
-        <span id="userName" class="text-sm font-extrabold"></span>
+      <div class="flex items-center gap-3">
+        <span id="userName" class="text-sm font-semibold"></span>
 
+        <!-- 🔔 Notifications -->
+        <div class="relative" id="notifWrap">
+          <button id="notifBtn"
+            class="w-10 h-10 rounded-2xl glass flex items-center justify-center hover:bg-white transition"
+            title="Notifications">
+            🔔
+            <span id="notifBadge"
+              class="hidden absolute -top-1 -right-1 text-[11px] px-1.5 py-0.5 rounded-full bg-red-500 text-white font-bold">
+              0
+            </span>
+          </button>
+
+          <div id="notifMenu"
+            class="hidden absolute right-0 mt-2 w-80 max-w-[90vw] glass rounded-2xl overflow-hidden">
+            <div class="px-4 py-3 flex items-center justify-between border-b border-black/10">
+              <div class="font-semibold">Notifications</div>
+              <button id="notifReadAll"
+                class="text-xs font-semibold px-2 py-1 rounded-xl bg-slate-100 hover:bg-slate-200">
+                Mark all read
+              </button>
+            </div>
+            <div id="notifList" class="max-h-80 overflow-auto"></div>
+            <div class="px-4 py-3 text-xs text-slate-500 border-t border-black/10">
+              Uploads • edits • deletes
+            </div>
+          </div>
+        </div>
+
+        <!-- Avatar dropdown -->
         <div id="topAvatarWrap" class="relative">
           <div id="userAvatar"
-            class="w-9 h-9 rounded-full bg-[var(--soft-green)] border border-[var(--border-light)]
-                   flex items-center justify-center font-extrabold cursor-pointer select-none shadow-sm">
+            class="w-10 h-10 rounded-full bg-[var(--soft-green)] border border-black/10 flex items-center justify-center font-semibold cursor-pointer select-none">
           </div>
 
           <div id="profileMenu"
-            class="hidden absolute right-0 mt-2 w-44 bg-white/90 border border-[var(--border-light)]
-                   rounded-2xl shadow-lg overflow-hidden backdrop-blur">
-            <button id="logoutBtn" class="w-full text-left px-4 py-3 text-sm hover:bg-black/5 font-bold">
+            class="hidden absolute right-0 mt-2 w-44 glass rounded-2xl overflow-hidden">
+            <button id="logoutBtn"
+              class="w-full text-left px-4 py-3 text-sm hover:bg-black/5 font-semibold">
               Logout
             </button>
           </div>
         </div>
+
       </div>
     </div>
   </header>
 
   <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 px-4 py-6 relative">
 
-    <!-- SIDEBAR -->
+    <!-- Sidebar -->
     <aside id="sidebar"
       class="lg:col-span-3 fixed lg:static top-0 left-0 h-full lg:h-auto w-72 lg:w-auto
-             sidebar lg:rounded-2xl p-3 shadow-md transform -translate-x-full lg:translate-x-0
-             transition-transform duration-300 z-40 flex flex-col justify-between">
+      glass rounded-none lg:rounded-2xl border-r lg:border border-black/10
+      p-3 shadow-md transform -translate-x-full lg:translate-x-0 transition-transform duration-300
+      z-40 flex flex-col justify-between">
 
       <div>
-        <div class="px-3 pt-3">
-          <div class="text-xs uppercase tracking-wider muted font-extrabold">Navigation</div>
+        <div class="px-2 pt-2">
+          <div class="title-strong text-sm">Navigation</div>
+          <div class="text-xs subtitle">Student pages</div>
         </div>
 
-        <nav class="mt-2">
+        <nav class="mt-4">
           <ul class="space-y-1">
-            <li><a href="#" data-page="dashboard" class="nav-item active">🏠 Dashboard</a></li>
-            <li><a href="#" data-page="courses" class="nav-item">📚 My Courses</a></li>
-            <li><a href="#" data-page="assignments" class="nav-item">📝 Assignments</a></li>
-            <li><a href="#" data-page="schedule" class="nav-item">🗓 Schedule</a></li>
-            <li><a href="#" data-page="news" class="nav-item">📰 News</a></li>
+            <li><a href="#" data-page="dashboard" class="nav-item active">🏠 <span>Dashboard</span></a></li>
+            <li><a href="#" data-page="courses" class="nav-item">📚 <span>My Courses</span></a></li>
+            <li><a href="#" data-page="assignments" class="nav-item">📝 <span>Assignments</span></a></li>
+            <li><a href="#" data-page="schedule" class="nav-item">🗓 <span>Schedule</span></a></li>
+            <li><a href="#" data-page="news" class="nav-item">📰 <span>News</span></a></li>
           </ul>
         </nav>
 
-        <div class="mt-5 grid grid-cols-2 gap-3 px-2">
-          <section class="stat-box">
-            <p class="text-[11px] uppercase tracking-wider muted font-extrabold">Courses</p>
-            <p id="activeCoursesCount" class="text-2xl font-extrabold leading-tight">0</p>
+        <div class="mt-6 grid grid-cols-2 gap-3 px-1">
+          <section class="glass p-4 rounded-2xl">
+            <p class="text-xs subtitle">Courses</p>
+            <p id="activeCoursesCount" class="text-2xl font-semibold mt-1">0</p>
           </section>
-          <section class="stat-box">
-            <p class="text-[11px] uppercase tracking-wider muted font-extrabold">Assignments</p>
-            <p id="homeworkCount" class="text-2xl font-extrabold leading-tight">0</p>
+          <section class="glass p-4 rounded-2xl">
+            <p class="text-xs subtitle">Assignments</p>
+            <p id="homeworkCount" class="text-2xl font-semibold mt-1">0</p>
           </section>
         </div>
       </div>
 
       <div class="p-2">
         <button id="sidebarLogout"
-          class="w-full rounded-2xl border border-[var(--border-light)] bg-white/70 hover:bg-white
-                 px-4 py-3 text-left font-extrabold transition shadow-sm">
+          class="w-full rounded-2xl border border-black/10 bg-white/70 hover:bg-white
+                 px-4 py-3 text-left font-semibold transition shadow-sm">
           🚪 Logout
         </button>
       </div>
     </aside>
 
-    <div id="overlay" class="fixed inset-0 bg-black/40 hidden z-30 lg:hidden"></div>
+    <div id="overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-30 lg:hidden"></div>
 
-    <!-- MAIN -->
+    <!-- Main -->
     <main class="lg:col-span-9 space-y-6">
 
-      <!-- DASHBOARD -->
+      <!-- Dashboard -->
       <section id="dashboard" class="page-section">
-        <div class="hero">
-          <h2 class="text-2xl font-extrabold">Welcome back!</h2>
-          <p class="mt-1 muted">
-            Your courses and assignments update live from the same system as Instructor/Manager.
-          </p>
-        </div>
+        <section class="hero rounded-2xl p-6">
+          <h2 class="text-2xl title-strong">Welcome back!</h2>
+          <p class="subtitle mt-1">Your courses and assignments update live.</p>
+        </section>
 
-        <div class="panel mt-6">
+        <section class="glass rounded-2xl p-6 mt-6">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-extrabold">Continue</h3>
-            <a href="#" data-page="courses" class="text-sm font-extrabold underline muted hover:opacity-100">
-              View all
-            </a>
+            <h3 class="text-lg title-strong">Continue</h3>
+            <a href="#" data-page="courses" class="text-sm font-semibold underline opacity-80 hover:opacity-100">View all</a>
           </div>
 
           <div id="continueCourses" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-        </div>
+        </section>
       </section>
 
-      <!-- COURSES -->
+      <!-- Courses -->
       <section id="courses" class="page-section hidden">
-        <div class="panel">
+        <section class="glass rounded-2xl p-6">
           <div class="flex items-center justify-between mb-4">
-            <h2 class="text-xl font-extrabold">My Courses</h2>
+            <h2 class="text-xl title-strong">My Courses</h2>
             <button id="refreshCoursesBtn" class="btn">Refresh</button>
           </div>
           <div id="coursesGridFull" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
-        </div>
+        </section>
       </section>
 
-      <!-- ASSIGNMENTS -->
+      <!-- Assignments -->
       <section id="assignments" class="page-section hidden">
-        <div class="panel">
+        <section class="glass rounded-2xl p-6">
           <div class="flex items-center justify-between mb-4">
-            <h2 class="text-xl font-extrabold">Assignments</h2>
+            <h2 class="text-xl title-strong">Assignments</h2>
             <button id="refreshAssignmentsBtn" class="btn">Refresh</button>
           </div>
           <div id="assignmentsList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-        </div>
+        </section>
       </section>
 
-      <!-- SCHEDULE -->
+      <!-- Schedule -->
       <section id="schedule" class="page-section hidden">
-        <div class="panel min-h-[50vh] flex items-center justify-center">
-          <div class="text-center">
-            <div class="text-2xl font-extrabold">Schedule</div>
-            <div class="muted text-sm mt-1">Coming soon.</div>
+        <section class="glass rounded-2xl p-6 min-h-[55vh] flex items-center justify-center text-center">
+          <div>
+            <div class="text-2xl title-strong">Schedule</div>
+            <div class="subtitle text-sm mt-1">Coming soon.</div>
           </div>
-        </div>
+        </section>
       </section>
 
-      <!-- NEWS -->
+      <!-- News -->
       <section id="news" class="page-section hidden">
-        <div class="panel min-h-[50vh] flex items-center justify-center">
-          <div class="text-center">
-            <div class="text-2xl font-extrabold">News</div>
-            <div class="muted text-sm mt-1">Coming soon.</div>
+        <section class="glass rounded-2xl p-6 min-h-[55vh] flex items-center justify-center text-center">
+          <div>
+            <div class="text-2xl title-strong">News</div>
+            <div class="subtitle text-sm mt-1">Coming soon.</div>
           </div>
-        </div>
+        </section>
       </section>
 
     </main>
   </div>
 
-  <footer class="w-full py-6 text-center text-xs border-t border-[var(--border-light)] opacity-80">
+  <footer class="w-full py-6 text-center text-xs border-t border-black/10 opacity-80">
     © <span id="y"></span> Student Portal · Privacy · Terms
   </footer>
 
-  <script src="/students/script.js"></script>
+  <script src="/students/script.js" defer></script>
 </body>
 </html>
-
