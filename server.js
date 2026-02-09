@@ -56,7 +56,8 @@ function defaultData() {
       },
     ],
     students: [{ enrollment_id: 1, name: "John Doe", course: "Intro to Programming", grade: 9 }],
-    notifications: [] // ✅ NEW
+    notifications: [],
+    schedule: [] // ✅ NEW: schedule events stored here
   };
 }
 
@@ -65,7 +66,18 @@ function loadData() {
     if (!fs.existsSync(DATA_FILE)) {
       fs.writeFileSync(DATA_FILE, JSON.stringify(defaultData(), null, 2));
     }
-    return JSON.parse(fs.readFileSync(DATA_FILE, "utf-8"));
+    const raw = JSON.parse(fs.readFileSync(DATA_FILE, "utf-8"));
+
+    // ✅ ensure new keys exist even if data.json is old
+    raw.notifications = Array.isArray(raw.notifications) ? raw.notifications : [];
+    raw.schedule = Array.isArray(raw.schedule) ? raw.schedule : [];
+
+    raw.accounts = Array.isArray(raw.accounts) ? raw.accounts : defaultData().accounts;
+    raw.courses = Array.isArray(raw.courses) ? raw.courses : defaultData().courses;
+    raw.homework = Array.isArray(raw.homework) ? raw.homework : defaultData().homework;
+    raw.students = Array.isArray(raw.students) ? raw.students : defaultData().students;
+
+    return raw;
   } catch (e) {
     console.error("❌ Failed to load data.json, using defaults:", e);
     return defaultData();
@@ -87,7 +99,25 @@ function actorFromReq(req) {
   };
 }
 
-function addNotification({ type, action, message, byRole, byName, byUsername, targetType, targetId }) {
+/**
+ * addNotification supports targeting:
+ * audienceRole:
+ *  - "all" (default)
+ *  - "all-students"
+ *  - "student" + audienceUsername
+ */
+function addNotification({
+  type,
+  action,
+  message,
+  byRole,
+  byName,
+  byUsername,
+  targetType,
+  targetId,
+  audienceRole = "all",
+  audienceUsername = ""
+}) {
   const n = {
     id: Date.now(),
     ts: new Date().toISOString(),
@@ -99,6 +129,8 @@ function addNotification({ type, action, message, byRole, byName, byUsername, ta
     byUsername,
     targetType,
     targetId,
+    audienceRole,
+    audienceUsername,
     readBy: []
   };
   db.notifications.unshift(n);
@@ -118,6 +150,11 @@ function requireRole(req, res, allowedRoles = []) {
 function safeNoPassword(a) {
   const { password, ...rest } = a;
   return rest;
+}
+
+function isISODate(s) {
+  const d = new Date(s);
+  return !isNaN(d.getTime());
 }
 
 // ---------------- UPLOADS ----------------
@@ -154,7 +191,6 @@ app.post("/api/upload", (req, res) => {
 
     const ext = path.extname(req.file.originalname).toLowerCase();
     if (ext !== ".pdf") {
-      // delete non-pdf
       try { fs.unlinkSync(req.file.path); } catch {}
       return res.status(400).json({ success: false, message: "Only PDF allowed" });
     }
@@ -174,12 +210,29 @@ app.get("/api/notifications", (req, res) => {
   const username = String(req.query.username || "").trim();
   const role = String(req.query.role || "").trim();
   if (!username || !role) return res.status(400).json({ success: false, message: "username+role required" });
-  if (!["instructor", "manager"].includes(role)) return res.status(403).json({ success: false, message: "Forbidden" });
 
-  const items = db.notifications.slice(0, 50).map(n => ({
-    ...n,
-    unread: !n.readBy.includes(username)
-  }));
+  // ✅ allow student too (so bell works everywhere)
+  if (!["instructor", "manager", "student"].includes(role)) {
+    return res.status(403).json({ success: false, message: "Forbidden" });
+  }
+
+  const items = db.notifications
+    .filter(n => {
+      const aRole = n.audienceRole || "all";
+      const aUser = n.audienceUsername || "";
+
+      if (aRole === "all") return true;
+      if (aRole === "all-students") return role === "student";
+      if (aRole === "student") return role === "student" && aUser === username;
+
+      // fallback: show
+      return true;
+    })
+    .slice(0, 50)
+    .map(n => ({
+      ...n,
+      unread: !n.readBy.includes(username)
+    }));
 
   res.json({ success: true, items });
 });
@@ -187,15 +240,222 @@ app.get("/api/notifications", (req, res) => {
 app.post("/api/notifications/read-all", (req, res) => {
   const { username, role } = req.body || {};
   if (!username || !role) return res.status(400).json({ success: false });
-  if (!["instructor", "manager"].includes(role)) return res.status(403).json({ success: false, message: "Forbidden" });
 
+  if (!["instructor", "manager", "student"].includes(String(role))) {
+    return res.status(403).json({ success: false, message: "Forbidden" });
+  }
+
+  // only mark ones visible to you as read (clean)
   db.notifications.forEach(n => {
-    if (!n.readBy.includes(username)) n.readBy.push(username);
+    const aRole = n.audienceRole || "all";
+    const aUser = n.audienceUsername || "";
+
+    const visible =
+      aRole === "all" ||
+      (aRole === "all-students" && role === "student") ||
+      (aRole === "student" && role === "student" && aUser === username);
+
+    if (visible && !n.readBy.includes(username)) n.readBy.push(username);
   });
+
   saveData();
   res.json({ success: true });
 });
 
+
+// ---------- SCHEDULE (v1) ----------
+app.get("/api/schedule", (req, res) => {
+  const role = String(req.query.role || req.headers["x-role"] || "").trim();
+  const username = String(req.query.username || req.headers["x-username"] || "").trim();
+
+  // Student view: own + all-students
+  if (role === "student") {
+    if (!username) return res.status(400).json({ success: false, message: "Missing username" });
+
+    const now = Date.now();
+    const items = (db.schedule || [])
+      .filter(e => e && e.start)
+      .filter(e => {
+        // visibility
+        return (
+          e.audienceRole === "all-students" ||
+          (e.audienceRole === "student" && String(e.audienceUsername || "") === username)
+        );
+      })
+      .filter(e => {
+        // keep upcoming-ish (end >= now-1h)
+        const endMs = new Date(e.end || e.start).getTime();
+        return !isNaN(endMs) && endMs >= (now - 60 * 60 * 1000);
+      })
+      .sort((a, b) => new Date(a.start) - new Date(b.start))
+      .slice(0, 200);
+
+    return res.json({ success: true, items });
+  }
+
+  // Manager/instructor view all
+  if (!["manager", "instructor"].includes(role)) {
+    return res.status(403).json({ success: false, message: "Forbidden" });
+  }
+
+  const items = (db.schedule || []).slice().sort((a, b) => new Date(a.start) - new Date(b.start));
+  res.json({ success: true, items });
+});
+
+// create schedule (manager or instructor)
+app.post("/api/schedule", (req, res) => {
+  const role = requireRole(req, res, ["manager", "instructor"]);
+  if (!role) return;
+
+  const a = actorFromReq(req);
+  const {
+    title,
+    course = "",
+    start,
+    end,
+    location = "",
+    notes = "",
+    audienceRole = "all-students", // "all-students" OR "student"
+    audienceUsername = ""
+  } = req.body || {};
+
+  if (!title) return res.status(400).json({ success: false, message: "title required" });
+  if (!start || !isISODate(start)) return res.status(400).json({ success: false, message: "start must be ISO date" });
+  if (end && !isISODate(end)) return res.status(400).json({ success: false, message: "end must be ISO date" });
+
+  if (!["all-students", "student"].includes(audienceRole)) {
+    return res.status(400).json({ success: false, message: "audienceRole must be all-students or student" });
+  }
+  if (audienceRole === "student" && !String(audienceUsername).trim()) {
+    return res.status(400).json({ success: false, message: "audienceUsername required for audienceRole=student" });
+  }
+
+  const ev = {
+    id: Date.now(),
+    title: String(title),
+    course: String(course || ""),
+    start: new Date(start).toISOString(),
+    end: end ? new Date(end).toISOString() : new Date(start).toISOString(),
+    location: String(location || ""),
+    notes: String(notes || ""),
+    audienceRole,
+    audienceUsername: audienceRole === "student" ? String(audienceUsername).trim() : "",
+    createdBy: a.byName || a.byUsername || "Unknown",
+    createdByUsername: a.byUsername || "",
+    createdByRole: a.byRole || "",
+    createdAt: new Date().toISOString()
+  };
+
+  db.schedule = Array.isArray(db.schedule) ? db.schedule : [];
+  db.schedule.push(ev);
+  saveData();
+
+  // ✅ notify students
+  addNotification({
+    type: "schedule",
+    action: "created",
+    message: audienceRole === "student"
+      ? `New schedule: "${ev.title}" (for ${ev.audienceUsername})`
+      : `New schedule: "${ev.title}"`,
+    ...a,
+    targetType: "schedule",
+    targetId: ev.id,
+    audienceRole: audienceRole === "student" ? "student" : "all-students",
+    audienceUsername: audienceRole === "student" ? ev.audienceUsername : ""
+  });
+
+  res.json({ success: true, item: ev });
+});
+
+// update schedule (manager or instructor)
+app.put("/api/schedule/:id", (req, res) => {
+  const role = requireRole(req, res, ["manager", "instructor"]);
+  if (!role) return;
+
+  const a = actorFromReq(req);
+  const id = String(req.params.id);
+  db.schedule = Array.isArray(db.schedule) ? db.schedule : [];
+
+  const idx = db.schedule.findIndex(e => String(e.id) === id);
+  if (idx === -1) return res.status(404).json({ success: false, message: "Schedule event not found" });
+
+  const prev = db.schedule[idx];
+
+  const patch = { ...req.body };
+
+  if (patch.start && !isISODate(patch.start)) return res.status(400).json({ success: false, message: "start must be ISO date" });
+  if (patch.end && !isISODate(patch.end)) return res.status(400).json({ success: false, message: "end must be ISO date" });
+
+  if (patch.audienceRole && !["all-students", "student"].includes(patch.audienceRole)) {
+    return res.status(400).json({ success: false, message: "audienceRole must be all-students or student" });
+  }
+  if ((patch.audienceRole || prev.audienceRole) === "student") {
+    const u = String(patch.audienceUsername ?? prev.audienceUsername ?? "").trim();
+    if (!u) return res.status(400).json({ success: false, message: "audienceUsername required for audienceRole=student" });
+    patch.audienceUsername = u;
+  }
+
+  db.schedule[idx] = {
+    ...prev,
+    ...patch,
+    start: patch.start ? new Date(patch.start).toISOString() : prev.start,
+    end: patch.end ? new Date(patch.end).toISOString() : prev.end,
+    updatedBy: a.byName || a.byUsername || "Unknown",
+    updatedByUsername: a.byUsername || "",
+    updatedByRole: a.byRole || "",
+    updatedAt: new Date().toISOString()
+  };
+
+  saveData();
+
+  const ev = db.schedule[idx];
+  addNotification({
+    type: "schedule",
+    action: "updated",
+    message: ev.audienceRole === "student"
+      ? `Schedule updated: "${ev.title}" (for ${ev.audienceUsername})`
+      : `Schedule updated: "${ev.title}"`,
+    ...a,
+    targetType: "schedule",
+    targetId: ev.id,
+    audienceRole: ev.audienceRole === "student" ? "student" : "all-students",
+    audienceUsername: ev.audienceRole === "student" ? String(ev.audienceUsername || "") : ""
+  });
+
+  res.json({ success: true, item: ev });
+});
+
+// delete schedule (manager or instructor)
+app.delete("/api/schedule/:id", (req, res) => {
+  const role = requireRole(req, res, ["manager", "instructor"]);
+  if (!role) return;
+
+  const a = actorFromReq(req);
+  const id = String(req.params.id);
+  db.schedule = Array.isArray(db.schedule) ? db.schedule : [];
+
+  const idx = db.schedule.findIndex(e => String(e.id) === id);
+  if (idx === -1) return res.status(404).json({ success: false, message: "Schedule event not found" });
+
+  const ev = db.schedule[idx];
+  db.schedule.splice(idx, 1);
+  saveData();
+
+  addNotification({
+    type: "schedule",
+    action: "deleted",
+    message: ev.audienceRole === "student"
+      ? `Schedule deleted: "${ev.title}" (for ${ev.audienceUsername})`
+      : `Schedule deleted: "${ev.title}"`,
+    ...a,
+    targetType: "schedule",
+    targetId: id,
+    audienceRole: ev.audienceRole === "student" ? "student" : "all-students",
+    audienceUsername: ev.audienceRole === "student" ? String(ev.audienceUsername || "") : ""
+  });
+
+  res.json({ success: true });
+});
 
 
 
@@ -209,24 +469,24 @@ app.post("/api/courses", (req, res) => {
 
   const a = actorFromReq(req);
 
-const newCourse = {
-  id: Date.now(),
-  title,
-  description,
-  cover: "/images/course-placeholder.jpg",
-  duration: "—",
-  teacher: {
-    name: a.byName || "Staff",
-    photo: "/images/teacher-placeholder.jpg"
-  },
-  chapters: [],
-  reviews: [],
-  locationType,
-  pdfUrl,
-  pdfName,
-  createdBy: a.byName || a.byUsername || "Unknown",
-  createdAt: new Date().toISOString()
-};
+  const newCourse = {
+    id: Date.now(),
+    title,
+    description,
+    cover: "/images/course-placeholder.jpg",
+    duration: "—",
+    teacher: {
+      name: a.byName || "Staff",
+      photo: "/images/teacher-placeholder.jpg"
+    },
+    chapters: [],
+    reviews: [],
+    locationType,
+    pdfUrl,
+    pdfName,
+    createdBy: a.byName || a.byUsername || "Unknown",
+    createdAt: new Date().toISOString()
+  };
 
   db.courses.push(newCourse);
   saveData();
@@ -237,7 +497,8 @@ const newCourse = {
     message: `Course created: "${newCourse.title}"`,
     ...a,
     targetType: "course",
-    targetId: newCourse.id
+    targetId: newCourse.id,
+    audienceRole: "all"
   });
 
   res.json(newCourse);
@@ -267,7 +528,8 @@ app.put("/api/courses/:id", (req, res) => {
     message: `Course updated: "${db.courses[idx].title}"`,
     ...a,
     targetType: "course",
-    targetId: id
+    targetId: id,
+    audienceRole: "all"
   });
 
   res.json(db.courses[idx]);
@@ -287,13 +549,13 @@ app.delete("/api/courses/:id", (req, res) => {
       message: `Course deleted (id: ${id})`,
       ...a,
       targetType: "course",
-      targetId: id
+      targetId: id,
+      audienceRole: "all"
     });
   }
 
   res.json({ success: true });
 });
-
 
 
 // ---------- HOMEWORK ----------
@@ -329,7 +591,8 @@ app.post("/api/homework", (req, res) => {
     message: `Homework created: "${newHW.title}" (${newHW.course})`,
     ...a,
     targetType: "homework",
-    targetId: newHW.id
+    targetId: newHW.id,
+    audienceRole: "all"
   });
 
   res.json(newHW);
@@ -359,7 +622,8 @@ app.put("/api/homework/:id", (req, res) => {
     message: `Homework updated: "${db.homework[idx].title}" (${db.homework[idx].course})`,
     ...a,
     targetType: "homework",
-    targetId: id
+    targetId: id,
+    audienceRole: "all"
   });
 
   res.json(db.homework[idx]);
@@ -379,7 +643,8 @@ app.delete("/api/homework/:id", (req, res) => {
       message: `Homework deleted (id: ${id})`,
       ...a,
       targetType: "homework",
-      targetId: id
+      targetId: id,
+      audienceRole: "all"
     });
   }
 
@@ -430,7 +695,7 @@ app.post("/api/users", (req, res) => {
     password: String(password),
     role: newRole,
     name: String(name || cleanUsername).trim(),
-    avatarUrl: "" // for later profile picture saving
+    avatarUrl: ""
   };
 
   db.accounts.push(newUser);
@@ -454,7 +719,8 @@ app.post("/api/users", (req, res) => {
     message: `User created: "${newUser.username}" (${newUser.role})`,
     ...a,
     targetType: "user",
-    targetId: newUser.username
+    targetId: newUser.username,
+    audienceRole: "all"
   });
 
   res.json({ success: true, user: safeNoPassword(newUser) });
@@ -486,7 +752,8 @@ app.delete("/api/users/:username", (req, res) => {
     message: `User deleted: "${uname}"`,
     ...a,
     targetType: "user",
-    targetId: uname
+    targetId: uname,
+    audienceRole: "all"
   });
 
   res.json({ success: true });
@@ -511,7 +778,7 @@ app.post("/api/login", (req, res) => {
   res.json({ success: true, role: user.role, name: user.name, username: user.username, redirect });
 });
 
-// OPTIONAL: disable online register (since you changed it to info page)
+// OPTIONAL: disable online register
 app.post("/api/register", (req, res) => {
   return res.status(403).json({ success: false, message: "Online registration disabled. Visit Hofi Korsou." });
 });
@@ -534,4 +801,3 @@ app.get("/homepage/register.html", (req, res) => sendFirstExisting(res, "homepag
 
 // ---------------- START ----------------
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
-
