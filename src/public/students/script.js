@@ -37,6 +37,12 @@ document.addEventListener("DOMContentLoaded", () => {
     try { return await res.json(); } catch { return null; }
   }
 
+  function isSameDay(a, b) {
+    return a.getFullYear() === b.getFullYear() &&
+           a.getMonth() === b.getMonth() &&
+           a.getDate() === b.getDate();
+  }
+
   // ---------- UI: name + avatar + logout ----------
   const name = localStorage.getItem("userName") || "Student";
 
@@ -122,6 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (id === "dashboard") renderDashboard();
     if (id === "courses") renderCoursesPage();
     if (id === "assignments") renderAssignmentsPage();
+    if (id === "schedule") renderSchedulePage(); // ✅ added
   }
 
   navItems.forEach((it) => {
@@ -146,6 +153,9 @@ document.addEventListener("DOMContentLoaded", () => {
   qs("#refreshAssignmentsBtn")?.addEventListener("click", () =>
     loadAll(true).then(renderAssignmentsPage)
   );
+
+  // ✅ schedule refresh button (exists after you add schedule UI)
+  qs("#refreshScheduleBtn")?.addEventListener("click", () => loadSchedule(true).then(renderSchedulePage));
 
   // ---------- Cards ----------
   function courseCard(c) {
@@ -215,6 +225,81 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // ---------- Schedule Data ----------
+  let cacheSchedule = [];
+
+  async function loadSchedule(force = false) {
+    if (!force && cacheSchedule.length) return;
+
+    const username = localStorage.getItem("username") || "";
+    const role = localStorage.getItem("role") || "student";
+    if (!username) {
+      cacheSchedule = [];
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API}/schedule?role=${encodeURIComponent(role)}&username=${encodeURIComponent(username)}`);
+      const out = await safeJson(res);
+      if (!out?.success) {
+        cacheSchedule = [];
+        return;
+      }
+      cacheSchedule = Array.isArray(out.items) ? out.items : [];
+    } catch (e) {
+      console.error(e);
+      cacheSchedule = [];
+    }
+  }
+
+  function scheduleRow(ev) {
+    const title = escapeHtml(ev.title || "Event");
+    const course = escapeHtml(ev.course || "");
+    const location = escapeHtml(ev.location || "");
+    const notes = escapeHtml(ev.notes || "");
+
+    const start = new Date(ev.start);
+    const end = new Date(ev.end);
+    const time = `${start.toLocaleString()}${isNaN(end.getTime()) ? "" : " – " + end.toLocaleTimeString()}`;
+
+    return `
+      <div class="p-3 rounded-xl border border-black/10 bg-white/70">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <div class="font-semibold">${title}</div>
+            <div class="text-xs opacity-70 mt-1">${escapeHtml(time)}</div>
+            ${course ? `<div class="text-xs opacity-70 mt-1">Course: ${course}</div>` : ""}
+            ${location ? `<div class="text-xs opacity-70 mt-1">Location: ${location}</div>` : ""}
+            ${notes ? `<div class="text-xs opacity-70 mt-1">${notes}</div>` : ""}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  async function renderSchedulePage() {
+    await loadSchedule();
+
+    const todayBox = qs("#scheduleToday");
+    const upcomingBox = qs("#scheduleUpcoming");
+    const empty = qs("#scheduleEmpty");
+
+    if (!todayBox || !upcomingBox || !empty) return;
+
+    const now = new Date();
+    const items = cacheSchedule
+      .filter(e => e?.start)
+      .sort((a, b) => new Date(a.start) - new Date(b.start));
+
+    const today = items.filter(e => isSameDay(new Date(e.start), now));
+    const upcoming = items.filter(e => new Date(e.start) > now).slice(0, 20);
+
+    todayBox.innerHTML = today.length ? today.map(scheduleRow).join("") : `<div class="text-sm opacity-70">No events today.</div>`;
+    upcomingBox.innerHTML = upcoming.length ? upcoming.map(scheduleRow).join("") : `<div class="text-sm opacity-70">No upcoming events.</div>`;
+
+    empty.classList.toggle("hidden", items.length !== 0);
+  }
+
   // ---------- Render ----------
   async function renderDashboard() {
     await loadAll();
@@ -237,7 +322,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // ---------- Notifications (same API as instructor/manager) ----------
+  // ---------- Notifications ----------
   function setupNotificationsUI() {
     const btn = qs("#notifBtn");
     const menu = qs("#notifMenu");
@@ -290,19 +375,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const list = qs("#notifList");
     if (!list) return;
 
-    list.innerHTML = items
-      .map(
-        (n) => `
-        <div class="px-4 py-3 border-b border-black/5 ${n.unread ? "bg-green-50" : ""}">
-          <div class="text-sm font-semibold">${escapeHtml(n.message || "")}</div>
-          <div class="text-xs opacity-70 mt-1">
-            ${escapeHtml(n.byName || n.byUsername || "Someone")} · ${escapeHtml(n.byRole || "")} ·
-            ${new Date(n.ts).toLocaleString()}
-          </div>
+    list.innerHTML = items.map((n) => `
+      <div class="px-4 py-3 border-b border-black/5 ${n.unread ? "bg-green-50" : ""}">
+        <div class="text-sm font-semibold">${escapeHtml(n.message || "")}</div>
+        <div class="text-xs opacity-70 mt-1">
+          ${escapeHtml(n.byName || n.byUsername || "Someone")} · ${escapeHtml(n.byRole || "")} ·
+          ${new Date(n.ts).toLocaleString()}
         </div>
-      `
-      )
-      .join("");
+      </div>
+    `).join("");
   }
 
   // ---------- Boot ----------
