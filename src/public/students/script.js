@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   const LOGIN_PATH = "/homepage/login.html";
+  const API = "/api";
 
   // ---------- Auth guard ----------
   const path = window.location.pathname.toLowerCase();
@@ -32,6 +33,10 @@ document.addEventListener("DOMContentLoaded", () => {
     return (a + b).toUpperCase();
   }
 
+  async function safeJson(res) {
+    try { return await res.json(); } catch { return null; }
+  }
+
   // ---------- UI: name + avatar + logout ----------
   const name = localStorage.getItem("userName") || "Student";
 
@@ -58,7 +63,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // Profile dropdown
   const topWrap = qs("#topAvatarWrap");
   const profileMenu = qs("#profileMenu");
-  avatarEl?.addEventListener("click", () => profileMenu?.classList.toggle("hidden"));
+  avatarEl?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    profileMenu?.classList.toggle("hidden");
+  });
   document.addEventListener("click", (e) => {
     if (!topWrap || !profileMenu) return;
     if (!topWrap.contains(e.target)) profileMenu.classList.add("hidden");
@@ -69,14 +77,33 @@ document.addEventListener("DOMContentLoaded", () => {
   const overlay = qs("#overlay");
   const menuBtn = qs("#menuBtn");
 
-  menuBtn?.addEventListener("click", () => {
-    sidebar?.classList.toggle("-translate-x-full");
-    overlay?.classList.toggle("hidden");
-  });
-
-  overlay?.addEventListener("click", () => {
+  function closeSidebar() {
     sidebar?.classList.add("-translate-x-full");
     overlay?.classList.add("hidden");
+    document.body.style.overflow = "";
+  }
+
+  function toggleSidebar() {
+    if (!sidebar || !overlay) return;
+    const closed = sidebar.classList.contains("-translate-x-full");
+    if (closed) {
+      sidebar.classList.remove("-translate-x-full");
+      overlay.classList.remove("hidden");
+      document.body.style.overflow = "hidden";
+    } else {
+      closeSidebar();
+    }
+  }
+
+  menuBtn?.addEventListener("click", toggleSidebar);
+  overlay?.addEventListener("click", closeSidebar);
+
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeSidebar();
+      qs("#notifMenu")?.classList.add("hidden");
+      profileMenu?.classList.add("hidden");
+    }
   });
 
   // ---------- Navigation ----------
@@ -90,9 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
     navItems.forEach((i) => i.classList.remove("active"));
     navItems.find((i) => i.dataset.page === id)?.classList.add("active");
 
-    // close on mobile
-    sidebar?.classList.add("-translate-x-full");
-    overlay?.classList.add("hidden");
+    closeSidebar();
 
     if (id === "dashboard") renderDashboard();
     if (id === "courses") renderCoursesPage();
@@ -115,9 +140,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const activeCoursesCount = qs("#activeCoursesCount");
   const homeworkCount = qs("#homeworkCount");
 
-  // refresh buttons from the HTML I sent
-  qs("#refreshCoursesBtn")?.addEventListener("click", () => loadAll(true).then(renderCoursesPage));
-  qs("#refreshAssignmentsBtn")?.addEventListener("click", () => loadAll(true).then(renderAssignmentsPage));
+  qs("#refreshCoursesBtn")?.addEventListener("click", () =>
+    loadAll(true).then(renderCoursesPage)
+  );
+  qs("#refreshAssignmentsBtn")?.addEventListener("click", () =>
+    loadAll(true).then(renderAssignmentsPage)
+  );
 
   // ---------- Cards ----------
   function courseCard(c) {
@@ -126,15 +154,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     return `
       <div class="card">
-        <h4 class="font-black leading-tight">${title}</h4>
+        <h4 class="font-semibold leading-tight">${title}</h4>
         <p class="text-sm opacity-80 mt-1">${desc}</p>
 
         <div class="mt-3 w-full bg-black/10 rounded-full h-2.5">
-          <div class="h-2.5 rounded-full bg-black/60" style="width: 0%"></div>
+          <div class="h-2.5 rounded-full bg-black/50" style="width: 0%"></div>
         </div>
         <p class="text-xs opacity-70 mt-2">0% Complete</p>
 
-        <button class="mt-4 w-full rounded-xl bg-[var(--soft-green)] hover:bg-[var(--soft-green-dark)] text-[var(--text-dark)] font-black py-2 transition">
+        <button class="mt-4 w-full rounded-xl bg-white/70 hover:bg-white text-[var(--text-dark)] font-semibold py-2 transition border border-black/10">
           Continue
         </button>
       </div>
@@ -149,11 +177,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     return `
       <div class="card">
-        <h4 class="font-black leading-tight">${title}</h4>
+        <h4 class="font-semibold leading-tight">${title}</h4>
         <p class="text-sm opacity-80 mt-1">${desc}</p>
         <p class="text-xs opacity-70 mt-3">Course: ${course} · By: ${by}</p>
 
-        <button class="mt-4 w-full rounded-xl bg-white/70 hover:bg-white text-[var(--text-dark)] font-black py-2 transition border border-black/10">
+        <button class="mt-4 w-full rounded-xl bg-white/70 hover:bg-white text-[var(--text-dark)] font-semibold py-2 transition border border-black/10">
           View
         </button>
       </div>
@@ -169,12 +197,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       const [coursesRes, hwRes] = await Promise.all([
-        fetch("/api/courses"),
-        fetch("/api/homework"),
+        fetch(`${API}/courses`),
+        fetch(`${API}/homework`),
       ]);
 
-      cacheCourses = (await coursesRes.json()) || [];
-      cacheHomework = (await hwRes.json()) || [];
+      cacheCourses = (await safeJson(coursesRes)) || [];
+      cacheHomework = (await safeJson(hwRes)) || [];
 
       if (activeCoursesCount) activeCoursesCount.textContent = cacheCourses.length;
       if (homeworkCount) homeworkCount.textContent = cacheHomework.length;
@@ -209,7 +237,80 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // ---------- Notifications (same API as instructor/manager) ----------
+  function setupNotificationsUI() {
+    const btn = qs("#notifBtn");
+    const menu = qs("#notifMenu");
+    const wrap = qs("#notifWrap");
+
+    btn?.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      menu?.classList.toggle("hidden");
+      if (menu && !menu.classList.contains("hidden")) await loadNotifications();
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!wrap || !menu) return;
+      if (!wrap.contains(e.target)) menu.classList.add("hidden");
+    });
+
+    qs("#notifReadAll")?.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      const role = localStorage.getItem("role") || "";
+      const username = localStorage.getItem("username") || "";
+      await fetch(`${API}/notifications/read-all`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role, username }),
+      });
+      await loadNotifications();
+    });
+  }
+
+  async function loadNotifications() {
+    const role = localStorage.getItem("role") || "";
+    const username = localStorage.getItem("username") || "";
+    if (!username) return;
+
+    const res = await fetch(
+      `${API}/notifications?role=${encodeURIComponent(role)}&username=${encodeURIComponent(username)}`
+    );
+    const out = await safeJson(res);
+    if (!out?.success) return;
+
+    const items = out.items || [];
+    const unreadCount = items.filter((x) => x.unread).length;
+
+    const badge = qs("#notifBadge");
+    if (badge) {
+      badge.textContent = String(unreadCount);
+      badge.classList.toggle("hidden", unreadCount === 0);
+    }
+
+    const list = qs("#notifList");
+    if (!list) return;
+
+    list.innerHTML = items
+      .map(
+        (n) => `
+        <div class="px-4 py-3 border-b border-black/5 ${n.unread ? "bg-green-50" : ""}">
+          <div class="text-sm font-semibold">${escapeHtml(n.message || "")}</div>
+          <div class="text-xs opacity-70 mt-1">
+            ${escapeHtml(n.byName || n.byUsername || "Someone")} · ${escapeHtml(n.byRole || "")} ·
+            ${new Date(n.ts).toLocaleString()}
+          </div>
+        </div>
+      `
+      )
+      .join("");
+  }
+
   // ---------- Boot ----------
   qs("#y") && (qs("#y").textContent = new Date().getFullYear());
+
+  setupNotificationsUI();
+  loadNotifications();
+  setInterval(loadNotifications, 15000);
+
   showPage("dashboard");
 });
