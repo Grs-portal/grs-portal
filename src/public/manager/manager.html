@@ -1,271 +1,345 @@
 <!doctype html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Project Manager Portal</title>
 
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <!-- Inter font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
-    :root {
-      --soft-green: #BFE3B4;
-      --soft-green-light: #E8F7E4;
-      --soft-green-lighter: #F4FBF1;
-      --soft-green-dark: #9FCB99;
-      --text-dark: #1A1A1A;
+    :root{
+      --soft-green:#BFE3B4;
+      --soft-green-dark:#A9D69D;
+      --text-dark:#1C1820;
+      --border: rgba(0,0,0,.10);
     }
 
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 12px;
-      border-radius: 12px;
-      font-weight: 600;
-      transition: 0.15s;
+    html, body{
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
       color: var(--text-dark);
     }
 
-    .nav-item:hover {
-      background: rgba(191, 227, 180, 0.55);
-      transform: translateX(2px);
+    body{
+      background:
+        radial-gradient(900px 420px at 18% 8%, rgba(191,227,180,.55), transparent 55%),
+        radial-gradient(900px 420px at 90% 12%, rgba(169,214,157,.40), transparent 55%),
+        linear-gradient(180deg, #f2fbf0 0%, #e6f5e2 55%, #f2fbf0 100%);
     }
 
-    .nav-item.active {
-      background: var(--soft-green-dark);
-      color: white;
+    .title-strong{ font-weight:700; letter-spacing:-0.01em; }
+    .subtitle{ font-weight:500; opacity:.8; }
+
+    /* glass surfaces */
+    .glass{
+      background: rgba(255,255,255,.70);
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 26px rgba(0,0,0,0.06);
+      backdrop-filter: blur(12px);
     }
 
-    .soft-card {
-      background: white;
-      border: 1px solid var(--soft-green-dark);
-      border-radius: 18px;
-      padding: 22px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    }
-
-    .header-box {
+    .hero{
       background: linear-gradient(to bottom right, var(--soft-green), var(--soft-green-dark));
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 26px rgba(0,0,0,0.08);
+    }
+
+    /* nav */
+    .nav-item{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border-radius:14px;
       color: var(--text-dark);
-      padding: 26px;
-      border-radius: 20px;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+      font-weight:600;
+      transition:150ms;
+    }
+    .nav-item:hover{ background: rgba(191,227,180,0.35); }
+    .nav-item.active{
+      background: rgba(28,24,32,.92);
+      color: #e9f7e6;
     }
 
-    .btn-primary {
-      background: var(--soft-green-dark);
-      color: white;
-      padding: 10px 18px;
-      border-radius: 12px;
-      transition: 0.15s;
-      font-weight: 700;
+    /* buttons */
+    .btn-primary{
+      background: rgba(28,24,32,.92);
+      color:#e9f7e6;
+      border-radius:16px;
+      padding:10px 16px;
+      font-weight:600;
+      transition:150ms;
     }
-
-    .btn-primary:hover {
-      background: #86b780;
-    }
-
-    .stat-box {
-      background: white;
-      border: 1px solid var(--soft-green-dark);
-      padding: 16px;
-      border-radius: 16px;
-      text-align: center;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
-    }
-
-    .side-title {
-      font-size: 12px;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      opacity: .7;
-      margin: 10px 6px 6px;
-    }
+    .btn-primary:hover{ opacity:.92; }
   </style>
 </head>
 
-<body class="min-h-screen bg-[var(--soft-green-light)] text-[var(--text-dark)]">
+<body class="min-h-screen overflow-x-hidden">
 
   <!-- Topbar -->
-  <header class="sticky top-0 z-50 bg-[var(--soft-green)] shadow-md border-b border-[var(--soft-green-dark)]">
+  <header class="sticky top-0 z-50 border-b glass">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
 
       <div class="flex items-center gap-3">
-        <button id="menuBtn" class="lg:hidden text-2xl focus:outline-none hover:opacity-70 transition">☰</button>
-        <h1 class="font-semibold text-lg">Project Manager Portal</h1>
+        <button id="menuBtn" class="lg:hidden text-2xl leading-none hover:opacity-70 transition" aria-label="Open menu">☰</button>
+        <div>
+          <div class="title-strong text-[15px]">Project Manager Portal</div>
+          <div class="text-xs subtitle">Dashboard • Projects • Courses • Homework • Users</div>
+        </div>
       </div>
 
-      <div class="flex items-center gap-2">
-        <span id="userName" class="text-sm font-medium"></span>
+      <div class="flex items-center gap-3">
+        <span id="userName" class="text-sm font-semibold"></span>
 
+        <!-- 🔔 Notifications (manager.js already expects these IDs) -->
+        <div class="relative" id="notifWrap">
+          <button id="notifBtn"
+            class="w-10 h-10 rounded-2xl glass flex items-center justify-center hover:bg-white transition"
+            title="Notifications">
+            🔔
+            <span id="notifBadge"
+              class="hidden absolute -top-1 -right-1 text-[11px] px-1.5 py-0.5 rounded-full bg-red-500 text-white font-bold">
+              0
+            </span>
+          </button>
+
+          <div id="notifMenu"
+            class="hidden absolute right-0 mt-2 w-80 max-w-[90vw] glass rounded-2xl overflow-hidden">
+            <div class="px-4 py-3 flex items-center justify-between border-b border-black/10">
+              <div class="font-semibold">Notifications</div>
+              <button id="notifReadAll"
+                class="text-xs font-semibold px-2 py-1 rounded-xl bg-slate-100 hover:bg-slate-200">
+                Mark all read
+              </button>
+            </div>
+            <div id="notifList" class="max-h-80 overflow-auto"></div>
+            <div class="px-4 py-3 text-xs text-slate-500 border-t border-black/10">
+              Uploads • edits • deletes
+            </div>
+          </div>
+        </div>
+
+        <!-- Avatar dropdown -->
         <div id="topAvatarWrap" class="relative">
           <div id="userAvatar"
-            class="w-10 h-10 rounded-full bg-white border border-[var(--soft-green-dark)] flex items-center justify-center font-bold cursor-pointer shadow-sm">
+            class="w-10 h-10 rounded-full bg-[var(--soft-green)] border border-black/10 flex items-center justify-center font-semibold cursor-pointer select-none">
           </div>
 
           <div id="profileMenu"
-            class="hidden absolute right-0 mt-2 w-44 bg-white border border-[var(--soft-green-dark)] rounded-xl shadow-lg overflow-hidden z-50">
+            class="hidden absolute right-0 mt-2 w-44 glass rounded-2xl overflow-hidden z-50">
             <button id="logoutBtn"
-              class="w-full text-left px-4 py-3 text-sm hover:bg-[var(--soft-green-light)]">
+              class="w-full text-left px-4 py-3 text-sm hover:bg-black/5 font-semibold">
               Logout
             </button>
           </div>
         </div>
-      </div>
 
+      </div>
     </div>
   </header>
 
-  <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 px-4 py-6">
+  <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 px-4 py-6 relative">
 
     <!-- Sidebar -->
     <aside id="sidebar"
       class="lg:col-span-3 fixed lg:static top-0 left-0 h-full lg:h-auto w-72 lg:w-auto
-      bg-white/70 backdrop-blur border-r border-[var(--soft-green-dark)]
-      p-4 shadow-md transform -translate-x-full lg:translate-x-0 transition-transform duration-300
-      z-40 rounded-r-2xl lg:rounded-2xl">
+      glass rounded-none lg:rounded-2xl border-r lg:border border-black/10
+      p-3 shadow-md transform -translate-x-full lg:translate-x-0 transition-transform duration-300
+      z-40 flex flex-col justify-between">
 
-      <div class="flex items-center justify-between">
-        <div class="font-bold">Menu</div>
-        <span class="text-xs opacity-70">Manager</span>
+      <div>
+        <div class="px-2 pt-2">
+          <div class="title-strong text-sm">Menu</div>
+          <div class="text-xs subtitle">Manager navigation</div>
+        </div>
+
+        <div class="mt-4 text-[11px] uppercase tracking-widest opacity-70 px-2">Navigation</div>
+        <nav class="mt-2">
+          <ul class="space-y-1">
+            <li><a data-page="dashboard" class="nav-item active" href="#">📊 <span>Dashboard</span></a></li>
+            <li><a data-page="projects" class="nav-item" href="#">🧩 <span>Projects</span></a></li>
+            <li><a data-page="students" class="nav-item" href="#">🎓 <span>Students & Grades</span></a></li>
+            <li><a data-page="submitted-homework" class="nav-item" href="#">📥 <span>Submitted Homework</span></a></li>
+            <li><a data-page="submitted-courses" class="nav-item" href="#">📚 <span>Courses</span></a></li>
+          </ul>
+        </nav>
+
+        <div class="mt-5 text-[11px] uppercase tracking-widest opacity-70 px-2">Create</div>
+        <nav class="mt-2">
+          <ul class="space-y-1">
+            <li><a data-page="create-homework" class="nav-item" href="#">➕ <span>Create Homework</span></a></li>
+            <li><a data-page="create-course" class="nav-item" href="#">➕ <span>Create Course</span></a></li>
+            <li><a data-page="users" class="nav-item" href="#">👥 <span>Users</span></a></li>
+          </ul>
+        </nav>
+
+        <div class="mt-6 grid grid-cols-2 gap-3 px-1">
+          <section class="glass p-4 rounded-2xl">
+            <p class="text-xs subtitle">Active</p>
+            <p id="activeCoursesCount" class="text-2xl font-semibold mt-1">0</p>
+          </section>
+          <section class="glass p-4 rounded-2xl">
+            <p class="text-xs subtitle">To Grade</p>
+            <p id="toGradeCount" class="text-2xl font-semibold mt-1">0</p>
+          </section>
+        </div>
       </div>
 
-      <div class="side-title">Navigation</div>
-      <nav>
-        <ul class="space-y-2">
-          <li><a data-page="dashboard" class="nav-item active" href="#">📊 Dashboard</a></li>
-          <li><a data-page="projects" class="nav-item" href="#">🧩 Projects</a></li>
-          <li><a data-page="students" class="nav-item" href="#">🎓 Students & Grades</a></li>
-          <li><a data-page="submitted-homework" class="nav-item" href="#">📥 Submitted Homework</a></li>
-          <li><a data-page="submitted-courses" class="nav-item" href="#">📚 Courses</a></li>
-        </ul>
-      </nav>
-
-      <div class="side-title">Create</div>
-      <nav>
-        <ul class="space-y-2">
-          <li><a data-page="create-homework" class="nav-item" href="#">➕ Create Homework</a></li>
-          <li><a data-page="create-course" class="nav-item" href="#">➕ Create Course</a></li>
-          <li><a data-page="users" class="nav-item" href="#">👥 Users</a></li>
-          <li><a id="sidebarLogout" class="nav-item" href="#" style="background: rgba(0,0,0,0.05);">🚪 Logout</a></li>
-        </ul>
-      </nav>
-
-      <div class="mt-6 grid grid-cols-2 gap-3">
-        <section class="stat-box">
-          <p class="text-sm opacity-70">Active</p>
-          <p id="activeCoursesCount" class="text-xl font-bold">0</p>
-        </section>
-        <section class="stat-box">
-          <p class="text-sm opacity-70">To Grade</p>
-          <p id="toGradeCount" class="text-xl font-bold">0</p>
-        </section>
+      <div class="p-2">
+        <a id="sidebarLogout"
+          href="#"
+          class="block w-full rounded-2xl border border-black/10 bg-white/70 hover:bg-white
+                 px-4 py-3 text-left font-semibold transition shadow-sm">
+          🚪 Logout
+        </a>
       </div>
-
     </aside>
 
-    <div id="overlay" class="fixed inset-0 bg-black/40 hidden z-30 lg:hidden"></div>
+    <div id="overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-30 lg:hidden"></div>
 
     <!-- Main -->
     <main class="lg:col-span-9 space-y-6">
 
       <!-- Dashboard -->
       <div id="dashboard" class="page-section">
-        <section class="header-box mb-6">
-          <h2 class="text-2xl font-semibold">Welcome, Manager!</h2>
-          <p class="opacity-80 mt-1">Manage all courses, homework, projects, and grading.</p>
+        <section class="hero rounded-2xl p-6 mb-6">
+          <h2 class="text-2xl title-strong">Welcome, Manager!</h2>
+          <p class="subtitle mt-1">Manage courses, homework, projects, grading, and users.</p>
         </section>
 
-        <section class="soft-card mb-6">
-          <h3 class="text-xl font-semibold mb-3">All Courses</h3>
-          <div id="courses" class="grid gap-4"></div>
-          <!-- ✅ removed create course button from dashboard -->
+        <section class="glass rounded-2xl p-6 mb-6">
+          <div class="flex items-center justify-between gap-3">
+            <h3 class="text-lg title-strong">All Courses</h3>
+            <div class="text-xs subtitle">System-wide overview</div>
+          </div>
+          <div id="courses" class="grid gap-4 mt-4"></div>
         </section>
 
-        <section class="soft-card">
-          <h3 class="text-xl font-semibold mb-3">Projects</h3>
-          <div id="dashboardProjects" class="grid gap-4"></div>
+        <section class="glass rounded-2xl p-6">
+          <div class="flex items-center justify-between gap-3">
+            <h3 class="text-lg title-strong">Projects</h3>
+            <div class="text-xs subtitle">Quick overview</div>
+          </div>
+          <div id="dashboardProjects" class="grid gap-4 mt-4"></div>
         </section>
       </div>
 
       <!-- Projects -->
-      <div id="projects" class="page-section hidden soft-card">
-        <h2 class="text-xl font-semibold mb-4">Projects</h2>
-        <div id="projectsFullList" class="space-y-3"></div>
+      <div id="projects" class="page-section hidden">
+        <section class="glass rounded-2xl p-6">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl title-strong">Projects</h2>
+            <div class="text-xs subtitle">All projects</div>
+          </div>
+          <div id="projectsFullList" class="space-y-3 mt-4"></div>
+        </section>
       </div>
 
       <!-- Students -->
-      <div id="students" class="page-section hidden soft-card overflow-auto">
-        <h2 class="text-xl font-semibold mb-4">Students & Grades</h2>
-        <table class="min-w-full text-sm">
-          <thead class="bg-[var(--soft-green)] text-[var(--text-dark)] uppercase text-xs">
-            <tr>
-              <th class="px-6 py-3">Student</th>
-              <th class="px-6 py-3">Course</th>
-              <th class="px-6 py-3">Grade</th>
-              <th class="px-6 py-3 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="studentTable"></tbody>
-        </table>
+      <div id="students" class="page-section hidden">
+        <section class="glass rounded-2xl p-6 overflow-auto">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl title-strong">Students & Grades</h2>
+            <div class="text-xs subtitle">View + manage grades</div>
+          </div>
+
+          <div class="overflow-x-auto mt-4">
+            <table class="min-w-full text-sm">
+              <thead class="bg-[rgba(191,227,180,.85)] text-[var(--text-dark)] uppercase text-[0.75rem]">
+                <tr>
+                  <th class="px-6 py-3">Student</th>
+                  <th class="px-6 py-3">Course</th>
+                  <th class="px-6 py-3">Grade</th>
+                  <th class="px-6 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="studentTable"></tbody>
+            </table>
+          </div>
+        </section>
       </div>
 
       <!-- Submitted Homework -->
-      <div id="submitted-homework" class="page-section hidden soft-card">
-        <h2 class="text-xl font-semibold mb-4">Submitted Homework</h2>
-        <div id="homework-list" class="grid gap-4"></div>
+      <div id="submitted-homework" class="page-section hidden">
+        <section class="glass rounded-2xl p-6">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl title-strong">Submitted Homework</h2>
+            <div class="text-xs subtitle">Review + manage</div>
+          </div>
+          <div id="homework-list" class="grid gap-4 mt-4"></div>
+        </section>
       </div>
 
       <!-- Courses list -->
-      <div id="submitted-courses" class="page-section hidden soft-card">
-        <h2 class="text-xl font-semibold mb-4">Courses</h2>
-        <div id="submitted-courses-list"></div>
+      <div id="submitted-courses" class="page-section hidden">
+        <section class="glass rounded-2xl p-6">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl title-strong">Courses</h2>
+            <div class="text-xs subtitle">Manage all courses</div>
+          </div>
+          <div id="submitted-courses-list" class="mt-4"></div>
+        </section>
       </div>
 
       <!-- Create Homework -->
-      <div id="create-homework" class="page-section hidden soft-card text-center">
-        <h2 class="text-xl font-semibold mb-4">Create Homework</h2>
-        <button id="openCreateHw" class="btn-primary">+ Add Homework</button>
+      <div id="create-homework" class="page-section hidden">
+        <section class="glass rounded-2xl p-6 min-h-[55vh] flex flex-col items-center justify-center text-center">
+          <h2 class="text-2xl title-strong">Create Homework</h2>
+          <p class="subtitle mt-1">Create an assignment and attach a PDF if needed.</p>
+          <button id="openCreateHw" class="btn-primary mt-5">+ Add Homework</button>
+        </section>
       </div>
 
-      <!-- ✅ Create Course (NEW PAGE) -->
-      <div id="create-course" class="page-section hidden soft-card text-center">
-        <h2 class="text-xl font-semibold mb-4">Create Course</h2>
-        <button id="openCreateCourse" class="btn-primary">+ Add Course</button>
+      <!-- Create Course -->
+      <div id="create-course" class="page-section hidden">
+        <section class="glass rounded-2xl p-6 min-h-[55vh] flex flex-col items-center justify-center text-center">
+          <h2 class="text-2xl title-strong">Create Course</h2>
+          <p class="subtitle mt-1">Create a course with an optional PDF.</p>
+          <button id="openCreateCourse" class="btn-primary mt-5">+ Add Course</button>
+        </section>
       </div>
 
       <!-- Users -->
-      <div id="users" class="page-section hidden soft-card overflow-auto">
-        <div class="flex items-center justify-between gap-3 mb-4">
-          <h2 class="text-xl font-semibold">Users</h2>
-          <div class="flex gap-2">
-            <button id="createUserBtn" class="btn-primary">+ Create User</button>
-            <button id="refreshUsersBtn" class="btn-primary">Refresh</button>
+      <div id="users" class="page-section hidden">
+        <section class="glass rounded-2xl p-6 overflow-auto">
+          <div class="flex items-center justify-between gap-3 mb-4">
+            <h2 class="text-xl title-strong">Users</h2>
+            <div class="flex gap-2">
+              <button id="createUserBtn" class="btn-primary">+ Create User</button>
+              <button id="refreshUsersBtn" class="btn-primary">Refresh</button>
+            </div>
           </div>
-        </div>
 
-        <table class="min-w-full text-sm">
-          <thead class="bg-[var(--soft-green)] text-[var(--text-dark)] uppercase text-xs">
-            <tr>
-              <th class="px-6 py-3">Username</th>
-              <th class="px-6 py-3">Name</th>
-              <th class="px-6 py-3">Role</th>
-              <th class="px-6 py-3 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="usersTable"></tbody>
-        </table>
+          <div class="overflow-x-auto">
+            <table class="min-w-full text-sm">
+              <thead class="bg-[rgba(191,227,180,.85)] text-[var(--text-dark)] uppercase text-[0.75rem]">
+                <tr>
+                  <th class="px-6 py-3">Username</th>
+                  <th class="px-6 py-3">Name</th>
+                  <th class="px-6 py-3">Role</th>
+                  <th class="px-6 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="usersTable"></tbody>
+            </table>
+          </div>
+        </section>
       </div>
 
     </main>
   </div>
 
-  <footer class="text-center py-4 text-sm opacity-70">
+  <footer class="text-center py-6 text-xs border-t border-black/10 opacity-80">
     © <span id="y"></span> Project Manager Portal · Privacy · Terms
   </footer>
 
-  <script src="manager.js"></script>
+  <!-- IMPORTANT: defer so the DOM exists before manager.js runs -->
+  <script src="manager.js" defer></script>
 </body>
 </html>
