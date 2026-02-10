@@ -459,12 +459,17 @@ app.delete("/api/schedule/:id", (req, res) => {
 
 
 
-/* ════════════════✿══╡°˖✧‿୨˚̣̣̣͙୧ COURSES PAGE ୨˚̣̣̣͙୧‿✧˖°╞══✿════════════════ */
+/* ═════════✿══╡°˖✧᯽   COURSES PAGES    ᯽✧˖°╞══✿═════════*/
 
 app.get("/api/courses", (req, res) => res.json(db.courses));
 
 app.post("/api/courses", (req, res) => {
-  const { title, description = "", locationType = "in-person", pdfUrl = "", pdfName = "" } = req.body || {};
+  const {
+    title,
+    description = "",
+    locationType = "in-person",
+    courseType = "video"
+  } = req.body || {};
   if (!title) return res.status(400).json({ success: false, message: "Title required" });
 
   const a = actorFromReq(req);
@@ -473,6 +478,7 @@ app.post("/api/courses", (req, res) => {
     id: Date.now(),
     title,
     description,
+    courseType, 
     cover: "/images/course-placeholder.jpg",
     duration: "—",
     teacher: {
@@ -482,11 +488,10 @@ app.post("/api/courses", (req, res) => {
     chapters: [],
     reviews: [],
     locationType,
-    pdfUrl,
-    pdfName,
     createdBy: a.byName || a.byUsername || "Unknown",
     createdAt: new Date().toISOString()
   };
+
 
   db.courses.push(newCourse);
   saveData();
@@ -497,8 +502,7 @@ app.post("/api/courses", (req, res) => {
     message: `Course created: "${newCourse.title}"`,
     ...a,
     targetType: "course",
-    targetId: newCourse.id,
-    audienceRole: "all"
+    targetId: newCourse.id
   });
 
   res.json(newCourse);
@@ -528,8 +532,7 @@ app.put("/api/courses/:id", (req, res) => {
     message: `Course updated: "${db.courses[idx].title}"`,
     ...a,
     targetType: "course",
-    targetId: id,
-    audienceRole: "all"
+    targetId: id
   });
 
   res.json(db.courses[idx]);
@@ -549,8 +552,7 @@ app.delete("/api/courses/:id", (req, res) => {
       message: `Course deleted (id: ${id})`,
       ...a,
       targetType: "course",
-      targetId: id,
-      audienceRole: "all"
+      targetId: id
     });
   }
 
@@ -801,3 +803,4 @@ app.get("/homepage/register.html", (req, res) => sendFirstExisting(res, "homepag
 
 // ---------------- START ----------------
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+
