@@ -432,59 +432,66 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ---- Create/Edit Course & Homework ----
-  function openCourseModal() {
-    showModal(`
-      <h2 class="text-xl font-semibold mb-4">Create Course</h2>
-      <input id="courseTitle" type="text" placeholder="Course title" class="w-full border rounded-lg px-3 py-2 mb-3" />
-      <textarea id="courseDesc" placeholder="Description" class="w-full border rounded-lg px-3 py-2 mb-3"></textarea>
 
-      <select id="courseType" class="w-full border rounded-lg px-3 py-2 mb-3">
-        <option value="in-person">In-person</option>
-        <option value="online">Online</option>
-        <option value="hybrid">Hybrid</option>
-      </select>
+/* ══✿══╡°˖✧᯽   CREATE COURSES   ᯽✧˖°╞══✿══*/
+  // ... ✿°•∘ɷ∘•°✿ .. basically just adding the extra data needed for the front-page.
+  
+function openCourseModal() {
+  showModal(`
+    <h2 class="text-xl font-semibold mb-4">Create Course</h2>
 
-      <input id="coursePdf" type="file" accept=".pdf" class="w-full mb-4" />
+    <input id="courseTitle" placeholder="Course title" class="w-full border rounded-lg px-3 py-2 mb-3" />
+    <textarea id="courseDesc" placeholder="Description" class="w-full border rounded-lg px-3 py-2 mb-3"></textarea>
 
-      <div class="flex justify-end gap-2">
-        <button id="cancelModal" class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">Cancel</button>
-        <button id="submitModal" class="px-4 py-2 bg-black text-white rounded-lg hover:opacity-90">Create</button>
-      </div>
-    `);
+    <input id="courseCover" type="file" accept="image/*" class="w-full mb-4" />
 
-    qs("#submitModal")?.addEventListener("click", async () => {
-      const title = qs("#courseTitle").value.trim();
-      const description = qs("#courseDesc").value.trim();
-      const locationType = qs("#courseType").value;
+    <div class="flex justify-end gap-2">
+      <button id="cancelModal">Cancel</button>
+      <button id="submitModal">Create</button>
+    </div>
+  `);
 
-      if (!title) return toast("Title required!", "#b91c1c");
+// ... ✿°•∘ɷ∘•°✿ .. submit logic
 
-      let pdfUrl = "",
-        pdfName = "";
-      const file = qs("#coursePdf")?.files?.[0];
-      try {
-        if (file) {
-          const up = await uploadPdf(file);
-          pdfUrl = up.url;
-          pdfName = up.originalName;
-        }
-      } catch (e) {
-        return toast(e.message, "#b91c1c");
-      }
+qs("#submitModal")?.addEventListener("click", async () => {
+  const title = qs("#courseTitle").value.trim();
+  const description = qs("#courseDesc").value.trim();
+  const coverFile = qs("#courseCover")?.files?.[0];
 
-      const r = await fetch(`${API}/courses`, {
-        method: "POST",
-        headers: jsonHeaders(),
-        body: JSON.stringify({ title, description, locationType, pdfUrl, pdfName }),
-      });
+  if (!title) return toast("Title required", "#b91c1c");
 
-      if (!r.ok) return toast("Create course failed", "#b91c1c");
-      closeModal();
-      toast("Course created!", "#166534");
-      loadDashboard();
-      loadNotifications();
-    });
+  let cover = "/images/course-placeholder.jpg";
+
+  if (coverFile) {
+    const up = await uploadImage(coverFile);
+    cover = up.url;
+  }
+
+  const payload = {
+    title,
+    description,
+    cover,
+    teacher: {
+      name: currentUser.name,
+      photo: currentUser.photo
+    },
+    chapters: [],
+    reviews: []
+  };
+
+  const r = await fetch(`${API}/courses`, {
+    method: "POST",
+    headers: jsonHeaders(),
+    body: JSON.stringify(payload),
+  });
+
+  if (!r.ok) return toast("Create failed", "#b91c1c");
+
+  closeModal();
+  toast("Course created", "#166534");
+  loadDashboard();
+});
+
   }
 
   function openEditCourseModal(course) {
@@ -553,6 +560,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  
+// ---- Create/Edit Homework ----
   function openHomeworkModal() {
     showModal(`
       <h2 class="text-xl font-semibold mb-4">Create Homework</h2>
@@ -701,3 +710,4 @@ document.addEventListener("DOMContentLoaded", () => {
   // initial load
   showPage("dashboard");
 });
+
