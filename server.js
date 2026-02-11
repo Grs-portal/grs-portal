@@ -464,12 +464,8 @@ app.delete("/api/schedule/:id", (req, res) => {
 app.get("/api/courses", (req, res) => res.json(db.courses));
 
 app.post("/api/courses", (req, res) => {
-  const {
-    title,
-    description = "",
-    locationType = "in-person",
-    courseType = "video"
-  } = req.body || {};
+  const { title, description = "", locationType = "in-person", courseType = "video", cover } = req.body || {};
+
   if (!title) return res.status(400).json({ success: false, message: "Title required" });
 
   const a = actorFromReq(req);
@@ -478,18 +474,15 @@ app.post("/api/courses", (req, res) => {
     id: Date.now(),
     title,
     description,
-    courseType, 
-    cover: "/images/course-placeholder.jpg",
-    duration: "—",
-    teacher: {
-      name: a.byName || "Staff",
-      photo: "/images/teacher-placeholder.jpg"
-    },
+    courseType,
+    cover: cover || "/images/course-placeholder.jpg",
+    duration: req.body.duration || "—",
+    teacher: { name: a.byName || "Staff", photo: "/images/teacher-placeholder.jpg" },
     chapters: [],
     reviews: [],
     locationType,
     createdBy: a.byName || a.byUsername || "Unknown",
-    createdAt: new Date().toISOString()
+    createdAt: new Date().toISOString(),
   };
 
 
@@ -803,4 +796,5 @@ app.get("/homepage/register.html", (req, res) => sendFirstExisting(res, "homepag
 
 // ---------------- START ----------------
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+
 
