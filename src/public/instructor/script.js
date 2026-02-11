@@ -433,7 +433,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 
-/* ══✿══╡°˖✧᯽   CREATE COURSES   ᯽✧˖°╞══✿══*/
+/* ══════════════════✿══╡°˖✧᯽   CREATE COURSES   ᯽✧˖°╞══✿══════════════════*/
   // ... ✿°•∘ɷ∘•°✿ .. basically just adding the extra data needed for the front-page.
   
 function openCourseModal() {
@@ -464,6 +464,10 @@ function openCourseModal() {
       accept="image/*"
       class="w-full mb-4" />
 
+    <h3 class="font-semibold mb-2">Chapters</h3>
+    <div id="chaptersContainer" class="mb-3"></div>
+    <button id="addChapterBtn" class="px-3 py-1 mb-4 bg-gray-200 rounded hover:bg-gray-300">+ Add Chapter</button>
+
     <div class="flex justify-end gap-2">
       <button id="cancelModal"
         class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">
@@ -476,6 +480,29 @@ function openCourseModal() {
     </div>
   `);
 
+  const chaptersContainer = qs("#chaptersContainer");
+
+  // ... ✿°•∘ɷ∘•°✿ .. Add Chapter 
+  qs("#addChapterBtn")?.addEventListener("click", () => {
+    const chapterDiv = document.createElement("div");
+    chapterDiv.className = "chapterForm border p-2 mb-2 rounded";
+
+    chapterDiv.innerHTML = `
+      <input type="text" placeholder="Chapter title" class="chapterTitle mb-1 w-full border rounded px-2 py-1" />
+      <textarea placeholder="Chapter description" class="chapterDesc mb-1 w-full border rounded px-2 py-1"></textarea>
+      <input type="file" accept="image/*,.pdf,video/mp4" class="chapterCover mb-1 w-full" />
+      <input type="url" placeholder="Optional link" class="chapterLink mb-1 w-full border rounded px-2 py-1" />
+      <button class="removeChapterBtn text-sm text-red-600 mb-1">Remove</button>
+    `;
+
+    chapterDiv.querySelector(".removeChapterBtn")?.addEventListener("click", () => {
+      chapterDiv.remove();
+    });
+
+    chaptersContainer.appendChild(chapterDiv);
+  });
+
+  // ... ✿°•∘ɷ∘•°✿ .. Create Course  
   qs("#submitModal")?.addEventListener("click", async () => {
     const title = qs("#courseTitle").value.trim();
     const description = qs("#courseDesc").value.trim();
@@ -486,106 +513,87 @@ function openCourseModal() {
     if (!title) return toast("Title required", "#b91c1c");
 
     let cover = "/images/course-placeholder.jpg";
-
     if (coverFile) {
-      const up = await uploadImage(coverFile);
-      cover = up.url;
+      try {
+        const up = await uploadFile(coverFile);
+        cover = up.url;
+      } catch (e) {
+        return toast(e.message, "#b91c1c");
+      }
     }
 
+    // ... ✿°•∘ɷ∘•°✿ .. Process Chapters  
+    const chapterForms = [...document.querySelectorAll(".chapterForm")];
+    const chapters = [];
+
+    for (let ch of chapterForms) {
+      const chTitle = ch.querySelector(".chapterTitle").value.trim();
+      if (!chTitle) continue; // skip empty chapters
+
+      const chDesc = ch.querySelector(".chapterDesc").value.trim();
+      const chLink = ch.querySelector(".chapterLink").value.trim();
+      let chCoverUrl = "";
+
+      const chFile = ch.querySelector(".chapterCover")?.files?.[0];
+      if (chFile) {
+        try {
+          const up = await uploadFile(chFile);
+          chCoverUrl = up.url;
+        } catch (e) {
+          return toast(`Chapter upload failed: ${e.message}`, "#b91c1c");
+        }
+      }
+
+      chapters.push({
+        title: chTitle,
+        description: chDesc,
+        cover: chCoverUrl,
+        link: chLink,
+      });
+    }
+
+    // ... ✿°•∘ɷ∘•°✿ .. Course payload  
     const payload = {
       title,
       description,
       duration,
       courseType,
       cover,
+      chapters,
       teacher: {
-        name: currentUser.name,
-        photo: currentUser.photo
+        name: localStorage.getItem("userName") || "Instructor",
+        photo: "/images/teacher-placeholder.jpg",
       },
-      chapters: [],
-      reviews: []
+      reviews: [],
     };
 
-    const r = await fetch(`${API}/courses`, {
-      method: "POST",
-      headers: jsonHeaders(),
-      body: JSON.stringify(payload),
-    });
+    try {
+      const r = await fetch(`${API}/courses`, {
+        method: "POST",
+        headers: jsonHeaders(),
+        body: JSON.stringify(payload),
+      });
+      if (!r.ok) throw new Error("Create failed");
 
-    if (!r.ok) return toast("Create failed", "#b91c1c");
-
-    closeModal();
-    toast("Course created", "#166534");
-    loadDashboard();
+      closeModal();
+      toast("Course created!", "#166534");
+      loadDashboard();
+    } catch (e) {
+      toast(e.message, "#b91c1c");
+    }
   });
 }
 
+// ... ✿°•∘ɷ∘•°✿ .. Generalized upload for images, PDFs, videos  
+async function uploadFile(file) {
+  const fd = new FormData();
+  fd.append("file", file);
+  const res = await fetch(`${API}/upload`, { method: "POST", body: fd });
+  const out = await res.json();
+  if (!res.ok || !out?.success) throw new Error(out?.message || "Upload failed");
+  return out;
+}
 
-  function openEditCourseModal(course) {
-    showModal(`
-      <h2 class="text-xl font-semibold mb-4">Edit Course</h2>
-      <input id="courseTitle" class="w-full border rounded-lg px-3 py-2 mb-3" value="${esc(
-        course.title
-      )}" />
-      <textarea id="courseDesc" class="w-full border rounded-lg px-3 py-2 mb-3">${esc(
-        course.description || ""
-      )}</textarea>
-
-      <select id="courseType" class="w-full border rounded-lg px-3 py-2 mb-3">
-        <option value="in-person" ${
-          course.locationType === "in-person" ? "selected" : ""
-        }>In-person</option>
-        <option value="online" ${course.locationType === "online" ? "selected" : ""}>Online</option>
-        <option value="hybrid" ${
-          course.locationType === "hybrid" ? "selected" : ""
-        }>Hybrid</option>
-      </select>
-
-      <div class="text-xs opacity-70 mb-2">${
-        course.pdfUrl ? `Current PDF: ${esc(course.pdfName || "Attached")}` : "No PDF attached"
-      }</div>
-      <input id="coursePdf" type="file" accept=".pdf" class="w-full mb-4" />
-
-      <div class="flex justify-end gap-2">
-        <button id="cancelModal" class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">Cancel</button>
-        <button id="submitModal" class="px-4 py-2 bg-black text-white rounded-lg hover:opacity-90">Save</button>
-      </div>
-    `);
-
-    qs("#submitModal")?.addEventListener("click", async () => {
-      const title = qs("#courseTitle").value.trim();
-      const description = qs("#courseDesc").value.trim();
-      const locationType = qs("#courseType").value;
-
-      if (!title) return toast("Title required!", "#b91c1c");
-
-      let pdfUrl = course.pdfUrl || "",
-        pdfName = course.pdfName || "";
-      const file = qs("#coursePdf")?.files?.[0];
-      try {
-        if (file) {
-          const up = await uploadPdf(file);
-          pdfUrl = up.url;
-          pdfName = up.originalName;
-        }
-      } catch (e) {
-        return toast(e.message, "#b91c1c");
-      }
-
-      const r = await fetch(`${API}/courses/${course.id}`, {
-        method: "PUT",
-        headers: jsonHeaders(),
-        body: JSON.stringify({ title, description, locationType, pdfUrl, pdfName }),
-      });
-
-      if (!r.ok) return toast("Update failed", "#b91c1c");
-
-      closeModal();
-      toast("Course updated!", "#166534");
-      loadDashboard();
-      loadNotifications();
-    });
-  }
 
   
 // ---- Create/Edit Homework ----
@@ -737,5 +745,6 @@ function openCourseModal() {
   // initial load
   showPage("dashboard");
 });
+
 
 
