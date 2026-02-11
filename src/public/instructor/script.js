@@ -440,59 +440,86 @@ function openCourseModal() {
   showModal(`
     <h2 class="text-xl font-semibold mb-4">Create Course</h2>
 
-    <input id="courseTitle" placeholder="Course title" class="w-full border rounded-lg px-3 py-2 mb-3" />
-    <textarea id="courseDesc" placeholder="Description" class="w-full border rounded-lg px-3 py-2 mb-3"></textarea>
+    <input id="courseTitle"
+      placeholder="Course title"
+      class="w-full border rounded-lg px-3 py-2 mb-3" />
 
-    <input id="courseCover" type="file" accept="image/*" class="w-full mb-4" />
+    <textarea id="courseDesc"
+      placeholder="Description"
+      class="w-full border rounded-lg px-3 py-2 mb-3"></textarea>
+
+    <input id="courseDuration"
+      placeholder="Duration (e.g. 6 weeks)"
+      class="w-full border rounded-lg px-3 py-2 mb-3" />
+
+    <select id="courseType"
+      class="w-full border rounded-lg px-3 py-2 mb-3">
+      <option value="online">Online</option>
+      <option value="in-person">In-person</option>
+      <option value="hybrid">Hybrid</option>
+    </select>
+
+    <input id="courseCover"
+      type="file"
+      accept="image/*"
+      class="w-full mb-4" />
 
     <div class="flex justify-end gap-2">
-      <button id="cancelModal">Cancel</button>
-      <button id="submitModal">Create</button>
+      <button id="cancelModal"
+        class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">
+        Cancel
+      </button>
+      <button id="submitModal"
+        class="px-4 py-2 bg-black text-white rounded-lg hover:opacity-90">
+        Create
+      </button>
     </div>
   `);
 
-// ... ✿°•∘ɷ∘•°✿ .. submit logic
+  qs("#submitModal")?.addEventListener("click", async () => {
+    const title = qs("#courseTitle").value.trim();
+    const description = qs("#courseDesc").value.trim();
+    const duration = qs("#courseDuration").value.trim();
+    const courseType = qs("#courseType").value;
+    const coverFile = qs("#courseCover")?.files?.[0];
 
-qs("#submitModal")?.addEventListener("click", async () => {
-  const title = qs("#courseTitle").value.trim();
-  const description = qs("#courseDesc").value.trim();
-  const coverFile = qs("#courseCover")?.files?.[0];
+    if (!title) return toast("Title required", "#b91c1c");
 
-  if (!title) return toast("Title required", "#b91c1c");
+    let cover = "/images/course-placeholder.jpg";
 
-  let cover = "/images/course-placeholder.jpg";
+    if (coverFile) {
+      const up = await uploadImage(coverFile);
+      cover = up.url;
+    }
 
-  if (coverFile) {
-    const up = await uploadImage(coverFile);
-    cover = up.url;
-  }
+    const payload = {
+      title,
+      description,
+      duration,
+      courseType,
+      cover,
+      teacher: {
+        name: currentUser.name,
+        photo: currentUser.photo
+      },
+      chapters: [],
+      reviews: []
+    };
 
-  const payload = {
-    title,
-    description,
-    cover,
-    teacher: {
-      name: currentUser.name,
-      photo: currentUser.photo
-    },
-    chapters: [],
-    reviews: []
-  };
+    const r = await fetch(`${API}/courses`, {
+      method: "POST",
+      headers: jsonHeaders(),
+      body: JSON.stringify(payload),
+    });
 
-  const r = await fetch(`${API}/courses`, {
-    method: "POST",
-    headers: jsonHeaders(),
-    body: JSON.stringify(payload),
+    if (!r.ok) return toast("Create failed", "#b91c1c");
+
+    closeModal();
+    toast("Course created", "#166534");
+    loadDashboard();
   });
+}
 
-  if (!r.ok) return toast("Create failed", "#b91c1c");
-
-  closeModal();
-  toast("Course created", "#166534");
-  loadDashboard();
-});
-
-  }
 
   function openEditCourseModal(course) {
     showModal(`
@@ -710,4 +737,5 @@ qs("#submitModal")?.addEventListener("click", async () => {
   // initial load
   showPage("dashboard");
 });
+
 
