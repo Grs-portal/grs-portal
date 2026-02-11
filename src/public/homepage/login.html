@@ -53,6 +53,12 @@
       Info About Registry
       <a href="register.html" class="text-yellow-300 font-semibold hover:underline">Here</a>
     </p>
+
+    <!-- ✅ NEW HOMEPAGE BUTTON -->
+    <a href="/"
+       class="block w-full mt-4 text-center bg-white/20 hover:bg-white/30 text-white py-2 rounded-lg font-medium transition border border-white/30">
+      ⬅ Back to Homepage
+    </a>
   </div>
 
   <!-- ======================= LOGIN SCRIPT ======================= -->
@@ -83,7 +89,6 @@
       localStorage.setItem("userName", data.name);
 
       // ✅ IMPORTANT (needed for notifications + audit trail)
-      // Prefer backend username if provided, else use typed-in username.
       localStorage.setItem("username", data.username || username);
 
       // REDIRECT BASED ON BACKEND RETURN
