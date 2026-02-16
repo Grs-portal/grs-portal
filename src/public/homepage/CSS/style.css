@@ -903,6 +903,17 @@ html,body {
   box-sizing: border-box;
 }
 
+.course-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  padding: 4px 8px;
+  border-radius: 999px;
+  margin-bottom: 6px; 
+}
+
+.course-badge.video { background: #e0f2fe; color: #0369a1; }
+.course-badge.pdf { background: #fef3c7; color: #92400e; }
+.course-badge.mixed { background: #ede9fe; color: #5b21b6; }
 
 
 /* ... ✿°•∘ɷ∘•°✿ ..  REVIEWS */
@@ -1010,87 +1021,133 @@ html,body {
 
 /* ‿︵‿︵✿══╡°˖✧୨˚̣̣̣͙୧ MAIN PROJECT PAGE LAYOUT ୨˚̣̣̣͙୧‿╞══✿︵‿︵‿ */
 
-.projects-section { margin-top: 50px; margin-bottom: 200px;}
-.section-title { font-size: 2.4rem; font-weight: 700; margin: 3rem 0 1.5rem; padding-left: 2rem;}
-.projects-grid {display: grid; grid-template-columns: repeat(4, 345px); justify-content: center;gap: 20px; padding: 0 1rem 3rem 2rem;}
-
-
-
-/* ... ✿°•∘ɷ∘•°✿ .. project cards */
-
-.project-card {
-  background: #ffffff;
-  border-radius: 22px;
-  overflow: hidden;
-  box-shadow: 0 8px 18px rgba(0,0,0,0.08);
-  transition: 0.25s ease;
-  display: flex;
-  flex-direction: column;
-  height: 450px;
-  width: 345px; 
+.projects-page {
+  padding: 0px 5vw;
+  background-color: #e5ffff;
 }
 
+.projects-page-header {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto 40px auto;
+}
 
-.project-card:hover {
+.projects-page-header h1 {
+  font-size: 2.8rem;
+  margin-bottom: 20px;
+  color: #003329;
+}
+
+.projects-page-header p {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #004d40;
+}
+
+/* Search bar */
+.projects-search {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
+.projects-search input {
+  padding: 10px 14px;
+  width: 280px;
+  border-radius: 0px;
+  border: 0px solid #ccc;
+}
+
+.projects-search button {
+  padding: 10px 16px;
+  background-color: #92dacc;
+  color: #003329;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.projects-search button:hover {
+  background-color: #6cb29e;
+}
+
+/* Grid wrapper */
+.projects-grid-wrapper {
+  overflow-x: hidden;
+  margin-top: 40px;
+}
+
+.projects-grid {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap; /* allows multiple rows */
+  justify-content: center;
+}
+
+.project-card-preview {
+  flex: 0 0 calc((100% - 60px)/4); /* 4 cards per row, 3 gaps of 20px */
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: transform 0.3s ease;
+}
+
+.project-card-preview:hover {
   transform: translateY(-5px);
 }
 
-/* Color pops */
-.pop-1 { background: #ede1d6; }
-.pop-2 { background: #e8ddff; }
-.pop-3 { background: #f6f1e8; }
-
-/* ... ✿°•∘ɷ∘•°✿ .. tags */
-
-.tags {
-  display: flex;
-  gap: .5rem;
-  margin: 1rem 1rem;
-}
-
-.tags span {
-  background: var(--accent-2);
-  padding: .35rem .7rem;
-  border-radius: 12px;
-  font-size: .75rem;
-  font-weight: 600;
-}
-
-/* ... ✿°•∘ɷ∘•°✿ .. card title */
-.project-card h3 {
-  font-size: 2rem;
-  margin: 0.5rem 0.5rem;
-}
-
-/* ... ✿°•∘ɷ∘•°✿ .. card description */
-.project-card p {
-  color: #2c2727;
-  font-size: 0.95rem;
-  max-width: 90%;
-  margin-left: 0.5rem;
-}
-
-/* ... ✿°•∘ɷ∘•°✿ .. card image */
-.project-image {
-  position: relative;
+.project-card-preview img {
   width: 100%;
-  height: 260px;
-  overflow: hidden;
-  border-radius: 22px;
-}
-
-.project-image .project-btn {
-  position: absolute;
-  bottom: 20px;
-  z-index: 5;
-}
-
-.project-image img {
-  width: 100%;
-  height: 100%;
+  height: 300px;
   object-fit: cover;
   display: block;
 }
+
+.project-overlay {
+  padding: 15px;
+  background-color: #ffffff;
+  color: #003329;
+}
+
+.project-overlay h3 {
+  margin: 0 0 10px 0;
+  font-size: 1.3rem;
+}
+
+.project-overlay p {
+  font-size: 0.95rem;
+  margin-bottom: 10px;
+}
+
+.project-button {
+  display: inline-block;
+  padding: 8px 14px;
+  background-color: #92dacc;
+  color: #003329;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  transition: background 0.3s ease;
+}
+
+.project-button:hover {
+  background-color: #6cb29e;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .project-card-preview {
+    flex: 0 0 calc((100% - 20px)/2); /* 2 cards per row */
+  }
+}
+
+@media (max-width: 600px) {
+  .project-card-preview {
+    flex: 0 0 100%; /* 1 card per row */
+  }
+}
+
 
 
 
@@ -1827,10 +1884,12 @@ html,body {
 
 /* ════════════════✿══╡°˖✧‿୨˚̣̣̣͙୧ CONTACT PAGE ୨˚̣̣̣͙୧‿✧˖°╞══✿════════════════ */
 
+/* ‿︵‿︵✿══╡°˖✧୨˚̣̣̣͙୧ CONTACT INFORMATION ୨˚̣̣̣͙୧‿╞══✿︵‿︵‿ */
+
 
 .contact-info {
   margin-top: 50px;
-  margin-bottom: 200px;
+  margin-bottom: -50px;
   padding: 3rem 2rem 5rem;
   background-color: #003329;
 }
@@ -1923,6 +1982,173 @@ html,body {
     height: 100%;
     border: 0;
     border-radius: 15px;
+}
+
+
+/* ‿︵‿︵✿══╡°˖✧୨˚̣̣̣͙୧ REGISTRATION FORM ୨˚̣̣̣͙୧‿╞══✿︵‿︵‿ */
+
+.registration-section {
+  padding: 0 6.5rem 0 6.5rem;
+  text-align: center;
+  margin-top: 0;
+}
+
+
+/* ... ✿°•∘ɷ∘•°✿ .. Forms */
+
+.registration-form {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.5s ease, opacity 0.4s ease;
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.registration-form.open {
+  max-height: 900px;
+  opacity: 1;
+}
+
+.modal-box {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 90%;
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 51, 41, 0.35);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(6px);
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 999;
+}
+
+
+.modal-overlay.active {
+  backdrop-filter: blur(8px);
+  background: rgba(0, 51, 41, 0.35);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-form label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.9rem;
+  color: #003329;
+}
+
+.modal-form input,
+.modal-form textarea {
+  margin-top: 6px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #b3c4b3;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.modal-form input:focus,
+.modal-form textarea:focus {
+  border-color: #4d8658;
+  box-shadow: 0 0 0 3px rgba(77, 134, 88, 0.2);
+}
+
+.submit-button {
+  margin-top: 16px;
+  padding: 12px 18px;
+  background: #4d8658;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.3s;
+}
+
+.submit-button:hover {
+  background: #3b6944;
+}
+
+
+/*... ✿°•∘ɷ∘•°✿ .. Buttons */
+
+.registration-card {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  width: 50%;
+}
+
+
+.registration-box {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.choice-button {
+  all: unset;
+  cursor: pointer;
+
+  background: #e6f2ea;
+  border-radius: 12px;
+
+  width: 190px;
+  height: 50px;
+  padding: 0 16px;
+  margin-top: 15px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #223919;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.icon-form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+
+.icon-form svg {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+
+.choice-button:hover {
+  background: #d6ebe0;
+  transform: translateY(-2px);
 }
 
 
@@ -2853,3 +3079,5 @@ html,body {
     font-size: 1.1rem;
   }
 } 
+
+
