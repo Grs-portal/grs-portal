@@ -299,6 +299,43 @@
   </footer>
 
   <script src="/homepage/JS/lang-translation.js"></script>
+<script>
+    // Select all buttons with data-modal
+    const modalButtons = document.querySelectorAll('.choice-button');
+    const modals = {
+      participant: document.getElementById('participantModal'),
+      collaborator: document.getElementById('collaboratorModal')
+    };
+
+    // Open modal on button click
+    modalButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const modalKey = btn.dataset.modal;
+        if (modals[modalKey]) {
+          modals[modalKey].classList.add('active'); // show modal
+        }
+      });
+    });
+
+    // Close modals when clicking the close button
+    const closeButtons = document.querySelectorAll('.modal-close');
+    closeButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        btn.closest('.modal-overlay').classList.remove('active'); // hide modal
+      });
+    });
+
+    // Optional: Close modal when clicking outside the modal-box
+    const modalOverlays = document.querySelectorAll('.modal-overlay');
+    modalOverlays.forEach(overlay => {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          overlay.classList.remove('active');
+        }
+      });
+    });
+
+  </script>
 
 
 <!-- ... ✿°•∘ɷ∘•°✿ .. FontAwesome Icons -->
@@ -307,4 +344,5 @@
 
 </body>
 </html>
+
 
