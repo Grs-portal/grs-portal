@@ -8,7 +8,7 @@ const translations = {
 // ... ✿°•∘ɷ∘•°✿ .. HOME ... ✿°•∘ɷ∘•°✿ ..
 
     "nav-home": "Home",
-    "nav-courses": "Courses",
+    "nav-offer": "What we offer",
     "nav-projects": "Projects",
     "nav-about": "About Us",
     "nav-portals": "Portals",
@@ -33,8 +33,8 @@ const translations = {
     "projects-h": "Green Recovery Space",
     "projects-p": "Learn more about Green Recovery Space.",
 
-    "mental-h": "Program & Registration",
-    "mental-p": "Want to form part of our program? Register here >>",
+    "mental-h": "What do we offer?",
+    "mental-p": "Want to find out all the amazing things we have to offer?",
 
     "depression-h": "Depression",
     "depression-p": "Feelings of deep sadness and loss of interest that affect daily life.",
