@@ -8,6 +8,75 @@
 </head>
 <body>
 
+
+    <style>
+    
+/* ════════════════✿══╡°˖✧‿୨˚̣̣̣͙୧ OFFERINGS  PAGE ୨˚̣̣̣͙୧‿✧˖°╞══✿════════════════ */
+
+/*══✿══╡°˖✧᯽  PORTALS ᯽✧˖°╞══✿══*/
+
+.portal-hero {
+  position: relative;
+  padding: 5rem 2rem 6rem;
+  color: #fff;
+  overflow: hidden;
+}
+
+.hero-collage {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.2rem;
+  align-items: stretch;
+  margin-top: 3rem;
+}
+
+.collage-item {
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  aspect-ratio: 3/2;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.collage-item:hover {
+  transform: scale(1.03);
+}
+
+.collage-item.middle {
+  transform: translateY(-20px);
+}
+
+.collage-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.collage-item::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,0.6),
+    rgba(0,0,0,0.1)
+  );
+}
+
+.collage-item span {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  right: 1rem;
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: #fff;
+  z-index: 2;
+}
+
+  </style>
+
       <!--══✿══╡°˖✧᯽ NAVIGATION BAR ᯽✧˖°╞══✿══-->
 
 
@@ -92,5 +161,6 @@
   </div>
 
 </section>
+
 
 
