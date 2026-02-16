@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Programs</title>
+  <link rel="stylesheet" href="CSS/style.css" />
+</head>
+<body>
+
+
+      <!--══✿══╡°˖✧᯽ NAVIGATION BAR ᯽✧˖°╞══✿══-->
+
+
+    <header class="site-header">
+    <div class="container header-inner">
+      <nav class="main-nav">
+        <div class="nav-left">
+          <a href="index.html" class="nav-link" data-translate="nav-home">Home</a>
+          <a href="forwho.html" class="nav-link " data-translate="nav-forwho">For Who?</a>
+          <a href="green recovery space.html" class="nav-link" data-translate="nav-grs">Green Recovery Space</a>
+          <a href="offerings.html" class="nav-link active" data-translate="nav-courses">What we offer</a>
+        </div>
+
+        <!-- ... ✿°•∘ɷ∘•°✿ ..  logo circle  -->
+
+        <div class="logo-circle">
+          <img src="/images/Logo HK.jpg" alt="PBC logo">
+        </div>
+
+        <div class="nav-right">
+          <a href="about.html" class="nav-link" data-translate="nav-about">About Us</a>
+          <a href="projects.html" class="nav-link" data-translate="nav-projects">Projects</a>
+          <a href="Portal.html" class="nav-link" data-translate="nav-portals">Portals</a>
+          <a href="contact.html" class="nav-link" data-translate="nav-contact">Contact</a>
+          <div class="language-dropdown">
+            <button class="lang-btn">EN ▾</button>
+            <ul class="lang-menu">
+              <li data-lang="en">English</li>
+              <li data-lang="nl">Dutch</li>
+              <li data-lang="es">Spanish</li>
+            </ul>
+        </div>
+        </div>
+        
+      </nav>
+
+    </div>
+  </header>
+
+  
+<style>
+    /* ═════════ STORIES FULL PAGE ═════════ */
+
+.story-page {
+  padding: 80px 5vw;
+  background-color: #e5ffff;
+}
+
+.story-page-header {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto 50px auto;
+}
+
+.story-page-header h1 {
+  font-size: 2.8rem;
+  margin-bottom: 20px;
+  color: #003329;
+}
+
+.story-page-header p {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #004d40;
+}
+
+/* Search Bar */
+.story-search {
+  margin-top: 25px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.story-search input {
+  padding: 10px 14px;
+  width: 280px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-size: 0.9rem;
+}
+
+.story-search button {
+  padding: 10px 16px;
+  background-color: #92dacc;
+  color: #003329;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.story-search button:hover {
+  background-color: #6cb29e;
+}
+
+/* Make grid responsive */
+.story-grid-preview {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0px;
+}
+@media (max-width: 1100px) {
+  .story-grid-preview {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .story-grid-preview {
+    grid-template-columns: 1fr;
+  }
+
+  .story-card-preview img {
+    height: 300px;
+  }
+}
+
+</style>
+
+<!-- ════════════════ STORIES PAGE ════════════════ -->
+
+<section class="story-page">
+
+  <div class="story-page-header">
+    <h1>Stories & Experiences</h1>
+    <p>
+      Personal recovery journeys from participants of the Green Recovery Space.
+      Explore freely and read what resonates with you.
+    </p>
+
+    <!-- Search bar -->
+    <div class="story-search">
+      <input type="text" placeholder="Search by name or keyword...">
+      <button>Search</button>
+    </div>
+  </div>
+
+
+  <!-- Story Grid (same structure as preview) -->
+  <div class="story-grid-preview">
+
+    <!-- Emma -->
+    <div class="story-card-preview">
+      <img src="https://i.pinimg.com/736x/97/6f/c9/976fc9d4d50b09edc2d9b6dd433d68db.jpg" alt="Emma">
+      <div class="story-overlay">
+        <p class="story-quote">“Na maanden van overleven voelde ik voor het eerst ruimte om te ademen…”</p>
+        <p class="story-name">Emma, deelnemer</p>
+        <a href="story-emma.html" class="story-button">Lees haar verhaal</a>
+      </div>
+    </div>
+
+    <!-- Jonas -->
+    <div class="story-card-preview">
+      <img src="https://i.pinimg.com/736x/7d/94/62/7d9462aab53cf6a754150d18494fae93.jpg" alt="Jonas">
+      <div class="story-overlay">
+        <p class="story-quote">“Ik wist niet dat rust iets was wat je opnieuw kon leren…”</p>
+        <p class="story-name">Jonas, deelnemer</p>
+        <a href="story-jonas.html" class="story-button">Lees zijn verhaal</a>
+      </div>
+    </div>
+
+    <!-- Noor -->
+    <div class="story-card-preview">
+      <img src="https://i.pinimg.com/1200x/16/aa/b0/16aab04c4f6fb9b36c951e117197bfd7.jpg" alt="Noor">
+      <div class="story-overlay">
+        <p class="story-quote">“Hier ontdekte ik dat herstellen geen rechte lijn hoeft te zijn…”</p>
+        <p class="story-name">Noor, deelnemer</p>
+        <a href="story-noor.html" class="story-button">Lees haar verhaal</a>
+      </div>
+    </div>
+
+    <!-- Lars -->
+    <div class="story-card-preview">
+      <img src="https://i.pinimg.com/736x/c3/2f/15/c32f1592ce77b4812b6868ab3bc19e4e.jpg" alt="Lars">
+      <div class="story-overlay">
+        <p class="story-quote">“Ik heb geleerd dat kleine stappen ook vooruitgang zijn…”</p>
+        <p class="story-name">Lars, deelnemer</p>
+        <a href="story-lars.html" class="story-button">Lees zijn verhaal</a>
+      </div>
+    </div>
+
+    <!-- Add more stories below and it will automatically continue in rows of 4 -->
+
+        <!-- Noor -->
+    <div class="story-card-preview">
+      <img src="https://i.pinimg.com/1200x/16/aa/b0/16aab04c4f6fb9b36c951e117197bfd7.jpg" alt="Noor">
+      <div class="story-overlay">
+        <p class="story-quote">“Hier ontdekte ik dat herstellen geen rechte lijn hoeft te zijn…”</p>
+        <p class="story-name">Noor, deelnemer</p>
+        <a href="story-noor.html" class="story-button">Lees haar verhaal</a>
+      </div>
+    </div>
+    <!-- Emma -->
+    <div class="story-card-preview">
+      <img src="https://i.pinimg.com/736x/97/6f/c9/976fc9d4d50b09edc2d9b6dd433d68db.jpg" alt="Emma">
+      <div class="story-overlay">
+        <p class="story-quote">“Na maanden van overleven voelde ik voor het eerst ruimte om te ademen…”</p>
+        <p class="story-name">Emma, deelnemer</p>
+        <a href="story-emma.html" class="story-button">Lees haar verhaal</a>
+      </div>
+    </div>
+
+    <!-- Jonas -->
+    <div class="story-card-preview">
+      <img src="https://i.pinimg.com/736x/7d/94/62/7d9462aab53cf6a754150d18494fae93.jpg" alt="Jonas">
+      <div class="story-overlay">
+        <p class="story-quote">“Ik wist niet dat rust iets was wat je opnieuw kon leren…”</p>
+        <p class="story-name">Jonas, deelnemer</p>
+        <a href="story-jonas.html" class="story-button">Lees zijn verhaal</a>
+      </div>
+    </div>
+
+
+
+    <!-- Lars -->
+    <div class="story-card-preview">
+      <img src="https://i.pinimg.com/736x/c3/2f/15/c32f1592ce77b4812b6868ab3bc19e4e.jpg" alt="Lars">
+      <div class="story-overlay">
+        <p class="story-quote">“Ik heb geleerd dat kleine stappen ook vooruitgang zijn…”</p>
+        <p class="story-name">Lars, deelnemer</p>
+        <a href="story-lars.html" class="story-button">Lees zijn verhaal</a>
+      </div>
+    </div>
+  </div>
+
+</section>

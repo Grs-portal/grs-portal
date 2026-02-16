@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Programs</title>
+  <link rel="stylesheet" href="CSS/style.css" />
+</head>
+<body style="background-color: #f4faf7;">
+
+        <!--══✿══╡°˖✧᯽ NAVIGATION BAR ᯽✧˖°╞══✿══-->
+
+
+    <header class="site-header">
+    <div class="container header-inner">
+      <nav class="main-nav">
+        <div class="nav-left">
+          <a href="index.html" class="nav-link" data-translate="nav-home">Home</a>
+          <a href="forwho.html" class="nav-link " data-translate="nav-forwho">For Who?</a>
+          <a href="green recovery space.html" class="nav-link" data-translate="nav-grs">Green Recovery Space</a>
+          <a href="offerings.html" class="nav-link active" data-translate="nav-courses">What we offer</a>
+        </div>
+
+        <!-- ... ✿°•∘ɷ∘•°✿ ..  logo circle  -->
+
+        <div class="logo-circle">
+          <img src="/images/Logo HK.jpg" alt="PBC logo">
+        </div>
+
+        <div class="nav-right">
+          <a href="about.html" class="nav-link" data-translate="nav-about">About Us</a>
+          <a href="projects.html" class="nav-link" data-translate="nav-projects">Projects</a>
+          <a href="Portal.html" class="nav-link" data-translate="nav-portals">Portals</a>
+          <a href="contact.html" class="nav-link" data-translate="nav-contact">Contact</a>
+          <div class="language-dropdown">
+            <button class="lang-btn">EN ▾</button>
+            <ul class="lang-menu">
+              <li data-lang="en">English</li>
+              <li data-lang="nl">Dutch</li>
+              <li data-lang="es">Spanish</li>
+            </ul>
+        </div>
+        </div>
+        
+      </nav>
+
+    </div>
+  </header>
+
+
+<style>
+
+/* ═════════ PROGRAMS PAGE ═════════ */
+
+/* HERO */
+
+/* SECTION TITLES */
+.section-title {
+  font-size: 2.2rem;
+  color: #2e5e4e;
+  margin-bottom: 1.2rem;
+  text-align: center;
+}
+
+.section-intro {
+  max-width: 700px;
+  margin: 0 auto 3rem auto;
+  text-align: center;
+  line-height: 1.7;
+}
+
+.programs-container {
+  background: var(--white);
+  margin-top: 60px;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.programs-sidebar {
+  align-self: start;
+  position: sticky;
+  top: 20px;
+  background: #ffffff;
+  padding: 1.5rem;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+
+.programs-main {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+/* CALENDAR */
+.programs-calendar {
+  background: #f4faf7;
+  padding: 1.5rem;
+  border-radius: 12px;
+}
+
+.calendar-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.calendar-date {
+  font-weight: bold;
+  color: #4d8658;
+}
+
+/* PROGRAM GRID */
+.programs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.program-card {
+  background: white;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid #ddd;
+  transition: 0.25s ease;
+  position: relative;
+}
+
+.program-card:hover {
+  transform: translateY(-4px);
+}
+
+.program-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+}
+
+.program-content {
+  padding: 1rem;
+}
+
+.program-content h4 {
+  margin-bottom: 0.5rem;
+}
+
+.program-description {
+  font-size: 0.9rem;
+  margin-bottom: 0.8rem;
+  color: #555;
+}
+
+.program-meta {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.program-button {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 8px 14px;
+  background: #92dacc;
+  color: #003329;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.program-button:hover {
+  background: #6cb29e;
+}
+
+/* STATUS BADGES */
+.status-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  border-radius: 20px;
+  color: white;
+}
+
+.status-badge.upcoming {
+  background: #4d8658;
+}
+
+.status-badge.ongoing {
+  background: #d4a017;
+}
+
+.status-badge.completed {
+  background: #999;
+}
+
+/* Responsive */
+@media(max-width: 850px) {
+  .programs-container {
+    grid-template-columns: 1fr;
+  }
+  .programs-sidebar {
+    position: static;
+  }
+}
+
+/* SIDEBAR CALENDAR */
+
+.sidebar-calendar {
+  margin-top: 2rem;
+}
+
+.calendar-preview {
+  background: #f4faf7;
+  padding: 1rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.calendar-preview:hover {
+  background: #e6f3ef;
+}
+
+.calendar-header {
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  font-size: 0.75rem;
+  gap: 5px;
+  text-align: center;
+}
+
+.calendar-grid span {
+  padding: 4px;
+}
+
+.event-day {
+  background: #92dacc;
+  border-radius: 50%;
+  font-weight: bold;
+}
+
+.calendar-hint {
+  margin-top: 8px;
+  font-size: 0.7rem;
+  text-align: center;
+  color: #666;
+}
+
+/* MODAL */
+
+.calendar-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.calendar-modal.active {
+  display: flex;
+}
+
+.calendar-modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 700px;
+  position: relative;
+  animation: fadeIn 0.3s ease;
+}
+
+.close-calendar {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+/* ‿︵‿︵✿══╡°˖✧୨˚̣̣̣͙୧ REGISTRATION FORM ୨˚̣̣̣͙୧‿╞══✿︵‿︵‿ */
+
+.registration-section {
+  padding: 0 6.5rem 0 6.5rem;
+  text-align: center;
+  margin-top: 0;
+}
+
+
+/* ... ✿°•∘ɷ∘•°✿ .. Forms */
+
+.registration-form {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.5s ease, opacity 0.4s ease;
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.registration-form.open {
+  max-height: 900px;
+  opacity: 1;
+}
+
+.modal-box {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 90%;
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 51, 41, 0.35);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(6px);
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 999;
+}
+
+
+.modal-overlay.active {
+  backdrop-filter: blur(8px);
+  background: rgba(0, 51, 41, 0.35);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-form label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.9rem;
+  color: #003329;
+}
+
+.modal-form input,
+.modal-form textarea {
+  margin-top: 6px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #b3c4b3;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.modal-form input:focus,
+.modal-form textarea:focus {
+  border-color: #4d8658;
+  box-shadow: 0 0 0 3px rgba(77, 134, 88, 0.2);
+}
+
+.submit-button {
+  margin-top: 16px;
+  padding: 12px 18px;
+  background: #4d8658;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.3s;
+}
+
+.submit-button:hover {
+  background: #3b6944;
+}
+
+
+/*... ✿°•∘ɷ∘•°✿ .. Buttons */
+
+.registration-card {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  width: 50%;
+}
+
+
+.registration-box {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.choice-button {
+  all: unset;
+  cursor: pointer;
+
+  background: #e6f2ea;
+  border-radius: 12px;
+
+  width: 190px;
+  height: 50px;
+  padding: 0 16px;
+  margin-top: 15px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #223919;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.icon-form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+
+.icon-form svg {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+
+.choice-button:hover {
+  background: #d6ebe0;
+  transform: translateY(-2px);
+}
+
+
+</style>
+
+
+
+<!-- 🌱 OUR OFFERINGS -->
+<main class="programs-container" style="background-color: #f4faf7;">
+
+  <!-- SIDEBAR -->
+  <aside class="programs-sidebar">
+    <h3>Filter Programs</h3>
+
+    <div class="filter-group">
+      <label>Search</label>
+      <input type="text" placeholder="Search programs..." />
+    </div>
+
+    <div class="filter-group">
+      <label>Status</label>
+      <select>
+        <option value="">All</option>
+        <option>Upcoming</option>
+        <option>Ongoing</option>
+        <option>Completed</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Duration</label>
+      <select>
+        <option value="">Any</option>
+        <option>4 weeks</option>
+        <option>8 weeks</option>
+        <option>12 weeks</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Type</label>
+      <select>
+        <option value="">All</option>
+        <option>Course</option>
+        <option>Workshop</option>
+        <option>Program</option>
+      </select>
+    </div>
+
+    <div class="sidebar-calendar">
+      <h4 style="padding-bottom: 0.5rem;">Program Calendar</h4>
+
+      <div class="calendar-preview" id="openCalendar">
+        <div class="calendar-header">
+          <span>March 2026</span>
+        </div>
+
+        <div class="calendar-grid">
+          <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+
+          <span></span><span></span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+          <span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+          <span class="event-day">12</span>
+          <span>13</span>
+          <span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span>
+          <span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span>
+          <span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span>
+        </div>
+
+        <p class="calendar-hint">Click to view full calendar</p>
+    </div>
+  </div>
+
+  </aside>
+
+
+  <!-- MAIN CONTENT -->
+  <section class="programs-main">
+
+    <!-- ══✿══ UPCOMING PROGRAM REGISTRATION ══✿══ -->
+
+<section class="upcoming-registration">
+
+  <div class="card">
+    <h3 class="card-title" style="text-align: center;">Register</h3>
+    <p style="text-align: center; width: 80%; margin: auto;">
+      Whether you're looking for support with your recovery or want to contribute to Green Recovery Space, we always start with a short introduction. Complete the registration form and we'll contact you within 2-3 business days.
+    </p>
+
+    <div class="registration-box">
+      <button class="choice-button" data-modal="participant">
+        <div class="icon-form">
+          <svg fill="#283a22" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg" stroke="#283a22"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M 28.0117 27.3672 C 33.0508 27.3672 37.3867 22.8672 37.3867 17.0078 C 37.3867 11.2187 33.0274 6.9297 28.0117 6.9297 C 22.9961 6.9297 18.6367 11.3125 18.6367 17.0547 C 18.6367 22.8672 22.9961 27.3672 28.0117 27.3672 Z M 13.2930 49.0703 L 42.7305 49.0703 C 46.4101 49.0703 47.7226 48.0156 47.7226 45.9531 C 47.7226 39.9062 40.1523 31.5625 28.0117 31.5625 C 15.8477 31.5625 8.2774 39.9062 8.2774 45.9531 C 8.2774 48.0156 9.5898 49.0703 13.2930 49.0703 Z"></path></g></svg>
+          <span style="text-align: center;">Be part of the recovery</span>      
+      </div>
+        
+      </button>
+
+      <button class="choice-button" data-modal="collaborator">
+        <div class="icon-form">
+          <svg version="1.1" id="_x32_" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" xml:space="preserve" fill="#354d2d" stroke="#354d2d"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <style type="text/css"> .st0{fill:#283a22;} </style> <g> <path class="st0" d="M470.537,137.504H41.471C18.565,137.504,0,156.077,0,178.976v56.797l211.507,44.607V252.1h87.772v28.28 L512,235.489v-56.513C512,156.077,493.435,137.504,470.537,137.504z"></path> <path class="st0" d="M299.279,369.129h-87.772v-57.017L14.633,273.012V439.81c0,22.898,18.557,41.47,41.455,41.47h399.824 c22.898,0,41.463-18.572,41.463-41.47V272.721l-198.096,39.39V369.129z"></path> <rect x="233.452" y="274.044" class="st0" width="43.882" height="73.132"></rect> <path class="st0" d="M193.786,72.206c0.008-1.703,0.638-3.057,1.75-4.208c1.127-1.103,2.49-1.718,4.176-1.734h112.577 c1.686,0.016,3.058,0.631,4.185,1.734c1.103,1.151,1.726,2.505,1.733,4.208v29.627h35.546V72.206 c0.008-11.41-4.665-21.875-12.143-29.329c-7.446-7.485-17.934-12.166-29.321-12.158H199.712 c-11.394-0.008-21.875,4.673-29.32,12.158c-7.47,7.454-12.158,17.918-12.135,29.329v29.627h35.529V72.206z"></path> </g> </g></svg>      
+          <span>Collaborate with us</span>
+        </div>
+        </button>
+    </div>
+  </div>
+
+</section>
+
+
+
+    <!-- PROGRAM GRID -->
+    <div class="programs-grid">
+
+      <div class="program-card">
+        <div class="status-badge upcoming">Workshop</div>
+        <img src="https://images.unsplash.com/photo-1501004318641-b39e6451bec6?q=80&w=1200" />
+        <div class="program-content">
+          <h4>Green Recovery Program</h4>
+          <p class="program-description">
+            A structured 8-week program focused on healing through nature and connection.
+          </p>
+          <p class="program-meta">Duration: 8 weeks</p>
+          <p class="program-meta">Location: Hofi Korsou</p>
+          <p class="program-meta">Starts: March 12, 2026</p>
+          <a href="#" class="program-button">View Program</a>
+        </div>
+      </div>
+
+
+      <div class="program-card">
+        <div class="status-badge ongoing">Course</div>
+        <img src="https://images.unsplash.com/photo-1511988617509-a57c8a288659?q=80&w=1200" />
+        <div class="program-content">
+          <h4>Mindfulness & Growth</h4>
+          <p class="program-description">
+            4-week guided sessions to develop awareness and emotional balance.
+          </p>
+          <p class="program-meta">Duration: 4 weeks</p>
+          <p class="program-meta">Location: Outdoor Pavilion</p>
+          <p class="program-meta">Started: February 20, 2026</p>
+          <a href="#" class="program-button">View Program</a>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="calendar-modal" id="calendarModal">
+      <div class="calendar-modal-content">
+        <button class="close-calendar" id="closeCalendar">&times;</button>
+        <h2>Full Program Calendar</h2>
+
+        <div class="full-calendar-grid">
+          <!-- You can expand this later with real dynamic JS -->
+          <p>Here you can integrate a real monthly calendar view.</p>
+          <p>March 12 – Green Recovery Program</p>
+          <p>April 3 – Mindfulness Journey</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="greenRecoveryModal">
+      <div class="modal-box">
+        <button class="modal-close">✕</button>
+        <h4>Green Recovery Program Registration</h4>
+
+        <form class="modal-form">
+
+          <label>Full Name
+            <input type="text" required>
+          </label>
+
+          <label>Email
+            <input type="email" required>
+          </label>
+
+          <label>Phone
+            <input type="tel" required>
+          </label>
+
+          <label>Why are you interested?
+            <textarea></textarea>
+          </label>
+
+          <button type="submit" class="submit-button">Submit Registration</button>
+        </form>
+      </div>
+    </div>
+
+
+
+  </section>
+</main>
+
+<script>
+const modalButtons = document.querySelectorAll('.choice-button');
+const modalOverlays = document.querySelectorAll('.modal-overlay');
+
+// Open modal
+modalButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    const modalName = button.dataset.modal;
+    const modal = document.getElementById(modalName + "Modal");
+
+    if (modal) {
+      modal.classList.add("active");
+    }
+  });
+});
+
+// Close modal via X button
+document.querySelectorAll('.modal-close').forEach(btn => {
+  btn.addEventListener('click', () => {
+    btn.closest('.modal-overlay').classList.remove('active');
+  });
+});
+
+// Close modal when clicking outside
+modalOverlays.forEach(overlay => {
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) {
+      overlay.classList.remove('active');
+    }
+  });
+});
+</script>
+
+
+</body>
+</html>
