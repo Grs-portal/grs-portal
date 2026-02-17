@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Course</title>
+  <link rel="stylesheet" href="CSS/style.css" />
+</head>
+
+<body class="course-page">
+
+  <main class="course-page">
+
+    <!--══✿══╡°˖✧᯽  HERO ᯽✧˖°╞══✿══-->
+
+    <section class="course-hero">
+      <img id="courseCover" alt="">
+    </section>
+
+    <section class="course-content">
+      <h1 id="courseTitle"></h1>
+      <span id="courseTypeBadge"></span>
+      <p id="courseDescription"></p>
+
+      <div class="teacher-block">
+        <img id="teacherPhoto" alt="">
+        <span id="teacherName"></span>
+      </div>
+
+      <div class="course-info"></div>
+    </section>
+
+    <section class="chapters-section">
+      <div id="chaptersGrid" class="chapters-grid"></div>
+    </section>
+
+    <section class="course-reviews">
+      <h2>Course Reviews</h2>
+
+      <!-- ... ✿°•∘ɷ∘•°✿ ..  Overall Rating -->
+      <div class="overall-rating">
+        <span id="averageRating">0.0</span>
+        <span id="ratingStars"></span>
+        <span id="totalReviews">(0 reviews)</span>
+      </div>
+
+      <!-- ... ✿°•∘ɷ∘•°✿ .. Add Review Form (students) -->
+      <div class="add-review">
+        <h3>Leave a Review</h3>
+        <form id="reviewForm">
+          <label>Rating</label>
+          <select name="rating" required>
+            <option value="5">5 ⭐</option>
+            <option value="4">4 ⭐</option>
+            <option value="3">3 ⭐</option>
+            <option value="2">2 ⭐</option>
+            <option value="1">1 ⭐</option>
+          </select>
+
+          <label>Comment</label>
+          <textarea name="comment" required></textarea>
+
+          <button type="submit">Submit Review</button>
+        </form>
+      </div>
+
+      <!-- ... ✿°•∘ɷ∘•°✿ ..  Reviews List -->
+      <div id="reviewsList"></div>
+    </section>
+
+
+    <div class="course-info"></div>
+
+    <!-- ... ✿°•∘ɷ∘•°✿ .. COURSE ACTIONS -->
+    <div class="course-actions">
+      <button id="editCourseBtn" class="action-btn">Edit Course</button>
+      <button id="addChapterBtn" class="action-btn">Add Chapter</button>
+    </div>
+
+
+
+  </main>
+
+    <!-- ... ✿°•∘ɷ∘•°✿ ..  Edit Course Modal -->
+  <div id="editCourseModal" class="course-modal">
+    <div class="course-modal-content">
+      <button class="close-modal" data-close-modal>&times;</button>
+      <h2>Edit Course</h2>
+      <form id="editCourseForm">
+        <label>Title</label>
+        <input type="text" name="title" required />
+        <label>Description</label>
+        <textarea name="description" rows="4"></textarea>
+        <label>Cover URL</label>
+        <input type="text" name="cover" />
+        <label>Type</label>
+        <select name="courseType">
+          <option value="video">Video</option>
+          <option value="pdf">PDF</option>
+          <option value="mixed">Mixed</option>
+        </select>
+        <label>Duration</label>
+        <input type="text" name="duration" />
+        <label>Category</label>
+        <input type="text" name="category" />
+        <button type="submit">Save Changes</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ... ✿°•∘ɷ∘•°✿ .. Add/Edit Chapter Modal -->
+  <div id="chapterModal" class="course-modal">
+    <div class="course-modal-content">
+      <button class="close-modal" data-close-modal>&times;</button>
+      <h2 id="chapterModalTitle">Add Chapter</h2>
+      <form id="chapterForm">
+        <label>Title</label>
+        <input type="text" name="title" required />
+        <label>Cover URL</label>
+        <input type="text" name="cover" />
+        <label>Video/PDF URL</label>
+        <input type="text" name="video" />
+        <label>Duration</label>
+        <input type="text" name="duration" />
+        <label>Preview</label>
+        <input type="checkbox" name="preview" />
+        <input type="hidden" name="chapterId" />
+        <button type="submit">Save Chapter</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ... ✿°•∘ɷ∘•°✿ .. Video/PDF Modal -->
+  <div id="videoModal" class="video-modal">
+    <div class="video-modal-content">
+      <button class="close-modal" data-close-modal>&times;</button>
+      <div class="video-wrapper" id="videoWrapper"></div>
+    </div>
+  </div>
+
+  <script src="/JS/lang-translation.js"></script>
+  <script src="/JS/courses.js"></script>
+</body>
+</html>
