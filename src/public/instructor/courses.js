@@ -356,3 +356,30 @@ function openVideoModal(url) {
 document.addEventListener("DOMContentLoaded", () => {
   loadCourseDetail();
 });
+
+
+async function loadCourses() {
+  try {
+    const res = await fetch(API_BASE);
+    const courses = await res.json();
+
+    const grid = document.getElementById("coursesGrid");
+    if (!grid) return;
+
+    grid.innerHTML = courses.map(course => `
+      <div class="bg-white rounded-xl shadow p-4 hover:shadow-lg transition">
+        <img src="${course.cover}" class="w-full h-40 object-cover rounded-lg mb-3">
+        <h3 class="text-lg font-semibold">${course.title}</h3>
+        <p class="text-sm text-gray-600 mb-2">${course.description}</p>
+        <a href="course.html?id=${course.id}" 
+           class="inline-block mt-2 text-green-600 font-medium hover:underline">
+           View Course →
+        </a>
+      </div>
+    `).join("");
+
+  } catch (err) {
+    console.error("Failed to load courses:", err);
+  }
+}
+
