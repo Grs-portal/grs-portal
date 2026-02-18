@@ -10,7 +10,7 @@ const getQueryParam = key =>
 // ELEMENTS & MODALS
 // ------------------------
 const elements = {
-  // Standalone course page
+  // For standalone course page
   courseCover: $("#courseCover"),
   courseTitle: $("#courseTitle"),
   courseDescription: $("#courseDescription"),
@@ -20,16 +20,12 @@ const elements = {
   courseInfo: $(".course-info"),
   chaptersGrid: $("#chaptersGrid"),
   reviewsList: $("#reviewsList"),
-
   editCourseBtn: $("#editCourseBtn"),
   editCourseModal: $("#editCourseModal"),
   editCourseForm: $("#editCourseForm"),
-
   chapterModal: $("#chapterModal"),
   chapterForm: $("#chapterForm"),
   chapterModalTitle: $("#chapterModalTitle"),
-
-  courseModal: $("#courseModal"),
   videoModal: $("#videoModal"),
   videoWrapper: $("#videoWrapper")
 };
@@ -49,41 +45,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if (getQueryParam("id")) {
     loadCourseDetail(); // standalone course detail page
   }
-
-  // Modal close button (works for standalone & dashboard)
-  $("#closeModal")?.addEventListener("click", () => {
-    if (!elements.courseModal) return;
-    elements.courseModal.classList.add("hidden");
-    elements.courseModal.classList.remove("flex");
-  });
-
-  // Form submit for creating course (works for both dashboard & standalone)
-  $("#courseForm")?.addEventListener("submit", async e => {
-    e.preventDefault();
-    const form = e.target;
-    const data = {
-      title: form.title.value,
-      description: form.description.value,
-      locationType: form.locationType.value,
-      pdfUrl: form.pdfUrl.value,
-      pdfName: form.pdfName.value
-    };
-    try {
-      await fetch(API_BASE, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      });
-      elements.courseModal.classList.add("hidden");
-      elements.courseModal.classList.remove("flex");
-
-      // Reload dashboard or standalone
-      if ($("#dashboardCoursesGrid")) loadMyCourses($("#myCoursesContainer"));
-      else if ($("#coursesGrid")) loadCourses();
-    } catch (err) {
-      console.error("Failed to create course:", err);
-    }
-  });
 });
 
 // ------------------------
@@ -93,6 +54,7 @@ async function loadCourses() {
   try {
     const res = await fetch(API_BASE);
     const courses = await res.json();
+
     const grid = $("#coursesGrid");
     if (!grid) return;
 
@@ -101,8 +63,9 @@ async function loadCourses() {
         <img src="${course.cover}" class="w-full h-40 object-cover rounded-lg mb-3">
         <h3 class="text-lg font-semibold">${esc(course.title)}</h3>
         <p class="text-sm text-gray-600 mb-2">${esc(course.description)}</p>
-        <a href="course.html?id=${course.id}" class="inline-block mt-2 text-green-600 font-medium hover:underline">
-          View Course →
+        <a href="course.html?id=${course.id}" 
+           class="inline-block mt-2 text-green-600 font-medium hover:underline">
+           View Course →
         </a>
       </div>
     `).join("");
@@ -117,13 +80,24 @@ async function loadCourses() {
 async function loadMyCourses(container) {
   container.innerHTML = `
     <div class="flex gap-6">
-      <aside class="w-64 bg-white rounded-xl shadow p-5 sticky top-6 h-fit">
+      <aside class="w-64 bg-white rounded-xl shadow p-5 sticky top-6 h-fit" id="myCoursesSidebar">
         <h2 class="text-xl font-semibold mb-4">Filters</h2>
         <input id="filterSearch" class="w-full px-3 py-2 border rounded-lg mb-4" placeholder="Search courses...">
-        <select id="filterTeacher" class="w-full px-3 py-2 border rounded-lg mb-4"><option value="">All Teachers</option></select>
-        <select id="filterDuration" class="w-full px-3 py-2 border rounded-lg mb-4"><option value="">Any Duration</option></select>
-        <select id="filterTheme" class="w-full px-3 py-2 border rounded-lg mb-4"><option value="">All Themes</option></select>
-        <button id="createCourseBtnDashboard" class="mt-6 w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">+ Create Course</button>
+        <select id="filterTeacher" class="w-full px-3 py-2 border rounded-lg mb-4">
+          <option value="">All Teachers</option>
+        </select>
+        <select id="filterDuration" class="w-full px-3 py-2 border rounded-lg mb-4">
+          <option value="">Any Duration</option>
+          <option>1–2 hours</option>
+          <option>3–5 hours</option>
+          <option>6+ hours</option>
+        </select>
+        <select id="filterTheme" class="w-full px-3 py-2 border rounded-lg mb-4">
+          <option value="">All Themes</option>
+        </select>
+        <button id="createCourseBtnDashboard" class="mt-6 w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+          + Create Course
+        </button>
       </aside>
       <main class="flex-1">
         <div id="dashboardCoursesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
@@ -149,7 +123,7 @@ async function loadMyCourses(container) {
   const themeSelect = $("#filterTheme");
   themes.forEach(t => themeSelect.appendChild(new Option(t, t)));
 
-  // Render courses in dashboard
+  // Render courses
   function renderCourses(filtered = courses) {
     const grid = $("#dashboardCoursesGrid");
     grid.innerHTML = filtered.map(course => `
@@ -161,7 +135,7 @@ async function loadMyCourses(container) {
       </div>
     `).join("");
 
-    $$(".viewCourseBtn, img[data-id]").forEach(el => {
+    qsa(".viewCourseBtn, img[data-id]").forEach(el => {
       el.addEventListener("click", () => openCourseDetailDashboard(el.dataset.id));
     });
   }
@@ -175,10 +149,11 @@ async function loadMyCourses(container) {
     const duration = $("#filterDuration").value;
     const theme = $("#filterTheme").value;
 
-    const filtered = courses.filter(c =>
+    const filtered = courses.filter(c => 
       (!search || c.title.toLowerCase().includes(search)) &&
       (!teacher || c.teacher?.name === teacher) &&
-      (!theme || c.category === theme)
+      (!theme || c.category === theme) &&
+      (!duration || c.duration.includes(duration.split(' ')[0]))
     );
     renderCourses(filtered);
   }
@@ -188,16 +163,7 @@ async function loadMyCourses(container) {
   $("#filterDuration").addEventListener("change", filterCourses);
   $("#filterTheme").addEventListener("change", filterCourses);
 
-  // Dashboard Create Course button (reuses existing modal)
-  $("#createCourseBtnDashboard")?.addEventListener("click", () => {
-    if (!elements.courseModal) return;
-    $("#courseForm").reset();
-    $("#modalTitle").textContent = "Create Course";
-    elements.courseModal.classList.remove("hidden");
-    elements.courseModal.classList.add("flex");
-  });
-
-  // Dashboard course detail modal
+  // Open course detail in dashboard modal
   async function openCourseDetailDashboard(id) {
     try {
       const res = await fetch(`${API_BASE}/${id}`);
@@ -255,5 +221,7 @@ async function loadMyCourses(container) {
     modalsContainer.appendChild(vidDiv);
     $("#closeVideoModalDashboard").addEventListener("click", () => vidDiv.remove());
   }
-}
 
+  // Create course button
+  $("#createCourseBtnDashboard")?.addEventListener("click", () => openCourseModal());
+}
