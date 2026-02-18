@@ -746,5 +746,35 @@ async function uploadFile(file) {
   showPage("dashboard");
 });
 
+//load courses
+async function loadMyCourses() {
+  const container = qs("#myCoursesContainer");
+  if (!container) return;
+
+  const courses = await fetchJSON("/courses"); 
+
+  container.innerHTML = courses
+    .map(
+      (c) => `
+    <article class="bg-white rounded-2xl border border-[#A5C8A1]/60 p-4 shadow-sm flex justify-between items-start">
+      <div>
+        <h4 class="font-semibold">${esc(c.title)}</h4>
+        <p class="text-sm opacity-80">${esc(c.description || "")}</p>
+        <div class="text-xs opacity-60 mt-1">Type: ${esc(c.locationType || "in-person")}</div>
+        ${
+          c.pdfUrl
+            ? `<a class="text-xs underline text-green-800" href="${esc(c.pdfUrl)}" target="_blank">PDF: ${esc(c.pdfName || "View")}</a>`
+            : ""
+        }
+      </div>
+      <div class="flex gap-2">
+        <button class="editCourseBtn px-2 py-1 rounded hover:bg-black/5" data-id="${c.id}">✏️</button>
+        <button class="deleteCourseBtn px-2 py-1 rounded bg-rose-100 text-rose-700 hover:bg-rose-200" data-id="${c.id}">🗑</button>
+      </div>
+    </article>
+  `
+    )
+    .join("");
+}
 
 
