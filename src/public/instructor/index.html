@@ -168,7 +168,7 @@
             <li><a href="#" data-page="dashboard" class="nav-item active">🏠 <span>Dashboard</span></a></li>
             <li><a href="#" data-page="students" class="nav-item">🎓 <span>Students & Grades</span></a></li>
             <li><a href="#" data-page="submitted" class="nav-item">📥 <span>Submitted Homework</span></a></li>
-            <li><a href="#" data-page="create-course" class="nav-item">➕ <span>Create Course</span></a></li>
+            <li><a href="courses.html" data-page="my-courses" class="nav-item">📚 <span>My Courses</span></a></li>
             <li><a href="#" data-page="create-homework" class="nav-item">📝 <span>Create Homework</span></a></li>
             <li><a href="#" data-page="news" class="nav-item">📰 <span>News</span></a></li>
           </ul>
@@ -252,6 +252,18 @@
         </section>
       </div>
 
+            <!-- My Courses -->
+      <div id="my-courses" class="page-section hidden">
+        <section class="glass rounded-2xl p-6 min-h-[60vh]">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl title-strong">My Courses</h2>
+            <div class="text-xs subtitle">Courses you’re enrolled in or teaching</div>
+          </div>
+          <div id="myCoursesContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4"></div>
+        </section>
+      </div>
+
+
       <!-- Create Course -->
       <div id="create-course" class="page-section hidden">
         <section class="glass rounded-2xl p-6 min-h-[60vh] flex flex-col items-center justify-center text-center">
@@ -289,3 +301,4 @@
   <script src="/instructor/script.js" defer></script>
 </body>
 </html>
+
