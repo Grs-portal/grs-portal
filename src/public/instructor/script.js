@@ -17,7 +17,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // ---- helpers ----
   const qs = (s) => document.querySelector(s);
   const qsa = (s) => [...document.querySelectorAll(s)];
-
   const esc = (s) =>
     String(s || "")
       .replaceAll("&", "&amp;")
@@ -92,9 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const isClosed = sidebar.classList.contains("-translate-x-full");
     isClosed ? openSidebar() : closeSidebar();
   });
-
   overlay?.addEventListener("click", closeSidebar);
-
   window.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       closeSidebar();
@@ -118,7 +115,6 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.removeItem("role");
     window.location.replace(LOGIN_URL);
   }
-
   qs("#logoutBtn")?.addEventListener("click", logout);
   qs("#sidebarLogout")?.addEventListener("click", logout);
 
@@ -144,7 +140,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function showModal(innerHTML) {
     closeModal();
-
     const modalBg = document.createElement("div");
     modalBg.id = "modalBg";
     modalBg.className =
@@ -155,11 +150,9 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     `;
     document.body.appendChild(modalBg);
-
     modalBg.addEventListener("click", (e) => {
       if (e.target === modalBg) closeModal();
     });
-
     document.getElementById("cancelModal")?.addEventListener("click", closeModal);
   }
 
@@ -236,43 +229,49 @@ document.addEventListener("DOMContentLoaded", () => {
       .join("");
   }
 
-  // ---- Dashboard ----
-  async function loadDashboard() { /* ... keep existing ... */ }
+  // ---- Dashboard / Students / Homework ----
+  async function loadDashboard() { /* ... keep your existing ... */ }
+  async function loadStudents() { /* ... keep your existing ... */ }
+  async function loadHomework() { /* ... keep your existing ... */ }
+  function openCourseModal() { /* ... keep your existing ... */ }
 
-  // ---- Students ----
-  async function loadStudents() { /* ... keep existing ... */ }
+  // ---- My Courses: full integration with courses.js logic ----
+  const COURSE_API = "/api/courses";
 
-  // ---- Homework ----
-  async function loadHomework() { /* ... keep existing ... */ }
-
-  // ---- Create Courses ----
-  function openCourseModal() { /* ... keep existing ... */ }
-
-  // ---- My Courses (full load inside dashboard) ----
   async function loadMyCourses() {
     const container = qs("#myCoursesContainer");
     if (!container) return;
 
-    // ---- fetch standalone courses.html ----
-    const res = await fetch("/instructor/courses.html");
-    if (!res.ok) return (container.innerHTML = "Failed to load courses page.");
+    container.innerHTML = "Loading courses...";
+    try {
+      const res = await fetch(COURSE_API);
+      if (!res.ok) throw new Error("Failed to fetch courses");
+      const courses = await res.json();
 
-    let html = await res.text();
+      container.innerHTML = "";
+      courses.forEach((course) => {
+        const card = document.createElement("div");
+        card.className = "course-card";
+        card.innerHTML = `
+          <img src="${course.cover}" alt="${course.title}" class="course-cover">
+          <div class="course-info">
+            <h3>${course.title}</h3>
+            <p>${course.description}</p>
+            <span class="badge">${course.courseType}</span>
+            <button class="view-course">View</button>
+          </div>
+        `;
+        // View course button
+        card.querySelector(".view-course").addEventListener("click", () => {
+          window.location.href = `/instructor/course_detail.html?id=${course.id}`;
+        });
 
-    // ---- inject HTML into container ----
-    container.innerHTML = html;
-
-    // ---- execute scripts from courses.html ----
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = html;
-    const scripts = [...tempDiv.querySelectorAll("script")];
-    scripts.forEach((s) => {
-      const newS = document.createElement("script");
-      if (s.src) newS.src = s.src;
-      else newS.textContent = s.textContent;
-      document.body.appendChild(newS);
-      newS.remove(); // cleanup after running
-    });
+        container.appendChild(card);
+      });
+    } catch (err) {
+      console.error(err);
+      container.innerHTML = "Failed to load courses.";
+    }
   }
 
   // ---- Page router + nav ----
