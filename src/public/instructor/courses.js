@@ -261,7 +261,14 @@ elements.editCourseForm?.addEventListener("submit", async e => {
 
 
 document.addEventListener("DOMContentLoaded", () => {
-  loadCourseDetail();
+  if (document.getElementById("coursesGrid")) {
+    loadCourses();       // courses.html
+  }
+
+  if (getQueryParam("id")) {
+    loadCourseDetail();  // course.html
+  }
+});
 
   // Set button elements
   elements.editCourseBtn = $("#editCourseBtn");
