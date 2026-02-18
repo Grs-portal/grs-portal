@@ -159,11 +159,15 @@ document.addEventListener("DOMContentLoaded", () => {
   =============================== */
 
   async function deleteChapter(courseId, index) {
-    await fetch(`${COURSE_API}/${courseId}/chapters/${index}`, {
-      method: "DELETE"
-    });
-
-    openCourseDetail(courseId);
+    try {
+      await fetch(`${COURSE_API}/${courseId}/chapters/${index}`, {
+        method: "DELETE"
+      });
+      openCourseDetail(courseId);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete chapter.");
+    }
   }
 
   /* ===============================
@@ -206,17 +210,27 @@ document.addEventListener("DOMContentLoaded", () => {
     qs("#cancelModal").onclick = () => modal.remove();
 
     qs("#saveChapter").onclick = async () => {
-      const title = qs("#chapterTitle").value;
-      const content = qs("#chapterContent").value;
+      const title = qs("#chapterTitle").value.trim();
+      const content = qs("#chapterContent").value.trim();
 
-      await fetch(`${COURSE_API}/${courseId}/chapters`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, content })
-      });
+      if (!title || !content) {
+        alert("Please fill out both title and content.");
+        return;
+      }
 
-      modal.remove();
-      openCourseDetail(courseId);
+      try {
+        await fetch(`${COURSE_API}/${courseId}/chapters`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ title, content })
+        });
+
+        modal.remove();
+        openCourseDetail(courseId);
+      } catch (err) {
+        console.error(err);
+        alert("Failed to add chapter.");
+      }
     };
   }
 
