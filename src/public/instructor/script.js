@@ -66,10 +66,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ---- Top UI ----
   if (qs("#y")) qs("#y").textContent = new Date().getFullYear();
-
   const displayName = localStorage.getItem("userName") || "Instructor";
   if (qs("#userName")) qs("#userName").textContent = displayName;
-
   const avatar = qs("#userAvatar");
   if (avatar) avatar.textContent = (displayName.trim()[0] || "I").toUpperCase();
 
@@ -105,26 +103,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // ---- Navigation ----
   qsa(".nav-item").forEach((link) => {
     link.addEventListener("click", (e) => {
       e.preventDefault();
-
-      qsa(".nav-item").forEach((el) => el.classList.remove("active"));
-      link.classList.add("active");
-
-      qsa(".page-section").forEach((s) => s.classList.add("hidden"));
-
-      const page = link.dataset.page;
-      qs(`#${page}`)?.classList.remove("hidden");
-
-      if (page === "my-courses") loadMyCourses();
-      if (page === "dashboard") loadDashboard();
-      if (page === "students") loadStudents();
-      if (page === "submitted") loadHomework();
+      showPage(link.dataset.page);
+      closeSidebar();
     });
   });
 
-  // ---- Logout (top + sidebar) ----
+  // ---- Logout ----
   function logout() {
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("role");
@@ -248,126 +236,43 @@ document.addEventListener("DOMContentLoaded", () => {
       .join("");
   }
 
-  // ---- Upload helper (PDF) ----
-  async function uploadPdf(file) {
-    const fd = new FormData();
-    fd.append("file", file);
-    const res = await fetch(`${API}/upload`, { method: "POST", body: fd });
-    const out = await safeJson(res);
-    if (!res.ok || !out?.success) throw new Error(out?.message || "Upload failed");
-    return out;
-  }
-
-  async function uploadFile(file) {
-    const fd = new FormData();
-    fd.append("file", file);
-    const res = await fetch(`${API}/upload`, { method: "POST", body: fd });
-    const out = await res.json();
-    if (!res.ok || !out?.success) throw new Error(out?.message || "Upload failed");
-    return out;
-  }
-
   // ---- Dashboard ----
-  async function loadDashboard() {
-    const [courses, hw] = await Promise.all([
-      fetchJSON("/courses"),
-      fetchJSON("/homework"),
-    ]);
-
-    if (qs("#activeCoursesCount")) qs("#activeCoursesCount").textContent = courses.length;
-    if (qs("#toGradeCount")) qs("#toGradeCount").textContent = hw.length;
-
-    const container = qs("#courses");
-    if (!container) return;
-
-    container.innerHTML = courses
-      .map(
-        (c) => `
-      <article class="bg-white rounded-2xl border border-[#A5C8A1]/60 p-4 shadow-sm flex justify-between items-start">
-        <div>
-          <h4 class="font-semibold">${esc(c.title)}</h4>
-          <p class="text-sm opacity-80">${esc(c.description || "")}</p>
-          <div class="text-xs opacity-60 mt-1">Type: ${esc(
-            c.locationType || "in-person"
-          )}</div>
-          ${
-            c.pdfUrl
-              ? `<a class="text-xs underline text-green-800" href="${esc(
-                  c.pdfUrl
-                )}" target="_blank">PDF: ${esc(c.pdfName || "View")}</a>`
-              : ""
-          }
-        </div>
-        <div class="flex gap-2">
-          <button class="editCourseBtn px-2 py-1 rounded hover:bg-black/5" data-id="${c.id}">✏️</button>
-          <button class="deleteCourseBtn px-2 py-1 rounded bg-rose-100 text-rose-700 hover:bg-rose-200" data-id="${c.id}">🗑</button>
-        </div>
-      </article>
-    `
-      )
-      .join("");
-
-    qsa(".deleteCourseBtn").forEach((btn) => {
-      btn.addEventListener("click", async () => {
-        if (!confirm("Delete this course?")) return;
-        const r = await fetch(`${API}/courses/${btn.dataset.id}`, {
-          method: "DELETE",
-          headers: actorHeaders(),
-        });
-        if (!r.ok) return toast("Delete failed", "#b91c1c");
-        toast("Course deleted", "#b91c1c");
-        loadDashboard();
-        loadNotifications();
-      });
-    });
-
-    qsa(".editCourseBtn").forEach((btn) => {
-      btn.addEventListener("click", async () => {
-        const id = btn.dataset.id;
-        const coursesNow = await fetchJSON("/courses");
-        const found = coursesNow.find((x) => String(x.id) === String(id));
-        if (found) openEditCourseModal(found);
-      });
-    });
-  }
+  async function loadDashboard() { /* ... keep existing ... */ }
 
   // ---- Students ----
-  async function loadStudents() { /*... keep existing ...*/ }
-  function openEditGradeModal(id, grade) { /*... keep existing ...*/ }
+  async function loadStudents() { /* ... keep existing ... */ }
 
   // ---- Homework ----
-  async function loadHomework() { /*... keep existing ...*/ }
-  function openHomeworkModal() { /*... keep existing ...*/ }
-  function openEditHomeworkModal(hw) { /*... keep existing ...*/ }
+  async function loadHomework() { /* ... keep existing ... */ }
 
   // ---- Create Courses ----
-  function openCourseModal() { /*... keep existing ...*/ }
+  function openCourseModal() { /* ... keep existing ... */ }
 
-  // ---- My Courses ----
+  // ---- My Courses (full load inside dashboard) ----
   async function loadMyCourses() {
     const container = qs("#myCoursesContainer");
     if (!container) return;
 
-    const courses = await fetchJSON("/courses");
+    // ---- fetch standalone courses.html ----
+    const res = await fetch("/instructor/courses.html");
+    if (!res.ok) return (container.innerHTML = "Failed to load courses page.");
 
-    if (!courses.length) {
-      container.innerHTML = `
-        <div class="text-sm opacity-70">
-          No courses yet.
-        </div>
-      `;
-      return;
-    }
+    let html = await res.text();
 
-    container.innerHTML = courses.map(c => `
-      <div class="bg-white rounded-2xl border border-[#A5C8A1]/60 p-4 shadow-sm">
-        <h3 class="font-semibold text-lg">${esc(c.title)}</h3>
-        <p class="text-sm opacity-80 mt-1">${esc(c.description || "")}</p>
-        <div class="text-xs opacity-60 mt-2">
-          ${esc(c.courseType || "in-person")}
-        </div>
-      </div>
-    `).join("");
+    // ---- inject HTML into container ----
+    container.innerHTML = html;
+
+    // ---- execute scripts from courses.html ----
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = html;
+    const scripts = [...tempDiv.querySelectorAll("script")];
+    scripts.forEach((s) => {
+      const newS = document.createElement("script");
+      if (s.src) newS.src = s.src;
+      else newS.textContent = s.textContent;
+      document.body.appendChild(newS);
+      newS.remove(); // cleanup after running
+    });
   }
 
   // ---- Page router + nav ----
@@ -384,16 +289,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (id === "submitted") loadHomework();
     if (id === "my-courses") loadMyCourses();
   }
-
-  qsa(".nav-item").forEach((a) => {
-    a.addEventListener("click", (e) => {
-      e.preventDefault();
-      const page = a.dataset.page;
-      if (!page) return;
-      showPage(page);
-      closeSidebar();
-    });
-  });
 
   qs("#addCourseBtn")?.addEventListener("click", openCourseModal);
   qs("#addHomeworkBtn")?.addEventListener("click", openHomeworkModal);
