@@ -1,242 +1,220 @@
-const API_BASE = "/api/courses";
-const $ = s => document.querySelector(s);
-const $$ = s => document.querySelectorAll(s);
-const esc = s => String(s ?? '').replace(/</g, "&lt;").replace(/>/g, "&gt;");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instructor Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Optional small styles for badges, modals, etc. */
+    .hidden { display: none; }
+    .flex { display: flex; }
+    .badge { background: #34d399; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; }
+    .lock { color: #f87171; font-weight: bold; }
+  </style>
+</head>
+<body class="bg-gray-100">
 
-const getQueryParam = key =>
-  new URLSearchParams(window.location.search).get(key);
+  <div id="myCoursesContainer" class="p-6"></div>
 
-// ------------------------
-// ELEMENTS & MODALS
-// ------------------------
-const elements = {
-  // For standalone course page
-  courseCover: $("#courseCover"),
-  courseTitle: $("#courseTitle"),
-  courseDescription: $("#courseDescription"),
-  teacherPhoto: $("#teacherPhoto"),
-  teacherName: $("#teacherName"),
-  courseTypeBadge: $("#courseTypeBadge"),
-  courseInfo: $(".course-info"),
-  chaptersGrid: $("#chaptersGrid"),
-  reviewsList: $("#reviewsList"),
-  editCourseBtn: $("#editCourseBtn"),
-  editCourseModal: $("#editCourseModal"),
-  editCourseForm: $("#editCourseForm"),
-  chapterModal: $("#chapterModal"),
-  chapterForm: $("#chapterForm"),
-  chapterModalTitle: $("#chapterModalTitle"),
-  videoModal: $("#videoModal"),
-  videoWrapper: $("#videoWrapper")
-};
-
-// ------------------------
-// UNIVERSAL LOAD
-// ------------------------
-document.addEventListener("DOMContentLoaded", () => {
-  const dashboardContainer = $("#myCoursesContainer");
-
-  if (dashboardContainer) {
-    loadMyCourses(dashboardContainer); // dashboard mode
-  } else if ($("#coursesGrid")) {
-    loadCourses(); // standalone courses list
-  }
-
-  if (getQueryParam("id")) {
-    loadCourseDetail(); // standalone course detail page
-  }
-});
-
-// ------------------------
-// STANDALONE COURSES GRID
-// ------------------------
-async function loadCourses() {
-  try {
-    const res = await fetch(API_BASE);
-    const courses = await res.json();
-
-    const grid = $("#coursesGrid");
-    if (!grid) return;
-
-    grid.innerHTML = courses.map(course => `
-      <div class="bg-white rounded-xl shadow p-4 hover:shadow-lg transition">
-        <img src="${course.cover}" class="w-full h-40 object-cover rounded-lg mb-3">
-        <h3 class="text-lg font-semibold">${esc(course.title)}</h3>
-        <p class="text-sm text-gray-600 mb-2">${esc(course.description)}</p>
-        <a href="course.html?id=${course.id}" 
-           class="inline-block mt-2 text-green-600 font-medium hover:underline">
-           View Course →
-        </a>
-      </div>
-    `).join("");
-  } catch (err) {
-    console.error("Failed to load courses:", err);
-  }
-}
-
-// ------------------------
-// DASHBOARD MODE
-// ------------------------
-async function loadMyCourses(container) {
-  container.innerHTML = `
-    <div class="flex gap-6">
-      <aside class="w-64 bg-white rounded-xl shadow p-5 sticky top-6 h-fit" id="myCoursesSidebar">
-        <h2 class="text-xl font-semibold mb-4">Filters</h2>
-        <input id="filterSearch" class="w-full px-3 py-2 border rounded-lg mb-4" placeholder="Search courses...">
-        <select id="filterTeacher" class="w-full px-3 py-2 border rounded-lg mb-4">
-          <option value="">All Teachers</option>
-        </select>
-        <select id="filterDuration" class="w-full px-3 py-2 border rounded-lg mb-4">
-          <option value="">Any Duration</option>
-          <option>1–2 hours</option>
-          <option>3–5 hours</option>
-          <option>6+ hours</option>
-        </select>
-        <select id="filterTheme" class="w-full px-3 py-2 border rounded-lg mb-4">
-          <option value="">All Themes</option>
-        </select>
-        <button id="createCourseBtnDashboard" class="mt-6 w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
-          + Create Course
-        </button>
-      </aside>
-      <main class="flex-1">
-        <div id="dashboardCoursesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-      </main>
+  <!-- COURSE MODAL -->
+  <div id="courseModal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+    <div class="bg-white rounded-2xl p-6 w-[92%] max-w-xl relative">
+      <button id="closeModal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800">&times;</button>
+      <h2 id="modalTitle" class="text-2xl font-bold mb-4">Create Course</h2>
+      <form id="courseForm" class="space-y-4">
+        <input name="title" placeholder="Course Title" required class="w-full px-3 py-2 border rounded-lg">
+        <textarea name="description" placeholder="Course Description" required class="w-full px-3 py-2 border rounded-lg"></textarea>
+        <input name="locationType" placeholder="Location or Online" class="w-full px-3 py-2 border rounded-lg">
+        <input name="pdfUrl" placeholder="PDF/Document URL" class="w-full px-3 py-2 border rounded-lg">
+        <input name="pdfName" placeholder="PDF Name" class="w-full px-3 py-2 border rounded-lg">
+        <button type="submit" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">Save Course</button>
+      </form>
     </div>
-    <div id="modalsContainer"></div>
-  `;
+  </div>
 
-  // Open the existing course modal
-$("#createCourseBtnDashboard")?.addEventListener("click", () => {
-  if (!elements.courseModal) return;
-  
-  // Reset the form
-  const form = $("#courseForm");
-  form.reset();
-  $("#modalTitle").textContent = "Create Course";
-  
-  // Show modal
-  elements.courseModal.classList.remove("hidden");
-  elements.courseModal.classList.add("flex");
-});
+  <!-- MODALS CONTAINER FOR DYNAMIC MODALS -->
+  <div id="modalsContainer"></div>
 
+  <!-- SCRIPT -->
+  <script>
+  const API_BASE = "/api/courses";
+  const $ = s => document.querySelector(s);
+  const $$ = s => document.querySelectorAll(s);
+  const esc = s => String(s ?? '').replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-  // Fetch courses
-  let courses = [];
-  try {
-    const res = await fetch(API_BASE);
-    courses = await res.json();
-  } catch (err) {
-    console.error("Failed to fetch courses:", err);
-  }
+  document.addEventListener("DOMContentLoaded", () => {
+    const container = $("#myCoursesContainer");
 
-  // Populate teacher/theme filters
-  const teachers = [...new Set(courses.map(c => c.teacher?.name).filter(Boolean))];
-  const themes = [...new Set(courses.map(c => c.category).filter(Boolean))];
-  const teacherSelect = $("#filterTeacher");
-  teachers.forEach(t => teacherSelect.appendChild(new Option(t, t)));
-  const themeSelect = $("#filterTheme");
-  themes.forEach(t => themeSelect.appendChild(new Option(t, t)));
-
-  // Render courses
-  function renderCourses(filtered = courses) {
-    const grid = $("#dashboardCoursesGrid");
-    grid.innerHTML = filtered.map(course => `
-      <div class="bg-white rounded-xl shadow p-4 hover:shadow-lg transition relative">
-        <img src="${course.cover}" class="w-full h-40 object-cover rounded-lg mb-3 cursor-pointer" data-id="${course.id}">
-        <h3 class="text-lg font-semibold">${esc(course.title)}</h3>
-        <p class="text-sm text-gray-600 mb-2">${esc(course.description || "")}</p>
-        <button data-id="${course.id}" class="viewCourseBtn mt-2 text-green-600 font-medium hover:underline">View Course →</button>
+    // Render dashboard
+    container.innerHTML = `
+      <div class="flex gap-6">
+        <aside class="w-64 bg-white rounded-xl shadow p-5 sticky top-6 h-fit">
+          <h2 class="text-xl font-semibold mb-4">Filters</h2>
+          <input id="filterSearch" class="w-full px-3 py-2 border rounded-lg mb-4" placeholder="Search courses...">
+          <select id="filterTeacher" class="w-full px-3 py-2 border rounded-lg mb-4"><option value="">All Teachers</option></select>
+          <select id="filterDuration" class="w-full px-3 py-2 border rounded-lg mb-4"><option value="">Any Duration</option></select>
+          <select id="filterTheme" class="w-full px-3 py-2 border rounded-lg mb-4"><option value="">All Themes</option></select>
+          <button id="createCourseBtnDashboard" class="mt-6 w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">+ Create Course</button>
+        </aside>
+        <main class="flex-1">
+          <div id="dashboardCoursesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </main>
       </div>
-    `).join("");
+    `;
 
-    qsa(".viewCourseBtn, img[data-id]").forEach(el => {
-      el.addEventListener("click", () => openCourseDetailDashboard(el.dataset.id));
+    const modalsContainer = $("#modalsContainer");
+
+    // Fetch courses
+    let courses = [];
+    fetch(API_BASE).then(r => r.json()).then(data => {
+      courses = data;
+      populateFilters(courses);
+      renderCourses(courses);
+    }).catch(err => console.error("Fetch failed:", err));
+
+    function populateFilters(courses) {
+      const teachers = [...new Set(courses.map(c => c.teacher?.name).filter(Boolean))];
+      const themes = [...new Set(courses.map(c => c.category).filter(Boolean))];
+      const teacherSelect = $("#filterTeacher");
+      teachers.forEach(t => teacherSelect.appendChild(new Option(t, t)));
+      const themeSelect = $("#filterTheme");
+      themes.forEach(t => themeSelect.appendChild(new Option(t, t)));
+    }
+
+    function renderCourses(filtered) {
+      const grid = $("#dashboardCoursesGrid");
+      grid.innerHTML = filtered.map(course => `
+        <div class="bg-white rounded-xl shadow p-4 hover:shadow-lg transition relative">
+          <img src="${course.cover}" class="w-full h-40 object-cover rounded-lg mb-3 cursor-pointer" data-id="${course.id}">
+          <h3 class="text-lg font-semibold">${esc(course.title)}</h3>
+          <p class="text-sm text-gray-600 mb-2">${esc(course.description || "")}</p>
+          <button data-id="${course.id}" class="viewCourseBtn mt-2 text-green-600 font-medium hover:underline">View Course →</button>
+        </div>
+      `).join("");
+
+      $$(".viewCourseBtn, img[data-id]").forEach(el => {
+        el.addEventListener("click", e => openCourseDetailDashboard(el.dataset.id));
+      });
+    }
+
+    // Filters
+    ["filterSearch","filterTeacher","filterDuration","filterTheme"].forEach(id => {
+      $(`#${id}`).addEventListener("input", applyFilters);
+      $(`#${id}`).addEventListener("change", applyFilters);
     });
-  }
 
-  renderCourses();
+    function applyFilters() {
+      const search = $("#filterSearch").value.toLowerCase();
+      const teacher = $("#filterTeacher").value;
+      const theme = $("#filterTheme").value;
+      const filtered = courses.filter(c =>
+        (!search || c.title.toLowerCase().includes(search)) &&
+        (!teacher || c.teacher?.name === teacher) &&
+        (!theme || c.category === theme)
+      );
+      renderCourses(filtered);
+    }
 
-  // Filtering
-  function filterCourses() {
-    const search = $("#filterSearch").value.toLowerCase();
-    const teacher = $("#filterTeacher").value;
-    const duration = $("#filterDuration").value;
-    const theme = $("#filterTheme").value;
+    // CREATE COURSE BUTTON
+    $("#createCourseBtnDashboard").addEventListener("click", () => {
+      $("#courseForm").reset();
+      $("#modalTitle").textContent = "Create Course";
+      $("#courseModal").classList.remove("hidden");
+      $("#courseModal").classList.add("flex");
+    });
 
-    const filtered = courses.filter(c => 
-      (!search || c.title.toLowerCase().includes(search)) &&
-      (!teacher || c.teacher?.name === teacher) &&
-      (!theme || c.category === theme) &&
-      (!duration || c.duration.includes(duration.split(' ')[0]))
-    );
-    renderCourses(filtered);
-  }
+    $("#closeModal").addEventListener("click", () => {
+      $("#courseModal").classList.add("hidden");
+      $("#courseModal").classList.remove("flex");
+    });
 
-  $("#filterSearch").addEventListener("input", filterCourses);
-  $("#filterTeacher").addEventListener("change", filterCourses);
-  $("#filterDuration").addEventListener("change", filterCourses);
-  $("#filterTheme").addEventListener("change", filterCourses);
+    // SUBMIT FORM
+    $("#courseForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      const form = e.target;
+      const data = {
+        title: form.title.value,
+        description: form.description.value,
+        locationType: form.locationType.value,
+        pdfUrl: form.pdfUrl.value,
+        pdfName: form.pdfName.value
+      };
+      try {
+        await fetch(API_BASE, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+        $("#courseModal").classList.add("hidden");
+        $("#courseModal").classList.remove("flex");
+        // Reload courses
+        const res = await fetch(API_BASE);
+        courses = await res.json();
+        renderCourses(courses);
+      } catch (err) {
+        console.error("Failed to create course:", err);
+      }
+    });
 
-  // Open course detail in dashboard modal
-  async function openCourseDetailDashboard(id) {
-    try {
-      const res = await fetch(`${API_BASE}/${id}`);
-      if (!res.ok) throw new Error("Course not found");
-      const course = await res.json();
+    // COURSE DETAIL MODAL
+    async function openCourseDetailDashboard(id) {
+      try {
+        const res = await fetch(`${API_BASE}/${id}`);
+        if (!res.ok) throw new Error("Course not found");
+        const course = await res.json();
 
-      const modalsContainer = $("#modalsContainer");
-      modalsContainer.innerHTML = `
+        modalsContainer.innerHTML = `
+          <div class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+            <div class="bg-white rounded-2xl p-6 w-[92%] max-w-3xl relative">
+              <button id="closeDetailCourse" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800">&times;</button>
+              <h2 class="text-2xl font-bold mb-2">${esc(course.title)}</h2>
+              <p class="mb-4">${esc(course.description)}</p>
+              <div id="chaptersGridDashboard" class="flex flex-wrap gap-3"></div>
+            </div>
+          </div>
+        `;
+
+        const chaptersGrid = $("#chaptersGridDashboard");
+        course.chapters.forEach(ch => {
+          const card = document.createElement("div");
+          card.className = "chapter-card border p-2 rounded-lg cursor-pointer";
+          card.innerHTML = `
+            <h4>${esc(ch.title)}</h4>
+            <p>${esc(ch.duration)}</p>
+            ${ch.preview ? '<span class="badge">Preview</span>' : '<span class="lock">🔒</span>'}
+          `;
+          card.addEventListener("click", () => {
+            if (ch.video) openVideoModalDashboard(ch.video);
+            else alert("This chapter is locked.");
+          });
+          chaptersGrid.appendChild(card);
+        });
+
+        $("#closeDetailCourse").addEventListener("click", () => modalsContainer.innerHTML = "");
+      } catch (err) {
+        console.error("Failed to open course:", err);
+      }
+    }
+
+    function openVideoModalDashboard(url) {
+      const vidDiv = document.createElement("div");
+      vidDiv.innerHTML = `
         <div class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-          <div class="bg-white rounded-2xl p-6 w-[92%] max-w-3xl relative">
-            <button id="closeDetailCourse" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800">&times;</button>
-            <h2 class="text-2xl font-bold mb-2">${esc(course.title)}</h2>
-            <p class="mb-4">${esc(course.description)}</p>
-            <div id="chaptersGridDashboard" class="flex flex-wrap gap-3"></div>
+          <div class="bg-white rounded-2xl w-[90%] max-w-2xl h-[70%] relative">
+            <button id="closeVideoModalDashboard" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800">&times;</button>
+            ${url.endsWith(".pdf")
+              ? `<iframe src="${url}" style="width:100%;height:100%;border:none;"></iframe>`
+              : `<video src="${url}" controls autoplay style="width:100%;height:100%"></video>`}
           </div>
         </div>
       `;
-
-      const chaptersGrid = $("#chaptersGridDashboard");
-      course.chapters.forEach(ch => {
-        const card = document.createElement("div");
-        card.className = "chapter-card border p-2 rounded-lg cursor-pointer";
-        card.innerHTML = `
-          <h4>${esc(ch.title)}</h4>
-          <p>${esc(ch.duration)}</p>
-          ${ch.preview ? '<span class="badge">Preview</span>' : '<span class="lock">🔒</span>'}
-        `;
-        card.addEventListener("click", () => {
-          if (ch.video) openVideoModalDashboard(ch.video);
-          else alert("This chapter is locked.");
-        });
-        chaptersGrid.appendChild(card);
-      });
-
-      $("#closeDetailCourse").addEventListener("click", () => modalsContainer.innerHTML = "");
-
-    } catch (err) {
-      console.error("Failed to open course:", err);
+      modalsContainer.appendChild(vidDiv);
+      $("#closeVideoModalDashboard").addEventListener("click", () => vidDiv.remove());
     }
-  }
 
-  function openVideoModalDashboard(url) {
-    const modalsContainer = $("#modalsContainer");
-    const vidDiv = document.createElement("div");
-    vidDiv.innerHTML = `
-      <div class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-        <div class="bg-white rounded-2xl w-[90%] max-w-2xl h-[70%] relative">
-          <button id="closeVideoModalDashboard" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800">&times;</button>
-          ${url.endsWith(".pdf")
-            ? `<iframe src="${url}" style="width:100%;height:100%;border:none;"></iframe>`
-            : `<video src="${url}" controls autoplay style="width:100%;height:100%"></video>`}
-        </div>
-      </div>
-    `;
-    modalsContainer.appendChild(vidDiv);
-    $("#closeVideoModalDashboard").addEventListener("click", () => vidDiv.remove());
-  }
+  });
+  </script>
 
-  // Create course button
-  $("#createCourseBtnDashboard")?.addEventListener("click", () => openCourseModal());
-}
+</body>
+</html>
