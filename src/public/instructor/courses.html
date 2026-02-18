@@ -106,6 +106,21 @@ async function loadMyCourses(container) {
     <div id="modalsContainer"></div>
   `;
 
+  // Open the existing course modal
+$("#createCourseBtnDashboard")?.addEventListener("click", () => {
+  if (!elements.courseModal) return;
+  
+  // Reset the form
+  const form = $("#courseForm");
+  form.reset();
+  $("#modalTitle").textContent = "Create Course";
+  
+  // Show modal
+  elements.courseModal.classList.remove("hidden");
+  elements.courseModal.classList.add("flex");
+});
+
+
   // Fetch courses
   let courses = [];
   try {
