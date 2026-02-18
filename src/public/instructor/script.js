@@ -802,5 +802,32 @@ async function loadMyCourses() {
     .join("");
 }
 
+async function loadMyCourses() {
+  const container = document.getElementById("myCoursesContainer");
+  if (!container) return;
+
+  const courses = await fetchJSON("/courses");
+
+  if (!courses.length) {
+    container.innerHTML = `
+      <div class="text-sm opacity-70">
+        No courses yet.
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = courses.map(c => `
+    <div class="bg-white rounded-2xl border border-[#A5C8A1]/60 p-4 shadow-sm">
+      <h3 class="font-semibold text-lg">${esc(c.title)}</h3>
+      <p class="text-sm opacity-80 mt-1">${esc(c.description || "")}</p>
+      <div class="text-xs opacity-60 mt-2">
+        ${esc(c.locationType || "in-person")}
+      </div>
+    </div>
+  `).join("");
+}
+
+
 
 
