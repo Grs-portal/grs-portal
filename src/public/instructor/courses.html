@@ -1,227 +1,121 @@
-const API_BASE = "/api/courses";
-const $ = s => document.querySelector(s);
-const $$ = s => document.querySelectorAll(s);
-const esc = s => String(s ?? '').replace(/</g, "&lt;").replace(/>/g, "&gt;");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Courses Dashboard</title>
 
-const getQueryParam = key =>
-  new URLSearchParams(window.location.search).get(key);
+  <!-- Tailwind CDN (or your Tailwind build) -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-// ------------------------
-// ELEMENTS & MODALS
-// ------------------------
-const elements = {
-  // For standalone course page
-  courseCover: $("#courseCover"),
-  courseTitle: $("#courseTitle"),
-  courseDescription: $("#courseDescription"),
-  teacherPhoto: $("#teacherPhoto"),
-  teacherName: $("#teacherName"),
-  courseTypeBadge: $("#courseTypeBadge"),
-  courseInfo: $(".course-info"),
-  chaptersGrid: $("#chaptersGrid"),
-  reviewsList: $("#reviewsList"),
-  editCourseBtn: $("#editCourseBtn"),
-  editCourseModal: $("#editCourseModal"),
-  editCourseForm: $("#editCourseForm"),
-  chapterModal: $("#chapterModal"),
-  chapterForm: $("#chapterForm"),
-  chapterModalTitle: $("#chapterModalTitle"),
-  videoModal: $("#videoModal"),
-  videoWrapper: $("#videoWrapper")
-};
+  <!-- Optional: custom CSS for overrides -->
+  <link rel="stylesheet" href="css/courses.css">
+</head>
+<body class="bg-gray-100">
 
-// ------------------------
-// UNIVERSAL LOAD
-// ------------------------
-document.addEventListener("DOMContentLoaded", () => {
-  const dashboardContainer = $("#myCoursesContainer");
+    <!--═════✿══╡°˖✧᯽ MAIN LAYOUT ᯽✧˖°╞══✿══════-->
 
-  if (dashboardContainer) {
-    loadMyCourses(dashboardContainer); // dashboard mode
-  } else if ($("#coursesGrid")) {
-    loadCourses(); // standalone courses list
-  }
+  <div class="flex min-h-screen p-6 gap-6">
 
-  if (getQueryParam("id")) {
-    loadCourseDetail(); // standalone course detail page
-  }
-});
+    <!--═════✿══╡°˖✧᯽ SIDEBAR ᯽✧˖°╞══✿══════-->
+    
+    <aside class="w-64 bg-white rounded-xl shadow p-5 sticky top-6 h-fit">
+      <h2 class="text-xl font-semibold mb-4">Filters</h2>
 
-// ------------------------
-// STANDALONE COURSES GRID
-// ------------------------
-async function loadCourses() {
-  try {
-    const res = await fetch(API_BASE);
-    const courses = await res.json();
-
-    const grid = $("#coursesGrid");
-    if (!grid) return;
-
-    grid.innerHTML = courses.map(course => `
-      <div class="bg-white rounded-xl shadow p-4 hover:shadow-lg transition">
-        <img src="${course.cover}" class="w-full h-40 object-cover rounded-lg mb-3">
-        <h3 class="text-lg font-semibold">${esc(course.title)}</h3>
-        <p class="text-sm text-gray-600 mb-2">${esc(course.description)}</p>
-        <a href="course.html?id=${course.id}" 
-           class="inline-block mt-2 text-green-600 font-medium hover:underline">
-           View Course →
-        </a>
+      <div class="mb-4">
+        <label class="block mb-1 font-medium">Search</label>
+        <input type="text" placeholder="Search courses..." class="w-full px-3 py-2 border rounded-lg">
       </div>
-    `).join("");
-  } catch (err) {
-    console.error("Failed to load courses:", err);
-  }
-}
 
-// ------------------------
-// DASHBOARD MODE
-// ------------------------
-async function loadMyCourses(container) {
-  container.innerHTML = `
-    <div class="flex gap-6">
-      <aside class="w-64 bg-white rounded-xl shadow p-5 sticky top-6 h-fit" id="myCoursesSidebar">
-        <h2 class="text-xl font-semibold mb-4">Filters</h2>
-        <input id="filterSearch" class="w-full px-3 py-2 border rounded-lg mb-4" placeholder="Search courses...">
-        <select id="filterTeacher" class="w-full px-3 py-2 border rounded-lg mb-4">
-          <option value="">All Teachers</option>
+      <div class="mb-4">
+        <label class="block mb-1 font-medium">Teacher</label>
+        <select class="w-full px-3 py-2 border rounded-lg">
+          <option value="">All</option>
+          <option>John Doe</option>
+          <option>Maria Santos</option>
+          <option>Kai Nakamura</option>
         </select>
-        <select id="filterDuration" class="w-full px-3 py-2 border rounded-lg mb-4">
-          <option value="">Any Duration</option>
+      </div>
+
+      <div class="mb-4">
+        <label class="block mb-1 font-medium">Duration</label>
+        <select class="w-full px-3 py-2 border rounded-lg">
+          <option value="">Any</option>
           <option>1–2 hours</option>
           <option>3–5 hours</option>
           <option>6+ hours</option>
         </select>
-        <select id="filterTheme" class="w-full px-3 py-2 border rounded-lg mb-4">
-          <option value="">All Themes</option>
+      </div>
+
+      <div class="mb-4">
+        <label class="block mb-1 font-medium">Theme</label>
+        <select class="w-full px-3 py-2 border rounded-lg">
+          <option value="">All</option>
+          <option>Design</option>
+          <option>Programming</option>
+          <option>Marketing</option>
+          <option>Business</option>
         </select>
-        <button id="createCourseBtnDashboard" class="mt-6 w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
-          + Create Course
+      </div>
+
+      <button id="createCourseBtn" class="mt-6 w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+        + Create Course
+      </button>
+    </aside>
+
+    <!-- ... ✿°•∘ɷ∘•°✿ .. COURSES GRID -->
+    <main class="flex-1">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="coursesGrid">
+        <!-- Course cards will be injected here via JS -->
+      </div>
+    </main>
+
+  </div>
+
+  <!-- ... ✿°•∘ɷ∘•°✿ .. CREATE / EDIT COURSE MODAL ... ✿°•∘ɷ∘•°✿ .. -->
+
+  <div id="courseModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-xl p-6 w-full max-w-lg relative">
+      <button id="closeModal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800">&times;</button>
+      <h3 class="text-lg font-semibold mb-4" id="modalTitle">Create Course</h3>
+
+      <form id="courseForm" class="space-y-4">
+        <div>
+          <label class="block mb-1 font-medium">Title</label>
+          <input type="text" name="title" class="w-full border px-3 py-2 rounded-lg" required>
+        </div>
+
+        <div>
+          <label class="block mb-1 font-medium">Description</label>
+          <textarea name="description" class="w-full border px-3 py-2 rounded-lg" rows="3"></textarea>
+        </div>
+
+        <div>
+          <label class="block mb-1 font-medium">Location Type</label>
+          <select name="locationType" class="w-full border px-3 py-2 rounded-lg">
+            <option value="in-person">In-Person</option>
+            <option value="online">Online</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block mb-1 font-medium">PDF URL</label>
+          <input type="text" name="pdfUrl" class="w-full border px-3 py-2 rounded-lg">
+        </div>
+
+        <div>
+          <label class="block mb-1 font-medium">PDF Name</label>
+          <input type="text" name="pdfName" class="w-full border px-3 py-2 rounded-lg">
+        </div>
+
+        <button type="submit" class="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+          Save Course
         </button>
-      </aside>
-      <main class="flex-1">
-        <div id="dashboardCoursesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-      </main>
+      </form>
     </div>
-    <div id="modalsContainer"></div>
-  `;
+  </div>
 
-  // Fetch courses
-  let courses = [];
-  try {
-    const res = await fetch(API_BASE);
-    courses = await res.json();
-  } catch (err) {
-    console.error("Failed to fetch courses:", err);
-  }
+  <script src="js/courses.js"></script>
 
-  // Populate teacher/theme filters
-  const teachers = [...new Set(courses.map(c => c.teacher?.name).filter(Boolean))];
-  const themes = [...new Set(courses.map(c => c.category).filter(Boolean))];
-  const teacherSelect = $("#filterTeacher");
-  teachers.forEach(t => teacherSelect.appendChild(new Option(t, t)));
-  const themeSelect = $("#filterTheme");
-  themes.forEach(t => themeSelect.appendChild(new Option(t, t)));
-
-  // Render courses
-  function renderCourses(filtered = courses) {
-    const grid = $("#dashboardCoursesGrid");
-    grid.innerHTML = filtered.map(course => `
-      <div class="bg-white rounded-xl shadow p-4 hover:shadow-lg transition relative">
-        <img src="${course.cover}" class="w-full h-40 object-cover rounded-lg mb-3 cursor-pointer" data-id="${course.id}">
-        <h3 class="text-lg font-semibold">${esc(course.title)}</h3>
-        <p class="text-sm text-gray-600 mb-2">${esc(course.description || "")}</p>
-        <button data-id="${course.id}" class="viewCourseBtn mt-2 text-green-600 font-medium hover:underline">View Course →</button>
-      </div>
-    `).join("");
-
-    qsa(".viewCourseBtn, img[data-id]").forEach(el => {
-      el.addEventListener("click", () => openCourseDetailDashboard(el.dataset.id));
-    });
-  }
-
-  renderCourses();
-
-  // Filtering
-  function filterCourses() {
-    const search = $("#filterSearch").value.toLowerCase();
-    const teacher = $("#filterTeacher").value;
-    const duration = $("#filterDuration").value;
-    const theme = $("#filterTheme").value;
-
-    const filtered = courses.filter(c => 
-      (!search || c.title.toLowerCase().includes(search)) &&
-      (!teacher || c.teacher?.name === teacher) &&
-      (!theme || c.category === theme) &&
-      (!duration || c.duration.includes(duration.split(' ')[0]))
-    );
-    renderCourses(filtered);
-  }
-
-  $("#filterSearch").addEventListener("input", filterCourses);
-  $("#filterTeacher").addEventListener("change", filterCourses);
-  $("#filterDuration").addEventListener("change", filterCourses);
-  $("#filterTheme").addEventListener("change", filterCourses);
-
-  // Open course detail in dashboard modal
-  async function openCourseDetailDashboard(id) {
-    try {
-      const res = await fetch(`${API_BASE}/${id}`);
-      if (!res.ok) throw new Error("Course not found");
-      const course = await res.json();
-
-      const modalsContainer = $("#modalsContainer");
-      modalsContainer.innerHTML = `
-        <div class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-          <div class="bg-white rounded-2xl p-6 w-[92%] max-w-3xl relative">
-            <button id="closeDetailCourse" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800">&times;</button>
-            <h2 class="text-2xl font-bold mb-2">${esc(course.title)}</h2>
-            <p class="mb-4">${esc(course.description)}</p>
-            <div id="chaptersGridDashboard" class="flex flex-wrap gap-3"></div>
-          </div>
-        </div>
-      `;
-
-      const chaptersGrid = $("#chaptersGridDashboard");
-      course.chapters.forEach(ch => {
-        const card = document.createElement("div");
-        card.className = "chapter-card border p-2 rounded-lg cursor-pointer";
-        card.innerHTML = `
-          <h4>${esc(ch.title)}</h4>
-          <p>${esc(ch.duration)}</p>
-          ${ch.preview ? '<span class="badge">Preview</span>' : '<span class="lock">🔒</span>'}
-        `;
-        card.addEventListener("click", () => {
-          if (ch.video) openVideoModalDashboard(ch.video);
-          else alert("This chapter is locked.");
-        });
-        chaptersGrid.appendChild(card);
-      });
-
-      $("#closeDetailCourse").addEventListener("click", () => modalsContainer.innerHTML = "");
-
-    } catch (err) {
-      console.error("Failed to open course:", err);
-    }
-  }
-
-  function openVideoModalDashboard(url) {
-    const modalsContainer = $("#modalsContainer");
-    const vidDiv = document.createElement("div");
-    vidDiv.innerHTML = `
-      <div class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-        <div class="bg-white rounded-2xl w-[90%] max-w-2xl h-[70%] relative">
-          <button id="closeVideoModalDashboard" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800">&times;</button>
-          ${url.endsWith(".pdf")
-            ? `<iframe src="${url}" style="width:100%;height:100%;border:none;"></iframe>`
-            : `<video src="${url}" controls autoplay style="width:100%;height:100%"></video>`}
-        </div>
-      </div>
-    `;
-    modalsContainer.appendChild(vidDiv);
-    $("#closeVideoModalDashboard").addEventListener("click", () => vidDiv.remove());
-  }
-
-  // Create course button
-  $("#createCourseBtnDashboard")?.addEventListener("click", () => openCourseModal());
-}
+</body>
+</html>
