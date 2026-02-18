@@ -106,6 +106,31 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  qsa(".nav-item").forEach((link) => {
+  link.addEventListener("click", (e) => {
+    e.preventDefault();
+
+    // Remove active class from all
+    qsa(".nav-item").forEach((el) => el.classList.remove("active"));
+    link.classList.add("active");
+
+    // Hide all page sections
+    qsa(".page-section").forEach((s) => s.classList.add("hidden"));
+
+    // Show the selected page
+    const page = link.dataset.page;
+    const section = qs(`#${page}`);
+    section?.classList.remove("hidden");
+
+    // Load data if “My Courses”
+    if (page === "my-courses") loadMyCourses();
+    if (page === "dashboard") loadDashboard();
+    if (page === "students") loadStudents();
+    if (page === "submitted") loadHomework();
+  });
+});
+
+
   // ---- Logout (top + sidebar) ----
   function logout() {
     localStorage.removeItem("isLoggedIn");
@@ -776,5 +801,6 @@ async function loadMyCourses() {
     )
     .join("");
 }
+
 
 
