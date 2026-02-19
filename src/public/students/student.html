@@ -10,7 +10,6 @@
   /* ===================== THEME TOKENS ===================== */
   :root{
     --radius-outer: 18px;
-    --radius-inner: 16px;
 
     /* DEFAULT = GLASS */
     --page-bg:
@@ -34,24 +33,23 @@
     --btn-text: rgba(255,255,255,.92);
   }
 
-  /* LIGHT */
+  /* LIGHT (uses your green #d1ebd9) */
   html[data-theme="light"]{
     --page-bg:
-      radial-gradient(900px 520px at 15% 10%, rgba(191,227,180,.55), transparent 60%),
-      radial-gradient(900px 520px at 88% 10%, rgba(169,214,157,.40), transparent 60%),
-      linear-gradient(180deg, #f6fbf4 0%, #eaf6e6 60%, #f6fbf4 100%);
-
-      --soft-green: #d1ebd9;
-      --soft-green-dark: #bfe3cd;
-
+      radial-gradient(900px 520px at 15% 10%, rgba(209,235,217,.75), transparent 60%),
+      radial-gradient(900px 520px at 88% 10%, rgba(209,235,217,.55), transparent 60%),
+      linear-gradient(180deg, #f6fbf4 0%, #eef8f0 60%, #f6fbf4 100%);
 
     --text: #162116;
     --muted: rgba(22,33,22,.70);
 
-    --surface: rgba(255,255,255,.82);
-    --surface-2: rgba(255,255,255,.92);
+    --surface: rgba(255,255,255,.62);
+    --surface-2: rgba(255,255,255,.74);
     --border: rgba(0,0,0,.10);
     --shadow: 0 12px 28px rgba(0,0,0,.08);
+
+    --soft-green: #d1ebd9;
+    --soft-green-dark: #bfe3cd;
 
     --btn-bg: rgba(22,33,22,.92);
     --btn-bg-hover: rgba(22,33,22,.82);
@@ -73,6 +71,9 @@
     --border: rgba(255,255,255,.12);
     --shadow: 0 18px 45px rgba(0,0,0,.55);
 
+    --soft-green: rgba(34,197,94,.32);
+    --soft-green-dark: rgba(34,197,94,.45);
+
     --btn-bg: rgba(34,197,94,.22);
     --btn-bg-hover: rgba(34,197,94,.32);
     --btn-text: rgba(238,255,245,.95);
@@ -87,14 +88,6 @@
     background-attachment: fixed;
   }
 
-  /* your animated green flow stays but only in LIGHT theme (optional) */
-  html[data-theme="light"] body{
-    background:
-      radial-gradient(900px 520px at 15% 10%, rgba(191,227,180,.55), transparent 60%),
-      radial-gradient(900px 520px at 88% 10%, rgba(169,214,157,.40), transparent 60%),
-      linear-gradient(180deg, #f6fbf4 0%, #eaf6e6 60%, #f6fbf4 100%);
-  }
-
   /* Glass surfaces */
   .panel, .card, .hero, .topbar, .sidebar{
     background: var(--surface);
@@ -104,15 +97,16 @@
     -webkit-backdrop-filter: blur(18px);
     border-radius: var(--radius-outer);
   }
-  .card{ background: var(--surface-2); border-radius: var(--radius-outer); }
+  .card{ background: var(--surface-2); }
 
-  /* Topbar + sidebar look */
-  .topbar{ border-radius: 0; border-left: 0; border-right:0; border-top:0; }
+  /* Topbar + sidebar */
+  .topbar{
+    border-radius: 0;
+    border-left: 0; border-right:0; border-top:0;
+  }
   .sidebar{ border-radius: 0; }
-
   @media (min-width:1024px){
     .sidebar{ border-radius: var(--radius-outer); }
-    .topbar{ border-radius: 0; }
   }
 
   /* Buttons */
@@ -154,7 +148,7 @@
     outline: none;
   }
 
-  /* Small stat boxes */
+  /* Stats */
   .stat-box{
     background: var(--surface-2);
     border: 1px solid var(--border);
@@ -177,13 +171,10 @@
   }
   .icon-btn:hover{ background: var(--surface-2); }
 
-  /* Inputs */
-  input, textarea, select{
-    color: var(--text);
-  }
+  /* Dropdown options for dark/glass */
   html[data-theme="glass"] select,
   html[data-theme="dark"]  select{
-    color-scheme: dark; /* fixes dropdown menu */
+    color-scheme: dark;
   }
   html[data-theme="glass"] option,
   html[data-theme="dark"]  option{
@@ -212,19 +203,10 @@
       </div>
 
       <div class="flex items-center gap-2">
+
         <span id="userName" class="text-sm font-extrabold"></span>
 
-        <!-- 🎨 Theme -->
-        <div class="relative" id="themeWrap">
-          <button id="themeBtn" class="icon-btn" title="Theme">🎨</button>
-          <div id="themeMenu" class="hidden absolute right-0 mt-2 w-56 card overflow-hidden">
-            <button class="themePick w-full text-left px-4 py-3 hover:bg-white/10" data-theme="glass">Glass</button>
-            <button class="themePick w-full text-left px-4 py-3 hover:bg-white/10" data-theme="light">Light</button>
-            <button class="themePick w-full text-left px-4 py-3 hover:bg-white/10" data-theme="dark">Dark Green</button>
-          </div>
-        </div>
-
-        <!-- 🔔 Notifications (your existing student.js expects these IDs) -->
+        <!-- 🔔 Notifications -->
         <div class="relative" id="notifWrap">
           <button id="notifBtn" class="icon-btn" title="Notifications">
             🔔
@@ -248,36 +230,34 @@
           </div>
         </div>
 
-        <div id="topAvatarWrap" class="relative">
-          <div id="userAvatar"
+        <!-- Profile wrap (🎨 + avatar + dropdown) -->
+        <div id="profileWrap" class="relative flex items-center gap-2">
+          <button id="themeBtn" class="icon-btn" title="Theme">🎨</button>
+
+          <button id="userAvatar"
             class="w-9 h-9 rounded-full bg-white/10 border border-white/20
                    flex items-center justify-center font-extrabold cursor-pointer select-none shadow-sm">
+          </button>
+
+          <!-- Dropdown: Theme + Logout -->
+          <div id="profileMenu" class="hidden absolute right-0 top-[calc(100%+10px)] w-64 card overflow-hidden z-50">
+
+            <div class="px-4 py-3 border-b border-white/10">
+              <div class="text-xs font-extrabold muted mb-2">Theme</div>
+              <div class="grid grid-cols-3 gap-2">
+                <button class="themePick px-3 py-2 rounded-xl text-xs font-extrabold bg-white/10 hover:bg-white/15 border border-white/15"
+                  data-theme="glass">Glass</button>
+                <button class="themePick px-3 py-2 rounded-xl text-xs font-extrabold bg-white/10 hover:bg-white/15 border border-white/15"
+                  data-theme="light">Light</button>
+                <button class="themePick px-3 py-2 rounded-xl text-xs font-extrabold bg-white/10 hover:bg-white/15 border border-white/15"
+                  data-theme="dark">Dark</button>
+              </div>
+            </div>
+
+            <button id="logoutBtn" class="w-full text-left px-4 py-3 text-sm hover:bg-white/10 font-bold">
+              Logout
+            </button>
           </div>
-
-          <div id="profileMenu"
-  class="hidden absolute right-0 mt-2 w-56 card overflow-hidden">
-
-  <!-- Theme section -->
-  <div class="px-4 py-3 border-b border-white/10">
-    <div class="text-xs font-extrabold muted mb-2">Theme</div>
-
-    <div class="grid grid-cols-3 gap-2">
-      <button class="themePick px-3 py-2 rounded-xl text-xs font-extrabold bg-white/10 hover:bg-white/15 border border-white/15"
-        data-theme="glass">Glass</button>
-
-      <button class="themePick px-3 py-2 rounded-xl text-xs font-extrabold bg-white/10 hover:bg-white/15 border border-white/15"
-        data-theme="light">Light</button>
-
-      <button class="themePick px-3 py-2 rounded-xl text-xs font-extrabold bg-white/10 hover:bg-white/15 border border-white/15"
-        data-theme="dark">Dark</button>
-    </div>
-  </div>
-
-  <button id="logoutBtn" class="w-full text-left px-4 py-3 text-sm hover:bg-white/10 font-bold">
-    Logout
-  </button>
-</div>
-
         </div>
 
       </div>
@@ -337,9 +317,7 @@
       <section id="dashboard" class="page-section">
         <div class="hero p-6">
           <h2 class="text-2xl font-extrabold">Welcome back!</h2>
-          <p class="mt-1 muted">
-            Your courses and assignments update live from the same system.
-          </p>
+          <p class="mt-1 muted">Your courses and assignments update live from the same system.</p>
         </div>
 
         <div class="panel mt-6 p-6">
@@ -406,4 +384,3 @@
   <script src="/students/script.js"></script>
 </body>
 </html>
-
