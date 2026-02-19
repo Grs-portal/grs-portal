@@ -15,10 +15,15 @@
 
   <style>
     :root{
-      --soft-green:#BFE3B4;
-      --soft-green-dark:#A9D69D;
-      --text-dark:#1C1820;
-      --border: rgba(0,0,0,.10);
+      /* 🌱 Warm Calm Palette */
+      --soft-green: #8BBF8A;     /* main sage */
+      --soft-green-dark:#6FAE78; /* deeper sage for emphasis */
+      --cream: #FFFDF7;          /* warm background */
+      --cream-2:#FAF6EE;         /* secondary warm surface */
+      --soft-brown:#B08C6B;      /* warm accent (small touches) */
+
+      --text-dark:#2B2B2B;
+      --border: rgba(43,43,43,.10);
     }
 
     html, body{
@@ -26,26 +31,28 @@
       color: var(--text-dark);
     }
 
+    /* Warm, calm background (less “minty”, more “cozy”) */
     body{
       background:
-        radial-gradient(900px 420px at 18% 8%, rgba(191,227,180,.55), transparent 55%),
-        radial-gradient(900px 420px at 90% 12%, rgba(169,214,157,.40), transparent 55%),
-        linear-gradient(180deg, #f2fbf0 0%, #e6f5e2 55%, #f2fbf0 100%);
+        radial-gradient(900px 420px at 18% 8%, rgba(139,191,138,.35), transparent 55%),
+        radial-gradient(900px 420px at 90% 12%, rgba(176,140,107,.18), transparent 55%),
+        linear-gradient(180deg, var(--cream) 0%, var(--cream-2) 55%, var(--cream) 100%);
     }
 
     .title-strong{ font-weight:700; letter-spacing:-0.01em; }
-    .subtitle{ font-weight:500; opacity:.8; }
+    .subtitle{ font-weight:500; opacity:.78; }
 
-    /* glass surfaces */
+    /* glass surfaces (warmer) */
     .glass{
-      background: rgba(255,255,255,.70);
+      background: rgba(255,255,255,.72);
       border: 1px solid var(--border);
       box-shadow: 0 10px 26px rgba(0,0,0,0.06);
       backdrop-filter: blur(12px);
     }
 
+    /* hero (warm sage) */
     .hero{
-      background: linear-gradient(to bottom right, var(--soft-green), var(--soft-green-dark));
+      background: linear-gradient(to bottom right, rgba(139,191,138,.92), rgba(111,174,120,.92));
       border: 1px solid var(--border);
       box-shadow: 0 10px 26px rgba(0,0,0,0.08);
     }
@@ -61,22 +68,36 @@
       font-weight:600;
       transition:150ms;
     }
-    .nav-item:hover{ background: rgba(191,227,180,0.35); }
+    .nav-item:hover{
+      background: rgba(139,191,138,0.22);
+    }
     .nav-item.active{
-      background: rgba(28,24,32,.92);
-      color: #e9f7e6;
+      background: rgba(43,43,43,.92);
+      color: #fffdf7;
     }
 
-    /* buttons */
+    /* buttons (warm dark + tiny brown hint on hover) */
     .btn-primary{
-      background: rgba(28,24,32,.92);
-      color:#e9f7e6;
+      background: rgba(43,43,43,.92);
+      color:#fffdf7;
       border-radius:16px;
       padding:10px 16px;
       font-weight:600;
       transition:150ms;
     }
-    .btn-primary:hover{ opacity:.92; }
+    .btn-primary:hover{
+      opacity:.94;
+      box-shadow: 0 0 0 3px rgba(176,140,107,.18);
+    }
+
+    /* table heads: warm sage */
+    .table-head{
+      background: rgba(139,191,138,.35);
+      color: var(--text-dark);
+      text-transform:uppercase;
+      font-size:0.75rem;
+      letter-spacing:.06em;
+    }
   </style>
 </head>
 
@@ -97,7 +118,7 @@
       <div class="flex items-center gap-3">
         <span id="userName" class="text-sm font-semibold"></span>
 
-        <!-- 🔔 Notifications (manager.js already expects these IDs) -->
+        <!-- 🔔 Notifications -->
         <div class="relative" id="notifWrap">
           <button id="notifBtn"
             class="w-10 h-10 rounded-2xl glass flex items-center justify-center hover:bg-white transition"
@@ -251,7 +272,7 @@
 
           <div class="overflow-x-auto mt-4">
             <table class="min-w-full text-sm">
-              <thead class="bg-[rgba(191,227,180,.85)] text-[var(--text-dark)] uppercase text-[0.75rem]">
+              <thead class="table-head">
                 <tr>
                   <th class="px-6 py-3">Student</th>
                   <th class="px-6 py-3">Course</th>
@@ -318,7 +339,7 @@
 
           <div class="overflow-x-auto">
             <table class="min-w-full text-sm">
-              <thead class="bg-[rgba(191,227,180,.85)] text-[var(--text-dark)] uppercase text-[0.75rem]">
+              <thead class="table-head">
                 <tr>
                   <th class="px-6 py-3">Username</th>
                   <th class="px-6 py-3">Name</th>
