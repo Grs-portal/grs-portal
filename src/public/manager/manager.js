@@ -1,4 +1,4 @@
-// manager.js 
+// manager.js
 (() => {
   const API = "/api";
   const LOGIN = "/homepage/login.html";
@@ -6,7 +6,7 @@
   const qs = (s) => document.querySelector(s);
   const qsa = (s) => [...document.querySelectorAll(s)];
 
-  const toast = (msg, color = "#1C1820") => {
+  const toast = (msg, color = "rgba(0,0,0,.75)") => {
     const t = document.createElement("div");
     t.className =
       "fixed bottom-4 right-4 px-4 py-2 rounded-xl text-white shadow z-[9999] backdrop-blur-md border border-white/15";
@@ -41,16 +41,16 @@
     if (localStorage.getItem("role") !== "manager") return (location.href = LOGIN);
 
     const name = localStorage.getItem("userName") || "Manager";
-    qs("#userName") && (qs("#userName").textContent = name);
-    qs("#y") && (qs("#y").textContent = new Date().getFullYear());
-    qs("#userAvatar") &&
-      (qs("#userAvatar").textContent = name
-        .split(" ")
-        .map((x) => x[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2));
+    qs("#userName").textContent = name;
+    qs("#y").textContent = new Date().getFullYear();
+    qs("#userAvatar").textContent = name
+      .split(" ")
+      .map((x) => x[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
 
+    setupThemeUI();
     setupProfile();
     setupMobileSidebar();
     setupNav();
@@ -63,6 +63,40 @@
     await loadDashboard();
   }
 
+  // ---------------- THEME SWITCHER ----------------
+  function applyTheme(theme) {
+    const t = theme || "glass";
+    document.documentElement.dataset.theme = t;
+    localStorage.setItem("theme", t);
+  }
+
+  function setupThemeUI() {
+    const saved = localStorage.getItem("theme") || "glass";
+    applyTheme(saved);
+
+    const wrap = qs("#themeWrap");
+    const btn = qs("#themeBtn");
+    const menu = qs("#themeMenu");
+
+    btn?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      menu?.classList.toggle("hidden");
+    });
+
+    qsa(".themePick").forEach((b) => {
+      b.addEventListener("click", (e) => {
+        e.preventDefault();
+        applyTheme(b.dataset.theme);
+        menu?.classList.add("hidden");
+      });
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!wrap || !menu) return;
+      if (!wrap.contains(e.target)) menu.classList.add("hidden");
+    });
+  }
+
   function logout() {
     localStorage.clear();
     location.href = LOGIN;
@@ -73,7 +107,6 @@
       e.stopPropagation();
       qs("#profileMenu")?.classList.toggle("hidden");
     });
-
     qs("#logoutBtn")?.addEventListener("click", logout);
     qs("#sidebarLogout")?.addEventListener("click", (e) => {
       e.preventDefault();
@@ -84,14 +117,6 @@
       const wrap = qs("#topAvatarWrap");
       if (wrap && !wrap.contains(e.target)) qs("#profileMenu")?.classList.add("hidden");
     });
-
-    window.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
-        qs("#profileMenu")?.classList.add("hidden");
-        qs("#notifMenu")?.classList.add("hidden");
-        qs("#modalBg")?.remove();
-      }
-    });
   }
 
   function setupMobileSidebar() {
@@ -100,23 +125,15 @@
     const overlay = qs("#overlay");
     if (!menuBtn || !sidebar || !overlay) return;
 
-    const close = () => {
+    menuBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("-translate-x-full");
+      overlay.classList.toggle("hidden");
+    });
+
+    overlay.addEventListener("click", () => {
       sidebar.classList.add("-translate-x-full");
       overlay.classList.add("hidden");
-      document.body.style.overflow = "";
-    };
-
-    const toggle = () => {
-      const closed = sidebar.classList.contains("-translate-x-full");
-      if (closed) {
-        sidebar.classList.remove("-translate-x-full");
-        overlay.classList.remove("hidden");
-        document.body.style.overflow = "hidden";
-      } else close();
-    };
-
-    menuBtn.addEventListener("click", toggle);
-    overlay.addEventListener("click", close);
+    });
   }
 
   function setupNav() {
@@ -140,10 +157,6 @@
         if (page === "submitted-homework") await loadHomework();
         if (page === "submitted-courses") await loadCourses();
         if (page === "users") await loadUsers();
-
-        qs("#sidebar")?.classList.add("-translate-x-full");
-        qs("#overlay")?.classList.add("hidden");
-        document.body.style.overflow = "";
       });
     });
   }
@@ -151,32 +164,27 @@
   function bindButtons() {
     qs("#openCreateHw")?.addEventListener("click", openCreateHomeworkModal);
     qs("#openCreateCourse")?.addEventListener("click", openCreateCourseModal);
+
     qs("#refreshUsersBtn")?.addEventListener("click", loadUsers);
     qs("#createUserBtn")?.addEventListener("click", openCreateUserModal);
   }
 
-  // ---------------- MODAL (GLASS) ----------------
+  // ---------------- MODAL ----------------
   function showModal(html) {
     closeModal();
-
     const bg = document.createElement("div");
     bg.id = "modalBg";
-    bg.className =
-      "fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-4";
-
+    bg.className = "fixed inset-0 bg-black/45 flex items-center justify-center z-50 backdrop-blur-sm";
     bg.innerHTML = `
-      <div class="w-full max-w-md rounded-[22px] p-6
-        bg-white/10 border border-white/20 shadow-2xl backdrop-blur-xl">
+      <div class="surface-2 p-6 w-[92%] max-w-md">
         ${html}
       </div>
     `;
-
     document.body.appendChild(bg);
 
     bg.addEventListener("click", (e) => {
       if (e.target === bg) closeModal();
     });
-
     bg.querySelector("#cancelModal")?.addEventListener("click", closeModal);
   }
 
@@ -246,9 +254,9 @@
     list.innerHTML = items
       .map(
         (n) => `
-      <div class="px-4 py-3 border-b border-white/10 ${n.unread ? "bg-white/10" : "bg-transparent"}">
-        <div class="text-sm font-semibold text-white/95">${esc(n.message || "")}</div>
-        <div class="text-xs text-white/60 mt-1">
+      <div class="px-4 py-3 border-b border-white/10 ${n.unread ? "bg-white/10" : ""}">
+        <div class="text-sm font-extrabold">${esc(n.message || "")}</div>
+        <div class="text-xs muted mt-1">
           ${esc(n.byName || n.byUsername || "Someone")} · ${esc(n.byRole || "")} ·
           ${new Date(n.ts).toLocaleString()}
         </div>
@@ -262,8 +270,8 @@
   async function loadDashboard() {
     const [courses, hw] = await Promise.all([fetchJSON("/courses"), fetchJSON("/homework")]);
 
-    qs("#activeCoursesCount") && (qs("#activeCoursesCount").textContent = courses.length);
-    qs("#toGradeCount") && (qs("#toGradeCount").textContent = hw.length);
+    qs("#activeCoursesCount").textContent = courses.length;
+    qs("#toGradeCount").textContent = hw.length;
 
     const box = qs("#courses");
     if (!box) return;
@@ -271,23 +279,20 @@
     box.innerHTML = courses
       .map(
         (c) => `
-      <div class="p-4 rounded-2xl border border-white/15 bg-white/10 backdrop-blur-xl shadow-lg
-                  flex justify-between items-start">
+      <div class="surface-2 p-4 rounded-[18px] flex justify-between items-center">
         <div>
-          <div class="font-semibold text-white/95">${esc(c.title)}</div>
-          <div class="text-sm text-white/70 mt-1">${esc(c.description || "")}</div>
-          <div class="text-xs text-white/60 mt-2">Type: ${esc(c.locationType || "in-person")}</div>
+          <div class="font-extrabold">${esc(c.title)}</div>
+          <div class="text-sm muted">${esc(c.description || "")}</div>
+          <div class="text-xs muted mt-1">Type: ${esc(c.locationType || "in-person")}</div>
           ${
             c.pdfUrl
-              ? `<a class="text-xs underline text-emerald-200 hover:text-emerald-100" href="${esc(
-                  c.pdfUrl
-                )}" target="_blank">PDF: ${esc(c.pdfName || "View")}</a>`
+              ? `<a class="text-xs underline" href="${esc(c.pdfUrl)}" target="_blank">PDF: ${esc(c.pdfName || "View")}</a>`
               : ""
           }
         </div>
         <div class="flex gap-2">
-          <button class="edit-course px-2 py-1 rounded-lg hover:bg-white/10" data-id="${c.id}" title="Edit">✏️</button>
-          <button class="del-course px-2 py-1 rounded-lg hover:bg-white/10 text-red-200" data-id="${c.id}" title="Delete">🗑</button>
+          <button class="edit-course icon-btn" data-id="${c.id}" title="Edit">✏️</button>
+          <button class="del-course icon-btn" data-id="${c.id}" title="Delete">🗑</button>
         </div>
       </div>
     `
@@ -298,14 +303,10 @@
       btn.addEventListener("click", async () => {
         const id = btn.dataset.id;
         if (!confirm("Delete course?")) return;
-        const r = await fetch(`${API}/courses/${id}`, {
-          method: "DELETE",
-          headers: actorHeaders(),
-        });
-        if (!r.ok) return toast("Delete failed", "#b91c1c");
-        toast("Deleted", "#b91c1c");
+        const r = await fetch(`${API}/courses/${id}`, { method: "DELETE", headers: actorHeaders() });
+        if (!r.ok) return toast("Delete failed", "rgba(185,28,28,.85)");
+        toast("Deleted", "rgba(185,28,28,.85)");
         loadDashboard();
-        loadNotifications();
       });
     });
 
@@ -328,23 +329,20 @@
     list.innerHTML = courses
       .map(
         (c) => `
-      <div class="p-4 rounded-2xl border border-white/15 bg-white/10 backdrop-blur-xl shadow-lg
-                  mb-3 flex justify-between items-start">
+      <div class="surface-2 p-4 rounded-[18px] mb-3 flex justify-between items-center">
         <div>
-          <div class="font-semibold text-white/95">${esc(c.title)}</div>
-          <div class="text-sm text-white/70 mt-1">${esc(c.description || "")}</div>
-          <div class="text-xs text-white/60 mt-2">Type: ${esc(c.locationType || "in-person")}</div>
+          <div class="font-extrabold">${esc(c.title)}</div>
+          <div class="text-sm muted">${esc(c.description || "")}</div>
+          <div class="text-xs muted mt-1">Type: ${esc(c.locationType || "in-person")}</div>
           ${
             c.pdfUrl
-              ? `<a class="text-xs underline text-emerald-200 hover:text-emerald-100" href="${esc(
-                  c.pdfUrl
-                )}" target="_blank">PDF: ${esc(c.pdfName || "View")}</a>`
+              ? `<a class="text-xs underline" href="${esc(c.pdfUrl)}" target="_blank">PDF: ${esc(c.pdfName || "View")}</a>`
               : ""
           }
         </div>
         <div class="flex gap-2">
-          <button class="edit-course px-2 py-1 rounded-lg hover:bg-white/10" data-id="${c.id}" title="Edit">✏️</button>
-          <button class="del-course px-2 py-1 rounded-lg hover:bg-white/10 text-red-200" data-id="${c.id}" title="Delete">🗑</button>
+          <button class="edit-course icon-btn" data-id="${c.id}" title="Edit">✏️</button>
+          <button class="del-course icon-btn" data-id="${c.id}" title="Delete">🗑</button>
         </div>
       </div>
     `
@@ -355,15 +353,11 @@
       btn.addEventListener("click", async () => {
         const id = btn.dataset.id;
         if (!confirm("Delete course?")) return;
-        const r = await fetch(`${API}/courses/${id}`, {
-          method: "DELETE",
-          headers: actorHeaders(),
-        });
-        if (!r.ok) return toast("Delete failed", "#b91c1c");
-        toast("Deleted", "#b91c1c");
+        const r = await fetch(`${API}/courses/${id}`, { method: "DELETE", headers: actorHeaders() });
+        if (!r.ok) return toast("Delete failed", "rgba(185,28,28,.85)");
+        toast("Deleted", "rgba(185,28,28,.85)");
         loadCourses();
         loadDashboard();
-        loadNotifications();
       });
     });
 
@@ -386,10 +380,10 @@
       .map(
         (s) => `
       <tr class="border-t border-white/10">
-        <td class="px-6 py-3 text-white/90">${esc(s.name)}</td>
-        <td class="px-6 py-3 text-white/70">${esc(s.course)}</td>
-        <td class="px-6 py-3 text-white/90">${s.grade ?? "-"}</td>
-        <td class="px-6 py-3 text-right"></td>
+        <td class="px-6 py-3 font-bold">${esc(s.name)}</td>
+        <td class="px-6 py-3">${esc(s.course)}</td>
+        <td class="px-6 py-3">${s.grade ?? "-"}</td>
+        <td class="px-6 py-3 text-right muted">—</td>
       </tr>
     `
       )
@@ -405,25 +399,20 @@
     list.innerHTML = hw
       .map(
         (h) => `
-      <div class="p-4 rounded-2xl border border-white/15 bg-white/10 backdrop-blur-xl shadow-lg
-                  flex justify-between items-start">
+      <div class="surface-2 p-4 rounded-[18px] flex justify-between items-start">
         <div>
-          <div class="font-semibold text-white/95">${esc(h.title)}</div>
-          <div class="text-sm text-white/70 mt-1">${esc(h.description || "")}</div>
-          <div class="text-xs text-white/60 mt-2">By: ${esc(h.submitted_by || "N/A")} · ${esc(
-          h.course || ""
-        )}</div>
+          <div class="font-extrabold">${esc(h.title)}</div>
+          <div class="text-sm muted">${esc(h.description || "")}</div>
+          <div class="text-xs muted mt-2">By: ${esc(h.submitted_by || "N/A")} · ${esc(h.course || "")}</div>
           ${
             h.pdfUrl
-              ? `<a class="text-xs underline text-emerald-200 hover:text-emerald-100" href="${esc(
-                  h.pdfUrl
-                )}" target="_blank">PDF: ${esc(h.pdfName || "View")}</a>`
+              ? `<a class="text-xs underline" href="${esc(h.pdfUrl)}" target="_blank">PDF: ${esc(h.pdfName || "View")}</a>`
               : ""
           }
         </div>
         <div class="flex gap-2">
-          <button class="edit-hw px-2 py-1 rounded-lg hover:bg-white/10" data-id="${h.id}" title="Edit">✏️</button>
-          <button class="del-hw px-2 py-1 rounded-lg hover:bg-white/10 text-red-200" data-id="${h.id}" title="Delete">🗑</button>
+          <button class="edit-hw icon-btn" data-id="${h.id}" title="Edit">✏️</button>
+          <button class="del-hw icon-btn" data-id="${h.id}" title="Delete">🗑</button>
         </div>
       </div>
     `
@@ -434,15 +423,11 @@
       btn.addEventListener("click", async () => {
         const id = btn.dataset.id;
         if (!confirm("Delete homework?")) return;
-        const r = await fetch(`${API}/homework/${id}`, {
-          method: "DELETE",
-          headers: actorHeaders(),
-        });
-        if (!r.ok) return toast("Delete failed", "#b91c1c");
-        toast("Deleted", "#b91c1c");
+        const r = await fetch(`${API}/homework/${id}`, { method: "DELETE", headers: actorHeaders() });
+        if (!r.ok) return toast("Delete failed", "rgba(185,28,28,.85)");
+        toast("Deleted", "rgba(185,28,28,.85)");
         loadHomework();
         loadDashboard();
-        loadNotifications();
       });
     });
 
@@ -466,56 +451,49 @@
     return out; // {url, originalName}
   }
 
-  // ---------------- CREATE/EDIT MODALS (GLASS) ----------------
-  function inputClass() {
-    return "w-full px-3 py-2 rounded-xl bg-white/10 border border-white/15 text-white placeholder:text-white/50 outline-none focus:ring-2 focus:ring-emerald-200/40";
-  }
-
-  function btnDark() {
-    return "px-4 py-2 rounded-xl bg-white/15 hover:bg-white/20 text-white font-semibold border border-white/15";
-  }
-
-  function btnPrimary() {
-    return "px-4 py-2 rounded-xl bg-emerald-300/80 hover:bg-emerald-300 text-emerald-950 font-bold";
-  }
-
+  // ---------------- CREATE/EDIT MODALS ----------------
   function openCreateCourseModal() {
     showModal(`
-      <h2 class="text-xl font-semibold mb-4 text-white">Create Course</h2>
-      <input id="courseTitle" class="${inputClass()}" placeholder="Title" />
-      <textarea id="courseDesc" class="${inputClass()} mt-3" placeholder="Description"></textarea>
+      <h2 class="text-xl font-extrabold mb-4">Create Course</h2>
 
-      <select id="courseType" class="${inputClass()} mt-3">
+      <label class="text-sm font-bold muted">Title</label>
+      <input id="courseTitle" class="input-theme mt-1 mb-3" placeholder="Title" />
+
+      <label class="text-sm font-bold muted">Description</label>
+      <textarea id="courseDesc" class="input-theme mt-1 mb-3" placeholder="Description"></textarea>
+
+      <label class="text-sm font-bold muted">Type</label>
+      <select id="courseType" class="select-theme mt-1 mb-3">
         <option value="in-person">In-person</option>
         <option value="online">Online</option>
         <option value="hybrid">Hybrid</option>
       </select>
 
-      <div class="mt-3 text-xs text-white/60">Optional PDF</div>
-      <input id="coursePdf" type="file" accept=".pdf" class="w-full mt-2 text-white/80" />
+      <label class="text-sm font-bold muted">PDF (optional)</label>
+      <input id="coursePdf" type="file" accept=".pdf" class="mt-2 mb-4 w-full text-sm" />
 
-      <div class="flex justify-end gap-2 mt-5">
-        <button id="cancelModal" class="${btnDark()}">Cancel</button>
-        <button id="submitCourse" class="${btnPrimary()}">Create</button>
+      <div class="flex justify-end gap-2">
+        <button id="cancelModal" class="btn-theme">Cancel</button>
+        <button id="submitCourse" class="btn-theme">Create</button>
       </div>
     `);
 
-    qs("#submitCourse")?.addEventListener("click", async () => {
+    qs("#submitCourse").addEventListener("click", async () => {
       const title = qs("#courseTitle").value.trim();
       const description = qs("#courseDesc").value.trim();
       const locationType = qs("#courseType").value;
-      if (!title) return toast("Title required", "#b91c1c");
+
+      if (!title) return toast("Title required", "rgba(185,28,28,.85)");
 
       let pdfUrl = "", pdfName = "";
       const file = qs("#coursePdf")?.files?.[0];
       try {
         if (file) {
           const up = await uploadPdf(file);
-          pdfUrl = up.url;
-          pdfName = up.originalName;
+          pdfUrl = up.url; pdfName = up.originalName;
         }
       } catch (e) {
-        return toast(e.message, "#b91c1c");
+        return toast(e.message, "rgba(185,28,28,.85)");
       }
 
       const res = await fetch(`${API}/courses`, {
@@ -524,9 +502,10 @@
         body: JSON.stringify({ title, description, locationType, pdfUrl, pdfName }),
       });
 
-      if (!res.ok) return toast("Create course failed", "#b91c1c");
+      if (!res.ok) return toast("Create course failed", "rgba(185,28,28,.85)");
+
       closeModal();
-      toast("Course created", "#166534");
+      toast("Course created", "rgba(34,197,94,.70)");
       loadCourses();
       loadDashboard();
       loadNotifications();
@@ -535,43 +514,48 @@
 
   function openEditCourseModal(course) {
     showModal(`
-      <h2 class="text-xl font-semibold mb-4 text-white">Edit Course</h2>
-      <input id="courseTitle" class="${inputClass()}" value="${esc(course.title)}" />
-      <textarea id="courseDesc" class="${inputClass()} mt-3">${esc(course.description || "")}</textarea>
+      <h2 class="text-xl font-extrabold mb-4">Edit Course</h2>
 
-      <select id="courseType" class="${inputClass()} mt-3">
+      <label class="text-sm font-bold muted">Title</label>
+      <input id="courseTitle" class="input-theme mt-1 mb-3" value="${esc(course.title)}" />
+
+      <label class="text-sm font-bold muted">Description</label>
+      <textarea id="courseDesc" class="input-theme mt-1 mb-3">${esc(course.description || "")}</textarea>
+
+      <label class="text-sm font-bold muted">Type</label>
+      <select id="courseType" class="select-theme mt-1 mb-3">
         <option value="in-person" ${course.locationType === "in-person" ? "selected" : ""}>In-person</option>
         <option value="online" ${course.locationType === "online" ? "selected" : ""}>Online</option>
         <option value="hybrid" ${course.locationType === "hybrid" ? "selected" : ""}>Hybrid</option>
       </select>
 
-      <div class="text-xs text-white/60 mt-3">
+      <div class="text-xs muted mb-2">
         ${course.pdfUrl ? `Current PDF: ${esc(course.pdfName || "Attached")}` : "No PDF attached"}
       </div>
-      <input id="coursePdf" type="file" accept=".pdf" class="w-full mt-2 text-white/80" />
+      <input id="coursePdf" type="file" accept=".pdf" class="mt-1 mb-4 w-full text-sm" />
 
-      <div class="flex justify-end gap-2 mt-5">
-        <button id="cancelModal" class="${btnDark()}">Cancel</button>
-        <button id="saveCourse" class="${btnPrimary()}">Save</button>
+      <div class="flex justify-end gap-2">
+        <button id="cancelModal" class="btn-theme">Cancel</button>
+        <button id="saveCourse" class="btn-theme">Save</button>
       </div>
     `);
 
-    qs("#saveCourse")?.addEventListener("click", async () => {
+    qs("#saveCourse").addEventListener("click", async () => {
       const title = qs("#courseTitle").value.trim();
       const description = qs("#courseDesc").value.trim();
       const locationType = qs("#courseType").value;
-      if (!title) return toast("Title required", "#b91c1c");
+
+      if (!title) return toast("Title required", "rgba(185,28,28,.85)");
 
       let pdfUrl = course.pdfUrl || "", pdfName = course.pdfName || "";
       const file = qs("#coursePdf")?.files?.[0];
       try {
         if (file) {
           const up = await uploadPdf(file);
-          pdfUrl = up.url;
-          pdfName = up.originalName;
+          pdfUrl = up.url; pdfName = up.originalName;
         }
       } catch (e) {
-        return toast(e.message, "#b91c1c");
+        return toast(e.message, "rgba(185,28,28,.85)");
       }
 
       const res = await fetch(`${API}/courses/${encodeURIComponent(course.id)}`, {
@@ -580,9 +564,10 @@
         body: JSON.stringify({ title, description, locationType, pdfUrl, pdfName }),
       });
 
-      if (!res.ok) return toast("Update failed", "#b91c1c");
+      if (!res.ok) return toast("Update failed", "rgba(185,28,28,.85)");
+
       closeModal();
-      toast("Course updated", "#166534");
+      toast("Course updated", "rgba(34,197,94,.70)");
       loadCourses();
       loadDashboard();
       loadNotifications();
@@ -591,36 +576,41 @@
 
   function openCreateHomeworkModal() {
     showModal(`
-      <h2 class="text-xl font-semibold mb-4 text-white">Create Homework</h2>
-      <input id="hwTitle" class="${inputClass()}" placeholder="Title" />
-      <textarea id="hwDesc" class="${inputClass()} mt-3" placeholder="Description"></textarea>
-      <input id="hwCourse" class="${inputClass()} mt-3" placeholder="Course name" />
+      <h2 class="text-xl font-extrabold mb-4">Create Homework</h2>
 
-      <div class="mt-3 text-xs text-white/60">Optional PDF</div>
-      <input id="hwPdf" type="file" accept=".pdf" class="w-full mt-2 text-white/80" />
+      <label class="text-sm font-bold muted">Title</label>
+      <input id="hwTitle" class="input-theme mt-1 mb-3" placeholder="Title" />
 
-      <div class="flex justify-end gap-2 mt-5">
-        <button id="cancelModal" class="${btnDark()}">Cancel</button>
-        <button id="submitHw" class="${btnPrimary()}">Create</button>
+      <label class="text-sm font-bold muted">Description</label>
+      <textarea id="hwDesc" class="input-theme mt-1 mb-3" placeholder="Description"></textarea>
+
+      <label class="text-sm font-bold muted">Course</label>
+      <input id="hwCourse" class="input-theme mt-1 mb-3" placeholder="Course name" />
+
+      <label class="text-sm font-bold muted">PDF (optional)</label>
+      <input id="hwPdf" type="file" accept=".pdf" class="mt-2 mb-4 w-full text-sm" />
+
+      <div class="flex justify-end gap-2">
+        <button id="cancelModal" class="btn-theme">Cancel</button>
+        <button id="submitHw" class="btn-theme">Create</button>
       </div>
     `);
 
-    qs("#submitHw")?.addEventListener("click", async () => {
+    qs("#submitHw").addEventListener("click", async () => {
       const title = qs("#hwTitle").value.trim();
       const description = qs("#hwDesc").value.trim();
       const course = qs("#hwCourse").value.trim();
-      if (!title || !course) return toast("Title + course required", "#b91c1c");
+      if (!title || !course) return toast("Title + course required", "rgba(185,28,28,.85)");
 
       let pdfUrl = "", pdfName = "";
       const file = qs("#hwPdf")?.files?.[0];
       try {
         if (file) {
           const up = await uploadPdf(file);
-          pdfUrl = up.url;
-          pdfName = up.originalName;
+          pdfUrl = up.url; pdfName = up.originalName;
         }
       } catch (e) {
-        return toast(e.message, "#b91c1c");
+        return toast(e.message, "rgba(185,28,28,.85)");
       }
 
       const res = await fetch(`${API}/homework`, {
@@ -629,9 +619,10 @@
         body: JSON.stringify({ title, description, course, pdfUrl, pdfName }),
       });
 
-      if (!res.ok) return toast("Create homework failed", "#b91c1c");
+      if (!res.ok) return toast("Create homework failed", "rgba(185,28,28,.85)");
+
       closeModal();
-      toast("Homework created", "#166534");
+      toast("Homework created", "rgba(34,197,94,.70)");
       loadHomework();
       loadDashboard();
       loadNotifications();
@@ -640,38 +631,43 @@
 
   function openEditHomeworkModal(hw) {
     showModal(`
-      <h2 class="text-xl font-semibold mb-4 text-white">Edit Homework</h2>
-      <input id="hwTitle" class="${inputClass()}" value="${esc(hw.title)}" />
-      <textarea id="hwDesc" class="${inputClass()} mt-3">${esc(hw.description || "")}</textarea>
-      <input id="hwCourse" class="${inputClass()} mt-3" value="${esc(hw.course || "")}" />
+      <h2 class="text-xl font-extrabold mb-4">Edit Homework</h2>
 
-      <div class="text-xs text-white/60 mt-3">
+      <label class="text-sm font-bold muted">Title</label>
+      <input id="hwTitle" class="input-theme mt-1 mb-3" value="${esc(hw.title)}" />
+
+      <label class="text-sm font-bold muted">Description</label>
+      <textarea id="hwDesc" class="input-theme mt-1 mb-3">${esc(hw.description || "")}</textarea>
+
+      <label class="text-sm font-bold muted">Course</label>
+      <input id="hwCourse" class="input-theme mt-1 mb-3" value="${esc(hw.course || "")}" />
+
+      <div class="text-xs muted mb-2">
         ${hw.pdfUrl ? `Current PDF: ${esc(hw.pdfName || "Attached")}` : "No PDF attached"}
       </div>
-      <input id="hwPdf" type="file" accept=".pdf" class="w-full mt-2 text-white/80" />
+      <input id="hwPdf" type="file" accept=".pdf" class="mt-1 mb-4 w-full text-sm" />
 
-      <div class="flex justify-end gap-2 mt-5">
-        <button id="cancelModal" class="${btnDark()}">Cancel</button>
-        <button id="saveHw" class="${btnPrimary()}">Save</button>
+      <div class="flex justify-end gap-2">
+        <button id="cancelModal" class="btn-theme">Cancel</button>
+        <button id="saveHw" class="btn-theme">Save</button>
       </div>
     `);
 
-    qs("#saveHw")?.addEventListener("click", async () => {
+    qs("#saveHw").addEventListener("click", async () => {
       const title = qs("#hwTitle").value.trim();
       const description = qs("#hwDesc").value.trim();
       const course = qs("#hwCourse").value.trim();
-      if (!title || !course) return toast("Title + course required", "#b91c1c");
+      if (!title || !course) return toast("Title + course required", "rgba(185,28,28,.85)");
 
       let pdfUrl = hw.pdfUrl || "", pdfName = hw.pdfName || "";
       const file = qs("#hwPdf")?.files?.[0];
       try {
         if (file) {
           const up = await uploadPdf(file);
-          pdfUrl = up.url;
-          pdfName = up.originalName;
+          pdfUrl = up.url; pdfName = up.originalName;
         }
       } catch (e) {
-        return toast(e.message, "#b91c1c");
+        return toast(e.message, "rgba(185,28,28,.85)");
       }
 
       const res = await fetch(`${API}/homework/${encodeURIComponent(hw.id)}`, {
@@ -680,9 +676,10 @@
         body: JSON.stringify({ title, description, course, pdfUrl, pdfName }),
       });
 
-      if (!res.ok) return toast("Update failed", "#b91c1c");
+      if (!res.ok) return toast("Update failed", "rgba(185,28,28,.85)");
+
       closeModal();
-      toast("Homework updated", "#166534");
+      toast("Homework updated", "rgba(34,197,94,.70)");
       loadHomework();
       loadDashboard();
       loadNotifications();
@@ -691,30 +688,37 @@
 
   function openCreateUserModal() {
     showModal(`
-      <h2 class="text-xl font-semibold mb-4 text-white">Create User</h2>
-      <input id="uUsername" class="${inputClass()}" placeholder="Username" />
-      <input id="uName" class="${inputClass()} mt-3" placeholder="Full name" />
-      <input id="uPassword" type="password" class="${inputClass()} mt-3" placeholder="Password" />
+      <h2 class="text-xl font-extrabold mb-4">Create User</h2>
 
-      <select id="uRole" class="${inputClass()} mt-3">
+      <label class="text-sm font-bold muted">Username</label>
+      <input id="uUsername" class="input-theme mt-1 mb-3" placeholder="Username" />
+
+      <label class="text-sm font-bold muted">Full name</label>
+      <input id="uName" class="input-theme mt-1 mb-3" placeholder="Full name" />
+
+      <label class="text-sm font-bold muted">Password</label>
+      <input id="uPassword" type="password" class="input-theme mt-1 mb-3" placeholder="Password" />
+
+      <label class="text-sm font-bold muted">Role</label>
+      <select id="uRole" class="select-theme mt-1 mb-4">
         <option value="student">student</option>
         <option value="instructor">instructor</option>
         <option value="manager">manager</option>
       </select>
 
-      <div class="flex justify-end gap-2 mt-5">
-        <button id="cancelModal" class="${btnDark()}">Cancel</button>
-        <button id="submitUser" class="${btnPrimary()}">Create</button>
+      <div class="flex justify-end gap-2">
+        <button id="cancelModal" class="btn-theme">Cancel</button>
+        <button id="submitUser" class="btn-theme">Create</button>
       </div>
     `);
 
-    qs("#submitUser")?.addEventListener("click", async () => {
+    qs("#submitUser").addEventListener("click", async () => {
       const username = qs("#uUsername").value.trim();
       const name = qs("#uName").value.trim() || username;
       const password = qs("#uPassword").value.trim();
       const role = qs("#uRole").value;
 
-      if (!username || !password) return toast("Username + password required", "#b91c1c");
+      if (!username || !password) return toast("Username + password required", "rgba(185,28,28,.85)");
 
       const res = await fetch(`${API}/users`, {
         method: "POST",
@@ -723,10 +727,10 @@
       });
 
       const out = await safeJson(res);
-      if (!res.ok || !out?.success) return toast(out?.message || "Create failed", "#b91c1c");
+      if (!res.ok || !out?.success) return toast(out?.message || "Create failed", "rgba(185,28,28,.85)");
 
       closeModal();
-      toast("User created", "#166534");
+      toast("User created", "rgba(34,197,94,.70)");
       loadUsers();
       loadNotifications();
     });
@@ -735,31 +739,30 @@
   // ---------------- USERS ----------------
   async function loadUsers() {
     const table = qs("#usersTable");
-    if (!table) return toast("Missing #usersTable", "#b91c1c");
+    if (!table) return toast("Missing #usersTable", "rgba(185,28,28,.85)");
 
     const res = await fetch(`${API}/users`, { headers: actorHeaders() });
 
     if (res.status === 403) {
       table.innerHTML = "";
-      return toast("Forbidden: missing manager role", "#b91c1c");
+      return toast("Forbidden: missing manager role", "rgba(185,28,28,.85)");
     }
 
     const users = await safeJson(res);
     if (!Array.isArray(users)) {
       table.innerHTML = "";
-      return toast("Failed to load users", "#b91c1c");
+      return toast("Failed to load users", "rgba(185,28,28,.85)");
     }
 
     table.innerHTML = users
       .map(
         (u) => `
       <tr class="border-t border-white/10">
-        <td class="px-6 py-3 text-white/90">${esc(u.username)}</td>
-        <td class="px-6 py-3 text-white/70">${esc(u.name || "")}</td>
-        <td class="px-6 py-3 text-white/70">${esc(u.role || "")}</td>
+        <td class="px-6 py-3 font-bold">${esc(u.username)}</td>
+        <td class="px-6 py-3">${esc(u.name || "")}</td>
+        <td class="px-6 py-3">${esc(u.role || "")}</td>
         <td class="px-6 py-3 text-right">
-          <button class="del-user px-3 py-1 rounded-xl bg-white/10 hover:bg-white/15 text-red-200 border border-white/15"
-            data-username="${esc(u.username)}">Delete</button>
+          <button class="del-user btn-theme px-3 py-2" data-username="${esc(u.username)}">Delete</button>
         </td>
       </tr>
     `
@@ -769,6 +772,7 @@
     table.querySelectorAll(".del-user").forEach((btn) => {
       btn.addEventListener("click", async () => {
         const username = btn.dataset.username;
+
         if (!(await confirmDeleteUser(username))) return;
 
         const del = await fetch(`${API}/users/${encodeURIComponent(username)}`, {
@@ -777,9 +781,9 @@
         });
 
         const out = await safeJson(del);
-        if (!del.ok || !out?.success) return toast(out?.message || "Delete failed", "#b91c1c");
+        if (!del.ok || !out?.success) return toast(out?.message || "Delete failed", "rgba(185,28,28,.85)");
 
-        toast("User deleted", "#b91c1c");
+        toast("User deleted", "rgba(185,28,28,.85)");
         loadUsers();
         loadNotifications();
       });
