@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="glass">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -15,81 +15,108 @@
 
   <style>
     :root{
-      /* soft calm green (not too strong) */
-      --green: rgba(145, 235, 190, .55);
-      --green2: rgba(120, 220, 170, .45);
+      --radius-outer: 22px;
+      --radius-inner: 16px;
 
-      /* glass */
-      --glass: rgba(255,255,255,0.07);
-      --glass2: rgba(255,255,255,0.05);
-      --glassHover: rgba(255,255,255,0.12);
-      --border: rgba(255,255,255,0.18);
+      /* DEFAULT = GLASS */
+      --page-bg:
+        radial-gradient(900px 520px at 15% 10%, rgba(191,227,180,.18), transparent 60%),
+        radial-gradient(900px 520px at 88% 10%, rgba(169,214,157,.14), transparent 60%),
+        linear-gradient(180deg, rgba(3,7,6,.85) 0%, rgba(9,16,12,.88) 55%, rgba(3,7,6,.85) 100%),
+        url("/Screenshot 2025-11-05 104653.png") center/cover fixed no-repeat;
 
-      /* text */
-      --text: rgba(255,255,255,0.92);
-      --muted: rgba(255,255,255,0.72);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.70);
 
-      /* depth */
-      --shadow:
-        0 18px 50px rgba(0,0,0,0.35),
-        inset 0 1px 0 rgba(255,255,255,0.22);
+      --surface: rgba(255,255,255,.10);
+      --surface-2: rgba(255,255,255,.14);
+      --border: rgba(255,255,255,.18);
+      --shadow: 0 18px 45px rgba(0,0,0,.38);
+
+      --accent: rgba(191,227,180,.55);
+      --accent-strong: rgba(169,214,157,.85);
+
+      --btn-bg: rgba(255,255,255,.18);
+      --btn-bg-hover: rgba(255,255,255,.26);
+      --btn-text: rgba(255,255,255,.92);
+
+      --danger: rgba(248,113,113,.85);
+      --warn: rgba(251,191,36,.92);
+      --good: rgba(34,197,94,.80);
+    }
+
+    /* LIGHT */
+    html[data-theme="light"]{
+      --page-bg:
+        radial-gradient(900px 520px at 15% 10%, rgba(191,227,180,.55), transparent 60%),
+        radial-gradient(900px 520px at 88% 10%, rgba(169,214,157,.40), transparent 60%),
+        linear-gradient(180deg, #f6fbf4 0%, #eaf6e6 60%, #f6fbf4 100%);
+
+      --text: #1C1820;
+      --muted: rgba(28,24,32,.68);
+
+      --surface: rgba(255,255,255,.82);
+      --surface-2: rgba(255,255,255,.92);
+      --border: rgba(0,0,0,.10);
+      --shadow: 0 12px 28px rgba(0,0,0,.08);
+
+      --btn-bg: rgba(28,24,32,.92);
+      --btn-bg-hover: rgba(28,24,32,.82);
+      --btn-text: #e9f7e6;
+    }
+
+    /* DARK GREEN */
+    html[data-theme="dark"]{
+      --page-bg:
+        radial-gradient(900px 560px at 15% 10%, rgba(34,197,94,.18), transparent 62%),
+        radial-gradient(900px 560px at 88% 10%, rgba(16,185,129,.14), transparent 62%),
+        linear-gradient(180deg, #070b0a 0%, #0b1411 60%, #070b0a 100%);
+
+      --text: rgba(238,255,245,.92);
+      --muted: rgba(238,255,245,.68);
+
+      --surface: rgba(255,255,255,.06);
+      --surface-2: rgba(255,255,255,.10);
+      --border: rgba(255,255,255,.12);
+      --shadow: 0 18px 45px rgba(0,0,0,.55);
+
+      --btn-bg: rgba(34,197,94,.22);
+      --btn-bg-hover: rgba(34,197,94,.32);
+      --btn-text: rgba(238,255,245,.95);
     }
 
     html, body{
       font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-      color: var(--text);
     }
 
     body{
-      background: url("/Screenshot 2025-11-05 104653.png") no-repeat center center fixed;
-      background-size: cover;
+      background: var(--page-bg);
+      color: var(--text);
       min-height: 100vh;
       overflow-x: hidden;
     }
 
-    /* same trick as your login page (helps glass pop) */
-    body::before{
-      content:"";
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.45);
-      z-index: -1;
-    }
+    .muted{ color: var(--muted); }
 
-    /* extra soft green glow blobs */
-    body::after{
-      content:"";
-      position: fixed;
-      inset: -20%;
-      z-index: -2;
-      pointer-events: none;
-      background:
-        radial-gradient(520px 380px at 18% 15%, rgba(145,235,190,.25), transparent 70%),
-        radial-gradient(620px 420px at 85% 12%, rgba(120,220,170,.20), transparent 72%),
-        radial-gradient(600px 520px at 70% 85%, rgba(145,235,190,.18), transparent 70%);
-    }
-
-    /* true iOS-like glass */
-    .glass{
-      background: var(--glass);
+    /* Glass surfaces */
+    .surface{
+      background: var(--surface);
       border: 1px solid var(--border);
-      backdrop-filter: blur(22px);
-      -webkit-backdrop-filter: blur(22px);
+      border-radius: var(--radius-outer);
       box-shadow: var(--shadow);
-    }
-
-    .glass-soft{
-      background: var(--glass2);
-      border: 1px solid rgba(255,255,255,0.14);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
-      box-shadow:
-        0 10px 28px rgba(0,0,0,0.28),
-        inset 0 1px 0 rgba(255,255,255,0.18);
+    }
+    .surface-2{
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-outer);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
     }
 
-    .title-strong{ font-weight: 800; letter-spacing: -0.02em; }
-    .subtitle{ color: var(--muted); font-weight: 500; }
+    .title-strong{ font-weight: 800; letter-spacing: -0.01em; }
 
     /* nav */
     .nav-item{
@@ -97,133 +124,159 @@
       align-items:center;
       gap:10px;
       padding:10px 12px;
-      border-radius:14px;
+      border-radius: 14px;
+      font-weight: 700;
+      transition: 150ms;
       color: var(--text);
-      font-weight:700;
-      transition: 150ms ease;
-      border: 1px solid transparent;
+      opacity: .92;
     }
-    .nav-item:hover{
-      background: var(--glassHover);
-      border-color: rgba(255,255,255,0.12);
-      transform: translateX(2px);
-    }
+    html[data-theme="light"] .nav-item{ color: #1C1820; }
+    .nav-item:hover{ background: rgba(255,255,255,.10); }
+    html[data-theme="light"] .nav-item:hover{ background: rgba(0,0,0,.05); }
     .nav-item.active{
-      background: rgba(145,235,190,0.16);
-      border-color: rgba(145,235,190,0.22);
+      background: rgba(255,255,255,.14);
+      outline: 1px solid rgba(255,255,255,.22);
+    }
+    html[data-theme="light"] .nav-item.active{
+      background: rgba(28,24,32,.92);
+      color: #e9f7e6;
+      outline: none;
     }
 
     /* buttons */
-    .btn-primary{
-      background: rgba(255,255,255,0.14);
-      border: 1px solid rgba(255,255,255,0.20);
-      color: white;
+    .btn-theme{
+      background: var(--btn-bg);
+      color: var(--btn-text);
+      border: 1px solid var(--border);
       border-radius: 16px;
       padding: 10px 16px;
       font-weight: 700;
-      transition: 150ms ease;
+      transition: 150ms;
     }
-    .btn-primary:hover{
-      background: rgba(255,255,255,0.22);
-      transform: translateY(-1px);
+    .btn-theme:hover{ background: var(--btn-bg-hover); }
+
+    .icon-btn{
+      width: 42px; height: 42px;
+      border-radius: 16px;
+      display:flex; align-items:center; justify-content:center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      transition: 150ms;
+    }
+    .icon-btn:hover{ background: var(--surface-2); }
+
+    /* inputs */
+    .input-theme{
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.10);
+      color: var(--text);
+      outline: none;
+    }
+    html[data-theme="light"] .input-theme{
+      background: rgba(0,0,0,.04);
+      color: #1C1820;
+    }
+    .input-theme:focus{
+      box-shadow: 0 0 0 3px rgba(169,214,157,.25);
+      border-color: rgba(169,214,157,.50);
+    }
+
+    /* select dropdown fix (your screenshot issue) */
+    select.select-theme{
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.10);
+      color: var(--text);
+      outline: none;
+      appearance: none;
+    }
+    html[data-theme="light"] select.select-theme{
+      background: rgba(0,0,0,.04);
+      color: #1C1820;
+    }
+
+    /* makes native dropdown dark & readable in glass/dark */
+    html[data-theme="glass"] select.select-theme,
+    html[data-theme="dark"]  select.select-theme{
+      color-scheme: dark;
+    }
+    html[data-theme="glass"] select.select-theme option,
+    html[data-theme="dark"]  select.select-theme option{
+      background: #0b1220;
+      color: rgba(255,255,255,.95);
     }
 
     /* tables */
-    .table-head{
-      background: rgba(255,255,255,0.10);
-      border-bottom: 1px solid rgba(255,255,255,0.14);
-      color: rgba(255,255,255,0.72);
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: .08em;
+    .thead{
+      background: rgba(255,255,255,.10);
+      border-bottom: 1px solid var(--border);
     }
-    table td, table th{ border-color: rgba(255,255,255,0.10) !important; }
-
-    /* nicer section transitions */
-    .page-section{
-      opacity: 1;
-      transform: translateY(0);
-      transition: opacity 200ms ease, transform 220ms ease;
-    }
-    .page-section.hidden{
-      opacity: 0;
-      transform: translateY(8px);
-      pointer-events: none;
+    html[data-theme="light"] .thead{
+      background: rgba(191,227,180,.65);
     }
 
-    /* scrollbar nicer in notif list */
-    #notifList::-webkit-scrollbar{ width: 10px; }
-    #notifList::-webkit-scrollbar-thumb{
-      background: rgba(255,255,255,0.18);
-      border-radius: 999px;
-      border: 2px solid transparent;
-      background-clip: padding-box;
+    /* overlay */
+    .overlay{
+      background: rgba(0,0,0,.45);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
     }
-
-    /* Make native selects render with dark UI where supported */
-select {
-  color-scheme: dark;                 /* big one for Chromium/Edge */
-  background-color: rgba(255,255,255,0.10);
-  color: rgba(255,255,255,0.92);
-  border: 1px solid rgba(255,255,255,0.15);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-}
-
-/* Dropdown options */
-select option {
-  background-color: #0f172a;          /* dark slate */
-  color: rgba(255,255,255,0.95);
-}
-
-/* Optional: nicer hover/checked on some browsers */
-select option:checked {
-  background-color: #1d4ed8;          /* blue highlight like your screenshot */
-  color: #fff;
-}
-
   </style>
 </head>
 
-<body class="min-h-screen">
+<body>
 
   <!-- Topbar -->
-  <header class="sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between glass rounded-none lg:rounded-2xl mt-0 lg:mt-4">
+  <header class="sticky top-0 z-50 surface rounded-none border-x-0 border-t-0">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+
       <div class="flex items-center gap-3">
-        <button id="menuBtn" class="lg:hidden text-2xl leading-none hover:opacity-70 transition" aria-label="Open menu">☰</button>
+        <button id="menuBtn" class="lg:hidden text-2xl leading-none hover:opacity-80 transition" aria-label="Open menu">☰</button>
         <div class="leading-tight">
           <div class="title-strong text-[15px]">Project Manager Portal</div>
-          <div class="text-xs subtitle">Dashboard • Projects • Courses • Homework • Users</div>
+          <div class="text-xs muted">Dashboard • Projects • Courses • Homework • Users</div>
         </div>
       </div>
 
       <div class="flex items-center gap-3">
-        <span id="userName" class="text-sm font-semibold"></span>
+        <span id="userName" class="text-sm font-bold"></span>
 
-        <!-- 🔔 Notifications (manager.js expects these IDs) -->
+        <!-- Theme switcher -->
+        <div class="relative" id="themeWrap">
+          <button id="themeBtn" class="icon-btn" title="Theme">🎨</button>
+          <div id="themeMenu" class="hidden absolute right-0 mt-2 w-56 surface-2 overflow-hidden">
+            <button class="themePick w-full text-left px-4 py-3 hover:bg-white/10" data-theme="glass">Glass (default)</button>
+            <button class="themePick w-full text-left px-4 py-3 hover:bg-white/10" data-theme="light">Light (white/green)</button>
+            <button class="themePick w-full text-left px-4 py-3 hover:bg-white/10" data-theme="dark">Dark (green)</button>
+          </div>
+        </div>
+
+        <!-- Notifications -->
         <div class="relative" id="notifWrap">
-          <button id="notifBtn"
-            class="w-10 h-10 rounded-2xl glass-soft flex items-center justify-center hover:bg-white/10 transition"
-            title="Notifications">
+          <button id="notifBtn" class="icon-btn" title="Notifications">
             🔔
             <span id="notifBadge"
-              class="hidden absolute -top-1 -right-1 text-[11px] px-1.5 py-0.5 rounded-full bg-red-500 text-white font-bold">
+              class="hidden absolute -top-1 -right-1 text-[11px] px-1.5 py-0.5 rounded-full bg-red-500 text-white font-extrabold">
               0
             </span>
           </button>
 
-          <div id="notifMenu"
-            class="hidden absolute right-0 mt-2 w-80 max-w-[90vw] glass rounded-2xl overflow-hidden">
+          <div id="notifMenu" class="hidden absolute right-0 mt-2 w-80 max-w-[90vw] surface-2 overflow-hidden">
             <div class="px-4 py-3 flex items-center justify-between border-b border-white/10">
-              <div class="font-semibold">Notifications</div>
-              <button id="notifReadAll"
-                class="text-xs font-semibold px-2 py-1 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10">
+              <div class="font-bold">Notifications</div>
+              <button id="notifReadAll" class="text-xs font-bold px-3 py-1 rounded-xl btn-theme">
                 Mark all read
               </button>
             </div>
             <div id="notifList" class="max-h-80 overflow-auto"></div>
-            <div class="px-4 py-3 text-xs text-white/60 border-t border-white/10">
+            <div class="px-4 py-3 text-xs muted border-t border-white/10">
               Uploads • edits • deletes
             </div>
           </div>
@@ -231,14 +284,11 @@ select option:checked {
 
         <!-- Avatar dropdown -->
         <div id="topAvatarWrap" class="relative">
-          <div id="userAvatar"
-            class="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center font-semibold cursor-pointer select-none">
+          <div id="userAvatar" class="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center font-bold cursor-pointer select-none">
           </div>
 
-          <div id="profileMenu"
-            class="hidden absolute right-0 mt-2 w-44 glass rounded-2xl overflow-hidden z-50">
-            <button id="logoutBtn"
-              class="w-full text-left px-4 py-3 text-sm hover:bg-white/10 font-semibold">
+          <div id="profileMenu" class="hidden absolute right-0 mt-2 w-44 surface-2 overflow-hidden z-50">
+            <button id="logoutBtn" class="w-full text-left px-4 py-3 text-sm hover:bg-white/10 font-bold">
               Logout
             </button>
           </div>
@@ -253,16 +303,17 @@ select option:checked {
     <!-- Sidebar -->
     <aside id="sidebar"
       class="lg:col-span-3 fixed lg:static top-0 left-0 h-full lg:h-auto w-72 lg:w-auto
-      glass rounded-none lg:rounded-2xl p-3 shadow-md transform -translate-x-full lg:translate-x-0
-      transition-transform duration-300 z-40 flex flex-col justify-between">
+      surface rounded-none lg:rounded-[22px]
+      p-3 shadow-md transform -translate-x-full lg:translate-x-0 transition-transform duration-300
+      z-40 flex flex-col justify-between">
 
       <div>
         <div class="px-2 pt-2">
           <div class="title-strong text-sm">Menu</div>
-          <div class="text-xs subtitle">Manager navigation</div>
+          <div class="text-xs muted">Manager navigation</div>
         </div>
 
-        <div class="mt-4 text-[11px] uppercase tracking-widest opacity-70 px-2">Navigation</div>
+        <div class="mt-4 text-[11px] uppercase tracking-widest muted px-2">Navigation</div>
         <nav class="mt-2">
           <ul class="space-y-1">
             <li><a data-page="dashboard" class="nav-item active" href="#">📊 <span>Dashboard</span></a></li>
@@ -273,7 +324,7 @@ select option:checked {
           </ul>
         </nav>
 
-        <div class="mt-5 text-[11px] uppercase tracking-widest opacity-70 px-2">Create</div>
+        <div class="mt-5 text-[11px] uppercase tracking-widest muted px-2">Create</div>
         <nav class="mt-2">
           <ul class="space-y-1">
             <li><a data-page="create-homework" class="nav-item" href="#">➕ <span>Create Homework</span></a></li>
@@ -283,51 +334,48 @@ select option:checked {
         </nav>
 
         <div class="mt-6 grid grid-cols-2 gap-3 px-1">
-          <section class="glass-soft p-4 rounded-2xl">
-            <p class="text-xs subtitle">Active</p>
-            <p id="activeCoursesCount" class="text-2xl font-semibold mt-1">0</p>
+          <section class="surface-2 p-4 rounded-[18px]">
+            <p class="text-xs muted font-bold">Active</p>
+            <p id="activeCoursesCount" class="text-2xl font-extrabold mt-1">0</p>
           </section>
-          <section class="glass-soft p-4 rounded-2xl">
-            <p class="text-xs subtitle">To Grade</p>
-            <p id="toGradeCount" class="text-2xl font-semibold mt-1">0</p>
+          <section class="surface-2 p-4 rounded-[18px]">
+            <p class="text-xs muted font-bold">To Grade</p>
+            <p id="toGradeCount" class="text-2xl font-extrabold mt-1">0</p>
           </section>
         </div>
       </div>
 
       <div class="p-2">
-        <a id="sidebarLogout"
-          href="#"
-          class="block w-full rounded-2xl border border-white/15 bg-white/10 hover:bg-white/20
-                 px-4 py-3 text-left font-semibold transition">
+        <a id="sidebarLogout" href="#" class="block w-full rounded-[18px] border border-white/15 bg-white/10 hover:bg-white/15 px-4 py-3 text-left font-bold transition">
           🚪 Logout
         </a>
       </div>
     </aside>
 
-    <div id="overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-30 lg:hidden"></div>
+    <div id="overlay" class="fixed inset-0 overlay hidden z-30 lg:hidden"></div>
 
     <!-- Main -->
     <main class="lg:col-span-9 space-y-6">
 
       <!-- Dashboard -->
       <div id="dashboard" class="page-section">
-        <section class="hero rounded-2xl p-6 mb-6">
+        <section class="surface p-6 mb-6">
           <h2 class="text-2xl title-strong">Welcome, Manager!</h2>
-          <p class="subtitle mt-1">Manage courses, homework, projects, grading, and users.</p>
+          <p class="muted mt-1">Manage courses, homework, projects, grading, and users.</p>
         </section>
 
-        <section class="glass rounded-2xl p-6 mb-6">
+        <section class="surface p-6 mb-6">
           <div class="flex items-center justify-between gap-3">
             <h3 class="text-lg title-strong">All Courses</h3>
-            <div class="text-xs subtitle">System-wide overview</div>
+            <div class="text-xs muted">System-wide overview</div>
           </div>
           <div id="courses" class="grid gap-4 mt-4"></div>
         </section>
 
-        <section class="glass rounded-2xl p-6">
+        <section class="surface p-6">
           <div class="flex items-center justify-between gap-3">
             <h3 class="text-lg title-strong">Projects</h3>
-            <div class="text-xs subtitle">Quick overview</div>
+            <div class="text-xs muted">Quick overview</div>
           </div>
           <div id="dashboardProjects" class="grid gap-4 mt-4"></div>
         </section>
@@ -335,10 +383,10 @@ select option:checked {
 
       <!-- Projects -->
       <div id="projects" class="page-section hidden">
-        <section class="glass rounded-2xl p-6">
+        <section class="surface p-6">
           <div class="flex items-center justify-between">
             <h2 class="text-xl title-strong">Projects</h2>
-            <div class="text-xs subtitle">All projects</div>
+            <div class="text-xs muted">All projects</div>
           </div>
           <div id="projectsFullList" class="space-y-3 mt-4"></div>
         </section>
@@ -346,19 +394,19 @@ select option:checked {
 
       <!-- Students -->
       <div id="students" class="page-section hidden">
-        <section class="glass rounded-2xl p-6 overflow-auto">
+        <section class="surface p-6 overflow-auto">
           <div class="flex items-center justify-between">
             <h2 class="text-xl title-strong">Students & Grades</h2>
-            <div class="text-xs subtitle">View + manage grades</div>
+            <div class="text-xs muted">View students</div>
           </div>
 
           <div class="overflow-x-auto mt-4">
             <table class="min-w-full text-sm">
-              <thead class="table-head">
+              <thead class="thead text-xs uppercase">
                 <tr>
-                  <th class="px-6 py-3">Student</th>
-                  <th class="px-6 py-3">Course</th>
-                  <th class="px-6 py-3">Grade</th>
+                  <th class="px-6 py-3 text-left">Student</th>
+                  <th class="px-6 py-3 text-left">Course</th>
+                  <th class="px-6 py-3 text-left">Grade</th>
                   <th class="px-6 py-3 text-right">Actions</th>
                 </tr>
               </thead>
@@ -370,10 +418,10 @@ select option:checked {
 
       <!-- Submitted Homework -->
       <div id="submitted-homework" class="page-section hidden">
-        <section class="glass rounded-2xl p-6">
+        <section class="surface p-6">
           <div class="flex items-center justify-between">
             <h2 class="text-xl title-strong">Submitted Homework</h2>
-            <div class="text-xs subtitle">Review + manage</div>
+            <div class="text-xs muted">Review + manage</div>
           </div>
           <div id="homework-list" class="grid gap-4 mt-4"></div>
         </section>
@@ -381,10 +429,10 @@ select option:checked {
 
       <!-- Courses list -->
       <div id="submitted-courses" class="page-section hidden">
-        <section class="glass rounded-2xl p-6">
+        <section class="surface p-6">
           <div class="flex items-center justify-between">
             <h2 class="text-xl title-strong">Courses</h2>
-            <div class="text-xs subtitle">Manage all courses</div>
+            <div class="text-xs muted">Manage all</div>
           </div>
           <div id="submitted-courses-list" class="mt-4"></div>
         </section>
@@ -392,40 +440,40 @@ select option:checked {
 
       <!-- Create Homework -->
       <div id="create-homework" class="page-section hidden">
-        <section class="glass rounded-2xl p-6 min-h-[55vh] flex flex-col items-center justify-center text-center">
+        <section class="surface p-6 min-h-[55vh] flex flex-col items-center justify-center text-center">
           <h2 class="text-2xl title-strong">Create Homework</h2>
-          <p class="subtitle mt-1">Create an assignment and attach a PDF if needed.</p>
-          <button id="openCreateHw" class="btn-primary mt-5">+ Add Homework</button>
+          <p class="muted mt-1">Create an assignment and attach a PDF if needed.</p>
+          <button id="openCreateHw" class="btn-theme mt-5">+ Add Homework</button>
         </section>
       </div>
 
       <!-- Create Course -->
       <div id="create-course" class="page-section hidden">
-        <section class="glass rounded-2xl p-6 min-h-[55vh] flex flex-col items-center justify-center text-center">
+        <section class="surface p-6 min-h-[55vh] flex flex-col items-center justify-center text-center">
           <h2 class="text-2xl title-strong">Create Course</h2>
-          <p class="subtitle mt-1">Create a course with an optional PDF.</p>
-          <button id="openCreateCourse" class="btn-primary mt-5">+ Add Course</button>
+          <p class="muted mt-1">Create a course with an optional PDF.</p>
+          <button id="openCreateCourse" class="btn-theme mt-5">+ Add Course</button>
         </section>
       </div>
 
       <!-- Users -->
       <div id="users" class="page-section hidden">
-        <section class="glass rounded-2xl p-6 overflow-auto">
+        <section class="surface p-6 overflow-auto">
           <div class="flex items-center justify-between gap-3 mb-4">
             <h2 class="text-xl title-strong">Users</h2>
             <div class="flex gap-2">
-              <button id="createUserBtn" class="btn-primary">+ Create User</button>
-              <button id="refreshUsersBtn" class="btn-primary">Refresh</button>
+              <button id="createUserBtn" class="btn-theme">+ Create User</button>
+              <button id="refreshUsersBtn" class="btn-theme">Refresh</button>
             </div>
           </div>
 
           <div class="overflow-x-auto">
             <table class="min-w-full text-sm">
-              <thead class="table-head">
+              <thead class="thead text-xs uppercase">
                 <tr>
-                  <th class="px-6 py-3">Username</th>
-                  <th class="px-6 py-3">Name</th>
-                  <th class="px-6 py-3">Role</th>
+                  <th class="px-6 py-3 text-left">Username</th>
+                  <th class="px-6 py-3 text-left">Name</th>
+                  <th class="px-6 py-3 text-left">Role</th>
                   <th class="px-6 py-3 text-right">Actions</th>
                 </tr>
               </thead>
@@ -438,12 +486,10 @@ select option:checked {
     </main>
   </div>
 
-  <footer class="text-center py-6 text-xs border-t border-white/10 text-white/70">
+  <footer class="text-center py-6 text-xs muted">
     © <span id="y"></span> Project Manager Portal · Privacy · Terms
   </footer>
 
-  <!-- IMPORTANT: defer so DOM exists before manager.js runs -->
   <script src="manager.js" defer></script>
 </body>
 </html>
-
