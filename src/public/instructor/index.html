@@ -1,258 +1,143 @@
 <!doctype html>
-<html lang="en" data-theme="glass">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Student Portal</title>
+  <title>Instructor Portal</title>
+
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <!-- Inter font (cleaner + less “thick” look) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
-  /* ===================== THEME TOKENS ===================== */
-  :root{
-    --radius-outer: 18px;
-    --radius-inner: 16px;
+    :root {
+      --soft-green: #BFE3B4;
+      --soft-green-light: #E6F5E2;
+      --soft-green-dark: #A9D69D;
+      --text-dark: #1C1820;
+      --border: rgba(0,0,0,.10);
+    }
 
-    /* DEFAULT = GLASS */
-    --page-bg:
-      radial-gradient(900px 520px at 15% 10%, rgba(191,227,180,.18), transparent 60%),
-      radial-gradient(900px 520px at 88% 10%, rgba(169,214,157,.14), transparent 60%),
-      linear-gradient(180deg, rgba(3,7,6,.85) 0%, rgba(9,16,12,.88) 55%, rgba(3,7,6,.85) 100%);
+    html, body {
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      color: var(--text-dark);
+    }
 
-    --text: rgba(255,255,255,.92);
-    --muted: rgba(255,255,255,.70);
+    body {
+      background:
+        radial-gradient(900px 420px at 18% 8%, rgba(191,227,180,.55), transparent 55%),
+        radial-gradient(900px 420px at 90% 12%, rgba(169,214,157,.40), transparent 55%),
+        linear-gradient(180deg, #f2fbf0 0%, #e6f5e2 55%, #f2fbf0 100%);
+    }
 
-    --surface: rgba(255,255,255,.10);
-    --surface-2: rgba(255,255,255,.14);
-    --border: rgba(255,255,255,.18);
-    --shadow: 0 18px 45px rgba(0,0,0,.38);
+    /* Lighter typography */
+    .title-strong { font-weight: 700; letter-spacing: -0.01em; }
+    .subtitle     { font-weight: 500; opacity: .8; }
 
-    --soft-green: rgba(191,227,180,.55);
-    --soft-green-dark: rgba(169,214,157,.85);
+    /* Sidebar nav */
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      color: var(--text-dark);
+      font-weight: 600; /* lighter than before */
+      transition: 150ms;
+    }
+    .nav-item:hover {
+      background: rgba(191,227,180,0.35);
+    }
+    .nav-item.active {
+      background: rgba(28,24,32,.92);
+      color: #e9f7e6;
+    }
 
-    --btn-bg: rgba(255,255,255,.18);
-    --btn-bg-hover: rgba(255,255,255,.26);
-    --btn-text: rgba(255,255,255,.92);
-  }
+    /* Glass cards */
+    .glass {
+      background: rgba(255,255,255,.70);
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 26px rgba(0,0,0,0.06);
+      backdrop-filter: blur(12px);
+    }
 
-  /* LIGHT */
-  html[data-theme="light"]{
-    --page-bg:
-      radial-gradient(900px 520px at 15% 10%, rgba(191,227,180,.55), transparent 60%),
-      radial-gradient(900px 520px at 88% 10%, rgba(169,214,157,.40), transparent 60%),
-      linear-gradient(180deg, #f6fbf4 0%, #eaf6e6 60%, #f6fbf4 100%);
+    .hero {
+      background: linear-gradient(to bottom right, var(--soft-green), var(--soft-green-dark));
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 26px rgba(0,0,0,0.08);
+    }
 
-    --text: #162116;
-    --muted: rgba(22,33,22,.70);
-
-    --surface: rgba(255,255,255,.82);
-    --surface-2: rgba(255,255,255,.92);
-    --border: rgba(0,0,0,.10);
-    --shadow: 0 12px 28px rgba(0,0,0,.08);
-
-    --btn-bg: rgba(22,33,22,.92);
-    --btn-bg-hover: rgba(22,33,22,.82);
-    --btn-text: #e9f7e6;
-  }
-
-  /* DARK GREEN */
-  html[data-theme="dark"]{
-    --page-bg:
-      radial-gradient(900px 560px at 15% 10%, rgba(34,197,94,.18), transparent 62%),
-      radial-gradient(900px 560px at 88% 10%, rgba(16,185,129,.14), transparent 62%),
-      linear-gradient(180deg, #070b0a 0%, #0b1411 60%, #070b0a 100%);
-
-    --text: rgba(238,255,245,.92);
-    --muted: rgba(238,255,245,.68);
-
-    --surface: rgba(255,255,255,.06);
-    --surface-2: rgba(255,255,255,.10);
-    --border: rgba(255,255,255,.12);
-    --shadow: 0 18px 45px rgba(0,0,0,.55);
-
-    --btn-bg: rgba(34,197,94,.22);
-    --btn-bg-hover: rgba(34,197,94,.32);
-    --btn-text: rgba(238,255,245,.95);
-  }
-
-  /* ===================== BASE LOOK ===================== */
-  html, body{ color: var(--text); }
-  .muted{ color: var(--muted); }
-
-  body{
-    background: var(--page-bg);
-    background-attachment: fixed;
-  }
-
-  /* your animated green flow stays but only in LIGHT theme (optional) */
-  html[data-theme="light"] body{
-    background:
-      radial-gradient(900px 520px at 15% 10%, rgba(191,227,180,.55), transparent 60%),
-      radial-gradient(900px 520px at 88% 10%, rgba(169,214,157,.40), transparent 60%),
-      linear-gradient(180deg, #f6fbf4 0%, #eaf6e6 60%, #f6fbf4 100%);
-  }
-
-  /* Glass surfaces */
-  .panel, .card, .hero, .topbar, .sidebar{
-    background: var(--surface);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    border-radius: var(--radius-outer);
-  }
-  .card{ background: var(--surface-2); border-radius: var(--radius-outer); }
-
-  /* Topbar + sidebar look */
-  .topbar{ border-radius: 0; border-left: 0; border-right:0; border-top:0; }
-  .sidebar{ border-radius: 0; }
-
-  @media (min-width:1024px){
-    .sidebar{ border-radius: var(--radius-outer); }
-    .topbar{ border-radius: 0; }
-  }
-
-  /* Buttons */
-  .btn{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    gap:.5rem;
-    padding: 10px 14px;
-    border-radius: 14px;
-    font-weight: 800;
-    background: var(--btn-bg);
-    color: var(--btn-text);
-    border: 1px solid var(--border);
-    transition: .15s;
-  }
-  .btn:hover{ background: var(--btn-bg-hover); transform: translateY(-1px); }
-
-  /* Nav */
-  .nav-item{
-    display:block;
-    padding: 10px 12px;
-    border-radius: 14px;
-    font-weight: 800;
-    transition: .15s;
-    opacity: .95;
-    color: var(--text);
-  }
-  .nav-item:hover{ background: rgba(255,255,255,.10); }
-  html[data-theme="light"] .nav-item:hover{ background: rgba(0,0,0,.05); }
-
-  .nav-item.active{
-    background: rgba(255,255,255,.14);
-    outline: 1px solid rgba(255,255,255,.20);
-  }
-  html[data-theme="light"] .nav-item.active{
-    background: rgba(22,33,22,.92);
-    color: #e9f7e6;
-    outline: none;
-  }
-
-  /* Small stat boxes */
-  .stat-box{
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 14px;
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-  }
-
-  /* Icon button */
-  .icon-btn{
-    width: 40px; height: 40px;
-    border-radius: 16px;
-    display:flex; align-items:center; justify-content:center;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    transition: 150ms;
-  }
-  .icon-btn:hover{ background: var(--surface-2); }
-
-  /* Inputs */
-  input, textarea, select{
-    color: var(--text);
-  }
-  html[data-theme="glass"] select,
-  html[data-theme="dark"]  select{
-    color-scheme: dark; /* fixes dropdown menu */
-  }
-  html[data-theme="glass"] option,
-  html[data-theme="dark"]  option{
-    background: #0b1220;
-    color: rgba(255,255,255,.95);
-  }
+    .btn-primary {
+      background: rgba(28,24,32,.92);
+      color: #e9f7e6;
+      border-radius: 16px;
+      padding: 10px 16px;
+      font-weight: 600; /* lighter than before */
+      transition: 0.15s;
+    }
+    .btn-primary:hover { opacity: .92; }
   </style>
 </head>
 
 <body class="min-h-screen overflow-x-hidden">
 
-  <!-- TOPBAR -->
-  <header class="sticky top-0 z-50 topbar">
+  <!-- Topbar -->
+  <header class="sticky top-0 z-50 border-b glass">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+
       <div class="flex items-center gap-3">
-        <button id="menuBtn" class="lg:hidden text-2xl hover:opacity-75 transition">☰</button>
-
-        <div class="w-10 h-10 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center font-black">
-          S
-        </div>
-
-        <div class="leading-tight">
-          <div class="font-extrabold">Student Portal</div>
-          <div class="text-xs muted">Hofi Korsou</div>
+        <button id="menuBtn" class="lg:hidden text-2xl leading-none hover:opacity-70 transition" aria-label="Open menu">☰</button>
+        <div>
+          <div class="title-strong text-[15px]">Instructor Portal</div>
+          <div class="text-xs subtitle">Dashboard • Courses • Homework • Grades</div>
         </div>
       </div>
 
-      <div class="flex items-center gap-2">
-        <span id="userName" class="text-sm font-extrabold"></span>
+      <div class="flex items-center gap-3">
+        <span id="userName" class="text-sm font-semibold"></span>
 
-        <!-- 🎨 Theme -->
-        <div class="relative" id="themeWrap">
-          <button id="themeBtn" class="icon-btn" title="Theme">🎨</button>
-          <div id="themeMenu" class="hidden absolute right-0 mt-2 w-56 card overflow-hidden">
-            <button class="themePick w-full text-left px-4 py-3 hover:bg-white/10" data-theme="glass">Glass</button>
-            <button class="themePick w-full text-left px-4 py-3 hover:bg-white/10" data-theme="light">Light</button>
-            <button class="themePick w-full text-left px-4 py-3 hover:bg-white/10" data-theme="dark">Dark Green</button>
-          </div>
-        </div>
-
-        <!-- 🔔 Notifications (your existing student.js expects these IDs) -->
+        <!-- 🔔 Notifications -->
         <div class="relative" id="notifWrap">
-          <button id="notifBtn" class="icon-btn" title="Notifications">
+          <button id="notifBtn"
+            class="w-10 h-10 rounded-2xl glass flex items-center justify-center hover:bg-white transition"
+            title="Notifications">
             🔔
             <span id="notifBadge"
-              class="hidden absolute -top-1 -right-1 text-[11px] px-1.5 py-0.5 rounded-full bg-red-500 text-white font-extrabold">
+              class="hidden absolute -top-1 -right-1 text-[11px] px-1.5 py-0.5 rounded-full bg-red-500 text-white font-bold">
               0
             </span>
           </button>
 
-          <div id="notifMenu" class="hidden absolute right-0 mt-2 w-80 max-w-[90vw] card overflow-hidden">
-            <div class="px-4 py-3 flex items-center justify-between border-b border-white/10">
-              <div class="font-extrabold">Notifications</div>
-              <button id="notifReadAll" class="text-xs font-extrabold px-3 py-1 rounded-xl btn">
+          <div id="notifMenu"
+            class="hidden absolute right-0 mt-2 w-80 max-w-[90vw] glass rounded-2xl overflow-hidden">
+            <div class="px-4 py-3 flex items-center justify-between border-b border-black/10">
+              <div class="font-semibold">Notifications</div>
+              <button id="notifReadAll"
+                class="text-xs font-semibold px-2 py-1 rounded-xl bg-slate-100 hover:bg-slate-200">
                 Mark all read
               </button>
             </div>
             <div id="notifList" class="max-h-80 overflow-auto"></div>
-            <div class="px-4 py-3 text-xs muted border-t border-white/10">
-              Updates • edits • deletes
+            <div class="px-4 py-3 text-xs text-slate-500 border-t border-black/10">
+              Uploads • edits • deletes
             </div>
           </div>
         </div>
 
+        <!-- Avatar dropdown -->
         <div id="topAvatarWrap" class="relative">
           <div id="userAvatar"
-            class="w-9 h-9 rounded-full bg-white/10 border border-white/20
-                   flex items-center justify-center font-extrabold cursor-pointer select-none shadow-sm">
+            class="w-10 h-10 rounded-full bg-[var(--soft-green)] border border-black/10 flex items-center justify-center font-semibold cursor-pointer select-none">
           </div>
 
           <div id="profileMenu"
-            class="hidden absolute right-0 mt-2 w-44 card overflow-hidden">
-            <button id="logoutBtn" class="w-full text-left px-4 py-3 text-sm hover:bg-white/10 font-bold">
+            class="hidden absolute right-0 mt-2 w-44 glass rounded-2xl overflow-hidden">
+            <button id="logoutBtn"
+              class="w-full text-left px-4 py-3 text-sm hover:bg-black/5 font-semibold">
               Logout
             </button>
           </div>
@@ -264,123 +149,155 @@
 
   <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 px-4 py-6 relative">
 
-    <!-- SIDEBAR -->
+    <!-- Sidebar -->
     <aside id="sidebar"
-      class="lg:col-span-3 fixed lg:static top-0 left-0 h-full lg:h-auto w-72 lg:w-auto
-             sidebar p-3 shadow-md transform -translate-x-full lg:translate-x-0
-             transition-transform duration-300 z-40 flex flex-col justify-between">
+      class="lg:col-span-3 fixed lg:static top-0 left-0 h-full lg:h-auto
+      glass rounded-none lg:rounded-2xl
+      border-r lg:border border-black/10
+      p-3 shadow-md transform -translate-x-full lg:translate-x-0
+      transition-transform duration-300 ease-in-out z-40 flex flex-col justify-between">
 
       <div>
-        <div class="px-3 pt-3">
-          <div class="text-xs uppercase tracking-wider muted font-extrabold">Navigation</div>
+        <div class="px-2 pt-2">
+          <div class="title-strong text-sm">Navigation</div>
+          <div class="text-xs subtitle">Jump between sections</div>
         </div>
 
-        <nav class="mt-2">
+        <nav class="mt-4">
           <ul class="space-y-1">
-            <li><a href="#" data-page="dashboard" class="nav-item active">🏠 Dashboard</a></li>
-            <li><a href="#" data-page="courses" class="nav-item">📚 My Courses</a></li>
-            <li><a href="#" data-page="assignments" class="nav-item">📝 Assignments</a></li>
-            <li><a href="#" data-page="schedule" class="nav-item">🗓 Schedule</a></li>
-            <li><a href="#" data-page="news" class="nav-item">📰 News</a></li>
+            <li><a href="#" data-page="dashboard" class="nav-item active">🏠 <span>Dashboard</span></a></li>
+            <li><a href="#" data-page="students" class="nav-item">🎓 <span>Students & Grades</span></a></li>
+            <li><a href="#" data-page="submitted" class="nav-item">📥 <span>Submitted Homework</span></a></li>
+            <li><a href="#" data-page="my-courses" class="nav-item">📚 <span>My Courses</span></a></li>
+            <li><a href="#" data-page="create-homework" class="nav-item">📝 <span>Create Homework</span></a></li>
+            <li><a href="#" data-page="news" class="nav-item">📰 <span>News</span></a></li>
           </ul>
         </nav>
 
-        <div class="mt-5 grid grid-cols-2 gap-3 px-2">
-          <section class="stat-box">
-            <p class="text-[11px] uppercase tracking-wider muted font-extrabold">Courses</p>
-            <p id="activeCoursesCount" class="text-2xl font-extrabold leading-tight">0</p>
+        <div class="mt-6 grid grid-cols-2 gap-3">
+          <section class="glass p-4 rounded-2xl">
+            <p class="text-xs subtitle">Active courses</p>
+            <p id="activeCoursesCount" class="text-2xl font-semibold mt-1">0</p>
           </section>
-          <section class="stat-box">
-            <p class="text-[11px] uppercase tracking-wider muted font-extrabold">Assignments</p>
-            <p id="homeworkCount" class="text-2xl font-extrabold leading-tight">0</p>
+
+          <section class="glass p-4 rounded-2xl">
+            <p class="text-xs subtitle">To grade</p>
+            <p id="toGradeCount" class="text-2xl font-semibold mt-1">0</p>
           </section>
         </div>
       </div>
 
       <div class="p-2">
         <button id="sidebarLogout"
-          class="w-full rounded-2xl border border-white/15 bg-white/10 hover:bg-white/15
-                 px-4 py-3 text-left font-extrabold transition shadow-sm">
+          class="w-full rounded-2xl border border-black/10 bg-white/70 hover:bg-white
+                 px-4 py-3 text-left font-semibold transition shadow-sm">
           🚪 Logout
         </button>
       </div>
     </aside>
 
-    <div id="overlay" class="fixed inset-0 bg-black/40 hidden z-30 lg:hidden"></div>
+    <div id="overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-30 lg:hidden"></div>
 
-    <!-- MAIN -->
+    <!-- Main -->
     <main class="lg:col-span-9 space-y-6">
 
-      <!-- DASHBOARD -->
-      <section id="dashboard" class="page-section">
-        <div class="hero p-6">
-          <h2 class="text-2xl font-extrabold">Welcome back!</h2>
-          <p class="mt-1 muted">
-            Your courses and assignments update live from the same system.
-          </p>
-        </div>
+      <!-- Dashboard -->
+      <div id="dashboard" class="page-section">
+        <section class="hero rounded-2xl p-6">
+          <h2 class="text-2xl title-strong">Welcome, Teacher!</h2>
+          <p class="mt-1 subtitle">Manage your courses, homework, and grading from here.</p>
+        </section>
 
-        <div class="panel mt-6 p-6">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-extrabold">Continue</h3>
-            <a href="#" data-page="courses" class="text-sm font-extrabold underline muted hover:opacity-100">
-              View all
-            </a>
+        <section class="glass rounded-2xl p-6 mt-6">
+          <div class="flex items-center justify-between gap-3">
+            <h3 class="text-lg title-strong">My Courses</h3>
+            <div class="text-xs subtitle">Overview of what you teach</div>
+          </div>
+          <div id="courses" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4"></div>
+        </section>
+      </div>
+
+      <!-- Students -->
+      <div id="students" class="page-section hidden">
+        <section class="glass rounded-2xl p-6">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl title-strong">Students & Grades</h2>
+            <div class="text-xs subtitle">Edit grades quickly</div>
           </div>
 
-          <div id="continueCourses" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-        </div>
-      </section>
-
-      <!-- COURSES -->
-      <section id="courses" class="page-section hidden">
-        <div class="panel p-6">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-xl font-extrabold">My Courses</h2>
-            <button id="refreshCoursesBtn" class="btn">Refresh</button>
+          <div class="overflow-x-auto mt-4">
+            <table class="min-w-full text-sm text-left">
+              <thead class="bg-[rgba(191,227,180,.85)] text-[var(--text-dark)] uppercase text-[0.75rem]">
+                <tr>
+                  <th class="px-6 py-3">Student</th>
+                  <th class="px-6 py-3">Course</th>
+                  <th class="px-6 py-3">Grade</th>
+                  <th class="px-6 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="studentTable"></tbody>
+            </table>
           </div>
-          <div id="coursesGridFull" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
-        </div>
-      </section>
+        </section>
+      </div>
 
-      <!-- ASSIGNMENTS -->
-      <section id="assignments" class="page-section hidden">
-        <div class="panel p-6">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-xl font-extrabold">Assignments</h2>
-            <button id="refreshAssignmentsBtn" class="btn">Refresh</button>
+      <!-- Submitted Homework -->
+      <div id="submitted" class="page-section hidden">
+        <section class="glass rounded-2xl p-6 min-h-[60vh]">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl title-strong">Submitted Homework</h2>
+            <div class="text-xs subtitle">Review & manage submissions</div>
           </div>
-          <div id="assignmentsList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-        </div>
-      </section>
+          <div id="homework-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4"></div>
+        </section>
+      </div>
 
-      <!-- SCHEDULE -->
-      <section id="schedule" class="page-section hidden">
-        <div class="panel min-h-[50vh] flex items-center justify-center p-6">
-          <div class="text-center">
-            <div class="text-2xl font-extrabold">Schedule</div>
-            <div class="muted text-sm mt-1">Coming soon.</div>
+            <!-- My Courses -->
+      <div id="my-courses" class="page-section hidden">
+        <section class="glass rounded-2xl p-6 min-h-[60vh]">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl title-strong">My Courses</h2>
+            <div class="text-xs subtitle">Courses you’re enrolled in or teaching</div>
           </div>
-        </div>
-      </section>
+          <div id="myCoursesContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4"></div>
+        </section>
+      </div>
 
-      <!-- NEWS -->
-      <section id="news" class="page-section hidden">
-        <div class="panel min-h-[50vh] flex items-center justify-center p-6">
-          <div class="text-center">
-            <div class="text-2xl font-extrabold">News</div>
-            <div class="muted text-sm mt-1">Coming soon.</div>
-          </div>
-        </div>
-      </section>
+
+      <!-- Create Course -->
+      <div id="create-course" class="page-section hidden">
+        <section class="glass rounded-2xl p-6 min-h-[60vh] flex flex-col items-center justify-center text-center">
+          <h2 class="text-2xl title-strong">Create Course</h2>
+          <p class="subtitle mt-1">Add a new course, description, and optional PDF.</p>
+          <button id="addCourseBtn" class="btn-primary mt-5">+ Add Course</button>
+        </section>
+      </div>
+
+      <!-- Create Homework -->
+      <div id="create-homework" class="page-section hidden">
+        <section class="glass rounded-2xl p-6 min-h-[60vh] flex flex-col items-center justify-center text-center">
+          <h2 class="text-2xl title-strong">Create Homework</h2>
+          <p class="subtitle mt-1">Create an assignment and attach a PDF if needed.</p>
+          <button id="addHomeworkBtn" class="btn-primary mt-5">+ Add Homework</button>
+        </section>
+      </div>
+
+      <!-- News -->
+      <div id="news" class="page-section hidden">
+        <section class="glass rounded-2xl p-6 min-h-[60vh]">
+          <h2 class="text-2xl title-strong text-center">News</h2>
+          <p class="subtitle text-center mt-2">You can wire this page to an API later.</p>
+        </section>
+      </div>
 
     </main>
   </div>
 
-  <footer class="w-full py-6 text-center text-xs opacity-80">
-    © <span id="y"></span> Student Portal · Privacy · Terms
+  <footer class="w-full py-6 text-center text-xs border-t border-black/10 opacity-80">
+    © <span id="y"></span> Instructor Portal · Privacy · Terms
   </footer>
 
-  <script src="/students/script.js"></script>
+  <!-- Your JS -->
+  <script src="/instructor/script.js" defer></script>
 </body>
 </html>
