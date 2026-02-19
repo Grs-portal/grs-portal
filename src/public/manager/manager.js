@@ -1,4 +1,4 @@
-// manager.js
+// manager.js 
 (() => {
   const API = "/api";
   const LOGIN = "/homepage/login.html";
@@ -8,7 +8,8 @@
 
   const toast = (msg, color = "#1C1820") => {
     const t = document.createElement("div");
-    t.className = "fixed bottom-4 right-4 px-4 py-2 rounded text-white shadow z-[9999]";
+    t.className =
+      "fixed bottom-4 right-4 px-4 py-2 rounded-xl text-white shadow z-[9999] backdrop-blur-md border border-white/15";
     t.style.background = color;
     t.textContent = msg;
     document.body.appendChild(t);
@@ -40,9 +41,15 @@
     if (localStorage.getItem("role") !== "manager") return (location.href = LOGIN);
 
     const name = localStorage.getItem("userName") || "Manager";
-    qs("#userName").textContent = name;
-    qs("#y").textContent = new Date().getFullYear();
-    qs("#userAvatar").textContent = name.split(" ").map(x => x[0]).join("").toUpperCase().slice(0, 2);
+    qs("#userName") && (qs("#userName").textContent = name);
+    qs("#y") && (qs("#y").textContent = new Date().getFullYear());
+    qs("#userAvatar") &&
+      (qs("#userAvatar").textContent = name
+        .split(" ")
+        .map((x) => x[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2));
 
     setupProfile();
     setupMobileSidebar();
@@ -62,13 +69,28 @@
   }
 
   function setupProfile() {
-    qs("#userAvatar")?.addEventListener("click", () => qs("#profileMenu")?.classList.toggle("hidden"));
+    qs("#userAvatar")?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      qs("#profileMenu")?.classList.toggle("hidden");
+    });
+
     qs("#logoutBtn")?.addEventListener("click", logout);
-    qs("#sidebarLogout")?.addEventListener("click", (e) => { e.preventDefault(); logout(); });
+    qs("#sidebarLogout")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      logout();
+    });
 
     document.addEventListener("click", (e) => {
       const wrap = qs("#topAvatarWrap");
       if (wrap && !wrap.contains(e.target)) qs("#profileMenu")?.classList.add("hidden");
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        qs("#profileMenu")?.classList.add("hidden");
+        qs("#notifMenu")?.classList.add("hidden");
+        qs("#modalBg")?.remove();
+      }
     });
   }
 
@@ -78,15 +100,23 @@
     const overlay = qs("#overlay");
     if (!menuBtn || !sidebar || !overlay) return;
 
-    menuBtn.addEventListener("click", () => {
-      sidebar.classList.toggle("-translate-x-full");
-      overlay.classList.toggle("hidden");
-    });
-
-    overlay.addEventListener("click", () => {
+    const close = () => {
       sidebar.classList.add("-translate-x-full");
       overlay.classList.add("hidden");
-    });
+      document.body.style.overflow = "";
+    };
+
+    const toggle = () => {
+      const closed = sidebar.classList.contains("-translate-x-full");
+      if (closed) {
+        sidebar.classList.remove("-translate-x-full");
+        overlay.classList.remove("hidden");
+        document.body.style.overflow = "hidden";
+      } else close();
+    };
+
+    menuBtn.addEventListener("click", toggle);
+    overlay.addEventListener("click", close);
   }
 
   function setupNav() {
@@ -110,6 +140,10 @@
         if (page === "submitted-homework") await loadHomework();
         if (page === "submitted-courses") await loadCourses();
         if (page === "users") await loadUsers();
+
+        qs("#sidebar")?.classList.add("-translate-x-full");
+        qs("#overlay")?.classList.add("hidden");
+        document.body.style.overflow = "";
       });
     });
   }
@@ -117,31 +151,39 @@
   function bindButtons() {
     qs("#openCreateHw")?.addEventListener("click", openCreateHomeworkModal);
     qs("#openCreateCourse")?.addEventListener("click", openCreateCourseModal);
-
     qs("#refreshUsersBtn")?.addEventListener("click", loadUsers);
     qs("#createUserBtn")?.addEventListener("click", openCreateUserModal);
   }
 
-  // ---------------- MODAL ----------------
+  // ---------------- MODAL (GLASS) ----------------
   function showModal(html) {
     closeModal();
+
     const bg = document.createElement("div");
     bg.id = "modalBg";
-    bg.className = "fixed inset-0 bg-black/40 flex items-center justify-center z-50";
+    bg.className =
+      "fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-4";
+
     bg.innerHTML = `
-      <div class="bg-white rounded-2xl p-6 shadow-lg w-[92%] max-w-md">
+      <div class="w-full max-w-md rounded-[22px] p-6
+        bg-white/10 border border-white/20 shadow-2xl backdrop-blur-xl">
         ${html}
       </div>
     `;
+
     document.body.appendChild(bg);
 
-    bg.addEventListener("click", (e) => { if (e.target === bg) closeModal(); });
+    bg.addEventListener("click", (e) => {
+      if (e.target === bg) closeModal();
+    });
+
     bg.querySelector("#cancelModal")?.addEventListener("click", closeModal);
   }
 
-  function closeModal() { qs("#modalBg")?.remove(); }
+  function closeModal() {
+    qs("#modalBg")?.remove();
+  }
 
-  // safer account delete confirm
   async function confirmDeleteUser(username) {
     const typed = prompt(`Type the username "${username}" to confirm delete:`);
     return typed === username;
@@ -154,7 +196,8 @@
     const wrap = qs("#notifWrap");
     const readAll = qs("#notifReadAll");
 
-    btn?.addEventListener("click", async () => {
+    btn?.addEventListener("click", async (e) => {
+      e.stopPropagation();
       menu?.classList.toggle("hidden");
       if (menu && !menu.classList.contains("hidden")) await loadNotifications();
     });
@@ -164,13 +207,14 @@
       if (!wrap.contains(e.target)) menu.classList.add("hidden");
     });
 
-    readAll?.addEventListener("click", async () => {
+    readAll?.addEventListener("click", async (e) => {
+      e.stopPropagation();
       const role = localStorage.getItem("role") || "";
       const username = localStorage.getItem("username") || "";
       await fetch(`${API}/notifications/read-all`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role, username })
+        body: JSON.stringify({ role, username }),
       });
       await loadNotifications();
     });
@@ -181,12 +225,14 @@
     const username = localStorage.getItem("username") || "";
     if (!username || !["manager", "instructor"].includes(role)) return;
 
-    const res = await fetch(`${API}/notifications?role=${encodeURIComponent(role)}&username=${encodeURIComponent(username)}`);
+    const res = await fetch(
+      `${API}/notifications?role=${encodeURIComponent(role)}&username=${encodeURIComponent(username)}`
+    );
     const out = await safeJson(res);
     if (!out?.success) return;
 
     const items = out.items || [];
-    const unreadCount = items.filter(x => x.unread).length;
+    const unreadCount = items.filter((x) => x.unread).length;
 
     const badge = qs("#notifBadge");
     if (badge) {
@@ -197,58 +243,77 @@
     const list = qs("#notifList");
     if (!list) return;
 
-    list.innerHTML = items.map(n => `
-      <div class="px-4 py-3 border-b border-black/5 ${n.unread ? "bg-green-50" : ""}">
-        <div class="text-sm font-bold">${esc(n.message || "")}</div>
-        <div class="text-xs opacity-70 mt-1">
+    list.innerHTML = items
+      .map(
+        (n) => `
+      <div class="px-4 py-3 border-b border-white/10 ${n.unread ? "bg-white/10" : "bg-transparent"}">
+        <div class="text-sm font-semibold text-white/95">${esc(n.message || "")}</div>
+        <div class="text-xs text-white/60 mt-1">
           ${esc(n.byName || n.byUsername || "Someone")} · ${esc(n.byRole || "")} ·
           ${new Date(n.ts).toLocaleString()}
         </div>
       </div>
-    `).join("");
+    `
+      )
+      .join("");
   }
 
   // ---------------- DASHBOARD ----------------
   async function loadDashboard() {
     const [courses, hw] = await Promise.all([fetchJSON("/courses"), fetchJSON("/homework")]);
 
-    qs("#activeCoursesCount").textContent = courses.length;
-    qs("#toGradeCount").textContent = hw.length;
+    qs("#activeCoursesCount") && (qs("#activeCoursesCount").textContent = courses.length);
+    qs("#toGradeCount") && (qs("#toGradeCount").textContent = hw.length);
 
     const box = qs("#courses");
     if (!box) return;
 
-    box.innerHTML = courses.map(c => `
-      <div class="bg-white p-4 rounded-xl shadow border flex justify-between items-center">
+    box.innerHTML = courses
+      .map(
+        (c) => `
+      <div class="p-4 rounded-2xl border border-white/15 bg-white/10 backdrop-blur-xl shadow-lg
+                  flex justify-between items-start">
         <div>
-          <div class="font-semibold">${esc(c.title)}</div>
-          <div class="text-sm opacity-80">${esc(c.description || "")}</div>
-          <div class="text-xs opacity-60 mt-1">Type: ${esc(c.locationType || "in-person")}</div>
-          ${c.pdfUrl ? `<a class="text-xs underline text-green-800" href="${esc(c.pdfUrl)}" target="_blank">PDF: ${esc(c.pdfName || "View")}</a>` : ""}
+          <div class="font-semibold text-white/95">${esc(c.title)}</div>
+          <div class="text-sm text-white/70 mt-1">${esc(c.description || "")}</div>
+          <div class="text-xs text-white/60 mt-2">Type: ${esc(c.locationType || "in-person")}</div>
+          ${
+            c.pdfUrl
+              ? `<a class="text-xs underline text-emerald-200 hover:text-emerald-100" href="${esc(
+                  c.pdfUrl
+                )}" target="_blank">PDF: ${esc(c.pdfName || "View")}</a>`
+              : ""
+          }
         </div>
         <div class="flex gap-2">
-          <button class="edit-course px-2 py-1 rounded hover:bg-black/5" data-id="${c.id}">✏️</button>
-          <button class="del-course text-red-600 px-2 py-1 rounded hover:bg-red-50" data-id="${c.id}">🗑</button>
+          <button class="edit-course px-2 py-1 rounded-lg hover:bg-white/10" data-id="${c.id}" title="Edit">✏️</button>
+          <button class="del-course px-2 py-1 rounded-lg hover:bg-white/10 text-red-200" data-id="${c.id}" title="Delete">🗑</button>
         </div>
       </div>
-    `).join("");
+    `
+      )
+      .join("");
 
-    box.querySelectorAll(".del-course").forEach(btn => {
+    box.querySelectorAll(".del-course").forEach((btn) => {
       btn.addEventListener("click", async () => {
         const id = btn.dataset.id;
         if (!confirm("Delete course?")) return;
-        const r = await fetch(`${API}/courses/${id}`, { method: "DELETE", headers: actorHeaders() });
+        const r = await fetch(`${API}/courses/${id}`, {
+          method: "DELETE",
+          headers: actorHeaders(),
+        });
         if (!r.ok) return toast("Delete failed", "#b91c1c");
         toast("Deleted", "#b91c1c");
         loadDashboard();
+        loadNotifications();
       });
     });
 
-    box.querySelectorAll(".edit-course").forEach(btn => {
+    box.querySelectorAll(".edit-course").forEach((btn) => {
       btn.addEventListener("click", async () => {
         const id = btn.dataset.id;
         const coursesNow = await fetchJSON("/courses");
-        const found = coursesNow.find(x => String(x.id) === String(id));
+        const found = coursesNow.find((x) => String(x.id) === String(id));
         if (found) openEditCourseModal(found);
       });
     });
@@ -260,37 +325,52 @@
     const list = qs("#submitted-courses-list");
     if (!list) return;
 
-    list.innerHTML = courses.map(c => `
-      <div class="bg-white p-4 rounded-xl shadow border mb-3 flex justify-between items-center">
+    list.innerHTML = courses
+      .map(
+        (c) => `
+      <div class="p-4 rounded-2xl border border-white/15 bg-white/10 backdrop-blur-xl shadow-lg
+                  mb-3 flex justify-between items-start">
         <div>
-          <div class="font-semibold">${esc(c.title)}</div>
-          <div class="text-sm opacity-80">${esc(c.description || "")}</div>
-          <div class="text-xs opacity-60 mt-1">Type: ${esc(c.locationType || "in-person")}</div>
-          ${c.pdfUrl ? `<a class="text-xs underline text-green-800" href="${esc(c.pdfUrl)}" target="_blank">PDF: ${esc(c.pdfName || "View")}</a>` : ""}
+          <div class="font-semibold text-white/95">${esc(c.title)}</div>
+          <div class="text-sm text-white/70 mt-1">${esc(c.description || "")}</div>
+          <div class="text-xs text-white/60 mt-2">Type: ${esc(c.locationType || "in-person")}</div>
+          ${
+            c.pdfUrl
+              ? `<a class="text-xs underline text-emerald-200 hover:text-emerald-100" href="${esc(
+                  c.pdfUrl
+                )}" target="_blank">PDF: ${esc(c.pdfName || "View")}</a>`
+              : ""
+          }
         </div>
         <div class="flex gap-2">
-          <button class="edit-course px-2 py-1 rounded hover:bg-black/5" data-id="${c.id}">✏️</button>
-          <button class="del-course text-red-600 px-2 py-1 rounded hover:bg-red-50" data-id="${c.id}">🗑</button>
+          <button class="edit-course px-2 py-1 rounded-lg hover:bg-white/10" data-id="${c.id}" title="Edit">✏️</button>
+          <button class="del-course px-2 py-1 rounded-lg hover:bg-white/10 text-red-200" data-id="${c.id}" title="Delete">🗑</button>
         </div>
       </div>
-    `).join("");
+    `
+      )
+      .join("");
 
-    list.querySelectorAll(".del-course").forEach(btn => {
+    list.querySelectorAll(".del-course").forEach((btn) => {
       btn.addEventListener("click", async () => {
         const id = btn.dataset.id;
         if (!confirm("Delete course?")) return;
-        const r = await fetch(`${API}/courses/${id}`, { method: "DELETE", headers: actorHeaders() });
+        const r = await fetch(`${API}/courses/${id}`, {
+          method: "DELETE",
+          headers: actorHeaders(),
+        });
         if (!r.ok) return toast("Delete failed", "#b91c1c");
         toast("Deleted", "#b91c1c");
         loadCourses();
         loadDashboard();
+        loadNotifications();
       });
     });
 
-    list.querySelectorAll(".edit-course").forEach(btn => {
+    list.querySelectorAll(".edit-course").forEach((btn) => {
       btn.addEventListener("click", async () => {
         const id = btn.dataset.id;
-        const found = courses.find(x => String(x.id) === String(id));
+        const found = courses.find((x) => String(x.id) === String(id));
         if (found) openEditCourseModal(found);
       });
     });
@@ -302,14 +382,18 @@
     const table = qs("#studentTable");
     if (!table) return;
 
-    table.innerHTML = students.map(s => `
-      <tr class="border-t">
-        <td class="px-6 py-3">${esc(s.name)}</td>
-        <td class="px-6 py-3">${esc(s.course)}</td>
-        <td class="px-6 py-3">${s.grade ?? "-"}</td>
+    table.innerHTML = students
+      .map(
+        (s) => `
+      <tr class="border-t border-white/10">
+        <td class="px-6 py-3 text-white/90">${esc(s.name)}</td>
+        <td class="px-6 py-3 text-white/70">${esc(s.course)}</td>
+        <td class="px-6 py-3 text-white/90">${s.grade ?? "-"}</td>
         <td class="px-6 py-3 text-right"></td>
       </tr>
-    `).join("");
+    `
+      )
+      .join("");
   }
 
   // ---------------- HOMEWORK ----------------
@@ -318,37 +402,54 @@
     const list = qs("#homework-list");
     if (!list) return;
 
-    list.innerHTML = hw.map(h => `
-      <div class="bg-white p-4 rounded-xl shadow border flex justify-between items-start">
+    list.innerHTML = hw
+      .map(
+        (h) => `
+      <div class="p-4 rounded-2xl border border-white/15 bg-white/10 backdrop-blur-xl shadow-lg
+                  flex justify-between items-start">
         <div>
-          <div class="font-semibold">${esc(h.title)}</div>
-          <div class="text-sm opacity-80">${esc(h.description || "")}</div>
-          <div class="text-xs opacity-70 mt-2">By: ${esc(h.submitted_by || "N/A")} · ${esc(h.course || "")}</div>
-          ${h.pdfUrl ? `<a class="text-xs underline text-green-800" href="${esc(h.pdfUrl)}" target="_blank">PDF: ${esc(h.pdfName || "View")}</a>` : ""}
+          <div class="font-semibold text-white/95">${esc(h.title)}</div>
+          <div class="text-sm text-white/70 mt-1">${esc(h.description || "")}</div>
+          <div class="text-xs text-white/60 mt-2">By: ${esc(h.submitted_by || "N/A")} · ${esc(
+          h.course || ""
+        )}</div>
+          ${
+            h.pdfUrl
+              ? `<a class="text-xs underline text-emerald-200 hover:text-emerald-100" href="${esc(
+                  h.pdfUrl
+                )}" target="_blank">PDF: ${esc(h.pdfName || "View")}</a>`
+              : ""
+          }
         </div>
         <div class="flex gap-2">
-          <button class="edit-hw px-2 py-1 rounded hover:bg-black/5" data-id="${h.id}">✏️</button>
-          <button class="del-hw text-rose-600 px-2 py-1 rounded hover:bg-rose-50" data-id="${h.id}">🗑</button>
+          <button class="edit-hw px-2 py-1 rounded-lg hover:bg-white/10" data-id="${h.id}" title="Edit">✏️</button>
+          <button class="del-hw px-2 py-1 rounded-lg hover:bg-white/10 text-red-200" data-id="${h.id}" title="Delete">🗑</button>
         </div>
       </div>
-    `).join("");
+    `
+      )
+      .join("");
 
-    list.querySelectorAll(".del-hw").forEach(btn => {
+    list.querySelectorAll(".del-hw").forEach((btn) => {
       btn.addEventListener("click", async () => {
         const id = btn.dataset.id;
         if (!confirm("Delete homework?")) return;
-        const r = await fetch(`${API}/homework/${id}`, { method: "DELETE", headers: actorHeaders() });
+        const r = await fetch(`${API}/homework/${id}`, {
+          method: "DELETE",
+          headers: actorHeaders(),
+        });
         if (!r.ok) return toast("Delete failed", "#b91c1c");
         toast("Deleted", "#b91c1c");
         loadHomework();
         loadDashboard();
+        loadNotifications();
       });
     });
 
-    list.querySelectorAll(".edit-hw").forEach(btn => {
+    list.querySelectorAll(".edit-hw").forEach((btn) => {
       btn.addEventListener("click", async () => {
         const id = btn.dataset.id;
-        const found = hw.find(x => String(x.id) === String(id));
+        const found = hw.find((x) => String(x.id) === String(id));
         if (found) openEditHomeworkModal(found);
       });
     });
@@ -365,32 +466,44 @@
     return out; // {url, originalName}
   }
 
-  // ---------------- CREATE/EDIT MODALS ----------------
+  // ---------------- CREATE/EDIT MODALS (GLASS) ----------------
+  function inputClass() {
+    return "w-full px-3 py-2 rounded-xl bg-white/10 border border-white/15 text-white placeholder:text-white/50 outline-none focus:ring-2 focus:ring-emerald-200/40";
+  }
+
+  function btnDark() {
+    return "px-4 py-2 rounded-xl bg-white/15 hover:bg-white/20 text-white font-semibold border border-white/15";
+  }
+
+  function btnPrimary() {
+    return "px-4 py-2 rounded-xl bg-emerald-300/80 hover:bg-emerald-300 text-emerald-950 font-bold";
+  }
+
   function openCreateCourseModal() {
     showModal(`
-      <h2 class="text-xl font-semibold mb-4">Create Course</h2>
-      <input id="courseTitle" class="w-full border rounded-lg px-3 py-2 mb-3" placeholder="Title" />
-      <textarea id="courseDesc" class="w-full border rounded-lg px-3 py-2 mb-3" placeholder="Description"></textarea>
+      <h2 class="text-xl font-semibold mb-4 text-white">Create Course</h2>
+      <input id="courseTitle" class="${inputClass()}" placeholder="Title" />
+      <textarea id="courseDesc" class="${inputClass()} mt-3" placeholder="Description"></textarea>
 
-      <select id="courseType" class="w-full border rounded-lg px-3 py-2 mb-3">
+      <select id="courseType" class="${inputClass()} mt-3">
         <option value="in-person">In-person</option>
         <option value="online">Online</option>
         <option value="hybrid">Hybrid</option>
       </select>
 
-      <input id="coursePdf" type="file" accept=".pdf" class="w-full mb-4" />
+      <div class="mt-3 text-xs text-white/60">Optional PDF</div>
+      <input id="coursePdf" type="file" accept=".pdf" class="w-full mt-2 text-white/80" />
 
-      <div class="flex justify-end gap-2">
-        <button id="cancelModal" class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">Cancel</button>
-        <button id="submitCourse" class="px-4 py-2 bg-black text-white rounded-lg">Create</button>
+      <div class="flex justify-end gap-2 mt-5">
+        <button id="cancelModal" class="${btnDark()}">Cancel</button>
+        <button id="submitCourse" class="${btnPrimary()}">Create</button>
       </div>
     `);
 
-    qs("#submitCourse").addEventListener("click", async () => {
+    qs("#submitCourse")?.addEventListener("click", async () => {
       const title = qs("#courseTitle").value.trim();
       const description = qs("#courseDesc").value.trim();
       const locationType = qs("#courseType").value;
-
       if (!title) return toast("Title required", "#b91c1c");
 
       let pdfUrl = "", pdfName = "";
@@ -398,7 +511,8 @@
       try {
         if (file) {
           const up = await uploadPdf(file);
-          pdfUrl = up.url; pdfName = up.originalName;
+          pdfUrl = up.url;
+          pdfName = up.originalName;
         }
       } catch (e) {
         return toast(e.message, "#b91c1c");
@@ -411,7 +525,6 @@
       });
 
       if (!res.ok) return toast("Create course failed", "#b91c1c");
-
       closeModal();
       toast("Course created", "#166534");
       loadCourses();
@@ -422,30 +535,31 @@
 
   function openEditCourseModal(course) {
     showModal(`
-      <h2 class="text-xl font-semibold mb-4">Edit Course</h2>
-      <input id="courseTitle" class="w-full border rounded-lg px-3 py-2 mb-3" value="${esc(course.title)}" />
-      <textarea id="courseDesc" class="w-full border rounded-lg px-3 py-2 mb-3">${esc(course.description || "")}</textarea>
+      <h2 class="text-xl font-semibold mb-4 text-white">Edit Course</h2>
+      <input id="courseTitle" class="${inputClass()}" value="${esc(course.title)}" />
+      <textarea id="courseDesc" class="${inputClass()} mt-3">${esc(course.description || "")}</textarea>
 
-      <select id="courseType" class="w-full border rounded-lg px-3 py-2 mb-3">
+      <select id="courseType" class="${inputClass()} mt-3">
         <option value="in-person" ${course.locationType === "in-person" ? "selected" : ""}>In-person</option>
         <option value="online" ${course.locationType === "online" ? "selected" : ""}>Online</option>
         <option value="hybrid" ${course.locationType === "hybrid" ? "selected" : ""}>Hybrid</option>
       </select>
 
-      <div class="text-xs opacity-70 mb-2">${course.pdfUrl ? `Current PDF: ${esc(course.pdfName || "Attached")}` : "No PDF attached"}</div>
-      <input id="coursePdf" type="file" accept=".pdf" class="w-full mb-4" />
+      <div class="text-xs text-white/60 mt-3">
+        ${course.pdfUrl ? `Current PDF: ${esc(course.pdfName || "Attached")}` : "No PDF attached"}
+      </div>
+      <input id="coursePdf" type="file" accept=".pdf" class="w-full mt-2 text-white/80" />
 
-      <div class="flex justify-end gap-2">
-        <button id="cancelModal" class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">Cancel</button>
-        <button id="saveCourse" class="px-4 py-2 bg-black text-white rounded-lg">Save</button>
+      <div class="flex justify-end gap-2 mt-5">
+        <button id="cancelModal" class="${btnDark()}">Cancel</button>
+        <button id="saveCourse" class="${btnPrimary()}">Save</button>
       </div>
     `);
 
-    qs("#saveCourse").addEventListener("click", async () => {
+    qs("#saveCourse")?.addEventListener("click", async () => {
       const title = qs("#courseTitle").value.trim();
       const description = qs("#courseDesc").value.trim();
       const locationType = qs("#courseType").value;
-
       if (!title) return toast("Title required", "#b91c1c");
 
       let pdfUrl = course.pdfUrl || "", pdfName = course.pdfName || "";
@@ -453,7 +567,8 @@
       try {
         if (file) {
           const up = await uploadPdf(file);
-          pdfUrl = up.url; pdfName = up.originalName;
+          pdfUrl = up.url;
+          pdfName = up.originalName;
         }
       } catch (e) {
         return toast(e.message, "#b91c1c");
@@ -466,7 +581,6 @@
       });
 
       if (!res.ok) return toast("Update failed", "#b91c1c");
-
       closeModal();
       toast("Course updated", "#166534");
       loadCourses();
@@ -477,20 +591,21 @@
 
   function openCreateHomeworkModal() {
     showModal(`
-      <h2 class="text-xl font-semibold mb-4">Create Homework</h2>
-      <input id="hwTitle" class="w-full border rounded-lg px-3 py-2 mb-3" placeholder="Title" />
-      <textarea id="hwDesc" class="w-full border rounded-lg px-3 py-2 mb-3" placeholder="Description"></textarea>
-      <input id="hwCourse" class="w-full border rounded-lg px-3 py-2 mb-3" placeholder="Course name" />
+      <h2 class="text-xl font-semibold mb-4 text-white">Create Homework</h2>
+      <input id="hwTitle" class="${inputClass()}" placeholder="Title" />
+      <textarea id="hwDesc" class="${inputClass()} mt-3" placeholder="Description"></textarea>
+      <input id="hwCourse" class="${inputClass()} mt-3" placeholder="Course name" />
 
-      <input id="hwPdf" type="file" accept=".pdf" class="w-full mb-4" />
+      <div class="mt-3 text-xs text-white/60">Optional PDF</div>
+      <input id="hwPdf" type="file" accept=".pdf" class="w-full mt-2 text-white/80" />
 
-      <div class="flex justify-end gap-2">
-        <button id="cancelModal" class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">Cancel</button>
-        <button id="submitHw" class="px-4 py-2 bg-black text-white rounded-lg">Create</button>
+      <div class="flex justify-end gap-2 mt-5">
+        <button id="cancelModal" class="${btnDark()}">Cancel</button>
+        <button id="submitHw" class="${btnPrimary()}">Create</button>
       </div>
     `);
 
-    qs("#submitHw").addEventListener("click", async () => {
+    qs("#submitHw")?.addEventListener("click", async () => {
       const title = qs("#hwTitle").value.trim();
       const description = qs("#hwDesc").value.trim();
       const course = qs("#hwCourse").value.trim();
@@ -501,7 +616,8 @@
       try {
         if (file) {
           const up = await uploadPdf(file);
-          pdfUrl = up.url; pdfName = up.originalName;
+          pdfUrl = up.url;
+          pdfName = up.originalName;
         }
       } catch (e) {
         return toast(e.message, "#b91c1c");
@@ -514,7 +630,6 @@
       });
 
       if (!res.ok) return toast("Create homework failed", "#b91c1c");
-
       closeModal();
       toast("Homework created", "#166534");
       loadHomework();
@@ -525,21 +640,23 @@
 
   function openEditHomeworkModal(hw) {
     showModal(`
-      <h2 class="text-xl font-semibold mb-4">Edit Homework</h2>
-      <input id="hwTitle" class="w-full border rounded-lg px-3 py-2 mb-3" value="${esc(hw.title)}" />
-      <textarea id="hwDesc" class="w-full border rounded-lg px-3 py-2 mb-3">${esc(hw.description || "")}</textarea>
-      <input id="hwCourse" class="w-full border rounded-lg px-3 py-2 mb-3" value="${esc(hw.course || "")}" />
+      <h2 class="text-xl font-semibold mb-4 text-white">Edit Homework</h2>
+      <input id="hwTitle" class="${inputClass()}" value="${esc(hw.title)}" />
+      <textarea id="hwDesc" class="${inputClass()} mt-3">${esc(hw.description || "")}</textarea>
+      <input id="hwCourse" class="${inputClass()} mt-3" value="${esc(hw.course || "")}" />
 
-      <div class="text-xs opacity-70 mb-2">${hw.pdfUrl ? `Current PDF: ${esc(hw.pdfName || "Attached")}` : "No PDF attached"}</div>
-      <input id="hwPdf" type="file" accept=".pdf" class="w-full mb-4" />
+      <div class="text-xs text-white/60 mt-3">
+        ${hw.pdfUrl ? `Current PDF: ${esc(hw.pdfName || "Attached")}` : "No PDF attached"}
+      </div>
+      <input id="hwPdf" type="file" accept=".pdf" class="w-full mt-2 text-white/80" />
 
-      <div class="flex justify-end gap-2">
-        <button id="cancelModal" class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">Cancel</button>
-        <button id="saveHw" class="px-4 py-2 bg-black text-white rounded-lg">Save</button>
+      <div class="flex justify-end gap-2 mt-5">
+        <button id="cancelModal" class="${btnDark()}">Cancel</button>
+        <button id="saveHw" class="${btnPrimary()}">Save</button>
       </div>
     `);
 
-    qs("#saveHw").addEventListener("click", async () => {
+    qs("#saveHw")?.addEventListener("click", async () => {
       const title = qs("#hwTitle").value.trim();
       const description = qs("#hwDesc").value.trim();
       const course = qs("#hwCourse").value.trim();
@@ -550,7 +667,8 @@
       try {
         if (file) {
           const up = await uploadPdf(file);
-          pdfUrl = up.url; pdfName = up.originalName;
+          pdfUrl = up.url;
+          pdfName = up.originalName;
         }
       } catch (e) {
         return toast(e.message, "#b91c1c");
@@ -563,7 +681,6 @@
       });
 
       if (!res.ok) return toast("Update failed", "#b91c1c");
-
       closeModal();
       toast("Homework updated", "#166534");
       loadHomework();
@@ -574,22 +691,24 @@
 
   function openCreateUserModal() {
     showModal(`
-      <h2 class="text-xl font-semibold mb-4">Create User</h2>
-      <input id="uUsername" class="w-full border rounded-lg px-3 py-2 mb-3" placeholder="Username" />
-      <input id="uName" class="w-full border rounded-lg px-3 py-2 mb-3" placeholder="Full name" />
-      <input id="uPassword" type="password" class="w-full border rounded-lg px-3 py-2 mb-3" placeholder="Password" />
-      <select id="uRole" class="w-full border rounded-lg px-3 py-2 mb-4">
+      <h2 class="text-xl font-semibold mb-4 text-white">Create User</h2>
+      <input id="uUsername" class="${inputClass()}" placeholder="Username" />
+      <input id="uName" class="${inputClass()} mt-3" placeholder="Full name" />
+      <input id="uPassword" type="password" class="${inputClass()} mt-3" placeholder="Password" />
+
+      <select id="uRole" class="${inputClass()} mt-3">
         <option value="student">student</option>
         <option value="instructor">instructor</option>
         <option value="manager">manager</option>
       </select>
-      <div class="flex justify-end gap-2">
-        <button id="cancelModal" class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">Cancel</button>
-        <button id="submitUser" class="px-4 py-2 bg-black text-white rounded-lg">Create</button>
+
+      <div class="flex justify-end gap-2 mt-5">
+        <button id="cancelModal" class="${btnDark()}">Cancel</button>
+        <button id="submitUser" class="${btnPrimary()}">Create</button>
       </div>
     `);
 
-    qs("#submitUser").addEventListener("click", async () => {
+    qs("#submitUser")?.addEventListener("click", async () => {
       const username = qs("#uUsername").value.trim();
       const name = qs("#uName").value.trim() || username;
       const password = qs("#uPassword").value.trim();
@@ -631,22 +750,25 @@
       return toast("Failed to load users", "#b91c1c");
     }
 
-    table.innerHTML = users.map(u => `
-      <tr class="border-t">
-        <td class="px-6 py-3">${esc(u.username)}</td>
-        <td class="px-6 py-3">${esc(u.name || "")}</td>
-        <td class="px-6 py-3">${esc(u.role || "")}</td>
+    table.innerHTML = users
+      .map(
+        (u) => `
+      <tr class="border-t border-white/10">
+        <td class="px-6 py-3 text-white/90">${esc(u.username)}</td>
+        <td class="px-6 py-3 text-white/70">${esc(u.name || "")}</td>
+        <td class="px-6 py-3 text-white/70">${esc(u.role || "")}</td>
         <td class="px-6 py-3 text-right">
-          <button class="del-user px-3 py-1 rounded bg-red-100 text-red-600 hover:bg-red-200"
+          <button class="del-user px-3 py-1 rounded-xl bg-white/10 hover:bg-white/15 text-red-200 border border-white/15"
             data-username="${esc(u.username)}">Delete</button>
         </td>
       </tr>
-    `).join("");
+    `
+      )
+      .join("");
 
-    table.querySelectorAll(".del-user").forEach(btn => {
+    table.querySelectorAll(".del-user").forEach((btn) => {
       btn.addEventListener("click", async () => {
         const username = btn.dataset.username;
-
         if (!(await confirmDeleteUser(username))) return;
 
         const del = await fetch(`${API}/users/${encodeURIComponent(username)}`, {
@@ -676,10 +798,10 @@
   }
 
   async function safeJson(res) {
-    try { return await res.json(); } catch { return null; }
+    try {
+      return await res.json();
+    } catch {
+      return null;
+    }
   }
-
-  // Hook up your buttons (ensure these exist in HTML)
-  // openCreateHw button exists in your HTML already.
-  // For create course on sidebar, add a button id="openCreateCourse" wherever you want.
 })();
