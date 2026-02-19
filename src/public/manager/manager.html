@@ -159,6 +159,29 @@
       border: 2px solid transparent;
       background-clip: padding-box;
     }
+
+    /* Make native selects render with dark UI where supported */
+select {
+  color-scheme: dark;                 /* big one for Chromium/Edge */
+  background-color: rgba(255,255,255,0.10);
+  color: rgba(255,255,255,0.92);
+  border: 1px solid rgba(255,255,255,0.15);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* Dropdown options */
+select option {
+  background-color: #0f172a;          /* dark slate */
+  color: rgba(255,255,255,0.95);
+}
+
+/* Optional: nicer hover/checked on some browsers */
+select option:checked {
+  background-color: #1d4ed8;          /* blue highlight like your screenshot */
+  color: #fff;
+}
+
   </style>
 </head>
 
@@ -423,3 +446,4 @@
   <script src="manager.js" defer></script>
 </body>
 </html>
+
