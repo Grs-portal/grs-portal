@@ -27,14 +27,27 @@ const translations = {
     "mission-p": "The mission of the Green Recovery Space at Hòfi Kòrsou is to provide a safe, natural and healing environment where individuals can work on their mental wellbeing, personal recovery and emotional resilience. Through nature-based activities, peer support and accessible learning opportunities.",
     "learn-more": "Learn more -→",
 
-    "courses-h": "For Who?",
-    "courses-p": "Have doupts as to if you can fit into Green Recovery Space?",
+    "slogan-l": "A place to catch your breath",
+    "slogan-r": "and find direction again",
 
-    "projects-h": "Green Recovery Space",
-    "projects-p": "Learn more about Green Recovery Space.",
+    "who-h": "For Who?",
+    "who-p": "Have doupts as to if you can fit into Green Recovery Space?",
 
-    "mental-h": "What do we offer?",
-    "mental-p": "Want to find out all the amazing things we have to offer?",
+    "offer-h": "What do we offer?",
+    "offer-p": "Want to find out all the amazing things we have to offer?",
+
+    "believe-h": "Green Recovery Space",
+    "believe-p": "Learn more about Green Recovery Space and we offer with it.",
+
+    "main-story1": "'After months of surviving, I felt space to breathe for the first time…'",
+    "main-story-name1": "Emma, Participant",
+    "main-story2": "'I didn’t know that rest was something you could learn again…'",
+    "main-story-name2": "Jonas, Participant",
+    "main-story3": "'I discovered that recovery doesn’t have to be a straight line…'",
+    "main-story-name3": "Noor, Participant",
+    "main-story4": "'I learned that small steps can also be progress…'",
+    "main-story-name4": "Lars, Participant",
+
 
     "depression-h": "Depression",
     "depression-p": "Feelings of deep sadness and loss of interest that affect daily life.",
@@ -46,6 +59,7 @@ const translations = {
     "stress-p": "Mental and physical tension caused by high pressure or challenges.",
 
     "read-more": "Read More",
+
 
 
     // ... ✿°•∘ɷ∘•°✿ .. COURSES ... ✿°•∘ɷ∘•°✿ ..
@@ -141,15 +155,94 @@ const translations = {
     "phone": "Phone",
     "opening-h": "Opening Hours",
     "opening-p": "Mon - Fri: 9:00 AM - 5:00 PM",
-    "address": " Address: <span style='font-size: medium;'>8 Kaya Lobi, Willemstad, Curazao</span>"
+    "address": " Address: <span style='font-size: medium;'>8 Kaya Lobi, Willemstad, Curazao</span>",
     
+
+
+    // ... ✿°•∘ɷ∘•°✿ .. MENTAL HEALTH PAGES ... ✿°•∘ɷ∘•°✿ ..
+
+    //*✿°• DEPRESSION 
+    "header-depression": "Understanding Depression",
+    "header-depression-p": "A gentle guide to recognize, cope, and seek support",
+    "what-depression-h": "What is Depression?",
+    "what-depression-p": "Depression is a common mental health condition that affects how a person feels, thinks, and manages daily activities. It is more than occasional sadness and can persist for weeks, months, or even years. Symptoms may include persistent low mood, lack of motivation, changes in sleep or appetite, and a feeling of emptiness. Recognizing depression is the first step to recovery, and understanding that it is a medical condition, not a personal weakness, is crucial for self-compassion.",
+    "causes-depression-h": "Causes and Triggers",
+    "causes-depression-p": "Depression can result from a combination of genetic, biological, environmental, and psychological factors. Stressful life events, chronic illness, trauma, and social isolation can act as triggers. Brain chemistry and hormone imbalances may also contribute. It is important to remember that no single cause exists, and each person's experience is unique. Understanding the underlying triggers can help in finding the right treatment and coping mechanisms.",
+    "seeking-help-depression-h": "Seeking Help and Recovery",
+    "seeking-help-depression-p": "There are many ways to manage and recover from depression. Professional help, such as therapy or medication, can be life-changing. Building a support network of family and friends, practicing self-care routines, and engaging in physical activity also promote wellbeing. Recovery is a journey, and small steps matter. Remember, reaching out for help is a sign of strength, and no one should face depression alone.",
+    "highlight-depression": "Remember: Depression does not define you. And it's okay to ask for help. You are not alone, and support is always available.",
+
+
+    //*✿°• ANXIETY
+    "header-anxiety": "Understanding Anxiety",
+    "header-anxiety-p": "A gentle guide to recognize, cope, and seek support",
+    "what-anxiety-h": "What is Anxiety?",
+    "what-anxiety-p": "Anxiety is a common mental health condition that affects how a person thinks, feels, and responds to everyday situations. While occasional anxiety is a normal reaction to stress, anxiety disorders involve persistent and excessive worry that can interfere with daily life. Symptoms may include constant nervousness, racing thoughts, restlessness, difficulty concentrating, rapid heartbeat, or a sense of impending danger. Understanding anxiety helps reduce fear around it and reinforces that it is a real condition, not something someone can simply “snap out of.”",
+    "causes-anxiety-h": "Causes and Triggers",
+    "causes-anxiety-p": "Anxiety can develop from a mix of genetic, psychological, and environmental factors. Stressful life experiences, trauma, ongoing pressure, or major life changes can trigger anxiety symptoms. Brain chemistry, personality traits, and learned behaviors also play a role. Sometimes anxiety appears without a clear cause, which can be frustrating and confusing. Recognizing personal triggers is an important step toward managing anxiety more effectively and regaining a sense of control.",
+    "seeking-help-anxiety-h": "Seeking Help and Recovery",
+    "seeking-help-anxiety-p": "Anxiety is treatable, and many people find relief with the right support. Therapy, such as cognitive behavioral therapy (CBT), can help identify thought patterns that fuel anxiety and teach practical coping strategies. Medication may also be helpful for some individuals. Alongside professional support, techniques like mindfulness, regular exercise, healthy routines, and breathing exercises can reduce symptoms over time. Recovery is not always linear, but progress is possible, and support makes a real difference.",
+    "highlight-anxiety": "Remember: Anxiety does not define you. Help is available, and you deserve to feel safe, supported, and understood.",
+
+    //*✿°• STRESS
+    "header-stress": "Understanding Stress",
+    "header-stress-p": "A gentle guide to recognize, cope, and seek support",
+    "what-is-stress-h": "What is Stress?",
+    "what-is-stress-p": "Stress is the body’s natural response to pressure, challenges, or demands. In small amounts, stress can be motivating and help us stay focused. However, when stress becomes constant or overwhelming, it can negatively affect both mental and physical health. Common symptoms include tension, irritability, fatigue, headaches, trouble sleeping, and difficulty concentrating. Understanding stress is important, as unmanaged stress can slowly build up and impact overall wellbeing.",
+    "causes-stress-h": "Causes and Triggers",
+    "causes-stress-p": "Stress can be caused by a wide range of factors, including work or school pressure, financial concerns, relationship issues, health problems, or major life changes. Even positive events, such as moving or starting something new, can be stressful. Long-term exposure to stress, especially without enough rest or support, can increase the risk of burnout. Identifying personal stressors helps in finding healthier ways to cope and reduce their impact.",
+    "seeking-help-stress-h": "Seeking Help and Recovery",
+    "seeking-help-stress-p": "Managing stress starts with recognizing limits and prioritizing self-care. Techniques such as setting boundaries, organizing tasks, practicing relaxation exercises, and maintaining a healthy routine can significantly reduce stress levels. Physical activity, adequate sleep, and time away from screens also play an important role. If stress feels unmanageable, speaking to a therapist or counselor can provide valuable tools and guidance. Recovery from stress is about balance, not perfection, and small changes can lead to meaningful improvement.",
+    "highlight-stress": "Remember: Feeling stressed does not mean you are failing. Taking care of yourself is essential, and support is always available.",
+
+
+    // ... ✿°•∘ɷ∘•°✿ .. FOR WHO PAGE ... ✿°•∘ɷ∘•°✿ ..
+
+   "forwho-title": "Who is the Green Recovery Space for?", 
+    "forwho-p": "The Green Recovery Space is there for anyone who needs rest, recovery, and a renewed sense of direction. You don't need a label, diagnosis, or referral. You're not committed to anything.",
+    "forwho-welcome": "Everyone is welcome",
+    "forwho-no-diagnosis": "No diagnosis required",
+    "forwho-voluntary": "Voluntary participation,<br>at your own pace",
+    "forwho-invite": "Whether you're stuck due to stress, loss, mental health issues, overload, or simply feel like things aren't going well, you're welcome to explore together what will help you.",
+
+    "forwho-recognition-title": "Perhaps you recognize one or more of these situations:",
+    "forwho-recognition-list-item1": "Your mind never really stops",
+    "forwho-recognition-list-item2": "You've lost your connection with yourself",
+    "forwho-recognition-list-item3": "Everything takes effort, even things that used to come naturally",
+    "forwho-recognition-list-item4": "You're looking for peace, stability, or meaning, but you don't know how",
+  
+    "forwho-recognition-reassurance": "You don't have to be able to explain this clearly.",
+    "forwho-recognition-closing": "At the Green Recovery Space, you can start where you are now. At the Green Recovery Space, you can start where you are now.",  
+    "forwho-expectation-title": "What can you expect?",
+    
+    "who-card1-h": "Peace & Safety",
+    "who-card1-p": "A place where you don't have to prove anything. Plenty of space, in nature and dedicated to your process.",
+    "who-card2-h": "Grow at your own pace",
+    "who-card2-p": "We offer support through activities, rhythm, and presence without obligations or performance pressure.",
+    "who-card3-h": "Meeting",
+    "who-card3-p": "You meet others who are also working on recovery. Meeting is free of obligation: participate, listen, or simply be alone for a while.",
+    "who-card4-h": "Light structure",
+    "who-card4-p": "You meet others who are also working on recovery. Meeting is free of obligation: participate, listen, or simply be alone for a while.",
+
+    "what-is-title":"What it is (and what it isn't)", 
+    "what-is-p1": "The <strong>Green Recovery Space</strong> is not a replacement for regular care, but a supplement to it. For many people, this is a valuable addition to therapy, guidance, or other forms of care. Sometimes before, sometimes during, and sometimes after a care program. But even without a care program, you are very welcome at Green Recovery Space.", 
+    "what-is-p2": "For intensive or acute care needs, we are happy to discuss with you what is appropriate and where you can go.", 
+
+
+    "faq-title": "Frequently Asked Questions", 
+    "faq-question1": "Do I need a diagnosis?", 
+    "faq-answer1": "No. The Green Recovery Space is diagnosis-free and starts from your own experience.", 
+    "faq-question2": "Does it cost money?", 
+    "faq-answer2": "No, participation is free.", 
+    "faq-question3": "Should I be able to do or achieve something?",
+    "faq-answer3": "No. You don't have to be able to do anything or perform at all. Just being there is enough.",
+    "faq-question4": "What if things don't work out for a while?",
+    "faq-answer4": "That's okay. You can always let us know what you need, take a break, or keep your distance for a while. We'll be happy to help.",
 
   },
 
 
-  /* ══✿══╡°˖✧᯽  DUTCH TRANSLATION ᯽✧˖°╞══✿══ */
-
-
+    /* ══✿══╡°˖✧᯽  DUTCH TRANSLATION ᯽✧˖°╞══✿══ */
   nl: {
 
     // ... ✿°•∘ɷ∘•°✿ .. HOME ... ✿°•∘ɷ∘•°✿ ..
@@ -173,14 +266,26 @@ const translations = {
     "mission-p": "De missie van de Green Recovery Space in Hòfi Kòrsou is het bieden van een veilige, natuurlijke en helende omgeving waar mensen kunnen werken aan hun mentale welzijn, persoonlijk herstel en emotionele veerkracht. Dit gebeurt door middel van activiteiten in de natuur, steun van lotgenoten en toegankelijke leermogelijkheden.",
     "learn-more": "Lees meer -→",
 
-    "courses-h": "Onze Cursussen",
-    "courses-p": "Ontdek de cursussen die wij met zorg hebben samengesteld.",
+    "slogan-l": "Een plek om op adem te komen",
+    "slogan-r": "en weer richting te vinden",
 
-    "projects-h": "Onze Projecten",
-    "projects-p": "Bekijk onze projecten en workshops.",
+    "who-h": "Voor wie?",
+    "who-p": "Twijfel je of je bij Green Recovery Space past?",
 
-    "mental-h": "Mentale Gezondheid",
-    "mental-p": "Leer meer over mentale gezondheid en welzijn.",
+    "offer-h": "Wat bieden we aan?",
+    "offer-p": "Wil je ontdekken wat we allemaal te bieden hebben?",
+
+    "believe-h": "Green Recovery Space",
+    "believe-p": "Kom meer te weten over Green Recovery Space en wat we te bieden hebben.",
+
+    "main-story1": "'Na maanden overleven voelde ik voor het eerst de ruimte om te ademen...'",
+    "main-story-name1": "Emma, ​​deelnemer",
+    "main-story2": "'Ik wist niet dat rust iets was wat je opnieuw kon leren...'",
+    "main-story-name2": "Jonas, deelnemer",
+    "main-story3": "'Ik ontdekte dat herstel geen rechte lijn hoeft te zijn...'",
+    "main-story-name3": "Noor, deelnemer",
+    "main-story4": "'Ik leerde dat kleine stapjes ook vooruitgang kunnen betekenen...'",
+    "main-story-name4": "Lars, deelnemer",
 
     "depression-h": "Depressie",
     "depression-p": "Gevoelens van diepe somberheid en verlies van interesse in het dagelijks leven.",
@@ -285,7 +390,85 @@ const translations = {
     "phone": "Telefoonnummer",
     "opening-h": "Openingstijden",
     "opening-p": "Ma - vr: 9:00 AM - 5:00 PM",
-    "address": "Adres: <span style='font-size: medium;'>8 Kaya Lobi, Willemstad, Curaçao</span>"
+    "address": "Adres: <span style='font-size: medium;'>8 Kaya Lobi, Willemstad, Curaçao</span>",
+
+
+    // ... ✿°•∘ɷ∘•°✿ .. MENTAL HEALTH PAGES ... ✿°•∘ɷ∘•°✿ ..
+
+    "header-depression": "Depressie begrijpen",
+    "header-depression-p": "Een zachte gids om depressie te herkennen, ermee om te gaan en steun te zoeken",
+    "what-depression-h": ​​"Wat is depressie?",
+    "what-depression-p": "Depressie is een veelvoorkomende psychische aandoening die van invloed is op hoe iemand zich voelt, denkt en dagelijkse activiteiten uitvoert. Het is meer dan af en toe een somber gevoel en kan weken, maanden of zelfs jaren aanhouden. Symptomen kunnen zijn: een aanhoudend sombere stemming, gebrek aan motivatie, veranderingen in slaap of eetlust en een gevoel van leegte. Het herkennen van depressie is de eerste stap naar herstel, en begrijpen dat het een medische aandoening is, geen persoonlijke zwakte, is cruciaal voor zelfcompassie.",
+    "causes-depression-h": ​​"Oorzaken en triggers",
+    "causes-depression-p": "Depressie kan het gevolg zijn van een combinatie van genetische, biologische, omgevings- en psychologische factoren. Stressvolle levensgebeurtenissen, chronische ziekten, trauma en sociaal isolement kunnen als triggers fungeren. Hersenchemie en hormonen Ook onevenwichtigheden kunnen een rol spelen. Het is belangrijk om te onthouden dat er geen enkele oorzaak is en dat de ervaring van elke persoon uniek is. Inzicht in de onderliggende triggers kan helpen bij het vinden van de juiste behandeling en copingmechanismen.",
+    "seeking-help-depression-h": ​​"Hulp zoeken en herstel",
+    "seeking-help-depression-p": "Er zijn veel manieren om met depressie om te gaan en ervan te herstellen. Professionele hulp, zoals therapie of medicatie, kan een leven veranderen. Het opbouwen van een ondersteunend netwerk van familie en vrienden, het beoefenen van zelfzorgroutines en het deelnemen aan lichamelijke activiteit bevorderen ook het welzijn. Herstel is een reis en kleine stappen zijn belangrijk. Onthoud dat hulp vragen een teken van kracht is en dat niemand depressie alleen hoeft te doorstaan.",
+    "highlight-depression": "Onthoud: depressie definieert je niet. En het is oké om hulp te vragen. Je bent niet alleen en er is altijd steun beschikbaar.",
+
+    //*✿°• ANXIETY
+    "header-anxiety": "Angst begrijpen",
+    "header-anxiety-p": "Een zachte gids om angst te herkennen, ermee om te gaan en steun te zoeken",
+    "what-anxiety-h": "Wat is angst?",
+    "what-anxiety-p": "Angst is een veelvoorkomende psychische aandoening die van invloed is op hoe iemand denkt, zich voelt en reageert op dagelijkse situaties. Hoewel af en toe angst een normale reactie op stress is, betekent angststoornis dat er een aanhoudende en overmatige zorg is die het dagelijks leven belemmerd. Symptomen kunnen zijn: constante nerveusheid, snel opeenvolgende gedachten, rusteloosheid, moeilijkheden met concentratie, snelle hartslag of een gevoel van aankomende gevaar. Het begrijpen van angst helpt om de angst rondom het verlagen en benadrukt dat het een echte aandoening is, geen iets dat iemand gewoon 'eruit kan snapen'.",
+    "causes-anxiety-h": "Oorzaken en triggers",
+    "causes-anxiety-p": "Angst kan ontstaan door een combinatie van genetische, psychologische en omgevingsfactoren. Stressvolle levenservaringen, trauma's, voortdurende druk of grote levensveranderingen kunnen symptomen van angst veroorzaken. Hersenchemie, persoonlijkheidseigenschappen en geleerde gedragingen spelen ook een rol. Soms ontstaat angst zonder duidelijke oorzaak, wat frustrerend en verward kan zijn. Het herkennen van persoonlijke triggers is een belangrijke stap naar het effectiever beheersen van angst en het terugwinnen van een gevoel van controle.",
+    "seeking-help-anxiety-h": "Hulp zoeken en herstel",
+    "seeking-help-anxiety-p": "Angst is behandelbaar, en veel mensen vinden verlichting met de juiste steun. Therapie, zoals cognitieve gedragstherapie (CGT), kan helpen om gedachtoppattingen te identificeren die angst voeden en praktische copingstrategieën te leren. Medicatie kan ook nuttig zijn voor sommige individuen. Naast professionele hulp kunnen technieken zoals mindfulnes, regelmatige lichaamsbeweging, gezonde routines en ademhalingsoefeningen symptomen op de lange termijn verminderen. Herstel is niet altijd lineair, maar voortgang is mogelijk, en steun maakt een echte verschil.",
+    "highlight-anxiety": "Onthoud: angst definieert je niet. Er is steun beschikbaar, en je verdient het om veilig, ondersteund en begrepen te voelen.",
+
+    //*✿°• STRESS
+    "header-stress": "Stress begrijpen",
+    "header-stress-p": "Een zachte gids om stress te herkennen, ermee om te gaan en steun te zoeken",
+    "what-is-stress-h": "Wat is stress?",
+    "what-is-stress-p": "Stress is de natuurlijke reactie van het lichaam op druk, uitdagingen of eisen. In kleine hoeveelheden kan stress motiverend werken en ons helpen gefocust te blijven. Wanneer stress echter constant of overweldigend wordt, kan het een negatieve invloed hebben op zowel de mentale als de fysieke gezondheid. Veelvoorkomende symptomen zijn spanning, prikkelbaarheid, vermoeidheid, hoofdpijn, slaapproblemen en concentratieproblemen. Het is belangrijk om stress te begrijpen, omdat onbeheerde stress zich langzaam kan opbouwen en het algehele welzijn kan beïnvloeden.",
+    "causes-stress-h": "Oorzaken en triggers",
+    "causes-stress-p": "Stress kan worden veroorzaakt door een breed scala aan factoren, waaronder werk- of schooldruk, financiële zorgen, relatieproblemen, gezondheidsproblemen of grote levensveranderingen. Zelfs positieve gebeurtenissen, zoals verhuizen of een nieuwe start, kunnen stress veroorzaken. Iets nieuws kan stressvol zijn. Langdurige blootstelling aan stress, vooral zonder voldoende rust of steun, kan het risico op een burn-out verhogen. Het identificeren van persoonlijke stressfactoren helpt bij het vinden van gezondere manieren om ermee om te gaan en de impact ervan te verminderen.",
+    "seeking-help-stress-h": "Hulp zoeken en herstel",
+    "seeking-help-stress-p": "Stress beheersen begint met het erkennen van grenzen en het prioriteren van zelfzorg. Technieken zoals het stellen van grenzen, het organiseren van taken, het beoefenen van ontspanningsoefeningen en het aanhouden van een gezonde routine kunnen het stressniveau aanzienlijk verlagen. Lichaamsbeweging, voldoende slaap en tijd weg van schermen spelen ook een belangrijke rol. Als stress onbeheersbaar aanvoelt, kan een gesprek met een therapeut of counselor waardevolle hulpmiddelen en begeleiding bieden. Herstel van stress draait om balans, niet om perfectie, en kleine veranderingen kunnen leiden tot betekenisvolle verbetering.",
+    "highlight-stress": "Onthoud: stress ervaren betekent niet dat je faalt. Goed voor jezelf zorgen is essentieel en er is altijd steun beschikbaar.",
+
+
+       // ... ✿°•∘ɷ∘•°✿ .. FOR WHO PAGE ... ✿°•∘ɷ∘•°✿ ..
+    
+    "forwho-title": "Voor wie is de Green Recovery Space bedoeld?",
+    "forwho-p": "De Green Recovery Space is er voor iedereen die rust, herstel en een hernieuwd gevoel van richting nodig heeft. Je hebt geen label, diagnose of verwijzing nodig. Je bent nergens toe verplicht.",
+    "forwho-welcome": "Iedereen is welkom",
+    "forwho-no-diagnosis": "Geen diagnose vereist",
+    "forwho-voluntary": "Vrijwillige deelname,<br>in je eigen tempo",
+    "forwho-invite": "Of je nu vastloopt door stress, verlies, psychische problemen, overbelasting of gewoon het gevoel hebt dat het niet goed gaat, je bent van harte welkom om samen te onderzoeken wat jou kan helpen.",
+    
+    "forwho-recognition-title": "Misschien herken je een of meer van deze situaties:",
+    "forwho-recognition-list-item1": "Je verstand stopt nooit echt",
+    "forwho-recognition-list-item2": "Je hebt je verbinding met jezelf verloren",
+    "forwho-recognition-list-item3": "Alles kost moeite, zelfs dingen die vroeger natuurlijk waren",
+    "forwho-recogndition-list-item4": "Je zoekt rust, stabiliteit of betekenis, maar je weet niet hoe",
+    "forwho-recognition-reassurance": "Je hoeft dit niet duidelijk uit te kunnen leggen.",
+    "forwho-recognition-closing": "Bij de Green Recovery Space kun je beginnen waar je nu bent. Bij de Green Recovery Space kun je beginnen waar je nu bent.", 
+    "forwho-recognition-closing": "Bij Green Recovery Space kun je beginnen waar je nu bent. Bij Green Recovery Space kun je beginnen waar je nu bent.",
+    "forwho-expectation-title": "Wat kun je verwachten?",
+    
+    "who-card1-h": "Rust en veiligheid",
+    "who-card1-p": "Een plek waar je niets hoeft te bewijzen. Volop ruimte, in de natuur en volledig gericht op jouw proces.",
+    "who-card2-h": "Groei in je eigen tempo",
+    "who-card2-p": "We bieden ondersteuning door middel van activiteiten, ritme en aanwezigheid, zonder verplichtingen of prestatiedruk.",
+    "who-card3-h": "Ontmoeting",
+    "who-card3-p": "Je ontmoet anderen die ook aan hun herstel werken. De ontmoeting is vrijblijvend: doe mee, luister of wees gewoon even alleen.",
+    "who-card4-h": "Lichte structuur",
+    "who-card4-p": "Je ontmoet anderen die ook aan hun herstel werken. De ontmoeting is vrijblijvend: doe mee, luister of wees gewoon even alleen.",
+
+    "what-is-title": "Wat het is (en wat het niet is)",
+    "what-is-p1": "De <strong>Green Recovery Space</strong> is geen vervanging voor reguliere zorg, maar een aanvulling daarop. Voor veel mensen is dit een waardevolle aanvulling op therapie, begeleiding of andere vormen van zorg. Soms ervoor, soms tijdens en soms erna. Maar ook zonder zorgprogramma bent u van harte welkom bij Green Recovery Space.",
+    "what-is-p2": "Voor intensieve of acute zorgbehoeften bespreken we graag met u wat passend is en waar u terecht kunt.",
+    
+    "faq-title": "Veelgestelde vragen",
+    "faq-question1": "Heb ik een diagnose nodig?",
+    "faq-answer1": "Nee. Green Recovery Space is diagnosevrij en begint vanuit uw eigen ervaring.",
+    "faq-question2": "Kost het geld?",
+    "faq-answer2": "Nee, deelname is gratis.",
+    "faq-vraag3": "Moet ik iets kunnen doen of bereiken?",
+    "faq-antwoord3": "Nee. Je hoeft helemaal niets te kunnen doen of presteren. Alleen al je aanwezigheid is voldoende.",
+    "faq-vraag4": "Wat als het een tijdje niet lukt?",
+    "faq-antwoord4": "Dat is oké. Je kunt ons altijd laten weten wat je nodig hebt, een pauze nemen of een tijdje afstand houden. We helpen je graag."
 
 
   },
@@ -317,14 +500,26 @@ const translations = {
   "mission-p": "La misión del Green Recovery Space en Hòfi Kòrsou es proporcionar un entorno seguro, natural y sanador donde las personas puedan trabajar en su bienestar mental, recuperación personal y resiliencia emocional. A través de actividades basadas en la naturaleza, apoyo entre pares y oportunidades de aprendizaje accesibles.",
   "learn-more": "Saber más →",
 
-  "courses-h": "Nuestros Cursos",
-  "courses-p": "Aprende más sobre los increíbles cursos que ofrecemos.",
+  "slogan-l": "Un lugar para recuperar el aliento",
+  "slogan-r": "y encontrar el rumbo",
 
-  "projects-h": "Nuestros Proyectos",
-  "projects-p": "Aprende más sobre nuestros proyectos y talleres que ofrecemos.",
+  "who-h": "¿Para quién?",
+  "who-p": "¿Tienes dudas sobre si puedes integrarte en el Espacio de Recuperación Verde?",
 
-  "mental-h": "Concienciación sobre la Salud Mental",
-  "mental-p": "Aprende más sobre la salud mental",
+  "offer-h": "¿Qué ofrecemos?",
+  "offer-p": "¿Quieres descubrir todo lo increíble que ofrecemos?",
+
+  "believe-h": "Espacio de Recuperación Verde",
+  "believe-p": "Descubre más sobre el Espacio de Recuperación Verde y lo que ofrecemos.",
+
+  "main-story1": "'Después de meses de sobrevivir, sentí un espacio para respirar por primera vez…'",
+  "main-story-name1": "Emma, ​​Participante",
+  "main-story2": "'No sabía que el descanso era algo que se podía aprender de nuevo…'",
+  "main-story-name2": "Jonas, Participante",
+  "main-story3": "'Descubrí que la recuperación No tiene por qué ser una línea recta…'",
+  "main-story-name3": "Noor, Participante",
+  "main-story4": "Aprendí que los pequeños pasos también pueden ser progreso…'",
+  "main-story-name4": "Lars, Participante",
 
   "depression-h": "Depresión",
   "depression-p": "Sentimientos de profunda tristeza y pérdida de interés que afectan la vida diaria.",
@@ -425,13 +620,48 @@ const translations = {
   "opening-h": "Horario de Atención",
   "opening-p": "Lun - Vie: 9:00 AM - 5:00 PM",
   "address": "Dirección: <span style='font-size: medium;'>8 Kaya Lobi, Willemstad, Curazao</span>"
-}
+},
+
+
+  // ... ✿°•∘ɷ∘•°✿ .. MENTAL HEALTH PAGES ... ✿°•∘ɷ∘•°✿ ..
+
+  "header-depression": "Entendiendo la depresión",
+  "header-depression-p": "Una guía sencilla para reconocer la depresión, afrontarla y encontrar apoyo",
+  "what-depression-h": ​​​​​​"¿Qué es la depresión?",
+  "what-depression-p": "La depresión es un trastorno mental común que afecta la forma en que una persona se siente, piensa y realiza sus actividades diarias. Es más que un simple bajón ocasional y puede durar semanas, meses o incluso años. Los síntomas pueden incluir un estado de ánimo bajo persistente, falta de motivación, cambios en el sueño o el apetito, y una sensación de vacío. Reconocer la depresión es el primer paso hacia la recuperación, y comprender que es una condición médica, no una debilidad personal, es crucial para la autocompasión.",
+  "causes-depression-h": ​​​​​​"Causas y desencadenantes",
+  "causes-depression-p": "La depresión puede resultar de una combinación de factores genéticos, biológicos, ambientales y psicológicos. Los eventos vitales estresantes, las enfermedades crónicas, los traumas y el aislamiento social pueden actuar como Desencadenantes. La química cerebral y los desequilibrios hormonales también pueden influir. Es importante recordar que no existe una única causa y que la experiencia de cada persona es única. Comprender los desencadenantes subyacentes puede ayudar a orientar el tratamiento y los mecanismos de afrontamiento.",
+  "seeking-help-depression-h": ​​​​"Buscando ayuda y recuperación",
+  "seeking-help-depression-p": "Hay muchas maneras de afrontar y recuperarse de la depresión. La ayuda profesional, como la terapia o la medicación, puede cambiar la vida. Construir una red de apoyo con familiares y amigos, practicar rutinas de autocuidado y participar en actividad física también promueven el bienestar. La recuperación es un camino, y los pequeños pasos son importantes. Recuerda que pedir ayuda es señal de fortaleza, y nadie tiene que afrontar la depresión solo.",
+  "highlight-depression": "Recuerda: la depresión no te define. Y está bien pedir ayuda. No estás solo, y siempre hay apoyo disponible.",
+  
+  //*✿°• ANXIETY
+  "header-anxiety": "Entendiendo la Ansiedad",
+  "header-anxiety-p": "Una guía sencilla para reconocer, afrontar y encontrar apoyo para la ansiedad",
+  "what-anxiety-h": "¿Qué es la ansiedad?",
+  "what-anxiety-p": "La ansiedad es un trastorno de salud mental común que afecta la forma en que una persona piensa, siente y reacciona ante situaciones cotidianas. Si bien la ansiedad ocasional es una respuesta normal al estrés, el trastorno de ansiedad implica una preocupación persistente y excesiva que interfiere con la vida diaria. Los síntomas pueden incluir nerviosismo constante, pensamientos acelerados, inquietud, dificultad para concentrarse, taquicardia o sensación de peligro inminente. Comprender la ansiedad ayuda a reducir la ansiedad que la rodea y enfatiza que es una condición real, no algo de lo que alguien pueda simplemente 'salir'",
+  "causes-anxiety-h": "Causas y desencadenantes",
+  "causes-anxiety-p": "La ansiedad puede ser causada por una combinación de factores genéticos, psicológicos y ambientales. Experiencias vitales estresantes, traumas, presión constante, Los cambios importantes en la vida pueden desencadenar síntomas de ansiedad. La química cerebral, los rasgos de personalidad y los comportamientos aprendidos también influyen. A veces, la ansiedad surge sin una causa aparente, lo que puede ser frustrante y confuso. Reconocer los desencadenantes personales es un paso importante para controlar la ansiedad de forma más eficaz y recuperar el control.",
+  "seeking-help-anxiety-h": "Buscando ayuda y recuperación",
+  "seeking-help-anxiety-p": "La ansiedad es tratable y muchas personas encuentran alivio con el apoyo adecuado. La terapia, como la terapia cognitivo-conductual (TCC), puede ayudar a identificar patrones de pensamiento que alimentan la ansiedad y enseñar estrategias prácticas de afrontamiento. La medicación también puede ser útil para algunas personas. Además de la ayuda profesional, técnicas como la atención plena, el ejercicio regular, las rutinas saludables y los ejercicios de respiración pueden reducir los síntomas a largo plazo. La recuperación no siempre es lineal, pero es posible progresar y el apoyo marca la diferencia.",
+  "highlight-anxiety": "Recuerda: el miedo no te define. Hay apoyo disponible y mereces sentirte seguro, apoyado y comprendido.",
+    
+
+  //*✿°• STRESS
+  "header-stress": "Stress begrijpen",
+  "header-stress-p": "Een zachte gids om stress te herkennen, ermee om te gaan en steun te zoeken",
+  "what-is-stress-h": "Wat is stress?",
+  "what-is-stress-p": "Stress is de natuurlijke reactie van het lichaam op druk, uitdagingen of eisen. In kleine hoeveelheden kan stress motiverend werken en ons helpen gefocust te blijven. Wanneer stress echter constant of overweldigend wordt, kan het een negatieve invloed hebben op zowel de mentale als de fysieke gezondheid. Veelvoorkomende symptomen zijn spanning, prikkelbaarheid, vermoeidheid, hoofdpijn, slaapproblemen en concentratieproblemen. Het is belangrijk om stress te begrijpen, omdat onbeheerde stress zich langzaam kan opbouwen en het algehele welzijn kan beïnvloeden.",
+  "causes-stress-h": "Oorzaken en triggers",
+  "causes-stress-p": "Stress kan worden veroorzaakt door een breed scala aan factoren, waaronder werk- of schooldruk, financiële zorgen, relatieproblemen, gezondheidsproblemen of grote levensveranderingen. Zelfs positieve gebeurtenissen, zoals verhuizen of een nieuwe start, kunnen stress veroorzaken. Iets nieuws kan stressvol zijn. Langdurige blootstelling aan stress, vooral zonder voldoende rust of steun, kan het risico op een burn-out verhogen. Het identificeren van persoonlijke stressfactoren helpt bij het vinden van gezondere manieren om ermee om te gaan en de impact ervan te verminderen.",
+  "seeking-help-stress-h": "Hulp zoeken en herstel",
+  "seeking-help-stress-p": "Stress beheersen begint met het erkennen van grenzen en het prioriteren van zelfzorg. Technieken zoals het stellen van grenzen, het organiseren van taken, het beoefenen van ontspanningsoefeningen en het aanhouden van een gezonde routine kunnen het stressniveau aanzienlijk verlagen. Lichaamsbeweging, voldoende slaap en tijd weg van schermen spelen ook een belangrijke rol. Als stress onbeheersbaar aanvoelt, kan een gesprek met een therapeut of counselor waardevolle hulpmiddelen en begeleiding bieden. Herstel van stress draait om balans, niet om perfectie, en kleine veranderingen kunnen leiden tot betekenisvolle verbetering.",
+  "highlight-stress": "Onthoud: stress ervaren betekent niet dat je faalt. Goed voor jezelf zorgen is essentieel en er is altijd steun beschikbaar."
+
+  };
 
 
 /* ══✿══╡°˖✧᯽  TRANSLATION FUNCTION ᯽✧˖°╞══✿══ */
-
-
-};
 
 function setLanguage(lang) {
   document.querySelectorAll("[data-translate]").forEach(el => {
