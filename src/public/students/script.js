@@ -43,6 +43,40 @@ document.addEventListener("DOMContentLoaded", () => {
            a.getDate() === b.getDate();
   }
 
+  // ---------- Theme ----------
+  function applyTheme(theme) {
+    const t = theme || localStorage.getItem("theme") || "glass";
+    document.documentElement.dataset.theme = t;
+    localStorage.setItem("theme", t);
+  }
+
+  function setupThemeUI() {
+    applyTheme();
+
+    const wrap = qs("#themeWrap");
+    const btn = qs("#themeBtn");
+    const menu = qs("#themeMenu");
+
+    btn?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      menu?.classList.toggle("hidden");
+    });
+
+    qsa(".themePick").forEach((b) => {
+      b.addEventListener("click", (e) => {
+        e.preventDefault();
+        applyTheme(b.dataset.theme);
+        menu?.classList.add("hidden");
+      });
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!wrap || !menu) return;
+      if (!wrap.contains(e.target)) menu.classList.add("hidden");
+    });
+  }
+
+  
   // ---------- UI: name + avatar + logout ----------
   const name = localStorage.getItem("userName") || "Student";
 
