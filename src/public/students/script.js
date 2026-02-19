@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
            a.getDate() === b.getDate();
   }
 
-  // ---------- Theme ----------
+  // ---------- Theme (inside profile dropdown) ----------
   function applyTheme(theme) {
     const t = theme || localStorage.getItem("theme") || "glass";
     document.documentElement.dataset.theme = t;
@@ -53,30 +53,16 @@ document.addEventListener("DOMContentLoaded", () => {
   function setupThemeUI() {
     applyTheme();
 
-    const wrap = qs("#themeWrap");
-    const btn = qs("#themeBtn");
-    const menu = qs("#themeMenu");
-
-    btn?.addEventListener("click", (e) => {
-      e.stopPropagation();
-      menu?.classList.toggle("hidden");
-    });
-
+    // Theme buttons are inside the profile dropdown now
     qsa(".themePick").forEach((b) => {
       b.addEventListener("click", (e) => {
         e.preventDefault();
+        e.stopPropagation();
         applyTheme(b.dataset.theme);
-        menu?.classList.add("hidden");
       });
-    });
-
-    document.addEventListener("click", (e) => {
-      if (!wrap || !menu) return;
-      if (!wrap.contains(e.target)) menu.classList.add("hidden");
     });
   }
 
-  
   // ---------- UI: name + avatar + logout ----------
   const name = localStorage.getItem("userName") || "Student";
 
@@ -91,10 +77,15 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.removeItem("role");
     localStorage.removeItem("userName");
     localStorage.removeItem("userAvatar");
+    localStorage.removeItem("username");
     window.location.replace(LOGIN_PATH);
   }
 
-  qs("#logoutBtn")?.addEventListener("click", logout);
+  qs("#logoutBtn")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    logout();
+  });
+
   qs("#sidebarLogout")?.addEventListener("click", (e) => {
     e.preventDefault();
     logout();
@@ -103,10 +94,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // Profile dropdown
   const topWrap = qs("#topAvatarWrap");
   const profileMenu = qs("#profileMenu");
+
   avatarEl?.addEventListener("click", (e) => {
     e.stopPropagation();
     profileMenu?.classList.toggle("hidden");
   });
+
   document.addEventListener("click", (e) => {
     if (!topWrap || !profileMenu) return;
     if (!topWrap.contains(e.target)) profileMenu.classList.add("hidden");
@@ -162,7 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (id === "dashboard") renderDashboard();
     if (id === "courses") renderCoursesPage();
     if (id === "assignments") renderAssignmentsPage();
-    if (id === "schedule") renderSchedulePage(); // ✅ added
+    if (id === "schedule") renderSchedulePage();
   }
 
   navItems.forEach((it) => {
@@ -184,12 +177,14 @@ document.addEventListener("DOMContentLoaded", () => {
   qs("#refreshCoursesBtn")?.addEventListener("click", () =>
     loadAll(true).then(renderCoursesPage)
   );
+
   qs("#refreshAssignmentsBtn")?.addEventListener("click", () =>
     loadAll(true).then(renderAssignmentsPage)
   );
 
-  // ✅ schedule refresh button (exists after you add schedule UI)
-  qs("#refreshScheduleBtn")?.addEventListener("click", () => loadSchedule(true).then(renderSchedulePage));
+  qs("#refreshScheduleBtn")?.addEventListener("click", () =>
+    loadSchedule(true).then(renderSchedulePage)
+  );
 
   // ---------- Cards ----------
   function courseCard(c) {
@@ -197,7 +192,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const desc = escapeHtml(c.description || "");
 
     return `
-      <div class="card">
+      <div class="card p-4">
         <h4 class="font-semibold leading-tight">${title}</h4>
         <p class="text-sm opacity-80 mt-1">${desc}</p>
 
@@ -206,7 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
         <p class="text-xs opacity-70 mt-2">0% Complete</p>
 
-        <button class="mt-4 w-full rounded-xl bg-white/70 hover:bg-white text-[var(--text-dark)] font-semibold py-2 transition border border-black/10">
+        <button class="mt-4 w-full rounded-xl bg-white/15 hover:bg-white/20 font-semibold py-2 transition border border-white/10">
           Continue
         </button>
       </div>
@@ -220,12 +215,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const course = escapeHtml(h.course || "N/A");
 
     return `
-      <div class="card">
+      <div class="card p-4">
         <h4 class="font-semibold leading-tight">${title}</h4>
         <p class="text-sm opacity-80 mt-1">${desc}</p>
         <p class="text-xs opacity-70 mt-3">Course: ${course} · By: ${by}</p>
 
-        <button class="mt-4 w-full rounded-xl bg-white/70 hover:bg-white text-[var(--text-dark)] font-semibold py-2 transition border border-black/10">
+        <button class="mt-4 w-full rounded-xl bg-white/15 hover:bg-white/20 font-semibold py-2 transition border border-white/10">
           View
         </button>
       </div>
@@ -297,16 +292,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const time = `${start.toLocaleString()}${isNaN(end.getTime()) ? "" : " – " + end.toLocaleTimeString()}`;
 
     return `
-      <div class="p-3 rounded-xl border border-black/10 bg-white/70">
-        <div class="flex items-start justify-between gap-3">
-          <div>
-            <div class="font-semibold">${title}</div>
-            <div class="text-xs opacity-70 mt-1">${escapeHtml(time)}</div>
-            ${course ? `<div class="text-xs opacity-70 mt-1">Course: ${course}</div>` : ""}
-            ${location ? `<div class="text-xs opacity-70 mt-1">Location: ${location}</div>` : ""}
-            ${notes ? `<div class="text-xs opacity-70 mt-1">${notes}</div>` : ""}
-          </div>
-        </div>
+      <div class="card p-4">
+        <div class="font-semibold">${title}</div>
+        <div class="text-xs opacity-70 mt-1">${escapeHtml(time)}</div>
+        ${course ? `<div class="text-xs opacity-70 mt-1">Course: ${course}</div>` : ""}
+        ${location ? `<div class="text-xs opacity-70 mt-1">Location: ${location}</div>` : ""}
+        ${notes ? `<div class="text-xs opacity-70 mt-1">${notes}</div>` : ""}
       </div>
     `;
   }
@@ -328,8 +319,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const today = items.filter(e => isSameDay(new Date(e.start), now));
     const upcoming = items.filter(e => new Date(e.start) > now).slice(0, 20);
 
-    todayBox.innerHTML = today.length ? today.map(scheduleRow).join("") : `<div class="text-sm opacity-70">No events today.</div>`;
-    upcomingBox.innerHTML = upcoming.length ? upcoming.map(scheduleRow).join("") : `<div class="text-sm opacity-70">No upcoming events.</div>`;
+    todayBox.innerHTML = today.length
+      ? today.map(scheduleRow).join("")
+      : `<div class="text-sm opacity-70">No events today.</div>`;
+
+    upcomingBox.innerHTML = upcoming.length
+      ? upcoming.map(scheduleRow).join("")
+      : `<div class="text-sm opacity-70">No upcoming events.</div>`;
 
     empty.classList.toggle("hidden", items.length !== 0);
   }
@@ -391,9 +387,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const username = localStorage.getItem("username") || "";
     if (!username) return;
 
-    const res = await fetch(
-      `${API}/notifications?role=${encodeURIComponent(role)}&username=${encodeURIComponent(username)}`
-    );
+    const res = await fetch(`${API}/notifications?role=${encodeURIComponent(role)}&username=${encodeURIComponent(username)}`);
     const out = await safeJson(res);
     if (!out?.success) return;
 
@@ -410,7 +404,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!list) return;
 
     list.innerHTML = items.map((n) => `
-      <div class="px-4 py-3 border-b border-black/5 ${n.unread ? "bg-green-50" : ""}">
+      <div class="px-4 py-3 border-b border-white/10 ${n.unread ? "bg-white/5" : ""}">
         <div class="text-sm font-semibold">${escapeHtml(n.message || "")}</div>
         <div class="text-xs opacity-70 mt-1">
           ${escapeHtml(n.byName || n.byUsername || "Someone")} · ${escapeHtml(n.byRole || "")} ·
@@ -423,6 +417,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ---------- Boot ----------
   qs("#y") && (qs("#y").textContent = new Date().getFullYear());
 
+  setupThemeUI();           // ✅ THIS WAS MISSING (so buttons didn’t work)
   setupNotificationsUI();
   loadNotifications();
   setInterval(loadNotifications, 15000);
