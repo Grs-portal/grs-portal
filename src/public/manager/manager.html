@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Project Manager Portal</title>
 
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Inter font -->
@@ -13,148 +14,176 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
-   :root{
-  --glass: rgba(255,255,255,0.10);
-  --glass-hover: rgba(255,255,255,0.18);
-  --border: rgba(255,255,255,0.20);
+    :root{
+      /* soft calm green (not too strong) */
+      --green: rgba(145, 235, 190, .55);
+      --green2: rgba(120, 220, 170, .45);
 
-  --text: rgba(255,255,255,0.92);
-  --muted: rgba(255,255,255,0.70);
+      /* glass */
+      --glass: rgba(255,255,255,0.07);
+      --glass2: rgba(255,255,255,0.05);
+      --glassHover: rgba(255,255,255,0.12);
+      --border: rgba(255,255,255,0.18);
 
-  --green: rgba(130, 220, 170, 0.55);
-  --green-strong: rgba(90, 200, 140, 0.75);
+      /* text */
+      --text: rgba(255,255,255,0.92);
+      --muted: rgba(255,255,255,0.72);
 
-  --shadow: 0 18px 50px rgba(0,0,0,0.45);
-}
+      /* depth */
+      --shadow:
+        0 18px 50px rgba(0,0,0,0.35),
+        inset 0 1px 0 rgba(255,255,255,0.22);
+    }
 
-html, body{
-  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  color: var(--text);
-}
+    html, body{
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      color: var(--text);
+    }
 
-body{
-  background:
-    radial-gradient(900px 520px at 20% 10%, rgba(120, 220, 170, 0.30), transparent 60%),
-    radial-gradient(900px 520px at 80% 12%, rgba(100, 210, 160, 0.25), transparent 60%),
-    linear-gradient(180deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.85) 100%),
-    url("/Screenshot 2025-11-05 104653.png") no-repeat center center fixed;
-  background-size: cover;
-  min-height: 100vh;
-}
+    body{
+      background: url("/Screenshot 2025-11-05 104653.png") no-repeat center center fixed;
+      background-size: cover;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
 
-.glass{
-  background: var(--glass);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-}
+    /* same trick as your login page (helps glass pop) */
+    body::before{
+      content:"";
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: -1;
+    }
 
-.hero{
-  background: linear-gradient(135deg, rgba(130, 220, 170, 0.25), rgba(255,255,255,0.08));
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-}
+    /* extra soft green glow blobs */
+    body::after{
+      content:"";
+      position: fixed;
+      inset: -20%;
+      z-index: -2;
+      pointer-events: none;
+      background:
+        radial-gradient(520px 380px at 18% 15%, rgba(145,235,190,.25), transparent 70%),
+        radial-gradient(620px 420px at 85% 12%, rgba(120,220,170,.20), transparent 72%),
+        radial-gradient(600px 520px at 70% 85%, rgba(145,235,190,.18), transparent 70%);
+    }
 
-.title-strong{ font-weight: 800; letter-spacing: -0.02em; }
-.subtitle{ color: var(--muted); font-weight: 500; }
+    /* true iOS-like glass */
+    .glass{
+      background: var(--glass);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      box-shadow: var(--shadow);
+    }
 
-.nav-item{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:10px 12px;
-  border-radius:14px;
-  font-weight:700;
-  color: var(--text);
-  transition: 150ms ease;
-}
-.nav-item:hover{
-  background: var(--glass-hover);
-  transform: translateX(2px);
-}
-.nav-item.active{
-  background: rgba(130, 220, 170, 0.25);
-  border: 1px solid rgba(130, 220, 170, 0.35);
-}
+    .glass-soft{
+      background: var(--glass2);
+      border: 1px solid rgba(255,255,255,0.14);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow:
+        0 10px 28px rgba(0,0,0,0.28),
+        inset 0 1px 0 rgba(255,255,255,0.18);
+    }
 
-.btn-primary{
-  background: rgba(255,255,255,0.15);
-  border: 1px solid rgba(255,255,255,0.25);
-  color: white;
-  border-radius: 16px;
-  padding: 10px 16px;
-  font-weight: 700;
-  transition: 150ms ease;
-}
-.btn-primary:hover{
-  background: rgba(255,255,255,0.25);
-  transform: translateY(-1px);
-}
+    .title-strong{ font-weight: 800; letter-spacing: -0.02em; }
+    .subtitle{ color: var(--muted); font-weight: 500; }
 
-.table-head{
-  background: rgba(255,255,255,0.12);
-  border-bottom: 1px solid rgba(255,255,255,0.15);
-  color: rgba(255,255,255,0.75);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: .08em;
-}
+    /* nav */
+    .nav-item{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border-radius:14px;
+      color: var(--text);
+      font-weight:700;
+      transition: 150ms ease;
+      border: 1px solid transparent;
+    }
+    .nav-item:hover{
+      background: var(--glassHover);
+      border-color: rgba(255,255,255,0.12);
+      transform: translateX(2px);
+    }
+    .nav-item.active{
+      background: rgba(145,235,190,0.16);
+      border-color: rgba(145,235,190,0.22);
+    }
 
-.page-section{
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 200ms ease, transform 220ms ease;
-}
-.page-section.hidden{
-  opacity: 0;
-  transform: translateY(8px);
-  pointer-events: none;
-}
+    /* buttons */
+    .btn-primary{
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.20);
+      color: white;
+      border-radius: 16px;
+      padding: 10px 16px;
+      font-weight: 700;
+      transition: 150ms ease;
+    }
+    .btn-primary:hover{
+      background: rgba(255,255,255,0.22);
+      transform: translateY(-1px);
+    }
 
+    /* tables */
+    .table-head{
+      background: rgba(255,255,255,0.10);
+      border-bottom: 1px solid rgba(255,255,255,0.14);
+      color: rgba(255,255,255,0.72);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    table td, table th{ border-color: rgba(255,255,255,0.10) !important; }
+
+    /* nicer section transitions */
+    .page-section{
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 200ms ease, transform 220ms ease;
+    }
+    .page-section.hidden{
+      opacity: 0;
+      transform: translateY(8px);
+      pointer-events: none;
+    }
+
+    /* scrollbar nicer in notif list */
+    #notifList::-webkit-scrollbar{ width: 10px; }
+    #notifList::-webkit-scrollbar-thumb{
+      background: rgba(255,255,255,0.18);
+      border-radius: 999px;
+      border: 2px solid transparent;
+      background-clip: padding-box;
+    }
   </style>
 </head>
 
-<body class="overflow-x-hidden">
+<body class="min-h-screen">
 
-  <!-- TOPBAR -->
-  <header class="sticky top-0 z-50 glass border-b border-black/5">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-
+  <!-- Topbar -->
+  <header class="sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between glass rounded-none lg:rounded-2xl mt-0 lg:mt-4">
       <div class="flex items-center gap-3">
         <button id="menuBtn" class="lg:hidden text-2xl leading-none hover:opacity-70 transition" aria-label="Open menu">☰</button>
-
-        <div class="w-10 h-10 rounded-2xl glass strong flex items-center justify-center border border-white/25">
-          <!-- simple logo -->
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M12 2.5c4.7 0 8.5 3.8 8.5 8.5S16.7 19.5 12 19.5 3.5 15.7 3.5 11 7.3 2.5 12 2.5Z" stroke="rgba(24,35,28,.85)" stroke-width="1.6"/>
-            <path d="M8 14.2c1 .9 2.4 1.5 4 1.5s3-.6 4-1.5" stroke="rgba(79,158,120,.9)" stroke-width="1.6" stroke-linecap="round"/>
-          </svg>
-        </div>
-
         <div class="leading-tight">
-          <div class="title text-[15px]">Project Manager</div>
-          <div class="text-xs subtitle">Projects • Courses • Homework • Users</div>
+          <div class="title-strong text-[15px]">Project Manager Portal</div>
+          <div class="text-xs subtitle">Dashboard • Projects • Courses • Homework • Users</div>
         </div>
       </div>
 
       <div class="flex items-center gap-3">
         <span id="userName" class="text-sm font-semibold"></span>
 
-        <!-- 🔔 Notifications -->
+        <!-- 🔔 Notifications (manager.js expects these IDs) -->
         <div class="relative" id="notifWrap">
           <button id="notifBtn"
-            class="w-10 h-10 rounded-2xl glass strong flex items-center justify-center hover:bg-white/30 transition border border-white/20"
-            title="Notifications" aria-label="Notifications">
-            <!-- bell svg -->
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M12 22a2.2 2.2 0 0 0 2.1-1.6H9.9A2.2 2.2 0 0 0 12 22Z" fill="rgba(24,35,28,.75)"/>
-              <path d="M18 9.6c0-3.2-2-5.6-6-5.6s-6 2.4-6 5.6c0 5-2 5.6-2 6.8h16c0-1.2-2-1.8-2-6.8Z"
-                stroke="rgba(24,35,28,.80)" stroke-width="1.6" stroke-linejoin="round"/>
-            </svg>
-
+            class="w-10 h-10 rounded-2xl glass-soft flex items-center justify-center hover:bg-white/10 transition"
+            title="Notifications">
+            🔔
             <span id="notifBadge"
               class="hidden absolute -top-1 -right-1 text-[11px] px-1.5 py-0.5 rounded-full bg-red-500 text-white font-bold">
               0
@@ -162,33 +191,31 @@ body{
           </button>
 
           <div id="notifMenu"
-            class="hidden absolute right-0 mt-2 w-80 max-w-[90vw] glass strong rounded-2xl overflow-hidden border border-white/20">
-            <div class="px-4 py-3 flex items-center justify-between border-b border-black/10">
+            class="hidden absolute right-0 mt-2 w-80 max-w-[90vw] glass rounded-2xl overflow-hidden">
+            <div class="px-4 py-3 flex items-center justify-between border-b border-white/10">
               <div class="font-semibold">Notifications</div>
               <button id="notifReadAll"
-                class="text-xs font-semibold px-2 py-1 rounded-xl bg-white/30 hover:bg-white/50 transition">
+                class="text-xs font-semibold px-2 py-1 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10">
                 Mark all read
               </button>
             </div>
-
             <div id="notifList" class="max-h-80 overflow-auto"></div>
-
-            <div class="px-4 py-3 text-xs text-black/50 border-t border-black/10">
+            <div class="px-4 py-3 text-xs text-white/60 border-t border-white/10">
               Uploads • edits • deletes
             </div>
           </div>
         </div>
 
-        <!-- Avatar -->
+        <!-- Avatar dropdown -->
         <div id="topAvatarWrap" class="relative">
           <div id="userAvatar"
-            class="w-10 h-10 rounded-full glass strong border border-white/25 flex items-center justify-center font-bold cursor-pointer select-none">
+            class="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center font-semibold cursor-pointer select-none">
           </div>
 
           <div id="profileMenu"
-            class="hidden absolute right-0 mt-2 w-44 glass strong rounded-2xl overflow-hidden z-50 border border-white/20">
+            class="hidden absolute right-0 mt-2 w-44 glass rounded-2xl overflow-hidden z-50">
             <button id="logoutBtn"
-              class="w-full text-left px-4 py-3 text-sm hover:bg-white/20 font-semibold transition">
+              class="w-full text-left px-4 py-3 text-sm hover:bg-white/10 font-semibold">
               Logout
             </button>
           </div>
@@ -200,152 +227,83 @@ body{
 
   <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 px-4 py-6 relative">
 
-    <!-- SIDEBAR -->
+    <!-- Sidebar -->
     <aside id="sidebar"
       class="lg:col-span-3 fixed lg:static top-0 left-0 h-full lg:h-auto w-72 lg:w-auto
-      glass rounded-none lg:rounded-3xl border-r lg:border border-white/20
-      p-4 shadow-md transform -translate-x-full lg:translate-x-0 transition-transform duration-300
-      z-40 flex flex-col justify-between">
+      glass rounded-none lg:rounded-2xl p-3 shadow-md transform -translate-x-full lg:translate-x-0
+      transition-transform duration-300 z-40 flex flex-col justify-between">
 
       <div>
-        <div class="px-1">
-          <div class="title text-sm">Menu</div>
+        <div class="px-2 pt-2">
+          <div class="title-strong text-sm">Menu</div>
           <div class="text-xs subtitle">Manager navigation</div>
         </div>
 
-        <div class="mt-5 text-[11px] uppercase tracking-widest text-black/50 px-1">Navigation</div>
+        <div class="mt-4 text-[11px] uppercase tracking-widest opacity-70 px-2">Navigation</div>
         <nav class="mt-2">
           <ul class="space-y-1">
-            <li>
-              <a data-page="dashboard" class="nav-item active" href="#">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M4 13h7V4H4v9Zm9 7h7V11h-7v9ZM4 20h7v-5H4v5Zm9-7h7V4h-7v9Z"
-                    stroke="rgba(24,35,28,.82)" stroke-width="1.6" stroke-linejoin="round"/>
-                </svg>
-                <span>Dashboard</span>
-              </a>
-            </li>
-            <li>
-              <a data-page="projects" class="nav-item" href="#">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M7 7h10v10H7V7Z" stroke="rgba(24,35,28,.82)" stroke-width="1.6"/>
-                  <path d="M4.5 9.5V5.8c0-.7.6-1.3 1.3-1.3h3.7M19.5 14.5v3.7c0 .7-.6 1.3-1.3 1.3h-3.7"
-                    stroke="rgba(79,158,120,.9)" stroke-width="1.6" stroke-linecap="round"/>
-                </svg>
-                <span>Projects</span>
-              </a>
-            </li>
-            <li>
-              <a data-page="students" class="nav-item" href="#">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M12 4 3 8l9 4 9-4-9-4Z" stroke="rgba(24,35,28,.82)" stroke-width="1.6" stroke-linejoin="round"/>
-                  <path d="M6 10.2V16c0 1.7 3.1 3 6 3s6-1.3 6-3v-5.8"
-                    stroke="rgba(79,158,120,.9)" stroke-width="1.6" stroke-linecap="round"/>
-                </svg>
-                <span>Students & Grades</span>
-              </a>
-            </li>
-            <li>
-              <a data-page="submitted-homework" class="nav-item" href="#">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M7 4h7l3 3v13H7V4Z" stroke="rgba(24,35,28,.82)" stroke-width="1.6" stroke-linejoin="round"/>
-                  <path d="M9 12h6M9 15h6" stroke="rgba(79,158,120,.9)" stroke-width="1.6" stroke-linecap="round"/>
-                </svg>
-                <span>Submitted Homework</span>
-              </a>
-            </li>
-            <li>
-              <a data-page="submitted-courses" class="nav-item" href="#">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M5 6.5c2.5-1.3 4.5-1.3 7 0v14c-2.5-1.3-4.5-1.3-7 0v-14Z"
-                    stroke="rgba(24,35,28,.82)" stroke-width="1.6" stroke-linejoin="round"/>
-                  <path d="M12 6.5c2.5-1.3 4.5-1.3 7 0v14c-2.5-1.3-4.5-1.3-7 0v-14Z"
-                    stroke="rgba(79,158,120,.9)" stroke-width="1.6" stroke-linejoin="round"/>
-                </svg>
-                <span>Courses</span>
-              </a>
-            </li>
+            <li><a data-page="dashboard" class="nav-item active" href="#">📊 <span>Dashboard</span></a></li>
+            <li><a data-page="projects" class="nav-item" href="#">🧩 <span>Projects</span></a></li>
+            <li><a data-page="students" class="nav-item" href="#">🎓 <span>Students & Grades</span></a></li>
+            <li><a data-page="submitted-homework" class="nav-item" href="#">📥 <span>Submitted Homework</span></a></li>
+            <li><a data-page="submitted-courses" class="nav-item" href="#">📚 <span>Courses</span></a></li>
           </ul>
         </nav>
 
-        <div class="mt-5 text-[11px] uppercase tracking-widest text-black/50 px-1">Create</div>
+        <div class="mt-5 text-[11px] uppercase tracking-widest opacity-70 px-2">Create</div>
         <nav class="mt-2">
           <ul class="space-y-1">
-            <li>
-              <a data-page="create-homework" class="nav-item" href="#">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M12 5v14M5 12h14" stroke="rgba(79,158,120,.95)" stroke-width="1.8" stroke-linecap="round"/>
-                </svg>
-                <span>Create Homework</span>
-              </a>
-            </li>
-            <li>
-              <a data-page="create-course" class="nav-item" href="#">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M12 5v14M5 12h14" stroke="rgba(79,158,120,.95)" stroke-width="1.8" stroke-linecap="round"/>
-                </svg>
-                <span>Create Course</span>
-              </a>
-            </li>
-            <li>
-              <a data-page="users" class="nav-item" href="#">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M16 21v-2.2c0-1.2-1-2.2-2.2-2.2H8.2C7 16.6 6 17.6 6 18.8V21"
-                    stroke="rgba(24,35,28,.82)" stroke-width="1.6" stroke-linecap="round"/>
-                  <path d="M12 12.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z"
-                    stroke="rgba(79,158,120,.9)" stroke-width="1.6"/>
-                </svg>
-                <span>Users</span>
-              </a>
-            </li>
+            <li><a data-page="create-homework" class="nav-item" href="#">➕ <span>Create Homework</span></a></li>
+            <li><a data-page="create-course" class="nav-item" href="#">➕ <span>Create Course</span></a></li>
+            <li><a data-page="users" class="nav-item" href="#">👥 <span>Users</span></a></li>
           </ul>
         </nav>
 
-        <div class="mt-6 grid grid-cols-2 gap-3">
-          <section class="glass strong p-4 rounded-2xl border border-white/20">
+        <div class="mt-6 grid grid-cols-2 gap-3 px-1">
+          <section class="glass-soft p-4 rounded-2xl">
             <p class="text-xs subtitle">Active</p>
-            <p id="activeCoursesCount" class="text-2xl font-bold mt-1">0</p>
+            <p id="activeCoursesCount" class="text-2xl font-semibold mt-1">0</p>
           </section>
-          <section class="glass strong p-4 rounded-2xl border border-white/20">
+          <section class="glass-soft p-4 rounded-2xl">
             <p class="text-xs subtitle">To Grade</p>
-            <p id="toGradeCount" class="text-2xl font-bold mt-1">0</p>
+            <p id="toGradeCount" class="text-2xl font-semibold mt-1">0</p>
           </section>
         </div>
       </div>
 
-      <div class="pt-4">
+      <div class="p-2">
         <a id="sidebarLogout"
           href="#"
-          class="block w-full rounded-2xl border border-white/20 bg-white/15 hover:bg-white/25
-                 px-4 py-3 text-left font-semibold transition shadow-sm">
-          Logout
+          class="block w-full rounded-2xl border border-white/15 bg-white/10 hover:bg-white/20
+                 px-4 py-3 text-left font-semibold transition">
+          🚪 Logout
         </a>
       </div>
     </aside>
 
     <div id="overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-30 lg:hidden"></div>
 
-    <!-- MAIN -->
+    <!-- Main -->
     <main class="lg:col-span-9 space-y-6">
 
       <!-- Dashboard -->
       <div id="dashboard" class="page-section">
-        <section class="glass strong rounded-3xl p-7 border border-white/20">
-          <h2 class="text-2xl title">Welcome, Manager</h2>
+        <section class="hero rounded-2xl p-6 mb-6">
+          <h2 class="text-2xl title-strong">Welcome, Manager!</h2>
           <p class="subtitle mt-1">Manage courses, homework, projects, grading, and users.</p>
         </section>
 
-        <section class="glass rounded-3xl p-7 mt-6 border border-white/20">
+        <section class="glass rounded-2xl p-6 mb-6">
           <div class="flex items-center justify-between gap-3">
-            <h3 class="text-lg title">All Courses</h3>
+            <h3 class="text-lg title-strong">All Courses</h3>
             <div class="text-xs subtitle">System-wide overview</div>
           </div>
           <div id="courses" class="grid gap-4 mt-4"></div>
         </section>
 
-        <section class="glass rounded-3xl p-7 mt-6 border border-white/20">
+        <section class="glass rounded-2xl p-6">
           <div class="flex items-center justify-between gap-3">
-            <h3 class="text-lg title">Projects</h3>
+            <h3 class="text-lg title-strong">Projects</h3>
             <div class="text-xs subtitle">Quick overview</div>
           </div>
           <div id="dashboardProjects" class="grid gap-4 mt-4"></div>
@@ -354,9 +312,9 @@ body{
 
       <!-- Projects -->
       <div id="projects" class="page-section hidden">
-        <section class="glass rounded-3xl p-7 border border-white/20">
+        <section class="glass rounded-2xl p-6">
           <div class="flex items-center justify-between">
-            <h2 class="text-xl title">Projects</h2>
+            <h2 class="text-xl title-strong">Projects</h2>
             <div class="text-xs subtitle">All projects</div>
           </div>
           <div id="projectsFullList" class="space-y-3 mt-4"></div>
@@ -365,10 +323,10 @@ body{
 
       <!-- Students -->
       <div id="students" class="page-section hidden">
-        <section class="glass rounded-3xl p-7 border border-white/20 overflow-auto">
+        <section class="glass rounded-2xl p-6 overflow-auto">
           <div class="flex items-center justify-between">
-            <h2 class="text-xl title">Students & Grades</h2>
-            <div class="text-xs subtitle">View student grades</div>
+            <h2 class="text-xl title-strong">Students & Grades</h2>
+            <div class="text-xs subtitle">View + manage grades</div>
           </div>
 
           <div class="overflow-x-auto mt-4">
@@ -389,9 +347,9 @@ body{
 
       <!-- Submitted Homework -->
       <div id="submitted-homework" class="page-section hidden">
-        <section class="glass rounded-3xl p-7 border border-white/20">
+        <section class="glass rounded-2xl p-6">
           <div class="flex items-center justify-between">
-            <h2 class="text-xl title">Submitted Homework</h2>
+            <h2 class="text-xl title-strong">Submitted Homework</h2>
             <div class="text-xs subtitle">Review + manage</div>
           </div>
           <div id="homework-list" class="grid gap-4 mt-4"></div>
@@ -400,9 +358,9 @@ body{
 
       <!-- Courses list -->
       <div id="submitted-courses" class="page-section hidden">
-        <section class="glass rounded-3xl p-7 border border-white/20">
+        <section class="glass rounded-2xl p-6">
           <div class="flex items-center justify-between">
-            <h2 class="text-xl title">Courses</h2>
+            <h2 class="text-xl title-strong">Courses</h2>
             <div class="text-xs subtitle">Manage all courses</div>
           </div>
           <div id="submitted-courses-list" class="mt-4"></div>
@@ -411,30 +369,30 @@ body{
 
       <!-- Create Homework -->
       <div id="create-homework" class="page-section hidden">
-        <section class="glass rounded-3xl p-7 border border-white/20 min-h-[55vh] flex flex-col items-center justify-center text-center">
-          <h2 class="text-2xl title">Create Homework</h2>
+        <section class="glass rounded-2xl p-6 min-h-[55vh] flex flex-col items-center justify-center text-center">
+          <h2 class="text-2xl title-strong">Create Homework</h2>
           <p class="subtitle mt-1">Create an assignment and attach a PDF if needed.</p>
-          <button id="openCreateHw" class="btn-primary mt-5">Add Homework</button>
+          <button id="openCreateHw" class="btn-primary mt-5">+ Add Homework</button>
         </section>
       </div>
 
       <!-- Create Course -->
       <div id="create-course" class="page-section hidden">
-        <section class="glass rounded-3xl p-7 border border-white/20 min-h-[55vh] flex flex-col items-center justify-center text-center">
-          <h2 class="text-2xl title">Create Course</h2>
+        <section class="glass rounded-2xl p-6 min-h-[55vh] flex flex-col items-center justify-center text-center">
+          <h2 class="text-2xl title-strong">Create Course</h2>
           <p class="subtitle mt-1">Create a course with an optional PDF.</p>
-          <button id="openCreateCourse" class="btn-primary mt-5">Add Course</button>
+          <button id="openCreateCourse" class="btn-primary mt-5">+ Add Course</button>
         </section>
       </div>
 
       <!-- Users -->
       <div id="users" class="page-section hidden">
-        <section class="glass rounded-3xl p-7 border border-white/20 overflow-auto">
+        <section class="glass rounded-2xl p-6 overflow-auto">
           <div class="flex items-center justify-between gap-3 mb-4">
-            <h2 class="text-xl title">Users</h2>
+            <h2 class="text-xl title-strong">Users</h2>
             <div class="flex gap-2">
-              <button id="createUserBtn" class="btn-primary">Create User</button>
-              <button id="refreshUsersBtn" class="btn-soft">Refresh</button>
+              <button id="createUserBtn" class="btn-primary">+ Create User</button>
+              <button id="refreshUsersBtn" class="btn-primary">Refresh</button>
             </div>
           </div>
 
@@ -457,31 +415,11 @@ body{
     </main>
   </div>
 
-  <footer class="text-center py-6 text-xs border-t border-black/10 text-black/60">
+  <footer class="text-center py-6 text-xs border-t border-white/10 text-white/70">
     © <span id="y"></span> Project Manager Portal · Privacy · Terms
   </footer>
 
+  <!-- IMPORTANT: defer so DOM exists before manager.js runs -->
   <script src="manager.js" defer></script>
-
-  <!-- Page animation helper (works with your existing manager.js nav logic) -->
-  <script>
-    // Your manager.js toggles .hidden. We just add a micro "reflow" so animation is smooth.
-    document.addEventListener("click", (e) => {
-      const a = e.target.closest("a.nav-item");
-      if (!a) return;
-      // Let manager.js do its work; then ensure the shown page animates in.
-      requestAnimationFrame(() => {
-        document.querySelectorAll(".page-section").forEach(p => {
-          if (!p.classList.contains("hidden")) {
-            // re-trigger transition
-            p.style.willChange = "opacity, transform";
-            p.offsetHeight; // force reflow
-            p.style.willChange = "";
-          }
-        });
-      });
-    }, true);
-  </script>
 </body>
 </html>
-
