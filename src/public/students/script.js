@@ -37,58 +37,52 @@ document.addEventListener("DOMContentLoaded", () => {
     try { return await res.json(); } catch { return null; }
   }
 
+  function isSameDay(a, b) {
+    return a.getFullYear() === b.getFullYear() &&
+      a.getMonth() === b.getMonth() &&
+      a.getDate() === b.getDate();
+  }
+
   // ---------- Theme ----------
   function applyTheme(theme) {
     const t = theme || localStorage.getItem("theme") || "glass";
     document.documentElement.dataset.theme = t;
     localStorage.setItem("theme", t);
   }
-
-  function setupThemeUI() {
-    applyTheme();
-
-    const profileWrap = qs("#profileWrap");
-    const themeBtn = qs("#themeBtn");
-    const profileMenu = qs("#profileMenu");
-
-    // theme button opens the SAME dropdown
-    themeBtn?.addEventListener("click", (e) => {
-      e.stopPropagation();
-      profileMenu?.classList.toggle("hidden");
-    });
-
-    // theme pick buttons
-    qsa(".themePick").forEach((b) => {
-      b.addEventListener("click", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        applyTheme(b.dataset.theme);
-        profileMenu?.classList.add("hidden");
-      });
-    });
-
-    // click outside closes dropdown
-    document.addEventListener("click", (e) => {
-      if (!profileWrap || !profileMenu) return;
-      if (!profileWrap.contains(e.target)) profileMenu.classList.add("hidden");
-    });
-  }
+  applyTheme();
 
   // ---------- UI: name + avatar + logout ----------
-  const name = localStorage.getItem("userName") || "Student";
-
   const userNameEl = qs("#userName");
   const avatarEl = qs("#userAvatar");
-  const profileMenu = qs("#profileMenu");
 
-  if (userNameEl) userNameEl.textContent = name;
-  if (avatarEl) avatarEl.textContent = initials(name);
+  function renderTopbar() {
+    const name = localStorage.getItem("userName") || "Student";
+    const avatarData = localStorage.getItem("userAvatar") || "";
+
+    if (userNameEl) userNameEl.textContent = name;
+
+    if (!avatarEl) return;
+
+    if (avatarData) {
+      avatarEl.style.backgroundImage = `url(${avatarData})`;
+      avatarEl.style.backgroundSize = "cover";
+      avatarEl.style.backgroundPosition = "center";
+      avatarEl.textContent = "";
+    } else {
+      avatarEl.style.backgroundImage = "";
+      avatarEl.textContent = initials(name);
+    }
+  }
+
+  renderTopbar();
 
   function logout() {
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("role");
     localStorage.removeItem("userName");
     localStorage.removeItem("userAvatar");
+    // keep theme? your choice:
+    // localStorage.removeItem("theme");
     window.location.replace(LOGIN_PATH);
   }
 
@@ -98,10 +92,17 @@ document.addEventListener("DOMContentLoaded", () => {
     logout();
   });
 
-  // Avatar click toggles same dropdown
+  // Profile dropdown
+  const topWrap = qs("#topAvatarWrap");
+  const profileMenu = qs("#profileMenu");
   avatarEl?.addEventListener("click", (e) => {
     e.stopPropagation();
     profileMenu?.classList.toggle("hidden");
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!topWrap || !profileMenu) return;
+    if (!topWrap.contains(e.target)) profileMenu.classList.add("hidden");
   });
 
   // ---------- Sidebar mobile toggle ----------
@@ -134,7 +135,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "Escape") {
       closeSidebar();
       qs("#notifMenu")?.classList.add("hidden");
-      qs("#profileMenu")?.classList.add("hidden");
+      profileMenu?.classList.add("hidden");
+      closePersonalizeModal();
     }
   });
 
@@ -154,6 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (id === "dashboard") renderDashboard();
     if (id === "courses") renderCoursesPage();
     if (id === "assignments") renderAssignmentsPage();
+    if (id === "schedule") renderSchedulePage();
   }
 
   navItems.forEach((it) => {
@@ -178,6 +181,9 @@ document.addEventListener("DOMContentLoaded", () => {
   qs("#refreshAssignmentsBtn")?.addEventListener("click", () =>
     loadAll(true).then(renderAssignmentsPage)
   );
+  qs("#refreshScheduleBtn")?.addEventListener("click", () =>
+    loadSchedule(true).then(renderSchedulePage)
+  );
 
   // ---------- Cards ----------
   function courseCard(c) {
@@ -186,7 +192,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     return `
       <div class="card p-4">
-        <h4 class="font-extrabold leading-tight">${title}</h4>
+        <h4 class="font-semibold leading-tight">${title}</h4>
         <p class="text-sm opacity-80 mt-1">${desc}</p>
 
         <div class="mt-3 w-full bg-black/10 rounded-full h-2.5">
@@ -194,7 +200,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
         <p class="text-xs opacity-70 mt-2">0% Complete</p>
 
-        <button class="mt-4 w-full rounded-xl bg-white/10 hover:bg-white/15 text-[color:var(--text)] font-extrabold py-2 transition border border-white/15">
+        <button class="mt-4 w-full rounded-xl bg-white/10 hover:bg-white/15 text-[var(--text)] font-semibold py-2 transition border border-white/15">
           Continue
         </button>
       </div>
@@ -209,11 +215,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     return `
       <div class="card p-4">
-        <h4 class="font-extrabold leading-tight">${title}</h4>
+        <h4 class="font-semibold leading-tight">${title}</h4>
         <p class="text-sm opacity-80 mt-1">${desc}</p>
         <p class="text-xs opacity-70 mt-3">Course: ${course} · By: ${by}</p>
 
-        <button class="mt-4 w-full rounded-xl bg-white/10 hover:bg-white/15 text-[color:var(--text)] font-extrabold py-2 transition border border-white/15">
+        <button class="mt-4 w-full rounded-xl bg-white/10 hover:bg-white/15 text-[var(--text)] font-semibold py-2 transition border border-white/15">
           View
         </button>
       </div>
@@ -245,6 +251,86 @@ document.addEventListener("DOMContentLoaded", () => {
       if (activeCoursesCount) activeCoursesCount.textContent = "0";
       if (homeworkCount) homeworkCount.textContent = "0";
     }
+  }
+
+  // ---------- Schedule ----------
+  let cacheSchedule = [];
+
+  async function loadSchedule(force = false) {
+    if (!force && cacheSchedule.length) return;
+
+    const username = localStorage.getItem("username") || "";
+    const role = localStorage.getItem("role") || "student";
+    if (!username) {
+      cacheSchedule = [];
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API}/schedule?role=${encodeURIComponent(role)}&username=${encodeURIComponent(username)}`);
+      const out = await safeJson(res);
+      if (!out?.success) {
+        cacheSchedule = [];
+        return;
+      }
+      cacheSchedule = Array.isArray(out.items) ? out.items : [];
+    } catch (e) {
+      console.error(e);
+      cacheSchedule = [];
+    }
+  }
+
+  function scheduleRow(ev) {
+    const title = escapeHtml(ev.title || "Event");
+    const course = escapeHtml(ev.course || "");
+    const location = escapeHtml(ev.location || "");
+    const notes = escapeHtml(ev.notes || "");
+
+    const start = new Date(ev.start);
+    const end = new Date(ev.end);
+    const time = `${start.toLocaleString()}${isNaN(end.getTime()) ? "" : " – " + end.toLocaleTimeString()}`;
+
+    return `
+      <div class="card p-4">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <div class="font-semibold">${title}</div>
+            <div class="text-xs opacity-70 mt-1">${escapeHtml(time)}</div>
+            ${course ? `<div class="text-xs opacity-70 mt-1">Course: ${course}</div>` : ""}
+            ${location ? `<div class="text-xs opacity-70 mt-1">Location: ${location}</div>` : ""}
+            ${notes ? `<div class="text-xs opacity-70 mt-1">${notes}</div>` : ""}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  async function renderSchedulePage() {
+    await loadSchedule();
+
+    const todayBox = qs("#scheduleToday");
+    const upcomingBox = qs("#scheduleUpcoming");
+    const empty = qs("#scheduleEmpty");
+
+    if (!todayBox || !upcomingBox || !empty) return;
+
+    const now = new Date();
+    const items = cacheSchedule
+      .filter(e => e?.start)
+      .sort((a, b) => new Date(a.start) - new Date(b.start));
+
+    const today = items.filter(e => isSameDay(new Date(e.start), now));
+    const upcoming = items.filter(e => new Date(e.start) > now).slice(0, 20);
+
+    todayBox.innerHTML = today.length
+      ? today.map(scheduleRow).join("")
+      : `<div class="text-sm opacity-70">No events today.</div>`;
+
+    upcomingBox.innerHTML = upcoming.length
+      ? upcoming.map(scheduleRow).join("")
+      : `<div class="text-sm opacity-70">No upcoming events.</div>`;
+
+    empty.classList.toggle("hidden", items.length !== 0);
   }
 
   // ---------- Render ----------
@@ -304,9 +390,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const username = localStorage.getItem("username") || "";
     if (!username) return;
 
-    const res = await fetch(
-      `${API}/notifications?role=${encodeURIComponent(role)}&username=${encodeURIComponent(username)}`
-    );
+    const res = await fetch(`${API}/notifications?role=${encodeURIComponent(role)}&username=${encodeURIComponent(username)}`);
     const out = await safeJson(res);
     if (!out?.success) return;
 
@@ -324,7 +408,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     list.innerHTML = items.map((n) => `
       <div class="px-4 py-3 border-b border-white/10 ${n.unread ? "bg-white/5" : ""}">
-        <div class="text-sm font-extrabold">${escapeHtml(n.message || "")}</div>
+        <div class="text-sm font-semibold">${escapeHtml(n.message || "")}</div>
         <div class="text-xs opacity-70 mt-1">
           ${escapeHtml(n.byName || n.byUsername || "Someone")} · ${escapeHtml(n.byRole || "")} ·
           ${new Date(n.ts).toLocaleString()}
@@ -333,11 +417,106 @@ document.addEventListener("DOMContentLoaded", () => {
     `).join("");
   }
 
+  // ---------- Personalization Modal ----------
+  const personalizeModal = qs("#personalizeModal");
+  const personalizeBackdrop = qs("#personalizeBackdrop");
+  const closePersonalize = qs("#closePersonalize");
+  const openPersonalize = qs("#openPersonalize");
+
+  const personalizeAvatar = qs("#personalizeAvatar");
+  const personalizeName = qs("#personalizeName");
+  const personalizePhoto = qs("#personalizePhoto");
+  const removePhoto = qs("#removePhoto");
+  const savePersonalize = qs("#savePersonalize");
+  const resetPersonalize = qs("#resetPersonalize");
+
+  function renderPersonalizePreview() {
+    const name = localStorage.getItem("userName") || "Student";
+    const avatarData = localStorage.getItem("userAvatar") || "";
+
+    if (personalizeName) personalizeName.value = name;
+
+    if (!personalizeAvatar) return;
+
+    if (avatarData) {
+      personalizeAvatar.style.backgroundImage = `url(${avatarData})`;
+      personalizeAvatar.style.backgroundSize = "cover";
+      personalizeAvatar.style.backgroundPosition = "center";
+      personalizeAvatar.textContent = "";
+    } else {
+      personalizeAvatar.style.backgroundImage = "";
+      personalizeAvatar.textContent = initials(name);
+    }
+  }
+
+  function openPersonalizeModal() {
+    profileMenu?.classList.add("hidden");
+    renderPersonalizePreview();
+    personalizeModal?.classList.remove("hidden");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closePersonalizeModal() {
+    personalizeModal?.classList.add("hidden");
+    document.body.style.overflow = "";
+  }
+
+  openPersonalize?.addEventListener("click", (e) => {
+    e.preventDefault();
+    openPersonalizeModal();
+  });
+
+  closePersonalize?.addEventListener("click", closePersonalizeModal);
+  personalizeBackdrop?.addEventListener("click", closePersonalizeModal);
+
+  // theme buttons inside modal
+  qsa(".themePick").forEach((b) => {
+    b.addEventListener("click", (e) => {
+      e.preventDefault();
+      applyTheme(b.dataset.theme);
+    });
+  });
+
+  personalizePhoto?.addEventListener("change", (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      localStorage.setItem("userAvatar", ev.target.result);
+      renderPersonalizePreview();
+      renderTopbar();
+    };
+    reader.readAsDataURL(file);
+  });
+
+  removePhoto?.addEventListener("click", () => {
+    localStorage.removeItem("userAvatar");
+    renderPersonalizePreview();
+    renderTopbar();
+  });
+
+  savePersonalize?.addEventListener("click", () => {
+    const newName = (personalizeName?.value || "").trim() || "Student";
+    localStorage.setItem("userName", newName);
+    renderPersonalizePreview();
+    renderTopbar();
+    closePersonalizeModal();
+  });
+
+  resetPersonalize?.addEventListener("click", () => {
+    localStorage.removeItem("userAvatar");
+    localStorage.setItem("userName", "Student");
+    localStorage.setItem("theme", "glass");
+    applyTheme("glass");
+    renderPersonalizePreview();
+    renderTopbar();
+  });
+
   // ---------- Boot ----------
   qs("#y") && (qs("#y").textContent = new Date().getFullYear());
 
   setupNotificationsUI();
-  setupThemeUI(); // ✅ THIS was the missing part when "buttons don't work"
   loadNotifications();
   setInterval(loadNotifications, 15000);
 
