@@ -231,7 +231,13 @@
         </div>
 
         <!-- Profile wrap (🎨 + avatar + dropdown) -->
-       
+        <div id="profileWrap" class="relative flex items-center gap-2">
+          <button id="themeBtn" class="icon-btn" title="Theme">🎨</button>
+
+          <button id="userAvatar"
+            class="w-9 h-9 rounded-full bg-white/10 border border-white/20
+                   flex items-center justify-center font-extrabold cursor-pointer select-none shadow-sm">
+          </button>
 
           <!-- Dropdown: Theme + Logout -->
           <div id="profileMenu" class="hidden absolute right-0 top-[calc(100%+10px)] w-64 card overflow-hidden z-50">
@@ -378,4 +384,3 @@
   <script src="/students/script.js"></script>
 </body>
 </html>
-
