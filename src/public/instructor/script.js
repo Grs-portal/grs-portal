@@ -14,10 +14,9 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // ---- helpers ----
+  // ---- Helpers ----
   const qs = (s) => document.querySelector(s);
   const qsa = (s) => [...document.querySelectorAll(s)];
-
   const esc = (s) =>
     String(s || "")
       .replaceAll("&", "&amp;")
@@ -35,43 +34,14 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => t.remove(), 2500);
   };
 
-  const actorHeaders = () => ({
-    "x-role": localStorage.getItem("role") || "",
-    "x-username": localStorage.getItem("username") || "",
-    "x-name": localStorage.getItem("userName") || "",
-  });
-
-  const jsonHeaders = () => ({
-    ...actorHeaders(),
-    "Content-Type": "application/json",
-  });
-
-  async function safeJson(res) {
-    try {
-      return await res.json();
-    } catch {
-      return null;
-    }
-  }
-
-  async function fetchJSON(path) {
-    try {
-      const r = await fetch(API + path);
-      if (!r.ok) return [];
-      return await r.json();
-    } catch {
-      return [];
-    }
-  }
-
-  // ---- Top UI ----
+  // ---- Topbar ----
   if (qs("#y")) qs("#y").textContent = new Date().getFullYear();
   const displayName = localStorage.getItem("userName") || "Instructor";
   if (qs("#userName")) qs("#userName").textContent = displayName;
   const avatar = qs("#userAvatar");
   if (avatar) avatar.textContent = (displayName.trim()[0] || "I").toUpperCase();
 
-  // ---- Sidebar (mobile) ----
+  // ---- Sidebar toggle (mobile) ----
   const sidebar = qs("#sidebar");
   const overlay = qs("#overlay");
 
@@ -80,7 +50,6 @@ document.addEventListener("DOMContentLoaded", () => {
     overlay?.classList.remove("hidden");
     document.body.style.overflow = "hidden";
   }
-
   function closeSidebar() {
     sidebar?.classList.add("-translate-x-full");
     overlay?.classList.add("hidden");
@@ -88,29 +57,21 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   qs("#menuBtn")?.addEventListener("click", () => {
-    if (!sidebar) return;
-    const isClosed = sidebar.classList.contains("-translate-x-full");
-    isClosed ? openSidebar() : closeSidebar();
+    sidebar?.classList.contains("-translate-x-full") ? openSidebar() : closeSidebar();
   });
-
   overlay?.addEventListener("click", closeSidebar);
-
   window.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      closeSidebar();
-      qs("#notifMenu")?.classList.add("hidden");
-      qs("#profileMenu")?.classList.add("hidden");
-    }
+    if (e.key === "Escape") closeSidebar();
   });
 
   // ---- Navigation ----
-  qsa(".nav-item").forEach((link) => {
+  qsa(".nav-item").forEach((link) =>
     link.addEventListener("click", (e) => {
       e.preventDefault();
       showPage(link.dataset.page);
       closeSidebar();
-    });
-  });
+    })
+  );
 
   // ---- Logout ----
   function logout() {
@@ -118,7 +79,6 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.removeItem("role");
     window.location.replace(LOGIN_URL);
   }
-
   qs("#logoutBtn")?.addEventListener("click", logout);
   qs("#sidebarLogout")?.addEventListener("click", logout);
 
@@ -144,16 +104,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function showModal(innerHTML) {
     closeModal();
-
     const modalBg = document.createElement("div");
     modalBg.id = "modalBg";
     modalBg.className =
       "fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50";
-    modalBg.innerHTML = `
-      <div class="bg-white rounded-2xl p-6 shadow-lg w-[92%] max-w-md">
-        ${innerHTML}
-      </div>
-    `;
+    modalBg.innerHTML = `<div class="bg-white rounded-2xl p-6 shadow-lg w-[92%] max-w-md">${innerHTML}</div>`;
     document.body.appendChild(modalBg);
 
     modalBg.addEventListener("click", (e) => {
@@ -163,7 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("cancelModal")?.addEventListener("click", closeModal);
   }
 
-  // ---- Notifications UI ----
+  // ---- Notifications ----
   function setupNotificationsUI() {
     const btn = qs("#notifBtn");
     const menu = qs("#notifMenu");
@@ -203,12 +158,11 @@ document.addEventListener("DOMContentLoaded", () => {
         role
       )}&username=${encodeURIComponent(username)}`
     );
-    const out = await safeJson(res);
-    if (!out?.success) return;
+    const data = await res.json().catch(() => null);
+    if (!data?.success) return;
 
-    const items = out.items || [];
+    const items = data.items || [];
     const unreadCount = items.filter((x) => x.unread).length;
-
     const badge = qs("#notifBadge");
     if (badge) {
       badge.textContent = String(unreadCount);
@@ -217,81 +171,56 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const list = qs("#notifList");
     if (!list) return;
-
     list.innerHTML = items
       .map(
-        (n) => `
-      <div class="px-4 py-3 border-b border-black/5 ${
-        n.unread ? "bg-green-50" : ""
-      }">
-        <div class="text-sm font-bold">${esc(n.message || "")}</div>
-        <div class="text-xs opacity-70 mt-1">
-          ${esc(n.byName || n.byUsername || "Someone")} · ${esc(
-        n.byRole || ""
-      )} · ${new Date(n.ts).toLocaleString()}
-        </div>
-      </div>
-    `
+        (n) => `<div class="px-4 py-3 border-b border-black/5 ${
+          n.unread ? "bg-green-50" : ""
+        }">
+          <div class="text-sm font-bold">${esc(n.message)}</div>
+          <div class="text-xs opacity-70 mt-1">
+            ${esc(n.byName || n.byUsername || "Someone")} · ${esc(
+          n.byRole || ""
+        )} · ${new Date(n.ts).toLocaleString()}
+          </div>
+        </div>`
       )
       .join("");
   }
 
-  // ---- Dashboard ----
-  async function loadDashboard() { /* ... keep existing ... */ }
-
-  // ---- Students ----
-  async function loadStudents() { /* ... keep existing ... */ }
-
-  // ---- Homework ----
-  async function loadHomework() { /* ... keep existing ... */ }
-
-  // ---- Create Courses ----
-  function openCourseModal() { /* ... keep existing ... */ }
-
-  // ---- My Courses (full load inside dashboard) ----
-  async function loadMyCourses() {
-    const container = qs("#myCoursesContainer");
+  // ---- Demo Course Card ----
+  async function loadDashboard() {
+    const container = qs("#courses");
     if (!container) return;
 
-    // ---- fetch standalone courses.html ----
-    const res = await fetch("/instructor/courses.html");
-    if (!res.ok) return (container.innerHTML = "Failed to load courses page.");
+    container.innerHTML = "";
 
-    let html = await res.text();
-
-    // ---- inject HTML into container ----
-    container.innerHTML = html;
-
-    // ---- execute scripts from courses.html ----
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = html;
-    const scripts = [...tempDiv.querySelectorAll("script")];
-    scripts.forEach((s) => {
-      const newS = document.createElement("script");
-      if (s.src) newS.src = s.src;
-      else newS.textContent = s.textContent;
-      document.body.appendChild(newS);
-      newS.remove(); // cleanup after running
+    // demo card
+    const demoCard = document.createElement("div");
+    demoCard.className =
+      "glass p-4 rounded-2xl cursor-pointer hover:shadow-lg transition";
+    demoCard.innerHTML = `
+      <img src="https://via.placeholder.com/400x180.png?text=Demo+Course" class="rounded-xl w-full">
+      <h4 class="text-lg title-strong mt-2">Demo Course</h4>
+      <p class="text-xs subtitle mt-1">This is a sample course.</p>
+    `;
+    demoCard.addEventListener("click", () => {
+      window.location.href = "/instructor/course.html?id=demo";
     });
+
+    container.appendChild(demoCard);
   }
 
-  // ---- Page router + nav ----
+  // ---- Page Router ----
   function showPage(id) {
     qsa(".page-section").forEach((p) => p.classList.add("hidden"));
     qs(`#${id}`)?.classList.remove("hidden");
 
-    qsa(".nav-item").forEach((a) => {
-      a.classList.toggle("active", a.dataset.page === id);
-    });
+    qsa(".nav-item").forEach((a) =>
+      a.classList.toggle("active", a.dataset.page === id)
+    );
 
     if (id === "dashboard") loadDashboard();
-    if (id === "students") loadStudents();
-    if (id === "submitted") loadHomework();
-    if (id === "my-courses") loadMyCourses();
   }
-
-  qs("#addCourseBtn")?.addEventListener("click", openCourseModal);
-  qs("#addHomeworkBtn")?.addEventListener("click", openHomeworkModal);
 
   setupNotificationsUI();
   loadNotifications();
