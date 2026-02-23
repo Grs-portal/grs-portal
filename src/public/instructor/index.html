@@ -1,4 +1,4 @@
-e<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -45,15 +45,24 @@ body {
 /* ------------------------------
    Navigation Items
 ------------------------------- */
-.nav-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 10px 12px; border-radius: 14px;
-  color: var(--text-dark); font-weight: 600;
-  transition: 150ms; cursor: pointer;
-}
-.nav-item:hover { background: rgba(191,227,180,0.35); }
-.nav-item.active { background: rgba(28,24,32,.92); color: #e9f7e6; }
-
+   /* Sidebar nav */
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      color: var(--text-dark);
+      font-weight: 600; /* lighter than before */
+      transition: 150ms;
+    }
+    .nav-item:hover {
+      background: rgba(191,227,180,0.35);
+    }
+    .nav-item.active {
+      background: rgba(28,24,32,.92);
+      color: #e9f7e6;
+    }
 /* ------------------------------
    Glass / Card / Buttons
 ------------------------------- */
@@ -68,12 +77,15 @@ body {
   border: 1px solid var(--border);
   box-shadow: 0 10px 26px rgba(0,0,0,0.08);
 }
-.btn-primary {
-  background: rgba(28,24,32,.92); color: #e9f7e6;
-  border-radius: 16px; padding: 10px 16px; font-weight: 600;
-  transition: 0.15s;
-}
-.btn-primary:hover { opacity: .92; }
+    .btn-primary {
+      background: rgba(28,24,32,.92);
+      color: #e9f7e6;
+      border-radius: 16px;
+      padding: 10px 16px;
+      font-weight: 600; /* lighter than before */
+      transition: 0.15s;
+    }
+    .btn-primary:hover { opacity: .92; }
 
 /* ------------------------------
    Sidebar Layout
