@@ -159,6 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
   qs("#newCourseBtn").addEventListener("click", () => Courses.create());
 }
 
+  buildCoursesSidebar();
   /* =========================
      COURSES MODULE
   ========================= */
@@ -235,4 +236,5 @@ document.addEventListener("DOMContentLoaded", () => {
   showPage("dashboard");
 
 });
+
 
