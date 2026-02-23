@@ -1,19 +1,20 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-  /* =========================
+  /* =====================================================
      HELPERS
-  ========================= */
+  ===================================================== */
   const qs  = s => document.querySelector(s);
   const qsa = s => [...document.querySelectorAll(s)];
 
   const mainSidebar    = qs("#mainSidebar");
   const coursesSidebar = qs("#coursesSidebar");
   const overlay        = qs("#overlay");
+  const toggleBtn      = qs("#sidebarToggle");
   const menuBtn        = qs("#menuBtn");
 
-  /* =========================
+  /* =====================================================
      AUTH
-  ========================= */
+  ===================================================== */
   const LOGIN_URL = "/homepage/login.html";
   const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
   const role = localStorage.getItem("role");
@@ -23,13 +24,14 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  /* =========================
-     SIDEBAR CONTROL
-  ========================= */
+  /* =====================================================
+     SIDEBAR ENGINE
+  ===================================================== */
   function closeAllSidebars() {
     mainSidebar.classList.remove("active");
     coursesSidebar.classList.remove("active");
     overlay.classList.add("hidden");
+    toggleBtn.classList.add("hidden");
   }
 
   function openMainSidebar() {
@@ -40,20 +42,25 @@ document.addEventListener("DOMContentLoaded", () => {
   function openCoursesSidebar() {
     closeAllSidebars();
     coursesSidebar.classList.add("active");
+    toggleBtn.classList.remove("hidden");
     overlay.classList.remove("hidden");
   }
 
-  // mobile menu toggle
+  // Mobile menu
   menuBtn.addEventListener("click", () => {
-    if (mainSidebar.classList.contains("active")) closeAllSidebars();
-    else openMainSidebar();
+    if (mainSidebar.classList.contains("active")) {
+      closeAllSidebars();
+    } else {
+      openMainSidebar();
+    }
   });
 
-  overlay.addEventListener("click", closeAllSidebars);
+  toggleBtn.addEventListener("click", openMainSidebar);
+  overlay.addEventListener("click", openMainSidebar);
 
-  /* =========================
+  /* =====================================================
      ROUTER
-  ========================= */
+  ===================================================== */
   function showPage(id) {
 
     // hide all pages
@@ -68,15 +75,16 @@ document.addEventListener("DOMContentLoaded", () => {
       a.classList.toggle("active", a.dataset.page === id);
     });
 
-    // sidebar logic
-    if (id === "my-courses") openCoursesSidebar();
-    else openMainSidebar();
-
-    // init courses if page
-    if (id === "my-courses") Courses.init();
+    // sidebar control
+    if (id === "my-courses") {
+      openCoursesSidebar();
+      Courses.init();
+    } else {
+      openMainSidebar();
+    }
   }
 
-  // nav clicks
+  // nav click listeners
   qsa(".nav-item").forEach(link => {
     link.addEventListener("click", e => {
       e.preventDefault();
@@ -84,9 +92,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  /* =========================
-     BUILD COURSES SIDEBAR
-  ========================= */
+  /* =====================================================
+     COURSES SIDEBAR
+  ===================================================== */
   function buildCoursesSidebar() {
     coursesSidebar.innerHTML = `
       <div class="p-4 space-y-4 bg-white h-full overflow-y-auto">
@@ -109,9 +117,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   buildCoursesSidebar();
 
-  /* =========================
+  /* =====================================================
      COURSES MODULE
-  ========================= */
+  ===================================================== */
   const Courses = (() => {
     const KEY = "instructor_courses";
     let courses = JSON.parse(localStorage.getItem(KEY) || "[]");
@@ -123,55 +131,50 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function render() {
-      const container = qs("#my-courses-grid");
-      if (!container) return;
+      const container = qs("#my-courses");
 
       if (!courses.length) {
         container.innerHTML = `
-          <div class="glass p-6 rounded-2xl text-center fade-in">
+          <div class="glass p-10 rounded-2xl text-center fade-in">
             <p>No courses yet</p>
-            <button class="btn-primary mt-4" id="createCourseBtn">Create first course</button>
+            <button id="createCourseBtn" class="btn-primary mt-4">Create first course</button>
           </div>
         `;
         qs("#createCourseBtn").onclick = create;
         return;
       }
 
-      container.innerHTML = courses.map(c => `
-        <div class="course-card glass p-4 rounded-2xl cursor-pointer hover:scale-[1.02] transition" data-id="${c.id}">
-          <h3 class="title-strong text-lg">${c.title}</h3>
-          <p class="subtitle mt-1">${c.description || "No description"}</p>
-          <button class="btn-primary mt-2" data-edit-id="${c.id}">Edit</button>
+      // build course cards
+      container.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 fade-in">
+          ${courses.map(c => `
+            <div class="glass p-4 rounded-2xl cursor-pointer hover:scale-[1.02] transition"
+              data-id="${c.id}">
+              <div class="font-semibold">${c.title}</div>
+              <div class="text-xs opacity-70 mt-1">${c.description || "No description"}</div>
+            </div>
+          `).join("")}
         </div>
-      `).join("");
+      `;
 
-      // add card click for details
-      qsa(".course-card").forEach(card => {
-        card.addEventListener("click", () => alert("Course details coming soon!"));
-      });
-
-      // edit buttons
-      qsa("[data-edit-id]").forEach(btn => {
-        btn.addEventListener("click", e => {
-          e.stopPropagation(); // prevent card click
-          const id = btn.dataset.editId;
-          const course = courses.find(c => c.id === id);
-          const newTitle = prompt("Edit course title:", course.title);
-          if (!newTitle) return;
-          const newDesc = prompt("Edit course description:", course.description) || "";
-          course.title = newTitle;
-          course.description = newDesc;
-          save();
-          render();
-        });
+      // card click
+      qsa("[data-id]").forEach(card => {
+        card.onclick = () => alert("Course details coming soon!");
       });
     }
 
     function create() {
       const title = prompt("Course title?");
       if (!title) return;
+
       const description = prompt("Course description?") || "";
-      courses.push({ id: crypto.randomUUID(), title, description });
+
+      courses.push({
+        id: crypto.randomUUID(),
+        title,
+        description
+      });
+
       save();
       render();
     }
@@ -179,9 +182,9 @@ document.addEventListener("DOMContentLoaded", () => {
     return { init, create };
   })();
 
-  /* =========================
+  /* =====================================================
      INIT
-  ========================= */
+  ===================================================== */
   showPage("dashboard");
 
 });
