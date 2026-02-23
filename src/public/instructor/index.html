@@ -1,290 +1,190 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Instructor Portal</title>
+document.addEventListener("DOMContentLoaded", () => {
 
-<!-- Tailwind CSS -->
-<script src="https://cdn.tailwindcss.com"></script>
+  /* =====================================================
+     HELPERS
+  ===================================================== */
+  const qs  = s => document.querySelector(s);
+  const qsa = s => [...document.querySelectorAll(s)];
 
-<!-- Inter font -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  const mainSidebar    = qs("#mainSidebar");
+  const coursesSidebar = qs("#coursesSidebar");
+  const overlay        = qs("#overlay");
+  const toggleBtn      = qs("#sidebarToggle");
+  const menuBtn        = qs("#menuBtn");
 
-<style>
-  /* ------------------------------
-     Root Variables
-  ------------------------------- */
-  :root {
-    --soft-green: #BFE3B4;
-    --soft-green-light: #E6F5E2;
-    --soft-green-dark: #A9D69D;
-    --text-dark: #1C1820;
-    --border: rgba(0,0,0,.10);
-    --sidebar-w: 260px;
-    --header-h: 64px;
+  /* =====================================================
+     AUTH
+  ===================================================== */
+  const LOGIN_URL = "/homepage/login.html";
+  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+  const role = localStorage.getItem("role");
+
+  if (!isLoggedIn || role !== "instructor") {
+    window.location.replace(LOGIN_URL);
+    return;
   }
 
-  /* ------------------------------
-     Base Styles
-  ------------------------------- */
-  html, body {
-    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-    color: var(--text-dark);
+  /* =====================================================
+     SIDEBAR ENGINE
+  ===================================================== */
+  function closeAllSidebars() {
+    mainSidebar.classList.remove("active");
+    coursesSidebar.classList.remove("active");
+    overlay.classList.add("hidden");
+    toggleBtn.classList.add("hidden");
   }
-  body {
-    background:
-      radial-gradient(900px 420px at 18% 8%, rgba(191,227,180,.55), transparent 55%),
-      radial-gradient(900px 420px at 90% 12%, rgba(169,214,157,.40), transparent 55%),
-      linear-gradient(180deg, #f2fbf0 0%, #e6f5e2 55%, #f2fbf0 100%);
-    overflow-x: hidden;
-  }
-  .title-strong { font-weight: 700; letter-spacing: -0.01em; }
-  .subtitle { font-weight: 500; opacity: .8; }
 
-  /* ------------------------------
-     Navigation Items
-  ------------------------------- */
-  .nav-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: 14px;
-    color: var(--text-dark);
-    font-weight: 600;
-    transition: 150ms;
+  function openMainSidebar() {
+    closeAllSidebars();
+    mainSidebar.classList.add("active");
   }
-  .nav-item:hover { background: rgba(191,227,180,0.35); }
-  .nav-item.active { background: rgba(28,24,32,.92); color: #e9f7e6; }
 
-  /* ------------------------------
-     Glass / Card / Buttons
-  ------------------------------- */
-  .glass {
-    background: rgba(255,255,255,.70);
-    border: 1px solid var(--border);
-    box-shadow: 0 10px 26px rgba(0,0,0,0.06);
-    backdrop-filter: blur(12px);
+  function openCoursesSidebar() {
+    closeAllSidebars();
+    coursesSidebar.classList.add("active");
+    toggleBtn.classList.remove("hidden");
+    overlay.classList.remove("hidden");
   }
-  .hero {
-    background: linear-gradient(to bottom right, var(--soft-green), var(--soft-green-dark));
-    border: 1px solid var(--border);
-    box-shadow: 0 10px 26px rgba(0,0,0,0.08);
-  }
-  .btn-primary {
-    background: rgba(28,24,32,.92);
-    color: #e9f7e6;
-    border-radius: 16px;
-    padding: 10px 16px;
-    font-weight: 600;
-    transition: 0.15s;
-  }
-  .btn-primary:hover { opacity: .92; }
 
-  /* ------------------------------
-     Sidebar Layout
-  ------------------------------- */
-  #mainSidebar, #coursesSidebar {
-    grid-column: span 3 / span 3;
-    display: none;
-    height: fit-content;
-  }
-  #coursesSidebar { flex-direction: column; width: var(--sidebar-w); padding: 1rem; gap: 1rem; }
-
-  #mainSidebar.active, #coursesSidebar.active { display: flex; flex-direction: column; }
-
-  @media (max-width: 1024px) {
-    #mainSidebar, #coursesSidebar {
-      position: fixed; top: 0; left: 0; width: var(--sidebar-w);
-      height: 100vh; z-index: 40; transform: translateX(-100%);
-      transition: transform .35s ease;
+  // Mobile menu
+  menuBtn.addEventListener("click", () => {
+    if (mainSidebar.classList.contains("active")) {
+      closeAllSidebars();
+    } else {
+      openMainSidebar();
     }
-    #mainSidebar.active, #coursesSidebar.active { transform: translateX(0); }
+  });
+
+  toggleBtn.addEventListener("click", openMainSidebar);
+  overlay.addEventListener("click", openMainSidebar);
+
+  /* =====================================================
+     ROUTER
+  ===================================================== */
+  function showPage(id) {
+
+    // hide all pages
+    qsa(".page-section").forEach(p => p.classList.add("hidden"));
+
+    // show selected page
+    const page = qs("#" + id);
+    if (page) page.classList.remove("hidden");
+
+    // nav highlight
+    qsa(".nav-item").forEach(a => {
+      a.classList.toggle("active", a.dataset.page === id);
+    });
+
+    // sidebar control
+    if (id === "my-courses") {
+      openCoursesSidebar();
+      Courses.init();
+    } else {
+      openMainSidebar();
+    }
   }
 
-  /* Overlay */
-  #overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,.4);
-    backdrop-filter: blur(3px); display: none; z-index: 30;
-  }
-  #overlay.active { display: block; }
+  // nav click listeners
+  qsa(".nav-item").forEach(link => {
+    link.addEventListener("click", e => {
+      e.preventDefault();
+      showPage(link.dataset.page);
+    });
+  });
 
-  /* Animations */
-  .fade-in { animation: fadeIn 0.25s ease; }
-  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+  /* =====================================================
+     COURSES SIDEBAR
+  ===================================================== */
+  function buildCoursesSidebar() {
+    coursesSidebar.innerHTML = `
+      <div class="p-4 space-y-4 bg-white h-full overflow-y-auto">
+        <input id="searchCourse" placeholder="Search courses..."
+          class="w-full border rounded px-3 py-2">
 
-  /* Courses Grid */
-  #my-courses-grid .course-card {
-    background: rgba(255,255,255,0.75);
-    border: 1px solid var(--border);
-    border-radius: 1rem;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-  #my-courses-grid .course-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-  }
-  #dashboard-courses {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 1rem;
-  }
-</style>
-</head>
-<body class="min-h-screen overflow-x-hidden">
+        <select id="filterCourse" class="w-full border rounded px-3 py-2">
+          <option>All types</option>
+        </select>
 
-<!-- Topbar -->
-<header class="sticky top-0 z-50 border-b glass">
-  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <button id="menuBtn" class="lg:hidden text-2xl leading-none hover:opacity-70 transition">☰</button>
-      <div>
-        <div class="title-strong text-[15px]">Instructor Portal</div>
-        <div class="text-xs subtitle">Dashboard • Courses • Homework • Grades</div>
+        <button id="newCourseBtn"
+          class="w-full bg-black text-white rounded px-3 py-2">
+          + New Course
+        </button>
       </div>
-    </div>
-    <div class="flex items-center gap-3">
-      <span id="userName" class="text-sm font-semibold"></span>
-    </div>
-  </div>
-</header>
+    `;
 
-<div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 px-4 py-6 relative">
+    qs("#newCourseBtn").addEventListener("click", () => Courses.create());
+  }
 
-  <!-- Main Sidebar -->
-  <aside id="mainSidebar" class="sidebar active glass p-4 flex flex-col justify-between">
-    <div>
-      <div class="title-strong text-sm">Navigation</div>
-      <div class="text-xs subtitle">Jump between sections</div>
-      <nav class="mt-4">
-        <ul class="space-y-1">
-          <li><a href="#" data-page="dashboard" class="nav-item active">🏠 <span>Dashboard</span></a></li>
-          <li><a href="#" data-page="students" class="nav-item">🎓 <span>Students & Grades</span></a></li>
-          <li><a href="#" data-page="submitted" class="nav-item">📥 <span>Submitted Homework</span></a></li>
-          <li><a href="#" data-page="my-courses" class="nav-item">📚 <span>My Courses</span></a></li>
-          <li><a href="#" data-page="create-homework" class="nav-item">📝 <span>Create Homework</span></a></li>
-          <li><a href="#" data-page="news" class="nav-item">📰 <span>News</span></a></li>
-        </ul>
-      </nav>
-      <div class="mt-6 grid grid-cols-2 gap-3">
-        <section class="glass p-4 rounded-2xl text-center">
-          <p class="text-xs subtitle">Active courses</p>
-          <p id="activeCoursesCount" class="text-2xl font-semibold mt-1">0</p>
-        </section>
-        <section class="glass p-4 rounded-2xl text-center">
-          <p class="text-xs subtitle">To grade</p>
-          <p id="toGradeCount" class="text-2xl font-semibold mt-1">0</p>
-        </section>
-      </div>
-    </div>
-    <div>
-      <button id="sidebarLogout" class="w-full rounded-2xl border border-black/10 bg-white/70 hover:bg-white px-4 py-3 text-left font-semibold transition shadow-sm">
-        🚪 Logout
-      </button>
-    </div>
-  </aside>
+  buildCoursesSidebar();
 
-  <!-- Courses Sidebar -->
-  <aside id="coursesSidebar" class="sidebar glass p-4 hidden flex-col gap-3"></aside>
+  /* =====================================================
+     COURSES MODULE
+  ===================================================== */
+  const Courses = (() => {
+    const KEY = "instructor_courses";
+    let courses = JSON.parse(localStorage.getItem(KEY) || "[]");
 
-  <!-- Overlay for mobile -->
-  <div id="overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-30 lg:hidden"></div>
+    const save = () => localStorage.setItem(KEY, JSON.stringify(courses));
 
-  <!-- Main Content -->
-  <main class="lg:col-span-9 space-y-6">
+    function init() {
+      render();
+    }
 
-    <!-- Dashboard -->
-    <div id="dashboard" class="page-section">
-      <section class="hero rounded-2xl p-6">
-        <h2 class="text-2xl title-strong">Welcome, Teacher!</h2>
-        <p class="mt-1 subtitle">Manage your courses, homework, and grading from here.</p>
-      </section>
-      <section class="glass rounded-2xl p-6 mt-6">
-        <div class="flex items-center justify-between gap-3">
-          <h3 class="text-lg title-strong">My Courses</h3>
-          <div class="text-xs subtitle">Overview of what you teach</div>
-        </div>
-        <div id="dashboard-courses" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-          <!-- dynamically added dashboard courses -->
-        </div>
-      </section>
-    </div>
+    function render() {
+      const container = qs("#my-courses");
 
-    <!-- Students -->
-    <div id="students" class="page-section hidden">
-      <section class="glass rounded-2xl p-6">
-        <h2 class="text-xl title-strong">Students & Grades</h2>
-        <div class="overflow-x-auto mt-4">
-          <table class="min-w-full text-sm text-left">
-            <thead class="bg-[rgba(191,227,180,.85)] text-[var(--text-dark)] uppercase text-[0.75rem]">
-              <tr>
-                <th class="px-6 py-3">Student</th>
-                <th class="px-6 py-3">Course</th>
-                <th class="px-6 py-3">Grade</th>
-                <th class="px-6 py-3 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="studentTable"></tbody>
-          </table>
-        </div>
-      </section>
-    </div>
-
-    <!-- Submitted Homework -->
-    <div id="submitted" class="page-section hidden">
-      <section class="glass rounded-2xl p-6 min-h-[60vh]">
-        <h2 class="text-xl title-strong">Submitted Homework</h2>
-        <div id="homework-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4"></div>
-      </section>
-    </div>
-
-    <!-- My Courses -->
-    <div id="my-courses" class="page-section hidden">
-      <section class="glass rounded-2xl p-6">
-        <h2 class="text-xl title-strong mb-4">My Courses</h2>
-        <div id="my-courses-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <!-- dynamically added course cards -->
-          <div class="course-card">
-            <h3 class="title-strong text-lg">Course Name</h3>
-            <p class="subtitle mt-1">Course Description</p>
-            <button class="btn-primary mt-2">Edit</button>
+      if (!courses.length) {
+        container.innerHTML = `
+          <div class="glass p-10 rounded-2xl text-center fade-in">
+            <p>No courses yet</p>
+            <button id="createCourseBtn" class="btn-primary mt-4">Create first course</button>
           </div>
+        `;
+        qs("#createCourseBtn").onclick = create;
+        return;
+      }
+
+      // build course cards
+      container.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 fade-in">
+          ${courses.map(c => `
+            <div class="glass p-4 rounded-2xl cursor-pointer hover:scale-[1.02] transition"
+              data-id="${c.id}">
+              <div class="font-semibold">${c.title}</div>
+              <div class="text-xs opacity-70 mt-1">${c.description || "No description"}</div>
+            </div>
+          `).join("")}
         </div>
-      </section>
-    </div>
+      `;
 
-    <!-- Create Homework -->
-    <div id="create-homework" class="page-section hidden">
-      <section class="glass rounded-2xl p-6 min-h-[60vh] flex flex-col items-center justify-center text-center">
-        <h2 class="text-2xl title-strong">Create Homework</h2>
-        <p class="subtitle mt-1">Create an assignment and attach a PDF if needed.</p>
-        <button id="addHomeworkBtn" class="btn-primary mt-5">+ Add Homework</button>
-      </section>
-    </div>
+      // card click
+      qsa("[data-id]").forEach(card => {
+        card.onclick = () => alert("Course details coming soon!");
+      });
+    }
 
-    <!-- News -->
-    <div id="news" class="page-section hidden">
-      <section class="glass rounded-2xl p-6 min-h-[60vh]">
-        <h2 class="text-2xl title-strong text-center">News</h2>
-        <p class="subtitle text-center mt-2">You can wire this page to an API later.</p>
-      </section>
-    </div>
+    function create() {
+      const title = prompt("Course title?");
+      if (!title) return;
 
-  </main>
-</div>
+      const description = prompt("Course description?") || "";
 
-<footer class="w-full py-6 text-center text-xs border-t border-black/10 opacity-80">
-  © <span id="y"></span> Instructor Portal · Privacy · Terms
-</footer>
+      courses.push({
+        id: crypto.randomUUID(),
+        title,
+        description
+      });
 
-<script src="/instructor/script.js" defer></script>
-</body>
-</html>
+      save();
+      render();
+    }
+
+    return { init, create };
+  })();
+
+  /* =====================================================
+     INIT
+  ===================================================== */
+  showPage("dashboard");
+
+});
