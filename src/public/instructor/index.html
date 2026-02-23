@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Instructor Portal</title>
 
-<!-- Tailwind -->
+<!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com"></script>
 
 <!-- Inter font -->
@@ -15,207 +15,128 @@
 
 <style>
   /* ------------------------------
-   Root Variables
-------------------------------- */
-:root {
-  --soft-green: #BFE3B4;
-  --soft-green-light: #E6F5E2;
-  --soft-green-dark: #A9D69D;
-  --text-dark: #1C1820;
-  --border: rgba(0,0,0,.10);
-}
-
-:root {
-  --sidebar-w: 260px;
-  --header-h: 64px; /* header height */
-}
-
-/* ------------------------------
-   Base Styles
-------------------------------- */
-html, body {
-  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  color: var(--text-dark);
-}
-body {
-  background:
-    radial-gradient(900px 420px at 18% 8%, rgba(191,227,180,.55), transparent 55%),
-    radial-gradient(900px 420px at 90% 12%, rgba(169,214,157,.40), transparent 55%),
-    linear-gradient(180deg, #f2fbf0 0%, #e6f5e2 55%, #f2fbf0 100%);
-  overflow-x: hidden;
-}
-.title-strong { font-weight: 700; letter-spacing: -0.01em; }
-.subtitle { font-weight: 500; opacity: .8; }
-
-/* ------------------------------
-   Navigation Items
-------------------------------- */
-   /* Sidebar nav */
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 12px;
-      border-radius: 14px;
-      color: var(--text-dark);
-      font-weight: 600; /* lighter than before */
-      transition: 150ms;
-    }
-    .nav-item:hover {
-      background: rgba(191,227,180,0.35);
-    }
-    .nav-item.active {
-      background: rgba(28,24,32,.92);
-      color: #e9f7e6;
-    }
-/* ------------------------------
-   Glass / Card / Buttons
-------------------------------- */
-.glass {
-  background: rgba(255,255,255,.70);
-  border: 1px solid var(--border);
-  box-shadow: 0 10px 26px rgba(0,0,0,0.06);
-  backdrop-filter: blur(12px);
-}
-.hero {
-  background: linear-gradient(to bottom right, var(--soft-green), var(--soft-green-dark));
-  border: 1px solid var(--border);
-  box-shadow: 0 10px 26px rgba(0,0,0,0.08);
-}
-    .btn-primary {
-      background: rgba(28,24,32,.92);
-      color: #e9f7e6;
-      border-radius: 16px;
-      padding: 10px 16px;
-      font-weight: 600; /* lighter than before */
-      transition: 0.15s;
-    }
-    .btn-primary:hover { opacity: .92; }
-
-/* ------------------------------
-   Sidebar Layout
-------------------------------- */
-
-#mainSidebar,
-#coursesSidebar {
-  grid-column: span 3 / span 3; /* same space */
-  display: none;
-  height: fit-content;
-}
-
-#coursesSidebar {
-  flex-direction: column;
-  width: var(--sidebar-w); 
-  padding: 1rem; 
-  gap: 1rem;
-}
-
-/* active one shows */
-#mainSidebar.active,
-#coursesSidebar.active {
-  display: flex;
-  flex-direction: column;
-}
-
-/* mobile behavior only */
-@media (max-width: 1024px) {
-
-  #mainSidebar,
-  #coursesSidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 260px;
-    height: 100vh;
-    z-index: 40;
-    transform: translateX(-100%);
-    transition: transform .35s ease;
+     Root Variables
+  ------------------------------- */
+  :root {
+    --soft-green: #BFE3B4;
+    --soft-green-light: #E6F5E2;
+    --soft-green-dark: #A9D69D;
+    --text-dark: #1C1820;
+    --border: rgba(0,0,0,.10);
+    --sidebar-w: 260px;
+    --header-h: 64px;
   }
-  
 
-  #mainSidebar.active,
-  #coursesSidebar.active {
+  /* ------------------------------
+     Base Styles
+  ------------------------------- */
+  html, body {
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    color: var(--text-dark);
+  }
+  body {
+    background:
+      radial-gradient(900px 420px at 18% 8%, rgba(191,227,180,.55), transparent 55%),
+      radial-gradient(900px 420px at 90% 12%, rgba(169,214,157,.40), transparent 55%),
+      linear-gradient(180deg, #f2fbf0 0%, #e6f5e2 55%, #f2fbf0 100%);
+    overflow-x: hidden;
+  }
+  .title-strong { font-weight: 700; letter-spacing: -0.01em; }
+  .subtitle { font-weight: 500; opacity: .8; }
+
+  /* ------------------------------
+     Navigation Items
+  ------------------------------- */
+  .nav-item {
     display: flex;
-    transform: translateX(0);
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    color: var(--text-dark);
+    font-weight: 600;
+    transition: 150ms;
+  }
+  .nav-item:hover { background: rgba(191,227,180,0.35); }
+  .nav-item.active { background: rgba(28,24,32,.92); color: #e9f7e6; }
+
+  /* ------------------------------
+     Glass / Card / Buttons
+  ------------------------------- */
+  .glass {
+    background: rgba(255,255,255,.70);
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 26px rgba(0,0,0,0.06);
+    backdrop-filter: blur(12px);
+  }
+  .hero {
+    background: linear-gradient(to bottom right, var(--soft-green), var(--soft-green-dark));
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 26px rgba(0,0,0,0.08);
+  }
+  .btn-primary {
+    background: rgba(28,24,32,.92);
+    color: #e9f7e6;
+    border-radius: 16px;
+    padding: 10px 16px;
+    font-weight: 600;
+    transition: 0.15s;
+  }
+  .btn-primary:hover { opacity: .92; }
+
+  /* ------------------------------
+     Sidebar Layout
+  ------------------------------- */
+  #mainSidebar, #coursesSidebar {
+    grid-column: span 3 / span 3;
+    display: none;
+    height: fit-content;
+  }
+  #coursesSidebar { flex-direction: column; width: var(--sidebar-w); padding: 1rem; gap: 1rem; }
+
+  #mainSidebar.active, #coursesSidebar.active { display: flex; flex-direction: column; }
+
+  @media (max-width: 1024px) {
+    #mainSidebar, #coursesSidebar {
+      position: fixed; top: 0; left: 0; width: var(--sidebar-w);
+      height: 100vh; z-index: 40; transform: translateX(-100%);
+      transition: transform .35s ease;
+    }
+    #mainSidebar.active, #coursesSidebar.active { transform: translateX(0); }
   }
 
-}
-
-  #coursesSidebar {
-  display: none;
-  flex-direction: column;
-  height: fit-content;
-  width: var(--sidebar-w); /* same as main sidebar */
-  padding: 1rem;
-  gap: 1rem;
-}
-
-#coursesSidebar.active {
-  display: flex;
-}
-
-@media (max-width: 1024px) {
-  #coursesSidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: var(--sidebar-w);
-    height: 100vh;
-    z-index: 40;
-    transform: translateX(-100%);
-    transition: transform .35s ease;
+  /* Overlay */
+  #overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.4);
+    backdrop-filter: blur(3px); display: none; z-index: 30;
   }
+  #overlay.active { display: block; }
 
-  #coursesSidebar.active {
-    transform: translateX(0);
+  /* Animations */
+  .fade-in { animation: fadeIn 0.25s ease; }
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+  /* Courses Grid */
+  #my-courses-grid .course-card {
+    background: rgba(255,255,255,0.75);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
-}
-
-/* ===== OVERLAY ===== */
-#overlay {
-  position: fixed;
-  inset: 0;
-
-  background: rgba(0,0,0,.4);
-  backdrop-filter: blur(3px);
-
-  display: none;
-  z-index: 30;
-}
-
-#overlay.active {
-  display: block;
-}
-/* ------------------------------
-   Animations
-------------------------------- */
-.fade-in { animation: fadeIn 0.25s ease; }
-@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-
-
-#my-courses-grid .course-card {
-  background: rgba(255,255,255,0.75);
-  border: 1px solid var(--border);
-  border-radius: 1rem;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-#my-courses-grid .course-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-}
-
-#dashboard-courses {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1rem;
-}
-  
+  #my-courses-grid .course-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  }
+  #dashboard-courses {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+  }
 </style>
 </head>
 <body class="min-h-screen overflow-x-hidden">
@@ -224,13 +145,12 @@ body {
 <header class="sticky top-0 z-50 border-b glass">
   <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
     <div class="flex items-center gap-3">
-      <button id="menuBtn" class="lg:hidden text-2xl leading-none hover:opacity-70 transition" aria-label="Open menu">☰</button>
+      <button id="menuBtn" class="lg:hidden text-2xl leading-none hover:opacity-70 transition">☰</button>
       <div>
         <div class="title-strong text-[15px]">Instructor Portal</div>
         <div class="text-xs subtitle">Dashboard • Courses • Homework • Grades</div>
       </div>
     </div>
-
     <div class="flex items-center gap-3">
       <span id="userName" class="text-sm font-semibold"></span>
     </div>
@@ -244,7 +164,6 @@ body {
     <div>
       <div class="title-strong text-sm">Navigation</div>
       <div class="text-xs subtitle">Jump between sections</div>
-
       <nav class="mt-4">
         <ul class="space-y-1">
           <li><a href="#" data-page="dashboard" class="nav-item active">🏠 <span>Dashboard</span></a></li>
@@ -255,20 +174,17 @@ body {
           <li><a href="#" data-page="news" class="nav-item">📰 <span>News</span></a></li>
         </ul>
       </nav>
-
       <div class="mt-6 grid grid-cols-2 gap-3">
         <section class="glass p-4 rounded-2xl text-center">
           <p class="text-xs subtitle">Active courses</p>
           <p id="activeCoursesCount" class="text-2xl font-semibold mt-1">0</p>
         </section>
-
         <section class="glass p-4 rounded-2xl text-center">
           <p class="text-xs subtitle">To grade</p>
           <p id="toGradeCount" class="text-2xl font-semibold mt-1">0</p>
         </section>
       </div>
     </div>
-
     <div>
       <button id="sidebarLogout" class="w-full rounded-2xl border border-black/10 bg-white/70 hover:bg-white px-4 py-3 text-left font-semibold transition shadow-sm">
         🚪 Logout
@@ -277,15 +193,12 @@ body {
   </aside>
 
   <!-- Courses Sidebar -->
-  <aside id="coursesSidebar" class="sidebar"></aside>
-
-  <!-- Toggle Button -->
-  <button id="sidebarToggle" class="sidebar-toggle hidden">☰ Dashboard</button>
+  <aside id="coursesSidebar" class="sidebar glass p-4 hidden flex-col gap-3"></aside>
 
   <!-- Overlay for mobile -->
   <div id="overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-30 lg:hidden"></div>
 
-  <!-- Main content -->
+  <!-- Main Content -->
   <main class="lg:col-span-9 space-y-6">
 
     <!-- Dashboard -->
@@ -294,14 +207,15 @@ body {
         <h2 class="text-2xl title-strong">Welcome, Teacher!</h2>
         <p class="mt-1 subtitle">Manage your courses, homework, and grading from here.</p>
       </section>
-
       <section class="glass rounded-2xl p-6 mt-6">
         <div class="flex items-center justify-between gap-3">
           <h3 class="text-lg title-strong">My Courses</h3>
           <div class="text-xs subtitle">Overview of what you teach</div>
         </div>
+        <div id="dashboard-courses" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <!-- dynamically added dashboard courses -->
+        </div>
       </section>
-        <div id="dashboard-courses" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4"></div>
     </div>
 
     <!-- Students -->
@@ -332,23 +246,19 @@ body {
       </section>
     </div>
 
-    <!-- My Courses section -->
+    <!-- My Courses -->
     <div id="my-courses" class="page-section hidden">
       <section class="glass rounded-2xl p-6">
         <h2 class="text-xl title-strong mb-4">My Courses</h2>
         <div id="my-courses-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <!-- dynamically added course cards -->
+          <div class="course-card">
+            <h3 class="title-strong text-lg">Course Name</h3>
+            <p class="subtitle mt-1">Course Description</p>
+            <button class="btn-primary mt-2">Edit</button>
+          </div>
         </div>
       </section>
-    </div>
-
-    <div id="my-courses-grid">
-      <div class="course-card">
-        <h3 class="title-strong text-lg">Course Name</h3>
-        <p class="subtitle mt-1">Course Description</p>
-        <button class="btn-primary mt-2">Edit</button>
-      </div>
-      <!-- repeat for more courses -->
     </div>
 
     <!-- Create Homework -->
@@ -378,12 +288,3 @@ body {
 <script src="/instructor/script.js" defer></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
