@@ -27,60 +27,75 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => t.remove(), 2000);
   }
 
-  /* ==========================
-     SIDEBAR SYSTEM
-  ========================== */
-  const mainSidebar = qs("#mainSidebar");
-  const coursesSidebar = qs("#coursesSidebar");
-  const toggleBtn = qs("#sidebarToggle");
+ /* ==========================
+   SIDEBAR SYSTEM FIXED
+========================== */
+const mainSidebar = qs("#mainSidebar");
+const coursesSidebar = qs("#coursesSidebar");
+const toggleBtn = qs("#sidebarToggle");
+const overlay = qs("#overlay");
 
-  function buildCoursesSidebar() {
-    coursesSidebar.innerHTML = `
-      <div class="p-4 space-y-4">
-        <input placeholder="Search courses..." class="w-full border rounded px-3 py-2">
-        <select class="w-full border rounded px-3 py-2">
-          <option>All types</option>
-          <option>Video</option>
-          <option>Readable</option>
-        </select>
-        <select class="w-full border rounded px-3 py-2">
-          <option>All locations</option>
-          <option>Online</option>
-          <option>In person</option>
-          <option>Both</option>
-        </select>
-        <select class="w-full border rounded px-3 py-2">
-          <option>All states</option>
-          <option>Draft</option>
-          <option>Published</option>
-        </select>
-        <button class="w-full bg-black text-white rounded px-3 py-2">+ New Course</button>
-        <div class="mt-6 text-xs opacity-50">📅 mini calendar (demo)</div>
-      </div>
-    `;
-  }
+function buildCoursesSidebar() {
+  coursesSidebar.innerHTML = `
+    <div class="p-4 space-y-4">
+      <input placeholder="Search courses..." class="w-full border rounded px-3 py-2">
+      <select class="w-full border rounded px-3 py-2">
+        <option>All types</option>
+        <option>Video</option>
+        <option>Readable</option>
+      </select>
+      <select class="w-full border rounded px-3 py-2">
+        <option>All locations</option>
+        <option>Online</option>
+        <option>In person</option>
+        <option>Both</option>
+      </select>
+      <select class="w-full border rounded px-3 py-2">
+        <option>All states</option>
+        <option>Draft</option>
+        <option>Published</option>
+      </select>
+      <button class="w-full bg-black text-white rounded px-3 py-2">+ New Course</button>
+      <div class="mt-6 text-xs opacity-50">📅 mini calendar (demo)</div>
+    </div>
+  `;
+}
 
-  function openCoursesSidebar() {
+function openCoursesSidebar() {
+  mainSidebar.classList.remove("active");
+  coursesSidebar.classList.add("active");
+  toggleBtn.classList.remove("hidden");
+  overlay.classList.remove("hidden");
+}
+
+function openMainSidebar() {
+  coursesSidebar.classList.remove("active");
+  mainSidebar.classList.add("active");
+  toggleBtn.classList.add("hidden");
+  overlay.classList.add("hidden");
+}
+
+toggleBtn.addEventListener("click", openMainSidebar);
+overlay.addEventListener("click", openMainSidebar);
+
+// Mobile menu button
+qs("#menuBtn").addEventListener("click", () => {
+  if (mainSidebar.classList.contains("active")) {
     mainSidebar.classList.remove("active");
-    coursesSidebar.classList.add("active");
-    toggleBtn.classList.remove("hidden");
-  }
-
-  function openMainSidebar() {
-    coursesSidebar.classList.remove("active");
+    overlay.classList.remove("hidden");
+  } else {
     mainSidebar.classList.add("active");
-    toggleBtn.classList.add("hidden");
+    overlay.classList.add("hidden");
   }
+});
 
-  toggleBtn.addEventListener("click", openMainSidebar);
-  qs('[data-page="my-courses"]').addEventListener("click", (e) => {
-    e.preventDefault();
-    openCoursesSidebar();
-    showPage("my-courses");
-  });
+qs('[data-page="my-courses"]').addEventListener("click", (e) => {
+  e.preventDefault();
+  openCoursesSidebar();
+  showPage("my-courses");
+});
 
-  buildCoursesSidebar();
-
+buildCoursesSidebar();
   /* ==========================
      ROUTER
   ========================== */
@@ -299,3 +314,4 @@ document.addEventListener("DOMContentLoaded", () => {
   ========================== */
   showPage("dashboard");
 });
+
