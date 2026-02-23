@@ -141,6 +141,36 @@ body {
 
 }
 
+  #coursesSidebar {
+  display: none;
+  flex-direction: column;
+  height: fit-content;
+  width: var(--sidebar-w); /* same as main sidebar */
+  padding: 1rem;
+  gap: 1rem;
+}
+
+#coursesSidebar.active {
+  display: flex;
+}
+
+@media (max-width: 1024px) {
+  #coursesSidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--sidebar-w);
+    height: 100vh;
+    z-index: 40;
+    transform: translateX(-100%);
+    transition: transform .35s ease;
+  }
+
+  #coursesSidebar.active {
+    transform: translateX(0);
+  }
+}
+
 /* ===== OVERLAY ===== */
 #overlay {
   position: fixed;
@@ -163,7 +193,7 @@ body {
 @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
 
 
-  #my-courses .course-card {
+#my-courses-grid .course-card {
   background: rgba(255,255,255,0.75);
   border: 1px solid var(--border);
   border-radius: 1rem;
@@ -175,12 +205,12 @@ body {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-#my-courses .course-card:hover {
+#my-courses-grid .course-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(0,0,0,0.08);
 }
 
-#courses {
+#dashboard-courses {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 1rem;
@@ -271,6 +301,7 @@ body {
           <div class="text-xs subtitle">Overview of what you teach</div>
         </div>
       </section>
+        <div id="dashboard-courses" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4"></div>
     </div>
 
     <!-- Students -->
@@ -301,14 +332,23 @@ body {
       </section>
     </div>
 
-    <!-- My Courses -->
+    <!-- My Courses section -->
     <div id="my-courses" class="page-section hidden">
       <section class="glass rounded-2xl p-6">
         <h2 class="text-xl title-strong mb-4">My Courses</h2>
-        <div id="courses" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div id="my-courses-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <!-- dynamically added course cards -->
         </div>
       </section>
+    </div>
+
+    <div id="my-courses-grid">
+      <div class="course-card">
+        <h3 class="title-strong text-lg">Course Name</h3>
+        <p class="subtitle mt-1">Course Description</p>
+        <button class="btn-primary mt-2">Edit</button>
+      </div>
+      <!-- repeat for more courses -->
     </div>
 
     <!-- Create Homework -->
@@ -338,6 +378,7 @@ body {
 <script src="/instructor/script.js" defer></script>
 </body>
 </html>
+
 
 
 
