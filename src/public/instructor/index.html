@@ -234,20 +234,66 @@
 <body class="min-h-screen overflow-x-hidden">
 
 <!-- Topbar -->
-<header class="sticky top-0 z-50 border-b glass">
-  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <button id="menuBtn" class="lg:hidden text-2xl leading-none hover:opacity-70 transition">☰</button>
-      <div>
-        <div class="title-strong text-[15px]">Instructor Portal</div>
-        <div class="text-xs subtitle">Dashboard • Courses • Homework • Grades</div>
+  <header class="sticky top-0 z-50 border-b glass">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+
+      <div class="flex items-center gap-3">
+        <button id="menuBtn" class="lg:hidden text-2xl leading-none hover:opacity-70 transition" aria-label="Open menu">☰</button>
+        <div>
+          <div class="title-strong text-[15px]">Instructor Portal</div>
+          <div class="text-xs subtitle">Dashboard • Courses • Homework • Grades</div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <span id="userName" class="text-sm font-semibold"></span>
+
+        <!-- 🔔 Notifications -->
+        <div class="relative" id="notifWrap">
+          <button id="notifBtn"
+            class="w-10 h-10 rounded-2xl glass flex items-center justify-center hover:bg-white transition"
+            title="Notifications">
+            🔔
+            <span id="notifBadge"
+              class="hidden absolute -top-1 -right-1 text-[11px] px-1.5 py-0.5 rounded-full bg-red-500 text-white font-bold">
+              0
+            </span>
+          </button>
+
+          <div id="notifMenu"
+            class="hidden absolute right-0 mt-2 w-80 max-w-[90vw] glass rounded-2xl overflow-hidden">
+            <div class="px-4 py-3 flex items-center justify-between border-b border-black/10">
+              <div class="font-semibold">Notifications</div>
+              <button id="notifReadAll"
+                class="text-xs font-semibold px-2 py-1 rounded-xl bg-slate-100 hover:bg-slate-200">
+                Mark all read
+              </button>
+            </div>
+            <div id="notifList" class="max-h-80 overflow-auto"></div>
+            <div class="px-4 py-3 text-xs text-slate-500 border-t border-black/10">
+              Uploads • edits • deletes
+            </div>
+          </div>
+        </div>
+
+        <!-- Avatar dropdown -->
+        <div id="topAvatarWrap" class="relative">
+          <div id="userAvatar"
+            class="w-10 h-10 rounded-full bg-[var(--soft-green)] border border-black/10 flex items-center justify-center font-semibold cursor-pointer select-none">
+          </div>
+
+          <div id="profileMenu"
+            class="hidden absolute right-0 mt-2 w-44 glass rounded-2xl overflow-hidden">
+            <button id="logoutBtn"
+              class="w-full text-left px-4 py-3 text-sm hover:bg-black/5 font-semibold">
+              Logout
+            </button>
+          </div>
+        </div>
+
       </div>
     </div>
-    <div class="flex items-center gap-3">
-      <span id="userName" class="text-sm font-semibold"></span>
-    </div>
-  </div>
-</header>
+  </header>
 
 <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 px-4 py-6 relative">
 
@@ -286,6 +332,11 @@
 
   <!-- Courses Sidebar -->
   <aside id="coursesSidebar" class="sidebar glass p-4 hidden flex-col gap-3"></aside>
+
+  <!-- toggle button -->
+    <button id="sidebarToggle" class="sidebar-toggle hidden">
+      ☰ Dashboard
+    </button>
 
   <!-- Overlay for mobile -->
   <div id="overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-30 lg:hidden"></div>
@@ -380,4 +431,5 @@
 <script src="/instructor/script.js" defer></script>
 </body>
 </html>
+
 
