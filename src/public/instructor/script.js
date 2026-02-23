@@ -2,6 +2,84 @@
 document.addEventListener("DOMContentLoaded", () => {
   const LOGIN_URL = "/homepage/login.html";
 
+
+  /* ========================================
+   SIDEBAR SWAP SYSTEM
+======================================== */
+
+const mainSidebar = document.getElementById("mainSidebar");
+const coursesSidebar = document.getElementById("coursesSidebar");
+const toggleBtn = document.getElementById("sidebarToggle");
+
+/* build courses sidebar once */
+function buildCoursesSidebar() {
+  coursesSidebar.innerHTML = `
+    <div class="p-4 space-y-4">
+
+      <input placeholder="Search courses..."
+        class="w-full border rounded px-3 py-2">
+
+      <select class="w-full border rounded px-3 py-2">
+        <option>All types</option>
+        <option>Video</option>
+        <option>Readable</option>
+      </select>
+
+      <select class="w-full border rounded px-3 py-2">
+        <option>All locations</option>
+        <option>Online</option>
+        <option>In person</option>
+        <option>Both</option>
+      </select>
+
+      <select class="w-full border rounded px-3 py-2">
+        <option>All states</option>
+        <option>Draft</option>
+        <option>Published</option>
+      </select>
+
+      <button class="w-full bg-black text-white rounded px-3 py-2">
+        + New Course
+      </button>
+
+      <div class="mt-6 text-xs opacity-50">
+        📅 mini calendar (demo)
+      </div>
+
+    </div>
+  `;
+}
+
+/* open courses */
+function openCoursesSidebar() {
+  mainSidebar.classList.remove("active");
+  coursesSidebar.classList.add("active");
+
+  toggleBtn.classList.remove("hidden");
+}
+
+/* return to dashboard */
+function openMainSidebar() {
+  coursesSidebar.classList.remove("active");
+  mainSidebar.classList.add("active");
+
+  toggleBtn.classList.add("hidden");
+}
+
+/* button click */
+toggleBtn.onclick = openMainSidebar;
+
+/* link nav button */
+document.querySelector('[data-page="my-courses"]')
+  .addEventListener("click", (e) => {
+    e.preventDefault();
+    openCoursesSidebar();
+  });
+
+/* build once */
+buildCoursesSidebar()
+
+  
   /* =====================================================
      AUTH GUARD
   ===================================================== */
@@ -357,3 +435,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
   showPage("dashboard");
 });
+
