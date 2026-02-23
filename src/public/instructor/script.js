@@ -25,10 +25,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
-     SIDEBAR ENGINE  (🔥 main fix)
-     Only these functions touch sidebars
+     SIDEBAR ENGINE
   ===================================================== */
-
   function closeAllSidebars() {
     mainSidebar.classList.remove("active");
     coursesSidebar.classList.remove("active");
@@ -48,11 +46,10 @@ document.addEventListener("DOMContentLoaded", () => {
     overlay.classList.remove("hidden");
   }
 
-  /* ---------- mobile menu ---------- */
+  // Mobile menu
   menuBtn.addEventListener("click", () => {
     if (mainSidebar.classList.contains("active")) {
       closeAllSidebars();
-      overlay.classList.remove("hidden");
     } else {
       openMainSidebar();
     }
@@ -62,23 +59,23 @@ document.addEventListener("DOMContentLoaded", () => {
   overlay.addEventListener("click", openMainSidebar);
 
   /* =====================================================
-     ROUTER  (🔥 now controls sidebar automatically)
+     ROUTER
   ===================================================== */
-
   function showPage(id) {
 
-    /* hide pages */
+    // hide all pages
     qsa(".page-section").forEach(p => p.classList.add("hidden"));
 
-    /* show page */
-    qs("#" + id)?.classList.remove("hidden");
+    // show selected page
+    const page = qs("#" + id);
+    if (page) page.classList.remove("hidden");
 
-    /* nav highlight */
-    qsa(".nav-item").forEach(a =>
-      a.classList.toggle("active", a.dataset.page === id)
-    );
+    // nav highlight
+    qsa(".nav-item").forEach(a => {
+      a.classList.toggle("active", a.dataset.page === id);
+    });
 
-    /* decide sidebar */
+    // sidebar control
     if (id === "my-courses") {
       openCoursesSidebar();
       Courses.init();
@@ -87,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  /* nav clicks */
+  // nav click listeners
   qsa(".nav-item").forEach(link => {
     link.addEventListener("click", e => {
       e.preventDefault();
@@ -96,16 +93,15 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* =====================================================
-     BUILD COURSES SIDEBAR
+     COURSES SIDEBAR
   ===================================================== */
-
   function buildCoursesSidebar() {
     coursesSidebar.innerHTML = `
       <div class="p-4 space-y-4 bg-white h-full overflow-y-auto">
-        <input placeholder="Search courses..."
+        <input id="searchCourse" placeholder="Search courses..."
           class="w-full border rounded px-3 py-2">
 
-        <select class="w-full border rounded px-3 py-2">
+        <select id="filterCourse" class="w-full border rounded px-3 py-2">
           <option>All types</option>
         </select>
 
@@ -115,21 +111,20 @@ document.addEventListener("DOMContentLoaded", () => {
         </button>
       </div>
     `;
+
+    qs("#newCourseBtn").addEventListener("click", () => Courses.create());
   }
 
   buildCoursesSidebar();
 
   /* =====================================================
-     COURSES MODULE  (same logic, cleaned)
+     COURSES MODULE
   ===================================================== */
-
   const Courses = (() => {
-
     const KEY = "instructor_courses";
     let courses = JSON.parse(localStorage.getItem(KEY) || "[]");
 
-    const save = () =>
-      localStorage.setItem(KEY, JSON.stringify(courses));
+    const save = () => localStorage.setItem(KEY, JSON.stringify(courses));
 
     function init() {
       render();
@@ -142,30 +137,29 @@ document.addEventListener("DOMContentLoaded", () => {
         container.innerHTML = `
           <div class="glass p-10 rounded-2xl text-center fade-in">
             <p>No courses yet</p>
-            <button id="createCourse" class="btn-primary mt-4">
-              Create first course
-            </button>
+            <button id="createCourseBtn" class="btn-primary mt-4">Create first course</button>
           </div>
         `;
-
-        qs("#createCourse").onclick = create;
+        qs("#createCourseBtn").onclick = create;
         return;
       }
 
+      // build course cards
       container.innerHTML = `
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 fade-in">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 fade-in">
           ${courses.map(c => `
             <div class="glass p-4 rounded-2xl cursor-pointer hover:scale-[1.02] transition"
               data-id="${c.id}">
               <div class="font-semibold">${c.title}</div>
-              <div class="text-xs opacity-70">${c.description}</div>
+              <div class="text-xs opacity-70 mt-1">${c.description || "No description"}</div>
             </div>
           `).join("")}
         </div>
       `;
 
+      // card click
       qsa("[data-id]").forEach(card => {
-        card.onclick = () => alert("Course detail later");
+        card.onclick = () => alert("Course details coming soon!");
       });
     }
 
@@ -173,24 +167,24 @@ document.addEventListener("DOMContentLoaded", () => {
       const title = prompt("Course title?");
       if (!title) return;
 
+      const description = prompt("Course description?") || "";
+
       courses.push({
         id: crypto.randomUUID(),
         title,
-        description: ""
+        description
       });
 
       save();
       render();
     }
 
-    return { init };
-
+    return { init, create };
   })();
 
   /* =====================================================
      INIT
   ===================================================== */
-
   showPage("dashboard");
 
 });
