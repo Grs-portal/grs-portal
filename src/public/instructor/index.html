@@ -30,7 +30,12 @@
   /* ------------------------------
      Base Styles
   ------------------------------- */
-  html, body { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; color: var(--text-dark); }
+  html, body {
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    color: var(--text-dark);
+    margin: 0;
+    padding: 0;
+  }
   body {
     background:
       radial-gradient(900px 420px at 18% 8%, rgba(191,227,180,.55), transparent 55%),
@@ -45,8 +50,14 @@
      Navigation Items
   ------------------------------- */
   .nav-item {
-    display: flex; align-items: center; gap: 10px; padding: 10px 12px;
-    border-radius: 14px; color: var(--text-dark); font-weight: 600; transition: 150ms;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    color: var(--text-dark);
+    font-weight: 600;
+    transition: 150ms;
   }
   .nav-item:hover { background: rgba(191,227,180,0.35); }
   .nav-item.active { background: rgba(28,24,32,.92); color: #e9f7e6; }
@@ -54,51 +65,78 @@
   /* ------------------------------
      Glass / Card / Buttons
   ------------------------------- */
-  .glass { background: rgba(255,255,255,.70); border: 1px solid var(--border); box-shadow: 0 10px 26px rgba(0,0,0,0.06); backdrop-filter: blur(12px); }
-  .hero { background: linear-gradient(to bottom right, var(--soft-green), var(--soft-green-dark)); border: 1px solid var(--border); box-shadow: 0 10px 26px rgba(0,0,0,0.08); }
-  .btn-primary { background: rgba(28,24,32,.92); color: #e9f7e6; border-radius: 16px; padding: 10px 16px; font-weight: 600; transition: 0.15s; }
+  .glass {
+    background: rgba(255,255,255,.70);
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 26px rgba(0,0,0,0.06);
+    backdrop-filter: blur(12px);
+  }
+  .hero {
+    background: linear-gradient(to bottom right, var(--soft-green), var(--soft-green-dark));
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 26px rgba(0,0,0,0.08);
+  }
+  .btn-primary {
+    background: rgba(28,24,32,.92);
+    color: #e9f7e6;
+    border-radius: 16px;
+    padding: 10px 16px;
+    font-weight: 600;
+    transition: 0.15s;
+  }
   .btn-primary:hover { opacity: .92; }
 
   /* ------------------------------
      Sidebar Layout
   ------------------------------- */
   #mainSidebar, #coursesSidebar {
-    grid-column: span 3 / span 3;
+    width: var(--sidebar-w);
     display: none;
     flex-direction: column;
     gap: 1rem;
+    padding: 1rem;
   }
   #mainSidebar.active, #coursesSidebar.active { display: flex; }
 
-  /* Courses Sidebar specific */
+  /* Courses Sidebar Custom Styles */
   #coursesSidebar {
-    width: var(--sidebar-w); 
-    height: 260px; /* fixed height */
-    padding: 1rem;
-    overflow-y: auto;
-    background: rgba(255,255,255,.95);
-    border: 1px solid var(--border);
+    height: 260px;
+    background: rgba(255,255,255,0.9);
     border-radius: 1rem;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-    position: relative;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+    overflow-y: auto;
   }
-  #coursesSidebar h3 { font-weight: 700; margin-bottom: 0.75rem; }
-  #coursesSidebar .filter-group { margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.25rem; }
-  #coursesSidebar input, #coursesSidebar select {
-    border: 1px solid var(--border);
-    border-radius: 0.5rem;
-    padding: 6px 8px;
-    outline: none;
+  #coursesSidebar h3 {
+    font-weight: 700; margin-bottom: 0.5rem;
   }
-  #coursesSidebar .sidebar-calendar { margin-top: 1rem; }
-  #coursesSidebar .calendar-grid {
-    display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center;
-    font-size: 0.75rem;
+  .filter-group {
+    display: flex; flex-direction: column; margin-bottom: 1rem;
   }
-  #coursesSidebar .calendar-grid .event-day { background: var(--soft-green); border-radius: 50%; padding: 2px 4px; }
+  .filter-group label { font-weight: 600; margin-bottom: 0.25rem; font-size: 0.85rem; }
+  .filter-group input, .filter-group select {
+    padding: 6px 8px; border: 1px solid var(--border); border-radius: 0.5rem; outline: none;
+  }
+  .sidebar-calendar {
+    margin-top: 1rem;
+  }
+  .calendar-preview {
+    background: rgba(191,227,180,0.2); border-radius: 0.5rem; padding: 0.5rem;
+    font-size: 0.75rem; text-align: center;
+  }
+  .calendar-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-top: 0.25rem;
+  }
+  .calendar-grid span {
+    display: block; padding: 2px; text-align: center;
+    border-radius: 0.25rem;
+  }
+  .event-day { background: var(--soft-green-dark); color: white; }
 
   /* Overlay */
-  #overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4); backdrop-filter: blur(3px); display: none; z-index: 30; }
+  #overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.4);
+    backdrop-filter: blur(3px); display: none; z-index: 30;
+  }
   #overlay.active { display: block; }
 
   /* Animations */
@@ -121,31 +159,16 @@
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(0,0,0,0.08);
   }
-  #dashboard-courses { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
 
-  /* Sidebar toggle button */
-  #sidebarToggle {
-    position: absolute;
-    top: 1rem; left: -120px;
-    background: rgba(28,24,32,.92);
-    color: #e9f7e6;
-    border-radius: 12px;
-    padding: 6px 10px;
-    font-weight: 600;
-    cursor: pointer;
-    z-index: 50;
-  }
-
+  /* Responsive Sidebar */
   @media (max-width: 1024px) {
     #mainSidebar, #coursesSidebar {
-      position: fixed; top: 0; left: 0; width: var(--sidebar-w);
-      height: 100vh; z-index: 40; transform: translateX(-100%);
-      transition: transform .35s ease;
+      position: fixed; top: 0; left: 0; height: 100vh; z-index: 40;
+      transform: translateX(-100%); transition: transform 0.35s ease;
     }
     #mainSidebar.active, #coursesSidebar.active { transform: translateX(0); }
-    #sidebarToggle { display: none; } /* no toggle on mobile */
+    #sidebarToggle { display: block; position: fixed; top: 1rem; left: 1rem; z-index: 50; background: var(--soft-green-dark); color: white; border-radius: 1rem; padding: 0.5rem 1rem; font-weight: 600; }
   }
-
 </style>
 </head>
 <body class="min-h-screen overflow-x-hidden">
@@ -202,14 +225,12 @@
   </aside>
 
   <!-- Courses Sidebar -->
-  <aside id="coursesSidebar" class="sidebar hidden glass p-4">
+  <aside id="coursesSidebar" class="sidebar glass p-4 hidden">
     <h3>Filter Programs</h3>
-
     <div class="filter-group">
       <label>Search</label>
       <input type="text" placeholder="Search programs..." />
     </div>
-
     <div class="filter-group">
       <label>Status</label>
       <select>
@@ -219,7 +240,6 @@
         <option>Completed</option>
       </select>
     </div>
-
     <div class="filter-group">
       <label>Duration</label>
       <select>
@@ -229,7 +249,6 @@
         <option>12 weeks</option>
       </select>
     </div>
-
     <div class="filter-group">
       <label>Type</label>
       <select>
@@ -239,34 +258,48 @@
         <option>Program</option>
       </select>
     </div>
-
     <div class="sidebar-calendar">
-      <h4 style="padding-bottom:0.5rem;">Program Calendar</h4>
+      <h4>Program Calendar</h4>
       <div class="calendar-preview">
-        <div class="calendar-header"><span>March 2026</span></div>
         <div class="calendar-grid">
           <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
           <span></span><span></span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
-          <span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
-          <span class="event-day">12</span>
+          <span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span class="event-day">12</span>
           <span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span>
-          <span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span>
-          <span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span>
+          <span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span>
+          <span>27</span><span>28</span><span>29</span><span>30</span><span>31</span>
         </div>
-        <p class="calendar-hint text-xs mt-1 opacity-70">Click to view full calendar</p>
+        <p class="calendar-hint text-xs mt-1">Click to view full calendar</p>
       </div>
     </div>
-
-    <!-- Toggle button to reopen main dashboard -->
-    <button id="sidebarToggle">☰ Dashboard</button>
   </aside>
 
-  <!-- Overlay for mobile -->
-  <div id="overlay" class="hidden"></div>
+  <!-- Sidebar toggle button -->
+  <button id="sidebarToggle" class="sidebar-toggle hidden">☰ Dashboard</button>
 
-  <!-- Main content -->
+  <!-- Overlay -->
+  <div id="overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-30 lg:hidden"></div>
+
+  <!-- Main Content -->
   <main class="lg:col-span-9 space-y-6">
-    <!-- dashboard, students, my-courses, etc. remain unchanged -->
+
+    <!-- Dashboard Section -->
+    <div id="dashboard" class="page-section">
+      <section class="hero rounded-2xl p-6">
+        <h2 class="text-2xl title-strong">Welcome, Teacher!</h2>
+        <p class="mt-1 subtitle">Manage your courses, homework, and grading from here.</p>
+      </section>
+      <section class="glass rounded-2xl p-6 mt-6">
+        <div class="flex items-center justify-between gap-3">
+          <h3 class="text-lg title-strong">My Courses</h3>
+          <div class="text-xs subtitle">Overview of what you teach</div>
+        </div>
+        <div id="dashboard-courses" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4"></div>
+      </section>
+    </div>
+
+    <!-- Other page sections omitted for brevity (students, submitted, my-courses, create-homework, news) -->
+
   </main>
 </div>
 
@@ -275,31 +308,37 @@
 </footer>
 
 <script>
+  // ------------------------
   // Sidebar toggle logic
+  // ------------------------
+  const menuBtn = document.getElementById('menuBtn');
+  const sidebarToggle = document.getElementById('sidebarToggle');
   const mainSidebar = document.getElementById('mainSidebar');
   const coursesSidebar = document.getElementById('coursesSidebar');
-  const sidebarToggle = document.getElementById('sidebarToggle');
+  const overlay = document.getElementById('overlay');
 
-  document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('click', e => {
-      if (item.dataset.page === 'my-courses') {
-        mainSidebar.classList.remove('active');
-        coursesSidebar.classList.add('active');
-        sidebarToggle.classList.remove('hidden');
-      } else {
-        coursesSidebar.classList.remove('active');
-        sidebarToggle.classList.add('hidden');
-        mainSidebar.classList.add('active');
-      }
-    });
+  menuBtn.addEventListener('click', () => {
+    mainSidebar.classList.toggle('active');
+    overlay.classList.toggle('active');
   });
 
   sidebarToggle.addEventListener('click', () => {
-    coursesSidebar.classList.remove('active');
     mainSidebar.classList.add('active');
-    sidebarToggle.classList.add('hidden');
+    coursesSidebar.classList.remove('active');
   });
-</script>
 
+  overlay.addEventListener('click', () => {
+    mainSidebar.classList.remove('active');
+    coursesSidebar.classList.remove('active');
+    overlay.classList.remove('active');
+  });
+
+  // Example: show courses sidebar
+  function openCoursesSidebar() {
+    mainSidebar.classList.remove('active');
+    coursesSidebar.classList.add('active');
+    sidebarToggle.classList.remove('hidden');
+  }
+</script>
 </body>
 </html>
