@@ -80,6 +80,49 @@
       transition: 0.15s;
     }
     .btn-primary:hover { opacity: .92; }
+
+    
+.layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* BOTH sidebars */
+.sidebar {
+  width: 260px;
+  background: white;
+  border-right: 1px solid #eee;
+  transition: transform .35s ease;
+  position: relative;
+  z-index: 20;
+}
+
+/* hidden by default */
+.sidebar:not(.active) {
+  transform: translateX(-100%);
+}
+
+/* content always full */
+#contentArea {
+  flex: 1;
+  overflow: auto;
+  padding: 24px;
+}
+
+/* floating toggle */
+.sidebar-toggle {
+  position: fixed;
+  left: 10px;
+  top: 10px;
+  z-index: 50;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: black;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
   </style>
 </head>
 
@@ -312,5 +355,6 @@
   <script src="/instructor/script.js" defer></script>
 </body>
 </html>
+
 
 
