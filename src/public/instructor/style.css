@@ -116,3 +116,47 @@ body.light #modalBg > div {
   background-color: #ffffff !important;
   color: #1A1A1A !important;
 }
+
+
+.layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* BOTH sidebars */
+.sidebar {
+  width: 260px;
+  background: white;
+  border-right: 1px solid #eee;
+  transition: transform .35s ease;
+  position: relative;
+  z-index: 20;
+}
+
+/* hidden by default */
+.sidebar:not(.active) {
+  transform: translateX(-100%);
+}
+
+/* content always full */
+#contentArea {
+  flex: 1;
+  overflow: auto;
+  padding: 24px;
+}
+
+/* floating toggle */
+.sidebar-toggle {
+  position: fixed;
+  left: 10px;
+  top: 10px;
+  z-index: 50;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: black;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
