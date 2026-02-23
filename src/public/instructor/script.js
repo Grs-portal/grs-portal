@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const mainSidebar    = qs("#mainSidebar");
   const coursesSidebar = qs("#coursesSidebar");
+  const toggleBtn = qs("#sidebarToggle");
   const overlay        = qs("#overlay");
   const menuBtn        = qs("#menuBtn");
 
@@ -236,6 +237,7 @@ document.addEventListener("DOMContentLoaded", () => {
   showPage("dashboard");
 
 });
+
 
 
 
