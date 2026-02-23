@@ -248,16 +248,291 @@ document.addEventListener("DOMContentLoaded", () => {
   // ---- Create Courses ----
   function openCourseModal() { /* ... keep existing ... */ }
 
-  // ---- My Courses (full load inside dashboard) ----
-  async function loadMyCourses() {
-    const container = qs("#myCoursesContainer");
-    if (!container) return;
 
-    // ---- fetch standalone courses.html ----
-    const res = await fetch("/instructor/courses.html");
-    if (!res.ok) return (container.innerHTML = "Failed to load courses page.");
+  /* =====================================================
+   COURSES SYSTEM — FULL REWRITE (SPA INTEGRATED)
+===================================================== */
 
-    let html = await res.text();
+const COURSE_KEY = "instructor_courses";
+
+/* ---------------------------
+   STATE
+--------------------------- */
+let courses = JSON.parse(localStorage.getItem(COURSE_KEY) || "[]");
+let activeCourseId = null;
+
+function saveCourses() {
+  localStorage.setItem(COURSE_KEY, JSON.stringify(courses));
+}
+
+/* ---------------------------
+   UTIL
+--------------------------- */
+const uid = () => crypto.randomUUID();
+
+function short(text, n = 90) {
+  return text.length > n ? text.slice(0, n) + "..." : text;
+}
+
+/* ---------------------------
+   MAIN ENTRY (called by router)
+--------------------------- */
+async function loadMyCourses() {
+  buildCoursesLayout();
+  renderCoursesGrid();
+}
+
+/* =====================================================
+   LAYOUT
+===================================================== */
+
+function buildCoursesLayout() {
+  const container = qs("#myCoursesContainer");
+
+  container.innerHTML = `
+  <div class="flex gap-6">
+
+    <!-- COURSES SIDEBAR -->
+    <aside id="coursesSidebar"
+      class="w-72 shrink-0 glass rounded-2xl p-4 space-y-4">
+
+      <input id="courseSearch"
+        placeholder="Search..."
+        class="w-full border rounded-xl px-3 py-2 text-sm" />
+
+      <select id="filterState" class="w-full border rounded-xl px-3 py-2 text-sm">
+        <option value="">All states</option>
+        <option value="draft">Draft</option>
+        <option value="published">Published</option>
+      </select>
+
+      <button id="newCourseBtn" class="btn-primary w-full">
+        + New Course
+      </button>
+
+      <div class="glass rounded-xl p-3 text-xs text-center opacity-70">
+        📅 Calendar demo
+      </div>
+    </aside>
+
+    <!-- CONTENT -->
+    <section id="coursesContent" class="flex-1">
+      <div id="coursesGrid"
+        class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+    </section>
+
+  </div>
+  `;
+
+  qs("#newCourseBtn").onclick = openCourseModal;
+  qs("#courseSearch").oninput = renderCoursesGrid;
+  qs("#filterState").onchange = renderCoursesGrid;
+}
+
+/* =====================================================
+   GRID
+===================================================== */
+
+function renderCoursesGrid() {
+  const grid = qs("#coursesGrid");
+
+  let list = [...courses];
+
+  const q = qs("#courseSearch").value.toLowerCase();
+  const state = qs("#filterState").value;
+
+  if (q) list = list.filter(c => c.title.toLowerCase().includes(q));
+  if (state) list = list.filter(c => c.state === state);
+
+  if (!list.length) {
+    grid.innerHTML = `
+      <div class="col-span-full glass p-8 text-center rounded-2xl">
+        <p class="subtitle">No courses yet</p>
+        <button class="btn-primary mt-3" onclick="openCourseModal()">Create your first course</button>
+      </div>
+    `;
+    return;
+  }
+
+  grid.innerHTML = list.map(c => `
+    <div class="glass rounded-2xl overflow-hidden cursor-pointer hover:scale-[1.02] transition"
+      onclick="openCourseDetail('${c.id}')">
+
+      <img src="${c.cover || 'https://picsum.photos/500'}"
+        class="h-36 w-full object-cover"/>
+
+      <div class="p-4 space-y-2">
+        <div class="font-semibold">${c.title}</div>
+        <div class="text-xs opacity-70">${short(c.description)}</div>
+
+        <div class="text-xs flex gap-2 flex-wrap">
+          <span>📍 ${c.location}</span>
+          <span>⏱ ${c.duration}</span>
+          <span class="px-2 py-0.5 rounded bg-black/10">${c.state}</span>
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+
+/* =====================================================
+   CREATE / EDIT MODAL
+===================================================== */
+
+function openCourseModal(editId = null) {
+  const edit = courses.find(c => c.id === editId);
+
+  showModal(`
+    <h3 class="text-lg font-semibold mb-4">
+      ${edit ? "Edit Course" : "New Course"}
+    </h3>
+
+    <form id="courseForm" class="space-y-3 text-sm">
+
+      <input id="title" placeholder="Title"
+        class="w-full border rounded-xl px-3 py-2" value="${edit?.title || ""}" required>
+
+      <textarea id="desc" placeholder="Description"
+        class="w-full border rounded-xl px-3 py-2">${edit?.description || ""}</textarea>
+
+      <input id="cover" placeholder="Cover image URL"
+        class="w-full border rounded-xl px-3 py-2" value="${edit?.cover || ""}">
+
+      <input id="duration" placeholder="Duration (ex: 3 hours)"
+        class="w-full border rounded-xl px-3 py-2" value="${edit?.duration || ""}">
+
+      <select id="location" class="w-full border rounded-xl px-3 py-2">
+        <option>online</option>
+        <option>in person</option>
+        <option>both</option>
+      </select>
+
+      <div class="flex gap-2">
+        <button type="submit" class="btn-primary flex-1">Save</button>
+        <button id="cancelModal" type="button" class="border px-4 rounded-xl">Cancel</button>
+      </div>
+    </form>
+  `);
+
+  qs("#courseForm").onsubmit = e => {
+    e.preventDefault();
+
+    const data = {
+      id: edit?.id || uid(),
+      title: qs("#title").value,
+      description: qs("#desc").value,
+      cover: qs("#cover").value,
+      duration: qs("#duration").value,
+      location: qs("#location").value,
+      state: edit?.state || "draft",
+      chapters: edit?.chapters || [],
+      publisher: localStorage.getItem("userName") || "Instructor",
+      createdAt: Date.now()
+    };
+
+    if (edit) {
+      courses = courses.map(c => c.id === editId ? data : c);
+    } else {
+      courses.unshift(data);
+    }
+
+    saveCourses();
+    closeModal();
+    renderCoursesGrid();
+  };
+}
+
+/* =====================================================
+   DETAIL PAGE
+===================================================== */
+
+function openCourseDetail(id) {
+  activeCourseId = id;
+  const c = courses.find(x => x.id === id);
+
+  qs("#coursesContent").innerHTML = `
+    <button onclick="renderCoursesGrid()" class="mb-4 text-sm opacity-70">
+      ← Back
+    </button>
+
+    <div class="glass rounded-2xl p-6 space-y-4">
+
+      <img src="${c.cover}" class="w-full h-60 object-cover rounded-xl"/>
+
+      <div class="flex justify-between">
+        <h2 class="text-xl font-semibold">${c.title}</h2>
+
+        <div class="flex gap-2">
+          <button onclick="openCourseModal('${c.id}')" class="btn-primary">Edit</button>
+          <button onclick="deleteCourse('${c.id}')" class="border rounded-xl px-3">Delete</button>
+        </div>
+      </div>
+
+      <p class="opacity-80">${c.description}</p>
+
+      <div class="text-sm flex gap-6">
+        <span>📍 ${c.location}</span>
+        <span>⏱ ${c.duration}</span>
+        <span>📚 ${c.chapters.length} chapters</span>
+      </div>
+
+      <div class="pt-4 border-t">
+        <button onclick="addChapter()" class="btn-primary">+ Add Chapter</button>
+
+        <div id="chaptersList" class="space-y-2 mt-3"></div>
+      </div>
+
+    </div>
+  `;
+
+  renderChapters();
+}
+
+/* =====================================================
+   CHAPTERS
+===================================================== */
+
+function renderChapters() {
+  const c = courses.find(x => x.id === activeCourseId);
+  const list = qs("#chaptersList");
+
+  list.innerHTML = c.chapters.map((ch,i)=>`
+    <div class="glass rounded-xl p-3 flex justify-between">
+      <span>${i+1}. ${ch.title}</span>
+      <button onclick="removeChapter(${i})">✕</button>
+    </div>
+  `).join("");
+}
+
+function addChapter() {
+  const title = prompt("Chapter title");
+  if(!title) return;
+
+  const c = courses.find(x => x.id === activeCourseId);
+  c.chapters.push({ title });
+
+  saveCourses();
+  renderChapters();
+}
+
+function removeChapter(i) {
+  const c = courses.find(x => x.id === activeCourseId);
+  c.chapters.splice(i,1);
+  saveCourses();
+  renderChapters();
+}
+
+/* =====================================================
+   DELETE
+===================================================== */
+
+function deleteCourse(id) {
+  if(!confirm("Delete this course?")) return;
+  courses = courses.filter(c=>c.id!==id);
+  saveCourses();
+  renderCoursesGrid();
+}
+
 
     // ---- inject HTML into container ----
     container.innerHTML = html;
@@ -273,7 +548,7 @@ document.addEventListener("DOMContentLoaded", () => {
       document.body.appendChild(newS);
       newS.remove(); // cleanup after running
     });
-  }
+  });
 
   // ---- Page router + nav ----
   function showPage(id) {
@@ -298,4 +573,3 @@ document.addEventListener("DOMContentLoaded", () => {
   setInterval(loadNotifications, 15000);
 
   showPage("dashboard");
-});
