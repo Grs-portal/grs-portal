@@ -1,4 +1,4 @@
-<!doctype html>
+e<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -14,70 +14,108 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-  :root {
-    --soft-green: #BFE3B4;
-    --soft-green-light: #E6F5E2;
-    --soft-green-dark: #A9D69D;
-    --text-dark: #1C1820;
-    --border: rgba(0,0,0,.10);
-  }
-
-  html, body { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; color: var(--text-dark); }
-  body {
-    background:
-      radial-gradient(900px 420px at 18% 8%, rgba(191,227,180,.55), transparent 55%),
-      radial-gradient(900px 420px at 90% 12%, rgba(169,214,157,.40), transparent 55%),
-      linear-gradient(180deg, #f2fbf0 0%, #e6f5e2 55%, #f2fbf0 100%);
-  }
-
-  .title-strong { font-weight: 700; letter-spacing: -0.01em; }
-  .subtitle { font-weight: 500; opacity: .8; }
-
-  .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 14px; color: var(--text-dark); font-weight: 600; transition: 150ms; cursor: pointer; }
-  .nav-item:hover { background: rgba(191,227,180,0.35); }
-  .nav-item.active { background: rgba(28,24,32,.92); color: #e9f7e6; }
-
-  .glass { background: rgba(255,255,255,.70); border: 1px solid var(--border); box-shadow: 0 10px 26px rgba(0,0,0,0.06); backdrop-filter: blur(12px); }
-  .hero { background: linear-gradient(to bottom right, var(--soft-green), var(--soft-green-dark)); border: 1px solid var(--border); box-shadow: 0 10px 26px rgba(0,0,0,0.08); }
-
-  .btn-primary { background: rgba(28,24,32,.92); color: #e9f7e6; border-radius: 16px; padding: 10px 16px; font-weight: 600; transition: 0.15s; }
-  .btn-primary:hover { opacity: .92; }
-
-  .layout { display: flex; height: 100vh; overflow: hidden; }
-  .mainSidebar { width: 260px; background: white; border-right: 1px solid #eee; transition: transform .35s ease; position: relative; z-index: 20; }
-  .mainSidebar:not(.active) { transform: translateX(-100%); }
-  #contentArea { flex: 1; overflow: auto; padding: 24px; }
-/* MAIN SIDEBAR stays fixed in place */
-#mainSidebar {
-  position: relative;
-  z-index: 20;
-  transition: transform 0.35s ease;
+  /* ------------------------------
+   Root Variables
+------------------------------- */
+:root {
+  --soft-green: #BFE3B4;
+  --soft-green-light: #E6F5E2;
+  --soft-green-dark: #A9D69D;
+  --text-dark: #1C1820;
+  --border: rgba(0,0,0,.10);
 }
 
-/* COURSES SIDEBAR overlays content */
+/* ------------------------------
+   Base Styles
+------------------------------- */
+html, body {
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  color: var(--text-dark);
+}
+body {
+  background:
+    radial-gradient(900px 420px at 18% 8%, rgba(191,227,180,.55), transparent 55%),
+    radial-gradient(900px 420px at 90% 12%, rgba(169,214,157,.40), transparent 55%),
+    linear-gradient(180deg, #f2fbf0 0%, #e6f5e2 55%, #f2fbf0 100%);
+  overflow-x: hidden;
+}
+.title-strong { font-weight: 700; letter-spacing: -0.01em; }
+.subtitle { font-weight: 500; opacity: .8; }
+
+/* ------------------------------
+   Navigation Items
+------------------------------- */
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 14px;
+  color: var(--text-dark); font-weight: 600;
+  transition: 150ms; cursor: pointer;
+}
+.nav-item:hover { background: rgba(191,227,180,0.35); }
+.nav-item.active { background: rgba(28,24,32,.92); color: #e9f7e6; }
+
+/* ------------------------------
+   Glass / Card / Buttons
+------------------------------- */
+.glass {
+  background: rgba(255,255,255,.70);
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.06);
+  backdrop-filter: blur(12px);
+}
+.hero {
+  background: linear-gradient(to bottom right, var(--soft-green), var(--soft-green-dark));
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.08);
+}
+.btn-primary {
+  background: rgba(28,24,32,.92); color: #e9f7e6;
+  border-radius: 16px; padding: 10px 16px; font-weight: 600;
+  transition: 0.15s;
+}
+.btn-primary:hover { opacity: .92; }
+
+/* ------------------------------
+   Sidebar Layout
+------------------------------- */
+.layout { display: flex; height: 100vh; }
+
+/* Main Sidebar */
+#mainSidebar {
+  width: 260px;
+  background: white;
+  border-right: 1px solid #eee;
+  transition: transform 0.35s ease;
+  position: relative;
+  z-index: 20;
+}
+#mainSidebar:not(.active) { transform: translateX(-100%); }
+
+/* Courses Sidebar (overlay) */
 #coursesSidebar {
-  position: fixed;       /* overlay on top of everything */
-  top: 0;
-  left: 0;
+  position: fixed;
+  top: 0; left: 0;
   height: 100%;
   width: 260px;
   background: white;
   z-index: 30;
-  transform: translateX(-100%); /* hide by default */
+  transform: translateX(-100%);
   transition: transform 0.35s ease;
 }
+#coursesSidebar.active { transform: translateX(0); }
 
-/* when active, slide in */
-#coursesSidebar.active {
-  transform: translateX(0);
-}
-
-/* toggle button */
+/* Toggle Button */
 #sidebarToggle {
+  position: fixed;
+  left: 10px; top: 10px;
   z-index: 40;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: black; color: white; border: none;
+  cursor: pointer;
 }
 
-/* overlay for mobile */
+/* Overlay for mobile */
 #overlay {
   position: fixed;
   inset: 0;
@@ -86,15 +124,13 @@
   display: none;
   z-index: 25;
 }
+#overlay.active { display: block; }
 
-#overlay.active {
-  display: block;
-}
-  .sidebar-toggle { position: fixed; left: 10px; top: 10px; z-index: 50; padding: 8px 12px; border-radius: 10px; background: black; color: white; border: none; cursor: pointer; }
-
-  /* Fade-in for modal content */
-  .fade-in { animation: fadeIn 0.25s ease; }
-  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+/* ------------------------------
+   Animations
+------------------------------- */
+.fade-in { animation: fadeIn 0.25s ease; }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
 </style>
 </head>
 <body class="min-h-screen overflow-x-hidden">
@@ -241,6 +277,7 @@
 <script src="/instructor/script.js" defer></script>
 </body>
 </html>
+
 
 
 
