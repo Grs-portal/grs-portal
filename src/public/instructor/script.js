@@ -105,16 +105,17 @@ document.addEventListener("DOMContentLoaded", () => {
           <option>Upcoming</option>
           <option>Ongoing</option>
           <option>Completed</option>
+          <option>Draft</option>
         </select>
       </div>
 
       <div class="filter-group">
-        <label>Duration</label>
-        <select id="durationFilter">
-          <option value="">Any</option>
-          <option>4 weeks</option>
-          <option>8 weeks</option>
-          <option>12 weeks</option>
+        <label>Location</label>
+        <select id="locationFilter">
+          <option value="">All</option>
+          <option>Online</option>
+          <option>In Person</option>
+          <option value="">Both</option>
         </select>
       </div>
 
@@ -122,9 +123,8 @@ document.addEventListener("DOMContentLoaded", () => {
         <label>Type</label>
         <select id="typeFilter">
           <option value="">All</option>
-          <option>Course</option>
-          <option>Workshop</option>
-          <option>Program</option>
+          <option>Video</option>
+          <option>PDF</option>
         </select>
       </div>
 
@@ -236,6 +236,7 @@ document.addEventListener("DOMContentLoaded", () => {
   showPage("dashboard");
 
 });
+
 
 
 
