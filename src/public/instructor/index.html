@@ -103,6 +103,13 @@ body {
   height: fit-content;
 }
 
+#coursesSidebar {
+  flex-direction: column;
+  width: var(--sidebar-w); 
+  padding: 1rem; 
+  gap: 1rem;
+}
+
 /* active one shows */
 #mainSidebar.active,
 #coursesSidebar.active {
@@ -124,6 +131,7 @@ body {
     transform: translateX(-100%);
     transition: transform .35s ease;
   }
+  
 
   #mainSidebar.active,
   #coursesSidebar.active {
@@ -153,6 +161,31 @@ body {
 ------------------------------- */
 .fade-in { animation: fadeIn 0.25s ease; }
 @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+
+  #my-courses .course-card {
+  background: rgba(255,255,255,0.75);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#my-courses .course-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+#courses {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+  
 </style>
 </head>
 <body class="min-h-screen overflow-x-hidden">
@@ -270,7 +303,14 @@ body {
     </div>
 
     <!-- My Courses -->
-    <div id="my-courses" class="page-section hidden"></div>
+    <div id="my-courses" class="page-section hidden">
+      <section class="glass rounded-2xl p-6">
+        <h2 class="text-xl title-strong mb-4">My Courses</h2>
+        <div id="courses" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- dynamically added course cards -->
+        </div>
+      </section>
+    </div>
 
     <!-- Create Homework -->
     <div id="create-homework" class="page-section hidden">
@@ -299,6 +339,7 @@ body {
 <script src="/instructor/script.js" defer></script>
 </body>
 </html>
+
 
 
 
