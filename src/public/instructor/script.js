@@ -219,20 +219,27 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       container.innerHTML = courses.map(c => `
-        <div class="course-card relative bg-white p-4 rounded-2xl shadow-sm fade-in" data-id="${c.id}">
+       <div class="course-card cursor-pointer relative"
+             data-id="${c.id}">
+             
           <div class="absolute top-3 left-3 text-xs font-semibold px-2 py-1 rounded-full ${getStatusClass(c.status)}">
             ${formatStatus(c.status)}
           </div>
-          <img src="${c.cover || 'https://via.placeholder.com/400x200'}" class="w-full h-32 object-cover rounded-xl mb-3">
+      
+          <img src="${c.cover || 'https://via.placeholder.com/400x200'}"
+               class="w-full h-32 object-cover rounded-xl mb-3">
+      
           <h3 class="title-strong text-lg">${c.title}</h3>
-          <p class="subtitle text-sm mt-1 line-clamp-2">${c.description}</p>
-          <div class="flex justify-between text-xs mt-3 opacity-80">
-            <span>${c.location}</span>
-            <span>${c.durationValue} ${c.durationUnit}</span>
-          </div>
+          <p class="subtitle text-sm mt-1">${c.description}</p>
         </div>
       `).join("");
-    }
+
+      container.querySelectorAll(".course-card").forEach(card => {
+        card.addEventListener("click", () => {
+          const id = card.dataset.id;
+          openCourseDetail(id);
+        });
+      });
 
     /* ===== CREATE ===== */
     function create(data) {
@@ -303,10 +310,166 @@ document.addEventListener("DOMContentLoaded", () => {
     return { init, openModal };
   })();
 
+  //======Course details page======
+
+  function openCourseDetail(courseId) {
+  const courses = JSON.parse(localStorage.getItem("instructor_courses") || "[]");
+  const course = courses.find(c => c.id === courseId);
+  if (!course) return;
+
+  const container = document.querySelector("#courseDetailContainer");
+
+  container.innerHTML = `
+    <div class="bg-white rounded-2xl overflow-hidden shadow-sm">
+
+      <!-- HERO -->
+      <div class="relative h-72 w-full">
+        <img src="${course.cover || 'https://via.placeholder.com/1200x400'}"
+             class="w-full h-full object-cover">
+        <button id="editCourseTopBtn"
+          class="absolute top-4 right-4 bg-black text-white px-4 py-2 rounded-xl text-sm">
+          Edit Course
+        </button>
+      </div>
+
+      <!-- CONTENT -->
+      <div class="p-8">
+
+        <h1 class="text-3xl font-bold mb-2">${course.title}</h1>
+
+        <span class="inline-block bg-gray-100 px-3 py-1 rounded-full text-xs mb-4">
+          ${course.type || "Course"}
+        </span>
+
+        <p class="text-gray-700 mb-6">${course.description}</p>
+
+        <!-- TEACHER -->
+        <div class="flex items-center gap-4 mb-8">
+          <img src="${localStorage.getItem("userPhoto") || 'https://via.placeholder.com/60'}"
+               class="w-14 h-14 rounded-full object-cover">
+          <span class="font-semibold">
+            ${localStorage.getItem("userName") || "Instructor"}
+          </span>
+        </div>
+
+        <!-- INFO BLOCKS -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+          <div class="glass p-4 rounded-xl text-center">
+            <div class="text-xl font-bold">${course.durationValue || 0}</div>
+            <div class="text-xs uppercase opacity-60">Duration</div>
+          </div>
+
+          <div class="glass p-4 rounded-xl text-center">
+            <div class="text-xl font-bold">${course.chapters?.length || 0}</div>
+            <div class="text-xs uppercase opacity-60">Chapters</div>
+          </div>
+
+          <div class="glass p-4 rounded-xl text-center">
+            <div class="text-xs font-semibold">${course.location}</div>
+            <div class="text-xs uppercase opacity-60">Location</div>
+          </div>
+
+          <div class="glass p-4 rounded-xl text-center">
+            <div class="text-xs font-semibold">${course.type || "-"}</div>
+            <div class="text-xs uppercase opacity-60">Type</div>
+          </div>
+        </div>
+
+        <!-- CHAPTERS -->
+        <div class="mb-12">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold">Chapters</h2>
+            <button id="addChapterBtn"
+              class="bg-green-600 text-white px-4 py-2 rounded-xl text-sm">
+              Add Chapter
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            ${(course.chapters || []).map(ch => `
+              <div class="bg-gray-50 rounded-xl overflow-hidden relative cursor-pointer">
+                <img src="${ch.cover || 'https://via.placeholder.com/300x200'}"
+                     class="w-full h-32 object-cover">
+
+                ${ch.preview
+                  ? `<span class="absolute top-2 right-2 bg-green-600 text-white text-xs px-2 py-1 rounded">
+                      Preview
+                     </span>`
+                  : `<span class="absolute top-2 right-2 bg-black text-white text-xs px-2 py-1 rounded">
+                      Locked
+                     </span>`}
+
+                <div class="p-3">
+                  <h4 class="font-semibold">${ch.title}</h4>
+                  <p class="text-xs opacity-60">${ch.duration}</p>
+                </div>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+
+        <!-- REVIEWS -->
+        <div>
+          <h2 class="text-xl font-bold mb-4">Reviews</h2>
+
+          <div id="reviewSummary" class="mb-6"></div>
+
+          <div id="reviewsList"></div>
+        </div>
+
+      </div>
+    </div>
+  `;
+
+  renderReviewsSection(course);
+  showPage("course-detail");
+}
+
+
+ //====== Reviews 
+  function renderReviewsSection(course) {
+  const reviews = course.reviews || [];
+  const total = reviews.length;
+
+  const avg = total === 0
+    ? 0
+    : (reviews.reduce((sum, r) => sum + r.rating, 0) / total).toFixed(1);
+
+  document.querySelector("#reviewSummary").innerHTML = `
+    <div class="flex items-center gap-4 text-lg">
+      <strong>${avg}</strong>
+      <span>${"★".repeat(Math.round(avg))}${"☆".repeat(5 - Math.round(avg))}</span>
+      <span class="opacity-60">(${total} reviews)</span>
+    </div>
+  `;
+
+  const list = document.querySelector("#reviewsList");
+
+  list.innerHTML = reviews.map(r => `
+    <div class="bg-gray-50 p-4 rounded-xl mb-4">
+      <strong>${r.name}</strong>
+      <div>${"★".repeat(r.rating)}${"☆".repeat(5 - r.rating)}</div>
+      <p class="mt-2">${r.comment}</p>
+
+      ${r.reply ? `
+        <div class="bg-green-50 p-3 rounded-lg mt-3">
+          <strong>Reply:</strong>
+          <p>${r.reply}</p>
+        </div>
+      ` : `
+        <button class="replyBtn mt-3 text-sm text-green-700 underline">
+          Reply
+        </button>
+      `}
+    </div>
+  `).join("");
+}
+
   /* =========================
      INIT
   ========================= */
   buildCoursesSidebar();
   showPage("dashboard");
 });
+
 
