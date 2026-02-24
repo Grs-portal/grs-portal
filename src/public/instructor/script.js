@@ -31,24 +31,18 @@ document.addEventListener("DOMContentLoaded", () => {
   mainSidebar.classList.remove("active");
   coursesSidebar.classList.remove("active");
   overlay.classList.add("hidden");
-  toggleBtn.classList.add("hidden");
 }
 
 function openMainSidebar() {
   coursesSidebar.classList.remove("active");
   mainSidebar.classList.add("active");
-
   overlay.classList.add("hidden");
-  toggleBtn.classList.add("hidden");
 }
 
 function openCoursesSidebar() {
   mainSidebar.classList.remove("active");
   coursesSidebar.classList.add("active");
-
   overlay.classList.remove("hidden");
-
-  // show toggle so user can go back
   toggleBtn.classList.remove("hidden");
 }
 
@@ -98,12 +92,15 @@ toggleBtn.addEventListener("click", openMainSidebar);
   /* =========================
      BUILD COURSES SIDEBAR
   ========================= */
-  function buildCoursesSidebar() {
+function buildCoursesSidebar() {
   coursesSidebar.innerHTML = `
-    <div class="courses-sidebar-content">
+    <aside class="courses-sidebar-content h-full overflow-y-auto">
 
-      <!-- New Course Button at Top -->
-      <button id="newCourseBtn" class="new-course-btn-top">+ New Course</button>
+      <!-- NEW: top back button -->
+      <button id="backDashboardBtn"
+        class="nav-item bg-black/90 text-white rounded-xl justify-center mb-2">
+        ← Dashboard
+      </button>
 
       <h3 class="sidebar-title">Filter Programs</h3>
 
@@ -129,7 +126,7 @@ toggleBtn.addEventListener("click", openMainSidebar);
           <option value="">All</option>
           <option>Online</option>
           <option>In Person</option>
-          <option value="">Both</option>
+          <option>Both</option>
         </select>
       </div>
 
@@ -142,18 +139,26 @@ toggleBtn.addEventListener("click", openMainSidebar);
         </select>
       </div>
 
+      <button id="newCourseBtn" class="new-course-btn">
+        + New Course
+      </button>
+
+      <div class="sidebar-calendar mt-6">
+      <p class="calendar-hint">Preview only</p>
+      </div>
+      
       <div class="sidebar-calendar mt-6">
         <h4>Program Calendar</h4>
         <div class="calendar-preview">
-          <div class="calendar-header">March 2026</div>
+          <div class="calendar-header">February 2026</div>
           <div class="calendar-grid">
             <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
             <span></span><span></span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
             <span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
-            <span class="event-day">12</span>
+            <span >12</span>
             <span>13</span><span>14</span><span>15</span><span>16</span><span>17</span>
             <span>18</span><span>19</span><span>20</span><span>21</span><span>22</span>
-            <span>23</span><span>24</span><span>25</span><span>26</span><span>27</span>
+            <span>23</span><span class="event-day">24</span><span>25</span><span>26</span><span>27</span>
             <span>28</span><span>29</span><span>30</span><span>31</span>
           </div>
           <p class="calendar-hint">Click to view full calendar</p>
@@ -161,9 +166,12 @@ toggleBtn.addEventListener("click", openMainSidebar);
       </div>
 
     </div>
+    </aside>
   `;
 
-  qs("#newCourseBtn").addEventListener("click", () => Courses.create());
+  qs("#newCourseBtn").onclick = () => Courses.create();
+
+  qs("#backDashboardBtn").onclick = () => showPage("dashboard");
 }
   /* =========================
      COURSES MODULE
@@ -242,6 +250,7 @@ toggleBtn.addEventListener("click", openMainSidebar);
   showPage("dashboard");
 
 });
+
 
 
 
