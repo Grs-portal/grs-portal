@@ -162,79 +162,139 @@ function buildCoursesSidebar() {
     </aside>
   `;
 
-  qs("#newCourseBtn").onclick = () => Courses.create();
+  qs("#newCourseBtn").onclick = () => Courses.openModal();
 
   qs("#backDashboardBtn").onclick = () => showPage("dashboard");
 }
+ 
   /* =========================
-     COURSES MODULE
-  ========================= */
-  const Courses = (() => {
-    const KEY = "instructor_courses";
-    let courses = JSON.parse(localStorage.getItem(KEY) || "[]");
+   COURSES MODULE
+========================= */
+const Courses = (() => {
 
-    const save = () => localStorage.setItem(KEY, JSON.stringify(courses));
+  const KEY = "instructor_courses";
+  let courses = JSON.parse(localStorage.getItem(KEY) || "[]");
 
-    function init() {
-      render();
-    }
+  const save = () =>
+    localStorage.setItem(KEY, JSON.stringify(courses));
 
-    function render() {
-      const container = qs("#my-courses-grid");
-      if (!container) return;
+  const modal = qs("#courseModal");
+  const form = qs("#courseForm");
 
-      if (!courses.length) {
-        container.innerHTML = `
-          <div class="glass p-6 rounded-2xl text-center fade-in">
-            <p>No courses yet</p>
-            <button class="btn-primary mt-4" id="createCourseBtn">Create first course</button>
-          </div>
-        `;
-        qs("#createCourseBtn").onclick = create;
-        return;
-      }
+  function openModal() {
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+  }
 
-      container.innerHTML = courses.map(c => `
-        <div class="course-card glass p-4 rounded-2xl cursor-pointer hover:scale-[1.02] transition" data-id="${c.id}">
-          <h3 class="title-strong text-lg">${c.title}</h3>
-          <p class="subtitle mt-1">${c.description || "No description"}</p>
-          <button class="btn-primary mt-2" data-edit-id="${c.id}">Edit</button>
+  function closeModal() {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+    form.reset();
+  }
+
+  function init() {
+    render();
+  }
+
+  function render() {
+    const container = qs("#my-courses-grid");
+    if (!container) return;
+
+    if (!courses.length) {
+      container.innerHTML = `
+        <div class="glass p-6 rounded-2xl text-center fade-in">
+          <p>No courses yet</p>
+          <button class="btn-primary mt-4" id="createCourseBtn">
+            Create first course
+          </button>
         </div>
-      `).join("");
-
-      // add card click for details
-      qsa(".course-card").forEach(card => {
-        card.addEventListener("click", () => alert("Course details coming soon!"));
-      });
-
-      // edit buttons
-      qsa("[data-edit-id]").forEach(btn => {
-        btn.addEventListener("click", e => {
-          e.stopPropagation(); // prevent card click
-          const id = btn.dataset.editId;
-          const course = courses.find(c => c.id === id);
-          const newTitle = prompt("Edit course title:", course.title);
-          if (!newTitle) return;
-          const newDesc = prompt("Edit course description:", course.description) || "";
-          course.title = newTitle;
-          course.description = newDesc;
-          save();
-          render();
-        });
-      });
+      `;
+      qs("#createCourseBtn").onclick = openModal;
+      return;
     }
 
-    function create() {
-      const title = prompt("Course title?");
-      if (!title) return;
-      const description = prompt("Course description?") || "";
-      courses.push({ id: crypto.randomUUID(), title, description });
-      save();
-      render();
+    container.innerHTML = courses.map(c => `
+      <div class="course-card fade-in" data-id="${c.id}">
+        <img src="${c.cover || 'https://via.placeholder.com/400x200'}"
+          class="w-full h-32 object-cover rounded-xl mb-3">
+
+        <h3 class="title-strong text-lg">${c.title}</h3>
+
+        <p class="subtitle text-sm mt-1 line-clamp-2">
+          ${c.description}
+        </p>
+
+        <div class="flex justify-between text-xs mt-3 opacity-80">
+          <span>${c.location}</span>
+          <span>${c.durationValue} ${c.durationUnit}</span>
+        </div>
+
+        <div class="mt-2 text-xs font-semibold">
+          Status: ${c.status}
+        </div>
+      </div>
+    `).join("");
+  }
+
+  function create(data) {
+    const newCourse = {
+      id: crypto.randomUUID(),
+      ...data,
+      createdAt: new Date().toISOString()
+    };
+
+    courses.push(newCourse);
+    save();
+    render();
+  }
+
+  /* ===== FORM SUBMIT ===== */
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const file = qs("#courseCover").files[0];
+    let coverURL = "";
+
+    if (file) {
+      coverURL = URL.createObjectURL(file);
     }
 
-    return { init, create };
-  })();
+    const location = qs("#courseLocation").value;
+
+    const data = {
+      title: qs("#courseTitle").value,
+      description: qs("#courseDescription").value,
+      cover: coverURL,
+      durationValue: qs("#courseDurationValue").value,
+      durationUnit: qs("#courseDurationUnit").value,
+      location,
+      type: (location === "in-person") ? null : qs("#courseType").value,
+      chapters: qs("#courseChapters").value,
+      previewTitle: qs("#coursePreview").value,
+      status: qs("#courseStatus").value
+    };
+
+    create(data);
+    closeModal();
+  });
+
+  qs("#closeCourseModal").onclick = closeModal;
+
+  /* ===== Location conditional logic ===== */
+
+  qs("#courseLocation").addEventListener("change", (e) => {
+    const typeWrapper = qs("#typeWrapper");
+    if (e.target.value === "in-person") {
+      typeWrapper.style.display = "none";
+    } else {
+      typeWrapper.style.display = "block";
+    }
+  });
+
+  return { init, openModal };
+
+})();
 
   /* =========================
      INIT
@@ -243,6 +303,7 @@ function buildCoursesSidebar() {
   showPage("dashboard");
 
 });
+
 
 
 
