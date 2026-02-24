@@ -294,93 +294,95 @@ document.addEventListener("DOMContentLoaded", () => {
   /* =========================
      COURSE DETAIL
   ========================= */
-  function openCourseDetail(courseId) {
-    const courses = JSON.parse(localStorage.getItem("instructor_courses") || "[]");
-    const course = courses.find(c => c.id === courseId);
-    if (!course) return;
+function openCourseDetail(courseId) {
+  const courses = JSON.parse(localStorage.getItem("instructor_courses") || "[]");
+  const course = courses.find(c => c.id === courseId);
+  if (!course) return;
 
-    // Hide sidebars
-    mainSidebar.classList.add("hidden");
-    coursesSidebar.classList.add("hidden");
-    mainContent.style.width = "100%";
+  // Hide sidebars
+  mainSidebar.classList.add("hidden");
+  coursesSidebar.classList.add("hidden");
+  document.querySelector("main").style.width = "100%";
 
-    const hero = qs("#courseCover");
-    hero.src = course.cover || 'https://via.placeholder.com/1200x400';
-
-    qs("#courseTitle").textContent = course.title;
-    qs("#courseDescription").textContent = course.description;
-    qs("#courseTypeBadge").textContent = course.type || "Course";
-    qs("#courseTypeBadge").className = "course-badge " + (course.type || "mixed");
-
-    qs("#teacherPhoto").src = localStorage.getItem("userPhoto") || 'https://via.placeholder.com/60';
-    qs("#teacherName").textContent = localStorage.getItem("userName") || "Instructor";
-
-    const infoContainer = qs(".course-info");
-    infoContainer.innerHTML = `
-      <div class="info-block">
-        <div class="number">${course.durationValue || 0}</div>
-        <div class="label">Duration</div>
+  const container = qs("#courseDetailContainer");
+  container.innerHTML = `
+    <div class="course-hero relative rounded-2xl overflow-hidden">
+      <img id="courseHeroImg" class="w-full h-60 object-cover" src="${course.cover || 'https://via.placeholder.com/1200x400'}" alt="Course Cover">
+      <div class="absolute bottom-4 left-4 text-white">
+        <h1 id="courseHeroTitle" class="text-3xl font-bold">${course.title}</h1>
+        <p id="courseHeroDesc" class="text-sm mt-1 max-w-xl">${course.description}</p>
       </div>
-      <div class="info-block">
-        <div class="number">${course.chapters?.length || 0}</div>
-        <div class="label">Chapters</div>
-      </div>
-      <div class="info-block info-block-location">
-        <span class="tag">${course.location || "-"}</span>
-        <div class="label">Location</div>
-      </div>
-      <div class="info-block">
-        <span>${course.type || "-"}</span>
-        <div class="label">Type</div>
-      </div>
-    `;
+    </div>
 
-    const chaptersGrid = qs("#chaptersGrid");
-    chaptersGrid.innerHTML = (course.chapters || []).map(ch => `
-      <div class="chapter-card">
-        <img src="${ch.cover || 'https://via.placeholder.com/300x200'}">
-        <div>
-          <h4>${ch.title}</h4>
-          <p>${ch.duration}</p>
+    <div class="flex flex-col md:flex-row gap-6 mt-6">
+      <div class="flex-1 space-y-4">
+        <div class="flex items-center gap-3">
+          <img id="teacherPhoto" class="w-12 h-12 rounded-full" src="${localStorage.getItem("userPhoto") || 'https://via.placeholder.com/60'}" alt="Instructor">
+          <span id="teacherName" class="font-semibold">${localStorage.getItem("userName") || "Instructor"}</span>
         </div>
-        ${ch.preview
-          ? `<span class="badge">Preview</span>`
-          : `<span class="lock">Locked</span>`}
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 course-info">
+          <div class="info-block">
+            <div class="number">${course.durationValue || 0} ${course.durationUnit || ''}</div>
+            <div class="label">Duration</div>
+          </div>
+          <div class="info-block">
+            <div class="number">${course.chapters?.length || 0}</div>
+            <div class="label">Chapters</div>
+          </div>
+          <div class="info-block info-block-location">
+            <span class="tag">${course.location || '-'}</span>
+            <div class="label">Location</div>
+          </div>
+          <div class="info-block">
+            <span>${course.type || '-'}</span>
+            <div class="label">Type</div>
+          </div>
+        </div>
+
+        <h3 class="text-lg font-bold mt-4">Chapters</h3>
+        <div id="chaptersGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          ${(course.chapters || []).map(ch => `
+            <div class="chapter-card relative border rounded-xl p-3">
+              <img src="${ch.cover || 'https://via.placeholder.com/300x200'}" class="w-full h-32 object-cover rounded-lg mb-2">
+              <h4 class="font-semibold">${ch.title}</h4>
+              <p class="text-sm text-gray-500">${ch.description || ''}</p>
+              ${ch.preview ? `<span class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded">Preview</span>` 
+                           : `<span class="absolute top-2 right-2 bg-gray-400 text-white text-xs px-2 py-1 rounded">Locked</span>`}
+            </div>
+          `).join('')}
+        </div>
       </div>
-    `).join("");
 
-    renderReviewsSection(course);
-
-    // Action buttons
-    qs("#editCourseBtn").onclick = () => Courses.openModal(course);
-    qs("#addChapterBtn").onclick = () => openChapterModal(course);
-
-    showPage("course-detail");
-  }
-
-  function renderReviewsSection(course) {
-    const reviews = course.reviews || [];
-    const total = reviews.length;
-    const avg = total === 0 ? 0 : (reviews.reduce((sum, r) => sum + r.rating, 0)/total).toFixed(1);
-
-    qs("#averageRating").textContent = avg;
-    qs("#ratingStars").textContent = "★".repeat(Math.round(avg)) + "☆".repeat(5-Math.round(avg));
-    qs("#totalReviews").textContent = `(${total} reviews)`;
-
-    const list = qs("#reviewsList");
-    list.innerHTML = (reviews.map(r => `
-      <div class="review-card">
-        <strong>${r.name}</strong>
-        <div>${"★".repeat(r.rating)}${"☆".repeat(5-r.rating)}</div>
-        <p>${r.comment}</p>
-        ${r.reply ? `<div class="reply-box"><strong>Reply:</strong><p>${r.reply}</p></div>` : `
-        <div class="review-actions">
-          <button class="replyBtn">Reply</button>
-        </div>`}
+      <div class="flex-1 space-y-4">
+        <h3 class="text-lg font-bold">Reviews</h3>
+        <div id="reviewsGrid" class="space-y-2">
+          ${(course.reviews || []).map(r => `
+            <div class="p-3 border rounded-xl">
+              <div class="flex items-center gap-2">
+                <strong>${r.user}</strong>
+                <span class="text-sm text-gray-500">${r.rating}⭐</span>
+              </div>
+              <p class="text-sm mt-1">${r.comment}</p>
+            </div>
+          `).join('')}
+        </div>
       </div>
-    `) || []).join("");
-  }
+    </div>
 
+    <div class="mt-6 flex gap-2">
+      <button id="editCourseBtn" class="btn-primary">Edit Course</button>
+      <button id="addChapterBtn" class="btn-primary">Add Chapter</button>
+    </div>
+  `;
+
+  // Add click handlers
+  qs("#editCourseBtn").onclick = () => Courses.openModal(course);
+  qs("#addChapterBtn").onclick = () => openChapterModal(course);
+
+  showPage("course-detail");
+}
+  
   function openChapterModal(course, chapter = null) {
     const modal = qs("#chapterModal");
     modal.classList.add("active");
@@ -436,3 +438,4 @@ document.addEventListener("DOMContentLoaded", () => {
   showPage("dashboard");
 
 });
+
