@@ -425,112 +425,129 @@
 </div>
 
 <!-- CREATE COURSE MODAL -->
-<div id="courseModal" class="fixed inset-0 hidden items-center justify-center bg-black/40 backdrop-blur-sm z-50">
+<div id="courseModal"
+  class="fixed inset-0 hidden items-center justify-center bg-black/40 backdrop-blur-sm z-50 p-4">
 
-  <div class="bg-white w-full max-w-2xl rounded-3xl p-6 relative fade-in">
+  <!-- Modal Card -->
+  <div
+    class="bg-white w-full max-w-xl max-h-[90vh] rounded-3xl shadow-xl relative fade-in flex flex-col">
 
-    <h2 class="text-xl font-bold mb-4">Create New Course</h2>
+    <!-- Header -->
+    <div class="p-6 border-b flex justify-between items-center">
+      <h2 class="text-xl font-bold">Create New Course</h2>
+      <button id="closeCourseModal"
+        class="text-xl font-bold opacity-60 hover:opacity-100">
+        ✕
+      </button>
+    </div>
 
-    <form id="courseForm" class="space-y-4">
+    <!-- Scrollable Body -->
+    <div class="p-6 overflow-y-auto">
 
-      <!-- Title -->
-      <div>
-        <label class="text-sm font-semibold">Title</label>
-        <input type="text" id="courseTitle" class="w-full border rounded-xl p-2 mt-1" required>
-      </div>
+      <form id="courseForm" class="space-y-4">
 
-      <!-- Description -->
-      <div>
-        <label class="text-sm font-semibold">Description</label>
-        <textarea id="courseDescription" rows="3"
-          class="w-full border rounded-xl p-2 mt-1" required></textarea>
-      </div>
-
-      <!-- Cover -->
-      <div>
-        <label class="text-sm font-semibold">Cover Image</label>
-        <input type="file" id="courseCover" accept="image/*"
-          class="w-full mt-1">
-      </div>
-
-      <!-- Duration -->
-      <div class="flex gap-2">
-        <div class="flex-1">
-          <label class="text-sm font-semibold">Duration</label>
-          <input type="number" id="courseDurationValue"
+        <!-- Title -->
+        <div>
+          <label class="text-sm font-semibold">Title</label>
+          <input type="text" id="courseTitle"
             class="w-full border rounded-xl p-2 mt-1" required>
         </div>
-        <div class="flex-1">
-          <label class="text-sm font-semibold">Unit</label>
-          <select id="courseDurationUnit"
+
+        <!-- Description -->
+        <div>
+          <label class="text-sm font-semibold">Description</label>
+          <textarea id="courseDescription" rows="3"
+            class="w-full border rounded-xl p-2 mt-1" required></textarea>
+        </div>
+
+        <!-- Cover -->
+        <div>
+          <label class="text-sm font-semibold">Cover Image</label>
+          <input type="file" id="courseCover"
+            accept="image/*" class="w-full mt-1">
+        </div>
+
+        <!-- Duration -->
+        <div class="flex gap-2">
+          <div class="flex-1">
+            <label class="text-sm font-semibold">Duration</label>
+            <input type="number" id="courseDurationValue"
+              class="w-full border rounded-xl p-2 mt-1" required>
+          </div>
+          <div class="flex-1">
+            <label class="text-sm font-semibold">Unit</label>
+            <select id="courseDurationUnit"
+              class="w-full border rounded-xl p-2 mt-1">
+              <option>Minutes</option>
+              <option>Hours</option>
+              <option>Days</option>
+              <option>Weeks</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Location -->
+        <div>
+          <label class="text-sm font-semibold">Location</label>
+          <select id="courseLocation"
             class="w-full border rounded-xl p-2 mt-1">
-            <option>Minutes</option>
-            <option>Hours</option>
-            <option>Days</option>
-            <option>Weeks</option>
+            <option value="online">Online</option>
+            <option value="in-person">In Person</option>
+            <option value="both">Both</option>
           </select>
         </div>
-      </div>
 
-      <!-- Location -->
-      <div>
-        <label class="text-sm font-semibold">Location</label>
-        <select id="courseLocation"
-          class="w-full border rounded-xl p-2 mt-1">
-          <option value="online">Online</option>
-          <option value="in-person">In Person</option>
-          <option value="both">Both</option>
-        </select>
-      </div>
+        <!-- Type -->
+        <div id="typeWrapper">
+          <label class="text-sm font-semibold">Course Type</label>
+          <select id="courseType"
+            class="w-full border rounded-xl p-2 mt-1">
+            <option value="video">Video</option>
+            <option value="readable">Readable</option>
+          </select>
+        </div>
 
-      <!-- Type (conditional) -->
-      <div id="typeWrapper">
-        <label class="text-sm font-semibold">Course Type</label>
-        <select id="courseType"
-          class="w-full border rounded-xl p-2 mt-1">
-          <option value="video">Video</option>
-          <option value="readable">Readable</option>
-        </select>
-      </div>
+        <!-- Chapters -->
+        <div>
+          <label class="text-sm font-semibold">Amount of Chapters</label>
+          <input type="number" id="courseChapters"
+            class="w-full border rounded-xl p-2 mt-1" required>
+        </div>
 
-      <!-- Chapters -->
-      <div>
-        <label class="text-sm font-semibold">Amount of Chapters</label>
-        <input type="number" id="courseChapters"
-          class="w-full border rounded-xl p-2 mt-1" required>
-      </div>
+        <!-- Preview -->
+        <div>
+          <label class="text-sm font-semibold">Preview Chapter Title</label>
+          <input type="text" id="coursePreview"
+            class="w-full border rounded-xl p-2 mt-1" required>
+        </div>
 
-      <!-- Preview Chapter -->
-      <div>
-        <label class="text-sm font-semibold">Preview Chapter Title</label>
-        <input type="text" id="coursePreview"
-          class="w-full border rounded-xl p-2 mt-1" required>
-      </div>
+        <!-- Status -->
+        <div>
+          <label class="text-sm font-semibold">Status</label>
+          <select id="courseStatus"
+            class="w-full border rounded-xl p-2 mt-1">
+            <option value="draft">Draft</option>
+            <option value="not-started">Not Started</option>
+            <option value="ongoing">Ongoing</option>
+            <option value="finished">Finished</option>
+          </select>
+        </div>
 
-      <!-- Status -->
-      <div>
-        <label class="text-sm font-semibold">Status</label>
-        <select id="courseStatus"
-          class="w-full border rounded-xl p-2 mt-1">
-          <option value="draft">Draft</option>
-          <option value="not-started">Not Started</option>
-          <option value="ongoing">Ongoing</option>
-          <option value="finished">Finished</option>
-        </select>
-      </div>
+        <!-- Buttons -->
+        <div class="flex justify-end gap-2 pt-4">
+          <button type="button"
+            class="px-4 py-2 rounded-xl border"
+            id="cancelCourseModal">
+            Cancel
+          </button>
+          <button type="submit"
+            class="btn-primary">
+            Save Course
+          </button>
+        </div>
 
-      <div class="flex justify-end gap-2 pt-4">
-        <button type="button" id="closeCourseModal"
-          class="px-4 py-2 rounded-xl border">
-          Cancel
-        </button>
-        <button type="submit"
-          class="btn-primary">
-          Save Course
-        </button>
-      </div>
-
-    </form>
+      </form>
+    </div>
   </div>
 </div>
 
@@ -541,6 +558,7 @@
 <script src="/instructor/script.js" defer></script>
 </body>
 </html>
+
 
 
 
