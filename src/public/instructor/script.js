@@ -184,12 +184,14 @@ const Courses = (() => {
   function openModal() {
     modal.classList.remove("hidden");
     modal.classList.add("flex");
+    document.body.style.overflow = "hidden";
   }
-
+  
   function closeModal() {
     modal.classList.add("hidden");
     modal.classList.remove("flex");
     form.reset();
+    document.body.style.overflow = "";
   }
 
   function init() {
@@ -213,6 +215,19 @@ const Courses = (() => {
       return;
     }
 
+    // Close when clicking outside
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) closeModal();
+    });
+    
+    // Close with ESC
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeModal();
+    });
+    
+    // Cancel button
+    qs("#cancelCourseModal").onclick = closeModal;
+    
     container.innerHTML = courses.map(c => `
       <div class="course-card fade-in" data-id="${c.id}">
         <img src="${c.cover || 'https://via.placeholder.com/400x200'}"
@@ -303,6 +318,7 @@ const Courses = (() => {
   showPage("dashboard");
 
 });
+
 
 
 
