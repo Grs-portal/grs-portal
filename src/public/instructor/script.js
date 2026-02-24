@@ -201,10 +201,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /* ===== RENDER ===== */
+    
     function render() {
       const container = qs("#my-courses-grid");
       if (!container) return;
-
+    
       if (!courses.length) {
         container.innerHTML = `
           <div class="glass p-6 rounded-2xl text-center fade-in">
@@ -217,30 +218,32 @@ document.addEventListener("DOMContentLoaded", () => {
         qs("#createCourseBtn").onclick = openModal;
         return;
       }
-
+    
       container.innerHTML = courses.map(c => `
-       <div class="course-card cursor-pointer relative"
+        <div class="course-card cursor-pointer relative"
              data-id="${c.id}">
              
           <div class="absolute top-3 left-3 text-xs font-semibold px-2 py-1 rounded-full ${getStatusClass(c.status)}">
             ${formatStatus(c.status)}
           </div>
-      
+    
           <img src="${c.cover || 'https://via.placeholder.com/400x200'}"
                class="w-full h-32 object-cover rounded-xl mb-3">
-      
+    
           <h3 class="title-strong text-lg">${c.title}</h3>
           <p class="subtitle text-sm mt-1">${c.description}</p>
         </div>
       `).join("");
-
+    
       container.querySelectorAll(".course-card").forEach(card => {
         card.addEventListener("click", () => {
           const id = card.dataset.id;
           openCourseDetail(id);
         });
       });
+  } 
 
+    
     /* ===== CREATE ===== */
     function create(data) {
       const newCourse = {
@@ -248,11 +251,13 @@ document.addEventListener("DOMContentLoaded", () => {
         ...data,
         createdAt: new Date().toISOString()
       };
+    
       courses.push(newCourse);
       saveCourses();
       render();
     }
 
+    
     /* ===== FORM SUBMIT ===== */
     form.addEventListener("submit", e => {
       e.preventDefault();
@@ -471,5 +476,6 @@ document.addEventListener("DOMContentLoaded", () => {
   buildCoursesSidebar();
   showPage("dashboard");
 });
+
 
 
