@@ -43,7 +43,6 @@ function openCoursesSidebar() {
   mainSidebar.classList.remove("active");
   coursesSidebar.classList.add("active");
   overlay.classList.remove("hidden");
-  toggleBtn.classList.remove("hidden");
 }
 
 toggleBtn.addEventListener("click", openMainSidebar);
@@ -99,7 +98,7 @@ function buildCoursesSidebar() {
       <!-- NEW: top back button -->
       <button id="backDashboardBtn"
         class="nav-item bg-black/90 text-white rounded-xl justify-center mb-2">
-        ← Dashboard
+        ☰ Dashboard
       </button>
 
       <h3 class="sidebar-title">Filter Programs</h3>
@@ -143,11 +142,9 @@ function buildCoursesSidebar() {
         + New Course
       </button>
 
-      <div class="sidebar-calendar mt-6">
-      <p class="calendar-hint">Preview only</p>
-      </div>
       
       <div class="sidebar-calendar mt-6">
+        <p class="calendar-hint">Preview only</p>
         <h4>Program Calendar</h4>
         <div class="calendar-preview">
           <div class="calendar-header">February 2026</div>
@@ -250,6 +247,7 @@ function buildCoursesSidebar() {
   showPage("dashboard");
 
 });
+
 
 
 
