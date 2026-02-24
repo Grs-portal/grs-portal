@@ -8,7 +8,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const mainSidebar    = qs("#mainSidebar");
   const coursesSidebar = qs("#coursesSidebar");
-  const toggleBtn = qs("#sidebarToggle");
   const overlay        = qs("#overlay");
   const menuBtn        = qs("#menuBtn");
 
@@ -247,6 +246,7 @@ function buildCoursesSidebar() {
   showPage("dashboard");
 
 });
+
 
 
 
