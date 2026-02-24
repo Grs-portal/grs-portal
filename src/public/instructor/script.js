@@ -174,6 +174,7 @@ const Courses = (() => {
 
   const KEY = "instructor_courses";
   let courses = JSON.parse(localStorage.getItem(KEY) || "[]");
+  let forceDraft = false;
 
   const save = () =>
     localStorage.setItem(KEY, JSON.stringify(courses));
@@ -229,7 +230,30 @@ const Courses = (() => {
     qs("#cancelCourseModal").onclick = closeModal;
     
     container.innerHTML = courses.map(c => `
-      <div class="course-card fade-in" data-id="${c.id}">
+    <div class="course-card relative bg-white p-4 rounded-2xl shadow-sm fade-in" data-id="${c.id}">
+  
+      <!-- STATUS TAG -->
+      <div class="absolute top-3 left-3 text-xs font-semibold px-2 py-1 rounded-full
+        ${getStatusClass(c.status)}">
+        ${formatStatus(c.status)}
+      </div>
+
+      <img src="${c.cover || 'https://via.placeholder.com/400x200'}"
+        class="w-full h-32 object-cover rounded-xl mb-3">
+  
+      <h3 class="title-strong text-lg">${c.title}</h3>
+  
+      <p class="subtitle text-sm mt-1 line-clamp-2">
+        ${c.description}
+      </p>
+  
+      <div class="flex justify-between text-xs mt-3 opacity-80">
+        <span>${c.location}</span>
+        <span>${c.durationValue} ${c.durationUnit}</span>
+      </div>
+
+  </div>
+`).join("");
         <img src="${c.cover || 'https://via.placeholder.com/400x200'}"
           class="w-full h-32 object-cover rounded-xl mb-3">
 
@@ -264,38 +288,45 @@ const Courses = (() => {
   }
 
   /* ===== FORM SUBMIT ===== */
+  
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  const file = qs("#courseCover").files[0];
+  let coverURL = "";
 
-    const file = qs("#courseCover").files[0];
-    let coverURL = "";
+  if (file) {
+    coverURL = URL.createObjectURL(file);
+  }
 
-    if (file) {
-      coverURL = URL.createObjectURL(file);
-    }
+  const location = qs("#courseLocation").value;
 
-    const location = qs("#courseLocation").value;
+  const selectedStatus = qs("#courseStatus").value;
 
-    const data = {
-      title: qs("#courseTitle").value,
-      description: qs("#courseDescription").value,
-      cover: coverURL,
-      durationValue: qs("#courseDurationValue").value,
-      durationUnit: qs("#courseDurationUnit").value,
-      location,
-      type: (location === "in-person") ? null : qs("#courseType").value,
-      chapters: qs("#courseChapters").value,
-      previewTitle: qs("#coursePreview").value,
-      status: qs("#courseStatus").value
-    };
+  const finalStatus = forceDraft ? "draft" : selectedStatus;
 
-    create(data);
-    closeModal();
-  });
+  const data = {
+    title: qs("#courseTitle").value,
+    description: qs("#courseDescription").value,
+    cover: coverURL,
+    durationValue: qs("#courseDurationValue").value,
+    durationUnit: qs("#courseDurationUnit").value,
+    location,
+    type: (location === "in-person") ? null : qs("#courseType").value,
+    chapters: qs("#courseChapters").value,
+    previewTitle: qs("#coursePreview").value,
+    status: finalStatus
+  };
 
-  qs("#closeCourseModal").onclick = closeModal;
+  create(data);
+  forceDraft = false;
+  closeModal();
+});
 
+qs("#saveDraftBtn").onclick = () => {
+  forceDraft = true;
+  form.requestSubmit();
+};
   /* ===== Location conditional logic ===== */
 
   qs("#courseLocation").addEventListener("change", (e) => {
@@ -306,6 +337,25 @@ const Courses = (() => {
       typeWrapper.style.display = "block";
     }
   });
+
+  function formatStatus(status) {
+  return status.replace("-", " ").toUpperCase();
+}
+
+function getStatusClass(status) {
+  switch (status) {
+    case "draft":
+      return "bg-gray-200 text-gray-800";
+    case "not-started":
+      return "bg-yellow-100 text-yellow-800";
+    case "ongoing":
+      return "bg-blue-100 text-blue-800";
+    case "finished":
+      return "bg-green-100 text-green-800";
+    default:
+      return "bg-gray-200 text-gray-800";
+  }
+}
 
   return { init, openModal };
 
@@ -318,6 +368,7 @@ const Courses = (() => {
   showPage("dashboard");
 
 });
+
 
 
 
