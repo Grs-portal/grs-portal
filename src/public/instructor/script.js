@@ -100,7 +100,10 @@ toggleBtn.addEventListener("click", openMainSidebar);
   ========================= */
   function buildCoursesSidebar() {
   coursesSidebar.innerHTML = `
-    <aside class="courses-sidebar-content h-full overflow-y-auto">
+    <div class="courses-sidebar-content">
+
+      <!-- New Course Button at Top -->
+      <button id="newCourseBtn" class="new-course-btn-top">+ New Course</button>
 
       <h3 class="sidebar-title">Filter Programs</h3>
 
@@ -139,16 +142,10 @@ toggleBtn.addEventListener("click", openMainSidebar);
         </select>
       </div>
 
-      <button id="newCourseBtn" class="new-course-btn">
-        + New Course
-      </button>
-
       <div class="sidebar-calendar mt-6">
         <h4>Program Calendar</h4>
-
         <div class="calendar-preview">
           <div class="calendar-header">March 2026</div>
-
           <div class="calendar-grid">
             <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
             <span></span><span></span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
@@ -159,17 +156,15 @@ toggleBtn.addEventListener("click", openMainSidebar);
             <span>23</span><span>24</span><span>25</span><span>26</span><span>27</span>
             <span>28</span><span>29</span><span>30</span><span>31</span>
           </div>
-
           <p class="calendar-hint">Click to view full calendar</p>
         </div>
       </div>
 
-    </aside>
+    </div>
   `;
 
   qs("#newCourseBtn").addEventListener("click", () => Courses.create());
 }
-
   /* =========================
      COURSES MODULE
   ========================= */
@@ -247,6 +242,7 @@ toggleBtn.addEventListener("click", openMainSidebar);
   showPage("dashboard");
 
 });
+
 
 
 
