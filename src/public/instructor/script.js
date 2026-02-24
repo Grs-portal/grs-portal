@@ -44,8 +44,6 @@ function openCoursesSidebar() {
   overlay.classList.remove("hidden");
 }
 
-toggleBtn.addEventListener("click", openMainSidebar);
-
   // mobile menu toggle
   menuBtn.addEventListener("click", () => {
     if (mainSidebar.classList.contains("active")) closeAllSidebars();
@@ -246,6 +244,7 @@ function buildCoursesSidebar() {
   showPage("dashboard");
 
 });
+
 
 
 
