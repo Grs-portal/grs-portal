@@ -142,7 +142,6 @@ function buildCoursesSidebar() {
       
       <div class="sidebar-calendar mt-6">
         <p class="calendar-hint">Preview only</p>
-        <h4>Program Calendar</h4>
         <div class="calendar-preview">
           <div class="calendar-header">February 2026</div>
           <div class="calendar-grid">
@@ -244,6 +243,7 @@ function buildCoursesSidebar() {
   showPage("dashboard");
 
 });
+
 
 
 
