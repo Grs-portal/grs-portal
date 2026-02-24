@@ -28,21 +28,31 @@ document.addEventListener("DOMContentLoaded", () => {
      SIDEBAR CONTROL
   ========================= */
   function closeAllSidebars() {
-    mainSidebar.classList.remove("active");
-    coursesSidebar.classList.remove("active");
-    overlay.classList.add("hidden");
-  }
+  mainSidebar.classList.remove("active");
+  coursesSidebar.classList.remove("active");
+  overlay.classList.add("hidden");
+  toggleBtn.classList.add("hidden");
+}
 
-  function openMainSidebar() {
-    closeAllSidebars();
-    mainSidebar.classList.add("active");
-  }
+function openMainSidebar() {
+  coursesSidebar.classList.remove("active");
+  mainSidebar.classList.add("active");
 
-  function openCoursesSidebar() {
-    closeAllSidebars();
-    coursesSidebar.classList.add("active");
-    overlay.classList.remove("hidden");
-  }
+  overlay.classList.add("hidden");
+  toggleBtn.classList.add("hidden");
+}
+
+function openCoursesSidebar() {
+  mainSidebar.classList.remove("active");
+  coursesSidebar.classList.add("active");
+
+  overlay.classList.remove("hidden");
+
+  // show toggle so user can go back
+  toggleBtn.classList.remove("hidden");
+}
+
+toggleBtn.addEventListener("click", openMainSidebar);
 
   // mobile menu toggle
   menuBtn.addEventListener("click", () => {
@@ -237,6 +247,7 @@ document.addEventListener("DOMContentLoaded", () => {
   showPage("dashboard");
 
 });
+
 
 
 
