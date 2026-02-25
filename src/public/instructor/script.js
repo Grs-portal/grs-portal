@@ -58,23 +58,29 @@ document.addEventListener("DOMContentLoaded", () => {
     qsa(".page-section").forEach(p => p.classList.add("hidden"));
     const page = qs("#" + id);
     if (page) page.classList.remove("hidden");
-
+  
     qsa(".nav-item").forEach(a => {
       a.classList.toggle("active", a.dataset.page === id);
     });
-
-    if (id === "my-courses") openCoursesSidebar();
-    else openMainSidebar();
-
-    if (id === "my-courses") Courses.init();
+  
+    /* NORMAL PAGES */
+    if (id === "my-courses") {
+      openCoursesSidebar();
+      Courses.init();
+      return;
+    }
+  
+    /* DETAIL PAGE = FULL WIDTH */
+    if (id === "course-detail") {
+      mainSidebar.classList.remove("active");
+      coursesSidebar.classList.remove("active");
+      overlay.classList.add("hidden");
+      return;
+    }
+  
+    /* everything else */
+    openMainSidebar();
   }
-
-  qsa(".nav-item").forEach(link => {
-    link.addEventListener("click", e => {
-      e.preventDefault();
-      showPage(link.dataset.page);
-    });
-  });
 
   /* =========================
      COURSES SIDEBAR
@@ -255,6 +261,8 @@ document.addEventListener("DOMContentLoaded", () => {
       courses.push(newCourse);
       saveCourses();
       render();
+    
+      return newCourse; // ⭐ 
     }
 
     
@@ -281,8 +289,9 @@ document.addEventListener("DOMContentLoaded", () => {
         status: finalStatus
       };
 
-      create(data);
+      const newCourse = create(data);
       closeModal();
+      openCourseDetail(newCourse.id); 
     });
 
     /* ===== DRAFT BUTTON ===== */
@@ -318,6 +327,11 @@ document.addEventListener("DOMContentLoaded", () => {
   //======Course details page======
 
   function openCourseDetail(courseId) {
+
+  mainSidebar.classList.remove("active");
+  coursesSidebar.classList.remove("active");
+  overlay.classList.add("hidden");
+    
   const courses = JSON.parse(localStorage.getItem("instructor_courses") || "[]");
   const course = courses.find(c => c.id === courseId);
   if (!course) return;
@@ -476,5 +490,6 @@ document.addEventListener("DOMContentLoaded", () => {
   buildCoursesSidebar();
   showPage("dashboard");
 });
+
 
 
