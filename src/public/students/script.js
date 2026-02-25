@@ -39,8 +39,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function isSameDay(a, b) {
     return a.getFullYear() === b.getFullYear() &&
-      a.getMonth() === b.getMonth() &&
-      a.getDate() === b.getDate();
+           a.getMonth() === b.getMonth() &&
+           a.getDate() === b.getDate();
   }
 
   // ---------- Theme ----------
@@ -51,16 +51,18 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   applyTheme();
 
-  // ---------- UI: name + avatar + logout ----------
+  // ---------- UI: name + avatar ----------
   const userNameEl = qs("#userName");
   const avatarEl = qs("#userAvatar");
 
-  function renderTopbar() {
+  function renderTopbarName() {
+    const name = localStorage.getItem("userName") || "Student";
+    if (userNameEl) userNameEl.textContent = name;
+  }
+
+  function renderTopbarAvatar() {
     const name = localStorage.getItem("userName") || "Student";
     const avatarData = localStorage.getItem("userAvatar") || "";
-
-    if (userNameEl) userNameEl.textContent = name;
-
     if (!avatarEl) return;
 
     if (avatarData) {
@@ -74,15 +76,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  renderTopbar();
+  renderTopbarName();
+  renderTopbarAvatar();
 
   function logout() {
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("role");
     localStorage.removeItem("userName");
     localStorage.removeItem("userAvatar");
-    // keep theme? your choice:
-    // localStorage.removeItem("theme");
+    localStorage.removeItem("theme");
     window.location.replace(LOGIN_PATH);
   }
 
@@ -92,17 +94,112 @@ document.addEventListener("DOMContentLoaded", () => {
     logout();
   });
 
-  // Profile dropdown
+  // ---------- Profile dropdown ----------
   const topWrap = qs("#topAvatarWrap");
   const profileMenu = qs("#profileMenu");
-  avatarEl?.addEventListener("click", (e) => {
-    e.stopPropagation();
+
+  function closeProfileMenu() {
+    profileMenu?.classList.add("hidden");
+  }
+  function toggleProfileMenu(e) {
+    e?.stopPropagation?.();
     profileMenu?.classList.toggle("hidden");
-  });
+  }
+
+  avatarEl?.addEventListener("click", toggleProfileMenu);
 
   document.addEventListener("click", (e) => {
     if (!topWrap || !profileMenu) return;
-    if (!topWrap.contains(e.target)) profileMenu.classList.add("hidden");
+    if (!topWrap.contains(e.target)) closeProfileMenu();
+  });
+
+  // ---------- Personalize modal ----------
+  const personalizeBg = qs("#personalizeBg");
+  const openPersonalizeBtn = qs("#openPersonalize");
+  const closePersonalizeBtn = qs("#closePersonalize");
+  const savePersonalizeBtn = qs("#savePersonalize");
+
+  const profileAvatarPreview = qs("#profileAvatarPreview");
+  const profileNameInput = qs("#profileNameInput");
+  const profilePhotoInput = qs("#profilePhotoInput");
+  const removeAvatarBtn = qs("#removeAvatarBtn");
+
+  function openPersonalize() {
+    closeProfileMenu();
+    loadPersonalizeUI();
+    personalizeBg?.classList.add("show");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closePersonalize() {
+    personalizeBg?.classList.remove("show");
+    document.body.style.overflow = "";
+  }
+
+  function loadPersonalizeUI() {
+    const name = localStorage.getItem("userName") || "Student";
+    const avatarData = localStorage.getItem("userAvatar") || "";
+    if (profileNameInput) profileNameInput.value = name;
+
+    if (profileAvatarPreview) {
+      if (avatarData) {
+        profileAvatarPreview.style.backgroundImage = `url(${avatarData})`;
+        profileAvatarPreview.style.backgroundSize = "cover";
+        profileAvatarPreview.style.backgroundPosition = "center";
+        profileAvatarPreview.textContent = "";
+      } else {
+        profileAvatarPreview.style.backgroundImage = "";
+        profileAvatarPreview.textContent = initials(name);
+      }
+    }
+  }
+
+  openPersonalizeBtn?.addEventListener("click", (e) => {
+    e.preventDefault();
+    openPersonalize();
+  });
+
+  closePersonalizeBtn?.addEventListener("click", closePersonalize);
+  personalizeBg?.addEventListener("click", (e) => {
+    if (e.target === personalizeBg) closePersonalize();
+  });
+
+  // Theme buttons inside modal
+  qsa(".themePick").forEach((b) => {
+    b.addEventListener("click", (e) => {
+      e.preventDefault();
+      applyTheme(b.dataset.theme);
+    });
+  });
+
+  profilePhotoInput?.addEventListener("change", (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      localStorage.setItem("userAvatar", String(ev.target.result || ""));
+      loadPersonalizeUI();
+      renderTopbarAvatar();
+    };
+    reader.readAsDataURL(file);
+  });
+
+  removeAvatarBtn?.addEventListener("click", (e) => {
+    e.preventDefault();
+    localStorage.removeItem("userAvatar");
+    if (profilePhotoInput) profilePhotoInput.value = "";
+    loadPersonalizeUI();
+    renderTopbarAvatar();
+  });
+
+  savePersonalizeBtn?.addEventListener("click", (e) => {
+    e.preventDefault();
+    const newName = (profileNameInput?.value || "").trim() || "Student";
+    localStorage.setItem("userName", newName);
+    renderTopbarName();
+    renderTopbarAvatar();
+    closePersonalize();
   });
 
   // ---------- Sidebar mobile toggle ----------
@@ -134,9 +231,9 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       closeSidebar();
+      closeProfileMenu();
+      closePersonalize();
       qs("#notifMenu")?.classList.add("hidden");
-      profileMenu?.classList.add("hidden");
-      closePersonalizeModal();
     }
   });
 
@@ -175,16 +272,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const activeCoursesCount = qs("#activeCoursesCount");
   const homeworkCount = qs("#homeworkCount");
 
-  qs("#refreshCoursesBtn")?.addEventListener("click", () =>
-    loadAll(true).then(renderCoursesPage)
-  );
-  qs("#refreshAssignmentsBtn")?.addEventListener("click", () =>
-    loadAll(true).then(renderAssignmentsPage)
-  );
-  qs("#refreshScheduleBtn")?.addEventListener("click", () =>
-    loadSchedule(true).then(renderSchedulePage)
-  );
-
   // ---------- Cards ----------
   function courseCard(c) {
     const title = escapeHtml(c.title);
@@ -192,7 +279,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     return `
       <div class="card p-4">
-        <h4 class="font-semibold leading-tight">${title}</h4>
+        <h4 class="font-extrabold leading-tight">${title}</h4>
         <p class="text-sm opacity-80 mt-1">${desc}</p>
 
         <div class="mt-3 w-full bg-black/10 rounded-full h-2.5">
@@ -200,7 +287,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
         <p class="text-xs opacity-70 mt-2">0% Complete</p>
 
-        <button class="mt-4 w-full rounded-xl bg-white/10 hover:bg-white/15 text-[var(--text)] font-semibold py-2 transition border border-white/15">
+        <button class="mt-4 w-full rounded-xl bg-white/10 hover:bg-white/15 font-extrabold py-2 transition border border-white/15">
           Continue
         </button>
       </div>
@@ -215,11 +302,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     return `
       <div class="card p-4">
-        <h4 class="font-semibold leading-tight">${title}</h4>
+        <h4 class="font-extrabold leading-tight">${title}</h4>
         <p class="text-sm opacity-80 mt-1">${desc}</p>
         <p class="text-xs opacity-70 mt-3">Course: ${course} · By: ${by}</p>
 
-        <button class="mt-4 w-full rounded-xl bg-white/10 hover:bg-white/15 text-[var(--text)] font-semibold py-2 transition border border-white/15">
+        <button class="mt-4 w-full rounded-xl bg-white/10 hover:bg-white/15 font-extrabold py-2 transition border border-white/15">
           View
         </button>
       </div>
@@ -269,11 +356,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const res = await fetch(`${API}/schedule?role=${encodeURIComponent(role)}&username=${encodeURIComponent(username)}`);
       const out = await safeJson(res);
-      if (!out?.success) {
-        cacheSchedule = [];
-        return;
-      }
-      cacheSchedule = Array.isArray(out.items) ? out.items : [];
+      cacheSchedule = Array.isArray(out?.items) ? out.items : [];
     } catch (e) {
       console.error(e);
       cacheSchedule = [];
@@ -291,16 +374,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const time = `${start.toLocaleString()}${isNaN(end.getTime()) ? "" : " – " + end.toLocaleTimeString()}`;
 
     return `
-      <div class="card p-4">
-        <div class="flex items-start justify-between gap-3">
-          <div>
-            <div class="font-semibold">${title}</div>
-            <div class="text-xs opacity-70 mt-1">${escapeHtml(time)}</div>
-            ${course ? `<div class="text-xs opacity-70 mt-1">Course: ${course}</div>` : ""}
-            ${location ? `<div class="text-xs opacity-70 mt-1">Location: ${location}</div>` : ""}
-            ${notes ? `<div class="text-xs opacity-70 mt-1">${notes}</div>` : ""}
-          </div>
-        </div>
+      <div class="p-3 rounded-xl border border-white/15 bg-white/10">
+        <div class="font-extrabold">${title}</div>
+        <div class="text-xs muted mt-1">${time}</div>
+        ${course ? `<div class="text-xs muted mt-1">Course: ${course}</div>` : ""}
+        ${location ? `<div class="text-xs muted mt-1">Location: ${location}</div>` : ""}
+        ${notes ? `<div class="text-xs muted mt-1">${notes}</div>` : ""}
       </div>
     `;
   }
@@ -324,11 +403,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     todayBox.innerHTML = today.length
       ? today.map(scheduleRow).join("")
-      : `<div class="text-sm opacity-70">No events today.</div>`;
+      : `<div class="text-sm muted">No events today.</div>`;
 
     upcomingBox.innerHTML = upcoming.length
       ? upcoming.map(scheduleRow).join("")
-      : `<div class="text-sm opacity-70">No upcoming events.</div>`;
+      : `<div class="text-sm muted">No upcoming events.</div>`;
 
     empty.classList.toggle("hidden", items.length !== 0);
   }
@@ -356,7 +435,21 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ---------- Notifications ----------
-  function setupNotificationsUI() {
+  // Your server currently blocks students from notifications.
+  // So for students: hide it so it doesn't feel broken.
+  function disableNotificationsForStudents() {
+    const wrap = qs("#notifWrap");
+    if (!wrap) return;
+    wrap.classList.add("hidden");
+  }
+
+  async function setupNotificationsUI() {
+    const role = localStorage.getItem("role") || "";
+    if (role === "student") {
+      disableNotificationsForStudents();
+      return;
+    }
+
     const btn = qs("#notifBtn");
     const menu = qs("#notifMenu");
     const wrap = qs("#notifWrap");
@@ -388,7 +481,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function loadNotifications() {
     const role = localStorage.getItem("role") || "";
     const username = localStorage.getItem("username") || "";
-    if (!username) return;
+    if (!username || !["manager", "instructor"].includes(role)) return;
 
     const res = await fetch(`${API}/notifications?role=${encodeURIComponent(role)}&username=${encodeURIComponent(username)}`);
     const out = await safeJson(res);
@@ -407,7 +500,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!list) return;
 
     list.innerHTML = items.map((n) => `
-      <div class="px-4 py-3 border-b border-white/10 ${n.unread ? "bg-white/5" : ""}">
+      <div class="px-4 py-3 border-b border-black/10 ${n.unread ? "bg-green-50" : ""}">
         <div class="text-sm font-semibold">${escapeHtml(n.message || "")}</div>
         <div class="text-xs opacity-70 mt-1">
           ${escapeHtml(n.byName || n.byUsername || "Someone")} · ${escapeHtml(n.byRole || "")} ·
@@ -417,108 +510,19 @@ document.addEventListener("DOMContentLoaded", () => {
     `).join("");
   }
 
-  // ---------- Personalization Modal ----------
-  const personalizeModal = qs("#personalizeModal");
-  const personalizeBackdrop = qs("#personalizeBackdrop");
-  const closePersonalize = qs("#closePersonalize");
-  const openPersonalize = qs("#openPersonalize");
-
-  const personalizeAvatar = qs("#personalizeAvatar");
-  const personalizeName = qs("#personalizeName");
-  const personalizePhoto = qs("#personalizePhoto");
-  const removePhoto = qs("#removePhoto");
-  const savePersonalize = qs("#savePersonalize");
-  const resetPersonalize = qs("#resetPersonalize");
-
-  function renderPersonalizePreview() {
-    const name = localStorage.getItem("userName") || "Student";
-    const avatarData = localStorage.getItem("userAvatar") || "";
-
-    if (personalizeName) personalizeName.value = name;
-
-    if (!personalizeAvatar) return;
-
-    if (avatarData) {
-      personalizeAvatar.style.backgroundImage = `url(${avatarData})`;
-      personalizeAvatar.style.backgroundSize = "cover";
-      personalizeAvatar.style.backgroundPosition = "center";
-      personalizeAvatar.textContent = "";
-    } else {
-      personalizeAvatar.style.backgroundImage = "";
-      personalizeAvatar.textContent = initials(name);
-    }
-  }
-
-  function openPersonalizeModal() {
-    profileMenu?.classList.add("hidden");
-    renderPersonalizePreview();
-    personalizeModal?.classList.remove("hidden");
-    document.body.style.overflow = "hidden";
-  }
-
-  function closePersonalizeModal() {
-    personalizeModal?.classList.add("hidden");
-    document.body.style.overflow = "";
-  }
-
-  openPersonalize?.addEventListener("click", (e) => {
-    e.preventDefault();
-    openPersonalizeModal();
-  });
-
-  closePersonalize?.addEventListener("click", closePersonalizeModal);
-  personalizeBackdrop?.addEventListener("click", closePersonalizeModal);
-
-  // theme buttons inside modal
-  qsa(".themePick").forEach((b) => {
-    b.addEventListener("click", (e) => {
-      e.preventDefault();
-      applyTheme(b.dataset.theme);
-    });
-  });
-
-  personalizePhoto?.addEventListener("change", (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      localStorage.setItem("userAvatar", ev.target.result);
-      renderPersonalizePreview();
-      renderTopbar();
-    };
-    reader.readAsDataURL(file);
-  });
-
-  removePhoto?.addEventListener("click", () => {
-    localStorage.removeItem("userAvatar");
-    renderPersonalizePreview();
-    renderTopbar();
-  });
-
-  savePersonalize?.addEventListener("click", () => {
-    const newName = (personalizeName?.value || "").trim() || "Student";
-    localStorage.setItem("userName", newName);
-    renderPersonalizePreview();
-    renderTopbar();
-    closePersonalizeModal();
-  });
-
-  resetPersonalize?.addEventListener("click", () => {
-    localStorage.removeItem("userAvatar");
-    localStorage.setItem("userName", "Student");
-    localStorage.setItem("theme", "glass");
-    applyTheme("glass");
-    renderPersonalizePreview();
-    renderTopbar();
-  });
+  // ---------- Buttons ----------
+  qs("#refreshCoursesBtn")?.addEventListener("click", () => loadAll(true).then(renderCoursesPage));
+  qs("#refreshAssignmentsBtn")?.addEventListener("click", () => loadAll(true).then(renderAssignmentsPage));
+  qs("#refreshScheduleBtn")?.addEventListener("click", () => loadSchedule(true).then(renderSchedulePage));
 
   // ---------- Boot ----------
   qs("#y") && (qs("#y").textContent = new Date().getFullYear());
 
   setupNotificationsUI();
-  loadNotifications();
-  setInterval(loadNotifications, 15000);
+  if (["manager", "instructor"].includes(localStorage.getItem("role") || "")) {
+    loadNotifications();
+    setInterval(loadNotifications, 15000);
+  }
 
   showPage("dashboard");
 });
