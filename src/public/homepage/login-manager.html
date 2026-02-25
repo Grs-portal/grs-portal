@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Manager Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen flex items-center justify-center bg-black text-white px-4">
+  <div class="w-full max-w-md p-6 rounded-2xl border border-white/15 bg-white/10 backdrop-blur-xl">
+    <h1 class="text-2xl font-extrabold">Manager Sign In</h1>
+    <p class="text-sm opacity-80 mt-1">Info about account here</p>
+
+    <p class="text-sm mt-2">
+      <a class="underline font-bold" href="/homepage/login-student.html">Sign in as student?</a>
+      <span class="opacity-70">·</span>
+      <a class="underline font-bold" href="/homepage/login-instructor.html">Sign in as instructor?</a>
+    </p>
+
+    <div class="mt-5 space-y-3">
+      <input id="username" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/15 outline-none" placeholder="Username" />
+      <input id="password" type="password" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/15 outline-none" placeholder="Password" />
+      <button id="loginBtn" class="w-full px-4 py-3 rounded-xl bg-white/20 hover:bg-white/30 font-extrabold">Login</button>
+      <div id="err" class="text-sm text-red-300 hidden"></div>
+    </div>
+  </div>
+
+  <script>
+    const API = "/api";
+    const qs = (s) => document.querySelector(s);
+    const showErr = (m) => { const e = qs("#err"); e.textContent = m; e.classList.remove("hidden"); };
+
+    qs("#loginBtn").addEventListener("click", async () => {
+      qs("#err").classList.add("hidden");
+      const username = qs("#username").value.trim();
+      const password = qs("#password").value.trim();
+      if (!username || !password) return showErr("Enter username + password.");
+
+      const res = await fetch(`/api/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+
+      const out = await res.json().catch(() => null);
+      if (!res.ok || !out?.success) return showErr("Invalid login.");
+
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("role", out.role);
+      localStorage.setItem("userName", out.name);
+      localStorage.setItem("username", out.username);
+
+      location.href = out.redirect || "/manager";
+    });
+  </script>
+</body>
+</html>
