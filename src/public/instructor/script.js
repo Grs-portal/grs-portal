@@ -444,6 +444,8 @@ document.addEventListener("DOMContentLoaded", () => {
   showPage("course-detail");
 }
 
+  qs("#backToCourses").onclick = () => showPage("my-courses");
+
 
  //====== Reviews 
   function renderReviewsSection(course) {
@@ -490,6 +492,7 @@ document.addEventListener("DOMContentLoaded", () => {
   buildCoursesSidebar();
   showPage("dashboard");
 });
+
 
 
 
