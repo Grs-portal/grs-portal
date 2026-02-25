@@ -186,7 +186,7 @@
       border-color: rgba(169,214,157,.50);
     }
 
-    /* select dropdown fix (your screenshot issue) */
+    /* select dropdown fix */
     select.select-theme{
       width: 100%;
       padding: 10px 12px;
@@ -202,7 +202,6 @@
       color: #1C1820;
     }
 
-    /* makes native dropdown dark & readable in glass/dark */
     html[data-theme="glass"] select.select-theme,
     html[data-theme="dark"]  select.select-theme{
       color-scheme: dark;
@@ -248,16 +247,6 @@
       <div class="flex items-center gap-3">
         <span id="userName" class="text-sm font-bold"></span>
 
-        <!-- Theme switcher -->
-        <div class="relative" id="themeWrap">
-          <button id="themeBtn" class="icon-btn" title="Theme">🎨</button>
-          <div id="themeMenu" class="hidden absolute right-0 mt-2 w-56 surface-2 overflow-hidden">
-            <button class="themePick w-full text-left px-4 py-3 hover:bg-white/10" data-theme="glass">Glass (default)</button>
-            <button class="themePick w-full text-left px-4 py-3 hover:bg-white/10" data-theme="light">Light (white/green)</button>
-            <button class="themePick w-full text-left px-4 py-3 hover:bg-white/10" data-theme="dark">Dark (green)</button>
-          </div>
-        </div>
-
         <!-- Notifications -->
         <div class="relative" id="notifWrap">
           <button id="notifBtn" class="icon-btn" title="Notifications">
@@ -287,8 +276,25 @@
           <div id="userAvatar" class="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center font-bold cursor-pointer select-none">
           </div>
 
-          <div id="profileMenu" class="hidden absolute right-0 mt-2 w-44 surface-2 overflow-hidden z-50">
-            <button id="logoutBtn" class="w-full text-left px-4 py-3 text-sm hover:bg-white/10 font-bold">
+          <!-- Dropdown: Personalize + Theme + Logout -->
+          <div id="profileMenu" class="hidden absolute right-0 mt-2 w-64 surface-2 overflow-hidden z-50">
+            <button id="openPersonalize" class="w-full text-left px-4 py-3 text-sm hover:bg-white/10 font-bold">
+              ✨ Personalize
+            </button>
+
+            <div class="px-4 py-3 border-t border-white/10">
+              <div class="text-xs font-extrabold muted mb-2">Theme</div>
+              <div class="grid grid-cols-3 gap-2">
+                <button class="themePick px-3 py-2 rounded-xl text-xs font-extrabold bg-white/10 hover:bg-white/15 border border-white/15"
+                  data-theme="glass">Glass</button>
+                <button class="themePick px-3 py-2 rounded-xl text-xs font-extrabold bg-white/10 hover:bg-white/15 border border-white/15"
+                  data-theme="light">Light</button>
+                <button class="themePick px-3 py-2 rounded-xl text-xs font-extrabold bg-white/10 hover:bg-white/15 border border-white/15"
+                  data-theme="dark">Dark</button>
+              </div>
+            </div>
+
+            <button id="logoutBtn" class="w-full text-left px-4 py-3 text-sm hover:bg-white/10 font-bold border-t border-white/10">
               Logout
             </button>
           </div>
@@ -484,6 +490,56 @@
       </div>
 
     </main>
+  </div>
+
+  <!-- PERSONALIZE MODAL -->
+  <div id="personalizeBg" class="fixed inset-0 overlay hidden items-center justify-center z-50 p-4">
+    <div class="surface-2 p-5 w-full max-w-lg">
+      <div class="flex items-center justify-between gap-3">
+        <div>
+          <div class="font-extrabold text-lg">Personalize</div>
+          <div class="text-xs muted">Nickname, profile picture, and theme.</div>
+        </div>
+        <button id="closePersonalize" class="icon-btn" title="Close">✕</button>
+      </div>
+
+      <div class="mt-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="surface p-4 rounded-[18px]">
+          <div class="text-sm font-extrabold mb-3">Profile Picture</div>
+          <div class="flex items-center gap-3">
+            <div id="profileAvatarPreview"
+              class="w-16 h-16 rounded-[18px] bg-white/10 border border-white/20 flex items-center justify-center font-extrabold overflow-hidden">
+              M
+            </div>
+            <div class="flex-1">
+              <input id="profilePhotoInput" type="file" accept="image/*" class="w-full text-sm" />
+              <button id="removeAvatarBtn" class="mt-3 w-full btn-theme">
+                Remove
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="surface p-4 rounded-[18px]">
+          <div class="text-sm font-extrabold mb-3">Nickname</div>
+          <input id="profileNameInput" class="input-theme" placeholder="Enter nickname" />
+          <div class="text-xs muted mt-2">Updates the name in the topbar.</div>
+        </div>
+
+        <div class="surface p-4 rounded-[18px] md:col-span-2">
+          <div class="text-sm font-extrabold mb-3">Theme</div>
+          <div class="grid grid-cols-3 gap-2">
+            <button class="themePick btn-theme !px-3 !py-2 !text-sm" data-theme="glass">Glass</button>
+            <button class="themePick btn-theme !px-3 !py-2 !text-sm" data-theme="light">Light</button>
+            <button class="themePick btn-theme !px-3 !py-2 !text-sm" data-theme="dark">Dark</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-5 flex justify-end gap-2">
+        <button id="savePersonalize" class="btn-theme">Save</button>
+      </div>
+    </div>
   </div>
 
   <footer class="text-center py-6 text-xs muted">
