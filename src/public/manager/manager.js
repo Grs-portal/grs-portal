@@ -40,18 +40,14 @@
     if (localStorage.getItem("isLoggedIn") !== "true") return (location.href = LOGIN);
     if (localStorage.getItem("role") !== "manager") return (location.href = LOGIN);
 
-    const name = localStorage.getItem("userName") || "Manager";
-    qs("#userName").textContent = name;
     qs("#y").textContent = new Date().getFullYear();
-    qs("#userAvatar").textContent = name
-      .split(" ")
-      .map((x) => x[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
+
+    // Load profile persisted in data.json (fallback to localStorage)
+    await hydrateProfile();
 
     setupThemeUI();
-    setupProfile();
+    setupProfileDropdown();
+    setupPersonalizeModal();
     setupMobileSidebar();
     setupNav();
     bindButtons();
@@ -63,37 +59,117 @@
     await loadDashboard();
   }
 
-  // ---------------- THEME SWITCHER ----------------
+  // ---------------- PROFILE + THEME (PERSISTED) ----------------
+  function initials(name) {
+    const parts = String(name || "").trim().split(/\s+/).filter(Boolean);
+    const a = parts[0]?.[0] || "M";
+    const b = parts[1]?.[0] || "";
+    return (a + b).toUpperCase().slice(0, 2);
+  }
+
   function applyTheme(theme) {
-    const t = theme || "glass";
+    const t = theme || localStorage.getItem("theme") || "glass";
     document.documentElement.dataset.theme = t;
     localStorage.setItem("theme", t);
   }
 
+  function setAvatarEl(el, displayName, avatarData) {
+    if (!el) return;
+    if (avatarData) {
+      el.style.backgroundImage = `url(${avatarData})`;
+      el.style.backgroundSize = "cover";
+      el.style.backgroundPosition = "center";
+      el.textContent = "";
+    } else {
+      el.style.backgroundImage = "";
+      el.textContent = initials(displayName || "Manager");
+    }
+  }
+
+  async function loadProfileFromServer() {
+    const username = localStorage.getItem("username") || "";
+    const role = localStorage.getItem("role") || "";
+    if (!username || !role) return null;
+
+    try {
+      const res = await fetch(
+        `${API}/profile?role=${encodeURIComponent(role)}&username=${encodeURIComponent(username)}`
+      );
+      const out = await safeJson(res);
+      if (!out?.success) return null;
+      return out.profile;
+    } catch {
+      return null;
+    }
+  }
+
+  async function saveProfileToServer({ displayName, avatarData, theme }) {
+    try {
+      const res = await fetch(`${API}/profile`, {
+        method: "PUT",
+        headers: jsonHeaders(),
+        body: JSON.stringify({ displayName, avatarData, theme }),
+      });
+      const out = await safeJson(res);
+      return !!out?.success;
+    } catch {
+      return false;
+    }
+  }
+
+  async function hydrateProfile() {
+    // Defaults from login
+    const baseName = localStorage.getItem("userName") || "Manager";
+
+    // Server profile (preferred)
+    const prof = await loadProfileFromServer();
+
+    const displayName =
+      prof?.displayName ||
+      localStorage.getItem("displayName") ||
+      baseName;
+
+    const avatarData =
+      prof?.avatarData ||
+      localStorage.getItem("userAvatar") ||
+      "";
+
+    const theme =
+      prof?.theme ||
+      localStorage.getItem("theme") ||
+      "glass";
+
+    localStorage.setItem("displayName", displayName);
+    localStorage.setItem("userAvatar", avatarData);
+    localStorage.setItem("theme", theme);
+
+    applyTheme(theme);
+
+    qs("#userName").textContent = displayName;
+    setAvatarEl(qs("#userAvatar"), displayName, avatarData);
+  }
+
+  // Theme buttons live in dropdown + modal (same class .themePick)
   function setupThemeUI() {
-    const saved = localStorage.getItem("theme") || "glass";
-    applyTheme(saved);
-
-    const wrap = qs("#themeWrap");
-    const btn = qs("#themeBtn");
-    const menu = qs("#themeMenu");
-
-    btn?.addEventListener("click", (e) => {
-      e.stopPropagation();
-      menu?.classList.toggle("hidden");
-    });
+    // Ensure current theme applied
+    applyTheme(localStorage.getItem("theme") || "glass");
 
     qsa(".themePick").forEach((b) => {
-      b.addEventListener("click", (e) => {
+      b.addEventListener("click", async (e) => {
         e.preventDefault();
-        applyTheme(b.dataset.theme);
-        menu?.classList.add("hidden");
-      });
-    });
+        const t = b.dataset.theme || "glass";
+        applyTheme(t);
 
-    document.addEventListener("click", (e) => {
-      if (!wrap || !menu) return;
-      if (!wrap.contains(e.target)) menu.classList.add("hidden");
+        // store + persist
+        localStorage.setItem("theme", t);
+        await saveProfileToServer({
+          displayName: localStorage.getItem("displayName") || localStorage.getItem("userName") || "Manager",
+          avatarData: localStorage.getItem("userAvatar") || "",
+          theme: t,
+        });
+
+        toast(`Theme: ${t}`, "rgba(34,197,94,.70)");
+      });
     });
   }
 
@@ -102,11 +178,16 @@
     location.href = LOGIN;
   }
 
-  function setupProfile() {
-    qs("#userAvatar")?.addEventListener("click", (e) => {
+  function setupProfileDropdown() {
+    const avatar = qs("#userAvatar");
+    const menu = qs("#profileMenu");
+    const wrap = qs("#topAvatarWrap");
+
+    avatar?.addEventListener("click", (e) => {
       e.stopPropagation();
-      qs("#profileMenu")?.classList.toggle("hidden");
+      menu?.classList.toggle("hidden");
     });
+
     qs("#logoutBtn")?.addEventListener("click", logout);
     qs("#sidebarLogout")?.addEventListener("click", (e) => {
       e.preventDefault();
@@ -114,11 +195,123 @@
     });
 
     document.addEventListener("click", (e) => {
-      const wrap = qs("#topAvatarWrap");
-      if (wrap && !wrap.contains(e.target)) qs("#profileMenu")?.classList.add("hidden");
+      if (wrap && !wrap.contains(e.target)) menu?.classList.add("hidden");
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") menu?.classList.add("hidden");
     });
   }
 
+  // ---------------- PERSONALIZE MODAL ----------------
+  function setupPersonalizeModal() {
+    const openBtn = qs("#openPersonalize");
+    const bg = qs("#personalizeBg");
+    const closeBtn = qs("#closePersonalize");
+    const saveBtn = qs("#savePersonalize");
+
+    const nameInput = qs("#profileNameInput");
+    const photoInput = qs("#profilePhotoInput");
+    const removeBtn = qs("#removeAvatarBtn");
+    const preview = qs("#profileAvatarPreview");
+
+    function open() {
+      qs("#profileMenu")?.classList.add("hidden");
+
+      const displayName = localStorage.getItem("displayName") || localStorage.getItem("userName") || "Manager";
+      const avatarData = localStorage.getItem("userAvatar") || "";
+
+      if (nameInput) nameInput.value = displayName;
+
+      if (preview) {
+        if (avatarData) {
+          preview.style.backgroundImage = `url(${avatarData})`;
+          preview.style.backgroundSize = "cover";
+          preview.style.backgroundPosition = "center";
+          preview.textContent = "";
+        } else {
+          preview.style.backgroundImage = "";
+          preview.textContent = initials(displayName);
+        }
+      }
+
+      bg?.classList.remove("hidden");
+      bg?.classList.add("flex");
+      document.body.style.overflow = "hidden";
+    }
+
+    function close() {
+      bg?.classList.add("hidden");
+      bg?.classList.remove("flex");
+      document.body.style.overflow = "";
+    }
+
+    openBtn?.addEventListener("click", (e) => { e.preventDefault(); open(); });
+    closeBtn?.addEventListener("click", close);
+    bg?.addEventListener("click", (e) => { if (e.target === bg) close(); });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") close();
+    });
+
+    photoInput?.addEventListener("change", (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const data = String(ev.target.result || "");
+        localStorage.setItem("userAvatar", data);
+
+        // update preview + topbar live
+        if (preview) {
+          preview.style.backgroundImage = `url(${data})`;
+          preview.style.backgroundSize = "cover";
+          preview.style.backgroundPosition = "center";
+          preview.textContent = "";
+        }
+        setAvatarEl(qs("#userAvatar"), localStorage.getItem("displayName") || "Manager", data);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    removeBtn?.addEventListener("click", (e) => {
+      e.preventDefault();
+      localStorage.removeItem("userAvatar");
+      if (photoInput) photoInput.value = "";
+
+      const displayName = localStorage.getItem("displayName") || "Manager";
+      if (preview) {
+        preview.style.backgroundImage = "";
+        preview.textContent = initials(displayName);
+      }
+      setAvatarEl(qs("#userAvatar"), displayName, "");
+    });
+
+    saveBtn?.addEventListener("click", async (e) => {
+      e.preventDefault();
+
+      const baseName = localStorage.getItem("userName") || "Manager";
+      const displayName = (nameInput?.value || "").trim() || baseName;
+      const avatarData = localStorage.getItem("userAvatar") || "";
+      const theme = localStorage.getItem("theme") || "glass";
+
+      localStorage.setItem("displayName", displayName);
+
+      // update topbar immediately
+      qs("#userName").textContent = displayName;
+      setAvatarEl(qs("#userAvatar"), displayName, avatarData);
+
+      // persist in data.json
+      const ok = await saveProfileToServer({ displayName, avatarData, theme });
+      if (ok) toast("Saved personalization", "rgba(34,197,94,.70)");
+      else toast("Saved locally (server failed)", "rgba(251,191,36,.90)");
+
+      close();
+    });
+  }
+
+  // ---------------- SIDEBAR MOBILE ----------------
   function setupMobileSidebar() {
     const menuBtn = qs("#menuBtn");
     const sidebar = qs("#sidebar");
@@ -134,8 +327,18 @@
       sidebar.classList.add("-translate-x-full");
       overlay.classList.add("hidden");
     });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        sidebar.classList.add("-translate-x-full");
+        overlay.classList.add("hidden");
+        qs("#notifMenu")?.classList.add("hidden");
+        qs("#profileMenu")?.classList.add("hidden");
+      }
+    });
   }
 
+  // ---------------- NAV ----------------
   function setupNav() {
     const pages = qsa(".page-section");
     const links = qsa(".nav-item");
@@ -231,7 +434,7 @@
   async function loadNotifications() {
     const role = localStorage.getItem("role") || "";
     const username = localStorage.getItem("username") || "";
-    if (!username || !["manager", "instructor"].includes(role)) return;
+    if (!username || !["manager", "instructor", "student"].includes(role)) return;
 
     const res = await fetch(
       `${API}/notifications?role=${encodeURIComponent(role)}&username=${encodeURIComponent(username)}`
