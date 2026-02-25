@@ -41,9 +41,9 @@ const DATA_FILE = path.join(__dirname, "data.json");
 function defaultData() {
   return {
     accounts: [
-      { username: "root", password: "1234", role: "instructor", name: "Instructor Root" },
-      { username: "manager", password: "9999", role: "manager", name: "Project Manager" },
-      { username: "student", password: "1234", role: "student", name: "Student" },
+      { username: "root", password: "1234", role: "instructor", name: "Instructor Root", displayName: "", avatarData: "", theme: "glass" },
+      { username: "manager", password: "9999", role: "manager", name: "Project Manager", displayName: "", avatarData: "", theme: "glass" },
+      { username: "student", password: "1234", role: "student", name: "Student", displayName: "", avatarData: "", theme: "glass" },
     ],
     courses: [{ id: 1, title: "Intro to Programming", description: "Learn JS basics", locationType: "in-person" }],
     homework: [
@@ -57,8 +57,17 @@ function defaultData() {
     ],
     students: [{ enrollment_id: 1, name: "John Doe", course: "Intro to Programming", grade: 9 }],
     notifications: [],
-    schedule: [] // ✅ NEW: schedule events stored here
+    schedule: [] // ✅ schedule events stored here
   };
+}
+
+function normalizeAccount(a) {
+  // auto-upgrade old accounts stored in data.json
+  if (!a) return a;
+  if (typeof a.displayName !== "string") a.displayName = "";
+  if (typeof a.avatarData !== "string") a.avatarData = "";
+  if (typeof a.theme !== "string") a.theme = "glass";
+  return a;
 }
 
 function loadData() {
@@ -68,7 +77,6 @@ function loadData() {
     }
     const raw = JSON.parse(fs.readFileSync(DATA_FILE, "utf-8"));
 
-    // ✅ ensure new keys exist even if data.json is old
     raw.notifications = Array.isArray(raw.notifications) ? raw.notifications : [];
     raw.schedule = Array.isArray(raw.schedule) ? raw.schedule : [];
 
@@ -76,6 +84,9 @@ function loadData() {
     raw.courses = Array.isArray(raw.courses) ? raw.courses : defaultData().courses;
     raw.homework = Array.isArray(raw.homework) ? raw.homework : defaultData().homework;
     raw.students = Array.isArray(raw.students) ? raw.students : defaultData().students;
+
+    // upgrade accounts
+    raw.accounts = raw.accounts.map(normalizeAccount);
 
     return raw;
   } catch (e) {
@@ -157,6 +168,10 @@ function isISODate(s) {
   return !isNaN(d.getTime());
 }
 
+function getUserByUsername(username) {
+  return db.accounts.find(a => a.username === username);
+}
+
 // ---------------- UPLOADS ----------------
 const uploadsDir = path.join(__dirname, "uploads");
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
@@ -205,13 +220,80 @@ app.post("/api/upload", (req, res) => {
 
 // ---------------- API ROUTES ----------------
 
+// ---------- PROFILE (persist personalization) ----------
+app.get("/api/profile", (req, res) => {
+  const username = String(req.query.username || "").trim();
+  const role = String(req.query.role || "").trim();
+  if (!username || !role) return res.status(400).json({ success: false, message: "username+role required" });
+
+  const u = getUserByUsername(username);
+  if (!u) return res.status(404).json({ success: false, message: "User not found" });
+
+  // optional safety check
+  if (u.role !== role) return res.status(403).json({ success: false, message: "Forbidden" });
+
+  res.json({
+    success: true,
+    profile: {
+      username: u.username,
+      role: u.role,
+      name: u.name,
+      displayName: u.displayName || "",
+      avatarData: u.avatarData || "",
+      theme: u.theme || "glass"
+    }
+  });
+});
+
+app.put("/api/profile", (req, res) => {
+  const role = String(req.headers["x-role"] || "").trim();
+  const username = String(req.headers["x-username"] || "").trim();
+  if (!username || !role) return res.status(400).json({ success: false, message: "Missing auth headers" });
+
+  const u = getUserByUsername(username);
+  if (!u) return res.status(404).json({ success: false, message: "User not found" });
+
+  if (u.role !== role) return res.status(403).json({ success: false, message: "Forbidden" });
+
+  const { displayName, avatarData, theme } = req.body || {};
+
+  const allowedThemes = ["glass", "light", "dark"];
+  if (theme && !allowedThemes.includes(theme)) {
+    return res.status(400).json({ success: false, message: "Invalid theme" });
+  }
+
+  if (typeof displayName === "string") u.displayName = displayName.slice(0, 40);
+
+  if (typeof avatarData === "string") {
+    // limit to avoid huge data.json
+    if (avatarData.length > 700000) {
+      return res.status(413).json({ success: false, message: "Avatar too large" });
+    }
+    u.avatarData = avatarData;
+  }
+
+  if (typeof theme === "string") u.theme = theme;
+
+  saveData();
+
+  addNotification({
+    type: "profile",
+    action: "updated",
+    message: `Profile updated: "${username}"`,
+    ...actorFromReq(req),
+    targetType: "user",
+    targetId: username
+  });
+
+  res.json({ success: true });
+});
+
 // ---------- NOTIFICATIONS ----------
 app.get("/api/notifications", (req, res) => {
   const username = String(req.query.username || "").trim();
   const role = String(req.query.role || "").trim();
   if (!username || !role) return res.status(400).json({ success: false, message: "username+role required" });
 
-  // ✅ allow student too (so bell works everywhere)
   if (!["instructor", "manager", "student"].includes(role)) {
     return res.status(403).json({ success: false, message: "Forbidden" });
   }
@@ -225,7 +307,6 @@ app.get("/api/notifications", (req, res) => {
       if (aRole === "all-students") return role === "student";
       if (aRole === "student") return role === "student" && aUser === username;
 
-      // fallback: show
       return true;
     })
     .slice(0, 50)
@@ -245,7 +326,6 @@ app.post("/api/notifications/read-all", (req, res) => {
     return res.status(403).json({ success: false, message: "Forbidden" });
   }
 
-  // only mark ones visible to you as read (clean)
   db.notifications.forEach(n => {
     const aRole = n.audienceRole || "all";
     const aUser = n.audienceUsername || "";
@@ -262,13 +342,11 @@ app.post("/api/notifications/read-all", (req, res) => {
   res.json({ success: true });
 });
 
-
 // ---------- SCHEDULE (v1) ----------
 app.get("/api/schedule", (req, res) => {
   const role = String(req.query.role || req.headers["x-role"] || "").trim();
   const username = String(req.query.username || req.headers["x-username"] || "").trim();
 
-  // Student view: own + all-students
   if (role === "student") {
     if (!username) return res.status(400).json({ success: false, message: "Missing username" });
 
@@ -276,14 +354,12 @@ app.get("/api/schedule", (req, res) => {
     const items = (db.schedule || [])
       .filter(e => e && e.start)
       .filter(e => {
-        // visibility
         return (
           e.audienceRole === "all-students" ||
           (e.audienceRole === "student" && String(e.audienceUsername || "") === username)
         );
       })
       .filter(e => {
-        // keep upcoming-ish (end >= now-1h)
         const endMs = new Date(e.end || e.start).getTime();
         return !isNaN(endMs) && endMs >= (now - 60 * 60 * 1000);
       })
@@ -293,7 +369,6 @@ app.get("/api/schedule", (req, res) => {
     return res.json({ success: true, items });
   }
 
-  // Manager/instructor view all
   if (!["manager", "instructor"].includes(role)) {
     return res.status(403).json({ success: false, message: "Forbidden" });
   }
@@ -315,7 +390,7 @@ app.post("/api/schedule", (req, res) => {
     end,
     location = "",
     notes = "",
-    audienceRole = "all-students", // "all-students" OR "student"
+    audienceRole = "all-students",
     audienceUsername = ""
   } = req.body || {};
 
@@ -350,7 +425,6 @@ app.post("/api/schedule", (req, res) => {
   db.schedule.push(ev);
   saveData();
 
-  // ✅ notify students
   addNotification({
     type: "schedule",
     action: "created",
@@ -380,7 +454,6 @@ app.put("/api/schedule/:id", (req, res) => {
   if (idx === -1) return res.status(404).json({ success: false, message: "Schedule event not found" });
 
   const prev = db.schedule[idx];
-
   const patch = { ...req.body };
 
   if (patch.start && !isISODate(patch.start)) return res.status(400).json({ success: false, message: "start must be ISO date" });
@@ -457,15 +530,11 @@ app.delete("/api/schedule/:id", (req, res) => {
   res.json({ success: true });
 });
 
-
-
 /* ═════════✿══╡°˖✧᯽   COURSES PAGES    ᯽✧˖°╞══✿═════════*/
-
 app.get("/api/courses", (req, res) => res.json(db.courses));
 
 app.post("/api/courses", (req, res) => {
-  const { title, description = "", locationType = "in-person", courseType = "video", cover } = req.body || {};
-
+  const { title, description = "", locationType = "in-person", courseType = "video", cover, pdfUrl = "", pdfName = "" } = req.body || {};
   if (!title) return res.status(400).json({ success: false, message: "Title required" });
 
   const a = actorFromReq(req);
@@ -481,10 +550,11 @@ app.post("/api/courses", (req, res) => {
     chapters: [],
     reviews: [],
     locationType,
+    pdfUrl,
+    pdfName,
     createdBy: a.byName || a.byUsername || "Unknown",
     createdAt: new Date().toISOString(),
   };
-
 
   db.courses.push(newCourse);
   saveData();
@@ -551,7 +621,6 @@ app.delete("/api/courses/:id", (req, res) => {
 
   res.json({ success: true });
 });
-
 
 // ---------- HOMEWORK ----------
 app.get("/api/homework", (req, res) => res.json(db.homework));
@@ -690,7 +759,10 @@ app.post("/api/users", (req, res) => {
     password: String(password),
     role: newRole,
     name: String(name || cleanUsername).trim(),
-    avatarUrl: ""
+    avatarUrl: "",
+    displayName: "",
+    avatarData: "",
+    theme: "glass"
   };
 
   db.accounts.push(newUser);
@@ -796,5 +868,3 @@ app.get("/homepage/register.html", (req, res) => sendFirstExisting(res, "homepag
 
 // ---------------- START ----------------
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
-
-
