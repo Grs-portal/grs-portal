@@ -58,27 +58,22 @@ document.addEventListener("DOMContentLoaded", () => {
     qsa(".page-section").forEach(p => p.classList.add("hidden"));
     const page = qs("#" + id);
     if (page) page.classList.remove("hidden");
-  
+
     qsa(".nav-item").forEach(a => {
       a.classList.toggle("active", a.dataset.page === id);
     });
-  
-    /* NORMAL PAGES */
+
     if (id === "my-courses") {
       openCoursesSidebar();
       Courses.init();
       return;
     }
-  
-    /* DETAIL PAGE = FULL WIDTH */
+
     if (id === "course-detail") {
-      mainSidebar.classList.remove("active");
-      coursesSidebar.classList.remove("active");
-      overlay.classList.add("hidden");
+      closeAllSidebars();
       return;
     }
-  
-    /* everything else */
+
     openMainSidebar();
   }
 
@@ -131,33 +126,29 @@ document.addEventListener("DOMContentLoaded", () => {
           </select>
         </div>
 
-        <button id="newCourseBtn" class="new-course-btn">
-          + New Course
-        </button>
-
-        <div class="sidebar-calendar mt-6">
-          <p class="calendar-hint">Preview only</p>
-          <div class="calendar-preview">
-            <div class="calendar-header">February 2026</div>
-            <div class="calendar-grid">
-              <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
-              <span></span><span></span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
-              <span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
-              <span >12</span>
-              <span>13</span><span>14</span><span>15</span><span>16</span><span>17</span>
-              <span>18</span><span>19</span><span>20</span><span>21</span><span>22</span>
-              <span>23</span><span class="event-day">24</span><span>25</span><span>26</span><span>27</span>
-              <span>28</span><span>29</span><span>30</span><span>31</span>
-            </div>
-            <p class="calendar-hint">Click to view full calendar</p>
-          </div>
-        </div>
-        
+        <button id="newCourseBtn" class="new-course-btn">+ New Course</button>
       </div>
     `;
 
     qs("#newCourseBtn").onclick = () => Courses.openModal();
     qs("#backDashboardBtn").onclick = () => showPage("dashboard");
+
+    // FILTER LOGIC
+    const searchInput = qs("#searchCourse");
+    const statusFilter = qs("#statusFilter");
+    const locationFilter = qs("#locationFilter");
+    const typeFilter = qs("#typeFilter");
+
+    const applyFilters = () => Courses.render({
+      search: searchInput.value,
+      status: statusFilter.value,
+      location: locationFilter.value,
+      type: typeFilter.value
+    });
+
+    [searchInput, statusFilter, locationFilter, typeFilter].forEach(el =>
+      el.addEventListener("input", applyFilters)
+    );
   }
 
   /* =========================
@@ -189,12 +180,10 @@ document.addEventListener("DOMContentLoaded", () => {
       document.body.style.overflow = "";
     }
 
-    // Close modal via outside click
     modal.addEventListener("click", e => {
       if (e.target === modal) closeModal();
     });
 
-    // Close modal via ESC
     document.addEventListener("keydown", e => {
       if (e.key === "Escape") closeModal();
     });
@@ -207,65 +196,72 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /* ===== RENDER ===== */
-    
-    function render() {
+    function render(filters = {}) {
       const container = qs("#my-courses-grid");
       if (!container) return;
-    
-      if (!courses.length) {
+
+      let filteredCourses = [...courses];
+
+      // APPLY FILTERS
+      if (filters.search) filteredCourses = filteredCourses.filter(c =>
+        c.title.toLowerCase().includes(filters.search.toLowerCase())
+      );
+      if (filters.status) filteredCourses = filteredCourses.filter(c => 
+        (c.status || "").toLowerCase() === filters.status.toLowerCase()
+      );
+      if (filters.location) filteredCourses = filteredCourses.filter(c =>
+        (c.location || "").toLowerCase() === filters.location.toLowerCase()
+      );
+      if (filters.type) filteredCourses = filteredCourses.filter(c =>
+        (c.type || "").toLowerCase() === filters.type.toLowerCase()
+      );
+
+      if (!filteredCourses.length) {
         container.innerHTML = `
           <div class="glass p-6 rounded-2xl text-center fade-in">
-            <p>No courses yet</p>
-            <button class="btn-primary mt-4" id="createCourseBtn">
-              Create first course
-            </button>
+            <p>No courses found</p>
+            <button class="btn-primary mt-4" id="createCourseBtn">Create Course</button>
           </div>
         `;
         qs("#createCourseBtn").onclick = openModal;
         return;
       }
-    
-      container.innerHTML = courses.map(c => `
-        <div class="course-card cursor-pointer relative"
-             data-id="${c.id}">
-             
+
+      container.innerHTML = filteredCourses.map(c => `
+        <div class="course-card cursor-pointer relative" data-id="${c.id}">
           <div class="absolute top-3 left-3 text-xs font-semibold px-2 py-1 rounded-full ${getStatusClass(c.status)}">
             ${formatStatus(c.status)}
           </div>
-    
           <img src="${c.cover || 'https://via.placeholder.com/400x200'}"
                class="w-full h-32 object-cover rounded-xl mb-3">
-    
           <h3 class="title-strong text-lg">${c.title}</h3>
           <p class="subtitle text-sm mt-1">${c.description}</p>
         </div>
       `).join("");
-    
+
       container.querySelectorAll(".course-card").forEach(card => {
         card.addEventListener("click", () => {
           const id = card.dataset.id;
           openCourseDetail(id);
         });
       });
-  } 
+    }
 
-    
     /* ===== CREATE ===== */
     function create(data) {
       const newCourse = {
         id: crypto.randomUUID(),
         ...data,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        chapters: Array.isArray(data.chapters) ? data.chapters : []
       };
-    
+
       courses.push(newCourse);
       saveCourses();
       render();
-    
-      return newCourse; // ⭐ 
+      return newCourse;
     }
 
-    
     /* ===== FORM SUBMIT ===== */
     form.addEventListener("submit", e => {
       e.preventDefault();
@@ -284,14 +280,14 @@ document.addEventListener("DOMContentLoaded", () => {
         durationUnit: qs("#courseDurationUnit").value,
         location: qs("#courseLocation").value,
         type: qs("#courseLocation").value === "in-person" ? null : qs("#courseType").value,
-        chapters: qs("#courseChapters").value,
+        chapters: qs("#courseChapters").value ? [ { title: qs("#courseChapters").value } ] : [],
         previewTitle: qs("#coursePreview").value,
         status: finalStatus
       };
 
       const newCourse = create(data);
       closeModal();
-      openCourseDetail(newCourse.id); 
+      openCourseDetail(newCourse.id);
     });
 
     /* ===== DRAFT BUTTON ===== */
@@ -308,7 +304,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /* ===== HELPERS ===== */
     function formatStatus(status) {
-      return status.replace("-", " ").toUpperCase();
+      return (status || "").replace("-", " ").toUpperCase();
     }
 
     function getStatusClass(status) {
@@ -321,170 +317,140 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    return { init, openModal };
+    return { init, openModal, render };
   })();
 
-  //======Course details page======
-
+  /* =========================
+     COURSE DETAIL PAGE
+  ========================= */
   function openCourseDetail(courseId) {
+    closeAllSidebars();
 
-  mainSidebar.classList.remove("active");
-  coursesSidebar.classList.remove("active");
-  overlay.classList.add("hidden");
-    
-  const courses = JSON.parse(localStorage.getItem("instructor_courses") || "[]");
-  const course = courses.find(c => c.id === courseId);
-  if (!course) return;
+    const courses = JSON.parse(localStorage.getItem("instructor_courses") || "[]");
+    const course = courses.find(c => c.id === courseId);
+    if (!course) return;
 
-  const container = document.querySelector("#courseDetailContainer");
+    const container = qs("#courseDetailContainer");
+    if (!container) return;
 
-  container.innerHTML = `
-    <div class="bg-white rounded-2xl overflow-hidden shadow-sm">
+    const chaptersCount = Array.isArray(course.chapters) ? course.chapters.length : Number(course.chapters) || 0;
 
-      <!-- HERO -->
-      <div class="relative h-72 w-full">
-        <img src="${course.cover || 'https://via.placeholder.com/1200x400'}"
-             class="w-full h-full object-cover">
-        <button id="editCourseTopBtn"
-          class="absolute top-4 right-4 bg-black text-white px-4 py-2 rounded-xl text-sm">
-          Edit Course
-        </button>
-      </div>
+    container.innerHTML = `
+      <div class="bg-white rounded-2xl overflow-hidden shadow-sm">
 
-      <!-- CONTENT -->
-      <div class="p-8">
-
-        <h1 class="text-3xl font-bold mb-2">${course.title}</h1>
-
-        <span class="inline-block bg-gray-100 px-3 py-1 rounded-full text-xs mb-4">
-          ${course.type || "Course"}
-        </span>
-
-        <p class="text-gray-700 mb-6">${course.description}</p>
-
-        <!-- TEACHER -->
-        <div class="flex items-center gap-4 mb-8">
-          <img src="${localStorage.getItem("userPhoto") || 'https://via.placeholder.com/60'}"
-               class="w-14 h-14 rounded-full object-cover">
-          <span class="font-semibold">
-            ${localStorage.getItem("userName") || "Instructor"}
-          </span>
+        <!-- HERO -->
+        <div class="relative h-72 w-full">
+          <img src="${course.cover || 'https://via.placeholder.com/1200x400'}"
+               class="w-full h-full object-cover">
+          <button id="editCourseTopBtn"
+            class="absolute top-4 right-4 bg-black text-white px-4 py-2 rounded-xl text-sm">
+            Edit Course
+          </button>
         </div>
 
-        <!-- INFO BLOCKS -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-          <div class="glass p-4 rounded-xl text-center">
-            <div class="text-xl font-bold">${course.durationValue || 0}</div>
-            <div class="text-xs uppercase opacity-60">Duration</div>
+        <!-- CONTENT -->
+        <div class="p-8">
+          <h1 class="text-3xl font-bold mb-2">${course.title}</h1>
+          <span class="inline-block bg-gray-100 px-3 py-1 rounded-full text-xs mb-4">${course.type || "Course"}</span>
+          <p class="text-gray-700 mb-6">${course.description}</p>
+
+          <div class="flex items-center gap-4 mb-8">
+            <img src="${localStorage.getItem("userPhoto") || 'https://via.placeholder.com/60'}" class="w-14 h-14 rounded-full object-cover">
+            <span class="font-semibold">${localStorage.getItem("userName") || "Instructor"}</span>
           </div>
 
-          <div class="glass p-4 rounded-xl text-center">
-            <div class="text-xl font-bold">${course.chapters?.length || 0}</div>
-            <div class="text-xs uppercase opacity-60">Chapters</div>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+            <div class="glass p-4 rounded-xl text-center">
+              <div class="text-xl font-bold">${course.durationValue || 0}</div>
+              <div class="text-xs uppercase opacity-60">Duration</div>
+            </div>
+
+            <div class="glass p-4 rounded-xl text-center">
+              <div class="text-xl font-bold">${chaptersCount}</div>
+              <div class="text-xs uppercase opacity-60">Chapters</div>
+            </div>
+
+            <div class="glass p-4 rounded-xl text-center">
+              <div class="text-xs font-semibold">${course.location}</div>
+              <div class="text-xs uppercase opacity-60">Location</div>
+            </div>
+
+            <div class="glass p-4 rounded-xl text-center">
+              <div class="text-xs font-semibold">${course.type || "-"}</div>
+              <div class="text-xs uppercase opacity-60">Type</div>
+            </div>
           </div>
 
-          <div class="glass p-4 rounded-xl text-center">
-            <div class="text-xs font-semibold">${course.location}</div>
-            <div class="text-xs uppercase opacity-60">Location</div>
-          </div>
-
-          <div class="glass p-4 rounded-xl text-center">
-            <div class="text-xs font-semibold">${course.type || "-"}</div>
-            <div class="text-xs uppercase opacity-60">Type</div>
-          </div>
-        </div>
-
-        <!-- CHAPTERS -->
-        <div class="mb-12">
-          <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-bold">Chapters</h2>
-            <button id="addChapterBtn"
-              class="bg-green-600 text-white px-4 py-2 rounded-xl text-sm">
-              Add Chapter
-            </button>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            ${(course.chapters || []).map(ch => `
-              <div class="bg-gray-50 rounded-xl overflow-hidden relative cursor-pointer">
-                <img src="${ch.cover || 'https://via.placeholder.com/300x200'}"
-                     class="w-full h-32 object-cover">
-
-                ${ch.preview
-                  ? `<span class="absolute top-2 right-2 bg-green-600 text-white text-xs px-2 py-1 rounded">
-                      Preview
-                     </span>`
-                  : `<span class="absolute top-2 right-2 bg-black text-white text-xs px-2 py-1 rounded">
-                      Locked
-                     </span>`}
-
-                <div class="p-3">
-                  <h4 class="font-semibold">${ch.title}</h4>
-                  <p class="text-xs opacity-60">${ch.duration}</p>
+          <div class="mb-12">
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="text-xl font-bold">Chapters</h2>
+              <button id="addChapterBtn" class="bg-green-600 text-white px-4 py-2 rounded-xl text-sm">Add Chapter</button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              ${(Array.isArray(course.chapters) ? course.chapters : []).map(ch => `
+                <div class="bg-gray-50 rounded-xl overflow-hidden relative cursor-pointer">
+                  <img src="${ch.cover || 'https://via.placeholder.com/300x200'}" class="w-full h-32 object-cover">
+                  ${ch.preview
+                    ? `<span class="absolute top-2 right-2 bg-green-600 text-white text-xs px-2 py-1 rounded">Preview</span>`
+                    : `<span class="absolute top-2 right-2 bg-black text-white text-xs px-2 py-1 rounded">Locked</span>`}
+                  <div class="p-3">
+                    <h4 class="font-semibold">${ch.title}</h4>
+                    <p class="text-xs opacity-60">${ch.duration || ""}</p>
+                  </div>
                 </div>
-              </div>
-            `).join("")}
+              `).join("")}
+            </div>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-bold mb-4">Reviews</h2>
+            <div id="reviewSummary" class="mb-6"></div>
+            <div id="reviewsList"></div>
           </div>
         </div>
-
-        <!-- REVIEWS -->
-        <div>
-          <h2 class="text-xl font-bold mb-4">Reviews</h2>
-
-          <div id="reviewSummary" class="mb-6"></div>
-
-          <div id="reviewsList"></div>
-        </div>
-
       </div>
-    </div>
-  `;
+    `;
 
-  renderReviewsSection(course);
-  showPage("course-detail");
-}
+    renderReviewsSection(course);
+    showPage("course-detail");
+  }
 
   qs("#backToCourses").onclick = () => showPage("my-courses");
 
-
- //====== Reviews 
+  /* =========================
+     REVIEWS
+  ========================= */
   function renderReviewsSection(course) {
-  const reviews = course.reviews || [];
-  const total = reviews.length;
+    const reviews = course.reviews || [];
+    const total = reviews.length;
+    const avg = total === 0 ? 0 : (reviews.reduce((sum, r) => sum + r.rating, 0) / total).toFixed(1);
 
-  const avg = total === 0
-    ? 0
-    : (reviews.reduce((sum, r) => sum + r.rating, 0) / total).toFixed(1);
+    const summary = qs("#reviewSummary");
+    if (summary) summary.innerHTML = `
+      <div class="flex items-center gap-4 text-lg">
+        <strong>${avg}</strong>
+        <span>${"★".repeat(Math.round(avg))}${"☆".repeat(5 - Math.round(avg))}</span>
+        <span class="opacity-60">(${total} reviews)</span>
+      </div>
+    `;
 
-  document.querySelector("#reviewSummary").innerHTML = `
-    <div class="flex items-center gap-4 text-lg">
-      <strong>${avg}</strong>
-      <span>${"★".repeat(Math.round(avg))}${"☆".repeat(5 - Math.round(avg))}</span>
-      <span class="opacity-60">(${total} reviews)</span>
-    </div>
-  `;
-
-  const list = document.querySelector("#reviewsList");
-
-  list.innerHTML = reviews.map(r => `
-    <div class="bg-gray-50 p-4 rounded-xl mb-4">
-      <strong>${r.name}</strong>
-      <div>${"★".repeat(r.rating)}${"☆".repeat(5 - r.rating)}</div>
-      <p class="mt-2">${r.comment}</p>
-
-      ${r.reply ? `
-        <div class="bg-green-50 p-3 rounded-lg mt-3">
-          <strong>Reply:</strong>
-          <p>${r.reply}</p>
+    const list = qs("#reviewsList");
+    if (list) {
+      list.innerHTML = reviews.map(r => `
+        <div class="bg-gray-50 p-4 rounded-xl mb-4">
+          <strong>${r.name}</strong>
+          <div>${"★".repeat(r.rating)}${"☆".repeat(5 - r.rating)}</div>
+          <p class="mt-2">${r.comment}</p>
+          ${r.reply ? `
+            <div class="bg-green-50 p-3 rounded-lg mt-3">
+              <strong>Reply:</strong>
+              <p>${r.reply}</p>
+            </div>
+          ` : `<button class="replyBtn mt-3 text-sm text-green-700 underline">Reply</button>`}
         </div>
-      ` : `
-        <button class="replyBtn mt-3 text-sm text-green-700 underline">
-          Reply
-        </button>
-      `}
-    </div>
-  `).join("");
-}
+      `).join("");
+    }
+  }
 
   /* =========================
      INIT
@@ -492,7 +458,3 @@ document.addEventListener("DOMContentLoaded", () => {
   buildCoursesSidebar();
   showPage("dashboard");
 });
-
-
-
-
