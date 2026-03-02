@@ -816,7 +816,7 @@ html,body {
 /* ... ✿°•∘ɷ∘•°✿ .. Hide text by default */
  .slide-btn {
     display: block;
-    opacity: 0;
+    opacity: 1;
     transform: translateY(0px);
     pointer-events: none;
     transition: opacity 0.3s ease, transform 0.3s ease;
