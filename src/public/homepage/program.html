@@ -11,14 +11,13 @@
         <!--══✿══╡°˖✧᯽ NAVIGATION BAR ᯽✧˖°╞══✿══-->
 
 
-    <header class="site-header">
-    <div class="container header-inner">
+  <header class="site-header" style="background-color: white;">
+    <div class="container header-inner" style="background-color: white;">
       <nav class="main-nav">
         <div class="nav-left">
-          <a href="/homepage/index.html" class="nav-link" data-translate="nav-home">Home</a>
-          <a href="/homepage/forwho.html" class="nav-link " data-translate="nav-forwho">For Who</a>
+          <a href="/homepage/index.html" class="nav-link " data-translate="nav-home">Home</a>
+          <a href="/homepage/forwho.html" class="nav-link" data-translate="nav-forwho">For Whom</a>
           <a href="/homepage/green recovery space.html" class="nav-link" data-translate="nav-grs">Green Recovery Space</a>
-          <a href="/homepage/offerings.html" class="nav-link active" data-translate="nav-offer">What we offer</a>
         </div>
 
         <!-- ... ✿°•∘ɷ∘•°✿ ..  logo circle  -->
@@ -27,21 +26,23 @@
           <img src="/homepage/images/Logo HK.jpg" alt="PBC logo">
         </div>
 
-        <div class="nav-right">
+        <div class="nav-right">          
+          <a href="/homepage/offerings.html" class="nav-link active" data-translate="nav-offer">What we offer</a>
           <a href="/homepage/about.html" class="nav-link" data-translate="nav-about">About Us</a>
-          <a href="/homepage/projects.html" class="nav-link" data-translate="nav-projects">Projects</a>
-          <a href="/homepage/Portal.html" class="nav-link" data-translate="nav-portals">Portals</a>
           <a href="/homepage/contact.html" class="nav-link" data-translate="nav-contact">Contact</a>
           <div class="language-dropdown">
-            <button class="lang-btn">EN ▾</button>
-            <ul class="lang-menu">
-              <li data-lang="en">English</li>
-              <li data-lang="nl">Dutch</li>
-              <li data-lang="es">Spanish</li>
-            </ul>
+              <button class="lang-btn">EN ▾</button>
+              <ul class="lang-menu">
+                <li data-lang="en">English</li>
+                <li data-lang="nl">Dutch</li>
+                <li data-lang="es">Spanish</li>
+              </ul>
+          </div>        
+          <a href="login.html" class="profile" aria-label="Sign in or register">
+            <img src="/homepage/images/unkown.png" alt="User profile">
+            <span class="profile-tooltip">Sign in / Register</span>
+          </a>
         </div>
-        </div>
-        
       </nav>
 
     </div>
@@ -71,7 +72,6 @@
 
 .programs-container {
   background: var(--white);
-  margin-top: 60px;
   display: grid;
   grid-template-columns: 260px 1fr;
   gap: 2rem;
@@ -81,7 +81,6 @@
 .programs-sidebar {
   align-self: start;
   position: sticky;
-  top: 20px;
   background: #ffffff;
   padding: 1.5rem;
   border-radius: 10px;
@@ -163,7 +162,7 @@
   margin-top: 10px;
   padding: 8px 14px;
   background: #92dacc;
-  color: #003329;
+  color: var(--bg-green);
   text-decoration: none;
   border-radius: 6px;
   font-size: 0.9rem;
@@ -302,7 +301,6 @@
 .registration-section {
   padding: 0 6.5rem 0 6.5rem;
   text-align: center;
-  margin-top: 0;
 }
 
 
@@ -313,7 +311,6 @@
   overflow: hidden;
   opacity: 0;
   transition: max-height 0.5s ease, opacity 0.4s ease;
-  margin-top: 30px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -371,7 +368,7 @@
   display: flex;
   flex-direction: column;
   font-size: 0.9rem;
-  color: #003329;
+  color: var(--bg-green);
 }
 
 .modal-form input,
@@ -464,8 +461,131 @@
 }
 
 
+
+.programs-offerings {
+  max-width: 95%;
+  margin: 0 auto 0px auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 4px 4px 4px 4px rgba(165, 188, 177, 0.068);
+
+}
+
+.offerings-toggle {
+  width: 100%;
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  font-weight: 600;
+  display: flex;
+  justify-content:start;
+  align-items: center;
+  cursor: pointer;
+  padding: 0;
+  color: #3b6944;
+}
+
+.toggle-icon {
+  display: inline-flex;
+  transition: transform 0.3s ease;
+  padding-left: 10px;
+}
+
+.toggle-icon.rotate {
+  transform: rotate(180deg);
+}
+
+.offerings-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease, opacity 0.4s ease;
+  opacity: 0;
+  line-height: 1.7;
+  margin-top: 1rem;
+}
+
+.offerings-content.open {
+  max-height: 1000px; /* large enough to fit content */
+  opacity: 1;
+}
+
+.offerings-content p {
+  margin-bottom: 1rem;
+}
+
 </style>
 
+
+<section class="hero sub-hero" aria-label="Courses hero">
+
+  <!-- ... ✿°•∘ɷ∘•°✿ .. background img -->
+  <div class="hero-bg" style="background-image:url('/homepage/images/Header hofi.png')"></div>
+  <div class="hero-tint"></div>
+
+    <div class="container hero-inner">
+      <div class="hero-copy">
+        <h1 data-translate="hero-courses-h" style="color: var(--header-green); margin-top: -40px;">Discover what you can do with us</h1>
+        <p style=" margin: auto; color: rgb(245, 232, 232); font-size: 1.1rem;">
+             Small steps, at your own pace, from introduction to deeper engagement. <br>
+        <br> At the Green Recovery Space, you can take part in activities, trainings, and self-help methods that contribute to recovery, balance, and overall well-being.
+        </p>
+      </div>
+    </div>
+
+    <!-- ... ✿°•∘ɷ∘•°✿ ..  wavy divider svg  -->
+
+    <svg class="hero-wave" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0,40 C220,110 440,0 720,40 C1000,80 1220,10 1440,50 L1440,120 L0,120 Z" fill="#f4faf7"></path>
+    </svg>
+
+  </section>
+  
+  <!-- ══✿══ OUR OFFERINGS (Collapsible) ══✿══ -->
+<section class="programs-offerings" style="height: fit-content;">
+
+  <button class="offerings-toggle" id="offeringsToggle">
+    <span>Our Offerings</span>
+
+    <span class="toggle-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+        <path d="M2.99854 7.00153L12.0006 17.0027L21.0027 7.00153"
+          stroke="#4d8658"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"/>
+      </svg>
+    </span>
+  </button>
+
+  <div class="offerings-content" id="offeringsContent">
+
+    <p>
+      At Green Recovery Space, we provide recovery-focused courses for people 
+      who want to work on their mental health, well-being, and resilience.
+    </p>
+
+    <p>
+      We do not start from diagnoses or labels but from the person behind the story. 
+      For us, recovery means finding direction again, experiencing connection, and 
+      learning to navigate life in a way that fits who you are and the context you live in.
+    </p>
+
+    <p>
+      Our courses differ in approach but share the same foundation: safety, equality, 
+      personal agency, and respect for each person’s pace.
+    </p>
+
+    <p>
+      All courses are guided by trained lived-experience experts and trainers, 
+      in small, trusted groups, and a calm setting. Everything happens at your pace.
+      You are welcome as you are.
+    </p>
+
+  </div>
+
+</section>
 
 
 <!-- 🌱 OUR OFFERINGS -->
@@ -481,12 +601,13 @@
     </div>
 
     <div class="filter-group">
-      <label>Status</label>
+      <label>Type of offerings</label>
       <select>
         <option value="">All</option>
-        <option>Upcoming</option>
-        <option>Ongoing</option>
-        <option>Completed</option>
+        <option>Activities</option>
+        <option>Learning & deepening recovery knowledge</option>
+        <option>Regular offerings</option>
+        <option>Lived-experience training</option>
       </select>
     </div>
 
@@ -494,21 +615,23 @@
       <label>Duration</label>
       <select>
         <option value="">Any</option>
-        <option>4 weeks</option>
-        <option>8 weeks</option>
-        <option>12 weeks</option>
+        <option>Short (± 1.5 to 2 hours)</option>
+        <option>Half-day (± 4 hours)</option>
+        <option>Multiple sessions</option>
       </select>
     </div>
 
     <div class="filter-group">
-      <label>Type</label>
+      <label>Theme</label>
       <select>
-        <option value="">All</option>
-        <option>Course</option>
-        <option>Workshop</option>
-        <option>Program</option>
+        <option value="">Any</option>
+        <option>Rest & relaxation</option>
+        <option>Recovery & balance</option>
+        <option>Self-insight</option>
+        <option>Connection</option>
       </select>
     </div>
+
 
     <div class="sidebar-calendar">
       <h4 style="padding-bottom: 0.5rem;">Program Calendar</h4>
@@ -576,16 +699,15 @@
     <div class="programs-grid">
 
       <div class="program-card">
-        <div class="status-badge upcoming">Workshop</div>
-        <img src="https://images.unsplash.com/photo-1501004318641-b39e6451bec6?q=80&w=1200" />
+        <div class="status-badge ongoing">Course</div>
+        <img src="/homepage/images/wrap.png"/>
         <div class="program-content">
-          <h4>Green Recovery Program</h4>
+          <h4>Wrap</h4>
           <p class="program-description">
-            A structured 8-week program focused on healing through nature and connection.
-          </p>
-          <p class="program-meta">Duration: 8 weeks</p>
-          <p class="program-meta">Location: Hofi Korsou</p>
-          <p class="program-meta">Starts: March 12, 2026</p>
+            A practical course focused on self-management and daily well-being. You'll learn what helps you feel good, how to recognize signs when things aren't going well, and how to support yourself with concrete plans and tools.          </p>
+          <p class="program-meta">Duration: 8 weekly 2.5 hours sessions</p>
+          <p class="program-meta">Instructor: Experienced Counselor</p>
+          <p class="program-meta">Starts: May 21, 2026</p>
           <a href="#" class="program-button">View Program</a>
         </div>
       </div>
@@ -593,15 +715,15 @@
 
       <div class="program-card">
         <div class="status-badge ongoing">Course</div>
-        <img src="https://images.unsplash.com/photo-1511988617509-a57c8a288659?q=80&w=1200" />
+        <img src="/homepage/images/You&I.png" />
         <div class="program-content">
-          <h4>Mindfulness & Growth</h4>
+          <h4>You & I</h4>
           <p class="program-description">
-            4-week guided sessions to develop awareness and emotional balance.
+           With an emphasis on connection and relationships. You'll explore how you connect with others, the patterns that play a role in this, and how you can create more space for closeness, boundaries, and reciprocity.
           </p>
-          <p class="program-meta">Duration: 4 weeks</p>
-          <p class="program-meta">Location: Outdoor Pavilion</p>
-          <p class="program-meta">Started: February 20, 2026</p>
+          <p class="program-meta">Duration: 8 weekly 2.5 hours sessions</p>
+          <p class="program-meta">Instructor: Experienced Counselor</p>
+          <p class="program-meta">Starts: undifined</p>
           <a href="#" class="program-button">View Program</a>
         </div>
       </div>
@@ -656,9 +778,10 @@
 </main>
 
 
-    <!--══✿══╡°˖✧᯽  FOOTER SECTION ᯽✧˖°╞══✿══-->
-  
-  <footer class="fancy-footer">
+     <!--══✿══╡°˖✧᯽  FOOTER   ᯽✧˖°╞══✿══-->
+
+
+  <footer class="fancy-footer" style="margin-top: 0;">
     <div class="footer-background-word">Hofi Korsou</div>
 
     <div class="footer-container">
@@ -674,7 +797,7 @@
           <h3 data-translate="col-com">Company</h3>
           <ul>
             <li><a data-translate="nav-about" href="/homepage/about.html">About Us</a></li>
-            <li><a data-translate="nav-contact" href="/homepage/contact.html">Contact Us</a></li>
+            <li><a data-translate="nav-contact" href="/homepage/contact.html">Contact Us</a></li>            
           </ul>
         </div>
 
@@ -711,20 +834,35 @@
 
       </div>
 
-      <div class="footer-bottom">
-        <p>© 2025 PBC — All rights reserved.</p>
+      <!--... ✿°•∘ɷ∘•°✿ .. SOCIALS -->
 
+      <div class="footer-bottom">
         <div class="footer-social-icons">
           <a href="#" class="social"><i class="fab fa-facebook"></i></a>
-          <a href="#" class="social"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="social"><i class="fab fa-tiktok"></i></a>
           <a href="#" class="social"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="social"><i class="fab fa-linkedin"></i></a>
           <a href="#" class="social"><i class="fab fa-email"></i></a>
+        </div>
+
+        <!-- ✿ Email Subscription -->
+        <div class="footer-subscribe">
+          <p class="subscribe-text">
+            Subscribe to receive weekly news and updates about Green Recovery Space.
+          </p>
+
+          <form class="subscribe-form">
+            <input 
+              type="email" 
+              placeholder="Fill in your email" 
+              required
+            />
+            <button type="submit">Subscribe</button>
+          </form>
         </div>
       </div>
     </div>
   </footer>
-
-  
 
 <script>
 const modalButtons = document.querySelectorAll('.choice-button');
@@ -757,14 +895,18 @@ modalOverlays.forEach(overlay => {
     }
   });
 });
+
+  const toggleBtn = document.getElementById("offeringsToggle");
+  const content = document.getElementById("offeringsContent");
+  const icon = document.querySelector(".toggle-icon");
+
+  toggleBtn.addEventListener("click", () => {
+    content.classList.toggle("open");
+    icon.classList.toggle("rotate");
+  });
+
 </script>
 
 
 </body>
 </html>
-
-
-
-
-
-
