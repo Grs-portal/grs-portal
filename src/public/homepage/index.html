@@ -10,10 +10,11 @@
 </head>
 
 
-<body style="background-color: #003329;">
+<body style="background-color: var(--bg-green);">
 
 
     <!--══✿══╡°˖✧᯽ NAVIGATION BAR ᯽✧˖°╞══✿══-->
+
 
   <header class="site-header" style="background-color: white;">
     <div class="container header-inner" style="background-color: white;">
@@ -71,25 +72,10 @@
   </section>
 
 
- <!--══✿══╡°˖✧᯽  SLOGAN PARALLAX SECTION ᯽✧˖°╞══✿══-->
-
-<section class="info-box" id="sloganSection">
-  <div class="slogan-text">
-    <div class="slogan-line left" id="lineLeft">
-      "Een plek om op adem te komen
-    </div>
-    <div class="slogan-line right" id="lineRight">
-      en opnieuw richting te vinden"
-    </div>
-  </div>
-</section>
+ <!--══✿══╡°˖✧᯽  MISSION SECTION ᯽✧˖°╞══✿══-->
 
 
 
-
-
-
-    <!--══✿══╡°˖✧᯽  MISSION SECTION ᯽✧˖°╞══✿══-->
 
   <section class="parallax-mission-section" style="background-color: var(--bg-green);">
 
@@ -116,9 +102,9 @@
 
     <!-- ... ✿°•∘ɷ∘•°✿ ..  blobs  -->
     
-    <img src="images/blob 1.png" id="blob1">
-    <img src="images/blob 2.png" id="blob2">
-    <img src="images/blob 3.png" id="blob3">
+    <img src="/homepage/images/blob 1.png" id="blob1">
+    <img src="/homepage/images/blob 2.png" id="blob2">
+    <img src="/homepage/images/blob 3.png" id="blob3">
 
     <div class="mission-layout">
         <!-- ... ✿°•∘ɷ∘•°✿ ..  mission card 1  - For Whom -->
@@ -137,7 +123,7 @@
                 <p id="know-more" style="margin-top: 2px;">Want to know more?</p>
                 <p id="click-trick" style="margin-top: 20px;">Read here</p>
                 <div id="home-slide-btn-wrapper">
-                <a href="forwho.html" class="slide-btn" style="margin: -20px auto;">
+                <a href="/homepage/forwho.html" class="slide-btn" style="margin: -20px auto;">
                     <span class="IconContainer">
                         <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
                             <path d="M21.883 12l-7.527 6.235.644.765 9-7.521-9-7.479-.645.764 7.529 6.236h-21.884v1h21.883z"/>
@@ -173,7 +159,7 @@
               <p data-translate="believe-p">We believe in a society where people who get stuck in their lives.</p>
                 <p id="know-more" style="margin-top: 8px;">Want to know more?</p>
                 <p id="click-trick" style="margin-top: 35px;">Read here</p>
-              <a href="about.html" class="slide-btn" style="margin: -15px auto;">
+              <a href="/homepage/about.html" class="slide-btn" style="margin: -15px auto;">
                   <span class="IconContainer">
                       <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
                           <path d="M21.883 12l-7.527 6.235.644.765 9-7.521-9-7.479-.645.764 7.529 6.236h-21.884v1h21.883z"/>
@@ -194,7 +180,7 @@
               <p data-translate="offer-p">Support from people who understand what you are going through because they have had similar experiences.</p>
                 <p id="know-more" style="margin-top: 5px;">Want to know more?</p>
                 <p id="click-trick" style="margin-top: 10px;">Read here</p>
-              <a href="offerings.html" class="slide-btn" style="margin: -18px auto;">
+              <a href="/homepage/offerings.html" class="slide-btn" style="margin: -18px auto;">
                   <span class="IconContainer">
                       <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
                           <path d="M21.883 12l-7.527 6.235.644.765 9-7.521-9-7.479-.645.764 7.529 6.236h-21.884v1h21.883z"/>
@@ -254,12 +240,10 @@
 
 
 
-
-
      <!--══✿══╡°˖✧᯽  FOOTER   ᯽✧˖°╞══✿══-->
 
 
-  <footer class="fancy-footer">
+  <footer class="fancy-footer" style="margin-top: 0;">
     <div class="footer-background-word">Hofi Korsou</div>
 
     <div class="footer-container">
@@ -267,15 +251,15 @@
 
         <!-- ... ✿°•∘ɷ∘•°✿ .. LOGO + TEXT -->
         <div class="footer-col-wide">
-          <img src="/homepage/images/HK logo no bg.png" alt="logo" class="footer-logo" />
+          <img src="images/HK logo no bg.png" alt="logo" class="footer-logo" />
         </div>
 
         <!-- ... ✿°•∘ɷ∘•°✿ .. COL 1 -->
         <div class="footer-col">
           <h3 data-translate="col-com">Company</h3>
           <ul>
-            <li><a data-translate="nav-about" href="/homepage/about.html">About Us</a></li>
-            <li><a data-translate="nav-contact" href="/homepage/contact.html">Contact Us</a></li>
+            <li><a data-translate="nav-about" href="about.html">About Us</a></li>
+            <li><a data-translate="nav-contact" href="contact.html">Contact Us</a></li>            
           </ul>
         </div>
 
@@ -312,10 +296,9 @@
 
       </div>
 
-    <!--... ✿°•∘ɷ∘•°✿ .. SOCIALS -->
+      <!--... ✿°•∘ɷ∘•°✿ .. SOCIALS -->
 
       <div class="footer-bottom">
-        <div class="footer-bottom">
         <div class="footer-social-icons">
           <a href="#" class="social"><i class="fab fa-facebook"></i></a>
           <a href="#" class="social"><i class="fab fa-tiktok"></i></a>
@@ -325,24 +308,25 @@
         </div>
 
         <!-- ✿ Email Subscription -->
-            <div class="footer-subscribe">
-              <p class="subscribe-text">
-                Subscribe to receive weekly news and updates about Green Recovery Space.
-              </p>
-    
-              <form class="subscribe-form">
-                <input 
-                  type="email" 
-                  placeholder="Fill in your email" 
-                  required
-                />
-                <button type="submit">Subscribe</button>
-              </form>
-            </div>
-          </div>
+        <div class="footer-subscribe">
+          <p class="subscribe-text">
+            Subscribe to receive weekly news and updates about Green Recovery Space.
+          </p>
+
+          <form class="subscribe-form">
+            <input 
+              type="email" 
+              placeholder="Fill in your email" 
+              required
+            />
+            <button type="submit">Subscribe</button>
+          </form>
+        </div>
       </div>
     </div>
   </footer>
+
+
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
@@ -361,12 +345,3 @@
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
