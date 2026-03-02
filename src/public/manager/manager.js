@@ -68,7 +68,7 @@
   }
 
   function applyTheme(theme) {
-    const t = theme || localStorage.getItem("theme") || "glass";
+    const t = theme || localStorage.getItem("theme") || "light";
     document.documentElement.dataset.theme = t;
     localStorage.setItem("theme", t);
   }
@@ -1012,3 +1012,4 @@
     }
   }
 })();
+
