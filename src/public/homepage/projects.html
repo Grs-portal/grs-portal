@@ -11,14 +11,13 @@
 
     <!--══✿══╡°˖✧᯽ NAVIGATION BAR ᯽✧˖°╞══✿══-->
 
-  <header class="site-header">
-    <div class="container header-inner">
+  <header class="site-header" style="background-color: white;">
+    <div class="container header-inner" style="background-color: white;">
       <nav class="main-nav">
         <div class="nav-left">
           <a href="/homepage/index.html" class="nav-link" data-translate="nav-home">Home</a>
-          <a href="/homepage/forwho.html" class="nav-link" data-translate="nav-forwho">For Who</a>
+          <a href="/homepage/forwho.html" class="nav-link" data-translate="nav-forwho">For Whom</a>
           <a href="/homepage/green recovery space.html" class="nav-link" data-translate="nav-grs">Green Recovery Space</a>
-          <a href="/homepage/offerings.html" class="nav-link active" data-translate="nav-offer">What we offer</a>
         </div>
 
         <!-- ... ✿°•∘ɷ∘•°✿ ..  logo circle  -->
@@ -28,23 +27,27 @@
         </div>
 
         <div class="nav-right">          
-          <a href="/homepage/projects.html" class="nav-link active" data-translate="nav-projects">Projects</a>
+          <a href="/homepage/offerings.html" class="nav-link active" data-translate="nav-offer">What we offer</a>
           <a href="/homepage/about.html" class="nav-link" data-translate="nav-about">About Us</a>
-          <a href="/homepage/Portal.html" class="nav-link" data-translate="nav-portals">Portals</a>
           <a href="/homepage/contact.html" class="nav-link" data-translate="nav-contact">Contact</a>
-        <div class="language-dropdown">
-            <button class="lang-btn">EN ▾</button>
-            <ul class="lang-menu">
-              <li data-lang="en">English</li>
-              <li data-lang="nl">Dutch</li>
-              <li data-lang="es">Spanish</li>
-            </ul>
-        </div>
+          <div class="language-dropdown">
+              <button class="lang-btn">EN ▾</button>
+              <ul class="lang-menu">
+                <li data-lang="en">English</li>
+                <li data-lang="nl">Dutch</li>
+                <li data-lang="es">Spanish</li>
+              </ul>
+          </div>        
+          <a href="login.html" class="profile" aria-label="Sign in or register">
+            <img src="/homepage/images/unkown.png" alt="User profile">
+            <span class="profile-tooltip">Sign in / Register</span>
+          </a>
         </div>
       </nav>
 
     </div>
   </header>
+
 
 
     <!--══✿══╡°˖✧᯽  HERO ᯽✧˖°╞══✿══-->
@@ -103,7 +106,7 @@
       <div class="project-card-preview">
         <img src="https://images.unsplash.com/photo-1533750349088-cd871a92f312?q=80&w=1200&auto=format&fit=crop" alt="Workshop">
         <div class="project-overlay">
-          <h3>Recovery Workshop</h3>
+          <h3>MHFA</h3>
           <p>Interactive workshop to learn practical tools for self-recovery and resilience.</p>
           <a href="project-workshop.html" class="project-button">Read More</a>
         </div>
@@ -112,7 +115,7 @@
       <div class="project-card-preview">
         <img src="https://www.harmonyhealthcareli.org/wp-content/uploads/2023/07/Blog-Healthy-Community-feature-final-1.jpg" alt="Community Project">
         <div class="project-overlay">
-          <h3>Community Project</h3>
+          <h3>Regionale Kenniswerkplaats</h3>
           <p>Collaborative initiative to build supportive networks and social connections.</p>
           <a href="project-community.html" class="project-button">Read More</a>
         </div>
@@ -121,13 +124,12 @@
       <div class="project-card-preview">
         <img src="https://images.unsplash.com/photo-1507537297725-24a1c029d3ca?q=80&w=1200&auto=format&fit=crop" alt="Research Initiative">
         <div class="project-overlay">
-          <h3>Research Initiative</h3>
+          <h3>Living Lab</h3>
           <p>Gathering insights and data to improve recovery programs and methods.</p>
           <a href="project-research.html" class="project-button">Read More</a>
         </div>
       </div>
 
-      <!-- Add more cards as needed -->
 
     </div>
   </div>
@@ -138,9 +140,11 @@
 
 
 
-    <!--══✿══╡°˖✧᯽  FOOTER SECTION ᯽✧˖°╞══✿══-->
-  
-  <footer class="fancy-footer">
+
+     <!--══✿══╡°˖✧᯽  FOOTER   ᯽✧˖°╞══✿══-->
+
+
+  <footer class="fancy-footer" style="margin-top: 0;">
     <div class="footer-background-word">Hofi Korsou</div>
 
     <div class="footer-container">
@@ -148,15 +152,15 @@
 
         <!-- ... ✿°•∘ɷ∘•°✿ .. LOGO + TEXT -->
         <div class="footer-col-wide">
-          <img src="images/HK logo no bg.png" alt="logo" class="footer-logo" />
+          <img src="/homepage/images/HK logo no bg.png" alt="logo" class="footer-logo" />
         </div>
 
         <!-- ... ✿°•∘ɷ∘•°✿ .. COL 1 -->
         <div class="footer-col">
           <h3 data-translate="col-com">Company</h3>
           <ul>
-            <li><a data-translate="nav-about" href="about.html">About Us</a></li>
-            <li><a data-translate="nav-contact" href="contact.html">Contact Us</a></li>
+            <li><a data-translate="nav-about" href="/homepage/about.html">About Us</a></li>
+            <li><a data-translate="nav-contact" href="/homepage/contact.html">Contact Us</a></li>            
           </ul>
         </div>
 
@@ -193,20 +197,37 @@
 
       </div>
 
-      <div class="footer-bottom">
-        <p>© 2025 PBC — All rights reserved.</p>
+      <!--... ✿°•∘ɷ∘•°✿ .. SOCIALS -->
 
+      <div class="footer-bottom">
         <div class="footer-social-icons">
           <a href="#" class="social"><i class="fab fa-facebook"></i></a>
-          <a href="#" class="social"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="social"><i class="fab fa-tiktok"></i></a>
           <a href="#" class="social"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="social"><i class="fab fa-linkedin"></i></a>
           <a href="#" class="social"><i class="fab fa-email"></i></a>
+        </div>
+
+        <!-- ✿ Email Subscription -->
+        <div class="footer-subscribe">
+          <p class="subscribe-text">
+            Subscribe to receive weekly news and updates about Green Recovery Space.
+          </p>
+
+          <form class="subscribe-form">
+            <input 
+              type="email" 
+              placeholder="Fill in your email" 
+              required
+            />
+            <button type="submit">Subscribe</button>
+          </form>
         </div>
       </div>
     </div>
   </footer>
 
-<script src="/JS/lang-translation.js"></script>
+<script src="/homepage/JS/lang-translation.js"></script>
 
 <!-- ... ✿°•∘ɷ∘•°✿ .. FontAwesome Icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -215,5 +236,3 @@
 
 </body>
 </html>
-
-
