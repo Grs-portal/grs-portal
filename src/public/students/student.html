@@ -161,6 +161,7 @@
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
     transition: 150ms;
+    position: relative;
   }
   .icon-btn:hover{ background: var(--surface-2); }
 
@@ -210,9 +211,9 @@
       <div class="flex items-center gap-2">
         <span id="userName" class="text-sm font-extrabold"></span>
 
-        <!-- 🔔 Notifications (hidden/disabled for students by JS) -->
+        <!-- 🔔 Notifications -->
         <div class="relative" id="notifWrap">
-          <button id="notifBtn" class="icon-btn" title="Notifications">
+          <button id="notifBtn" class="icon-btn" title="Notifications" aria-label="Notifications">
             🔔
             <span id="notifBadge"
               class="hidden absolute -top-1 -right-1 text-[11px] px-1.5 py-0.5 rounded-full bg-red-500 text-white font-extrabold">
@@ -238,7 +239,8 @@
         <div id="topAvatarWrap" class="relative">
           <button id="userAvatar"
             class="w-9 h-9 rounded-full bg-white/10 border border-white/20
-                   flex items-center justify-center font-extrabold cursor-pointer select-none shadow-sm">
+                   flex items-center justify-center font-extrabold cursor-pointer select-none shadow-sm"
+            aria-label="Profile">
           </button>
 
           <!-- Dropdown -->
@@ -393,14 +395,14 @@
   </footer>
 
   <!-- PERSONALIZE MODAL -->
-  <div id="personalizeBg" class="modal-bg">
+  <div id="personalizeBg" class="modal-bg" aria-hidden="true">
     <div class="card w-full max-w-lg p-5">
       <div class="flex items-center justify-between gap-3">
         <div>
           <div class="text-lg font-extrabold">Personalize</div>
           <div class="text-sm muted">Nickname, profile picture, and theme.</div>
         </div>
-        <button id="closePersonalize" class="icon-btn" title="Close">✕</button>
+        <button id="closePersonalize" class="icon-btn" title="Close" aria-label="Close">✕</button>
       </div>
 
       <div class="mt-5 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -413,8 +415,7 @@
               S
             </div>
             <div class="flex-1">
-              <input id="profilePhotoInput" type="file" accept="image/*"
-                class="w-full text-sm" />
+              <input id="profilePhotoInput" type="file" accept="image/*" class="w-full text-sm" />
               <button id="removeAvatarBtn" class="btn mt-3 w-full">Remove</button>
             </div>
           </div>
@@ -447,6 +448,7 @@
     </div>
   </div>
 
+  <!-- ✅ Separated JS file -->
   <script src="/students/script.js"></script>
 </body>
 </html>
