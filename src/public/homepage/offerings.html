@@ -28,7 +28,6 @@ body {
   overflow: hidden;
 }
 
-/* Card styling */
 .card {
   position: absolute;
   left: 0;
@@ -45,8 +44,29 @@ body {
   color: white;
   opacity: 0;
   z-index: 1;
+
+  /* Required */
+  position: absolute;
+  overflow: hidden;
 }
 
+/* Dark overlay */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55); 
+  z-index: 0;
+}
+
+.card > * {
+  position: relative;
+  z-index: 2;
+}
+
+.card:first-child::before {
+  background: none;
+}
 
 .card.active {
   transform: translateX(0);
@@ -338,3 +358,4 @@ startAutoSlide();
 
 </body>
 </html>
+
