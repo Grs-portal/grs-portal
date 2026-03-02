@@ -1,93 +1,179 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>What we offer</title>
-  <link rel="stylesheet" href="/homepage/CSS/style.css" />
-</head>
-<body>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FWhat We Offer</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@500&display=swap">
+<link rel="stylesheet" href="/homepage/CSS/style.css">
+<style>
+:root {
+  --primary-color: #1e6c2f;
+  --text-color: rgba(255,255,255,0.87);
+}
 
-
-    <style>
-    
-/* ════════════════✿══╡°˖✧‿୨˚̣̣̣͙୧ OFFERINGS  PAGE ୨˚̣̣̣͙୧‿✧˖°╞══✿════════════════ */
-
-/*══✿══╡°˖✧᯽  PORTALS ᯽✧˖°╞══✿══*/
-
-.portal-hero {
-  position: relative;
-  padding: 5rem 2rem 6rem;
-  color: #fff;
+body {
+  margin: 0;
+  background-color: #1a1a1a;
+  font-family: "Inter", sans-serif;
+  color: var(--text-color);
   overflow: hidden;
 }
 
-.hero-collage {
+/* Cards container */
+#cards-container {
+  position: relative;
+  width: 100vw;
+  height: 91.6vh;
+  overflow: hidden;
+}
+
+/* Card styling */
+.card {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background-size: cover;
+  background-position: center;
+  transition: opacity 0.8s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 80px;
+  color: white;
+  opacity: 0;
+  z-index: 1;
+}
+
+
+.card.active {
+  transform: translateX(0);
+  z-index: 10;
+}
+
+
+/* Active card */
+.card.active {
+  opacity: 1;
+  z-index: 10;
+}
+
+/* Card title overlay */
+.card .card-title {
+  font-family: "Oswald", sans-serif;
+  font-size: 72px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+
+.card .card-desc {
+  font-size: 20px;
+  max-width: 500px;
+  line-height: 1.4;
+}
+
+/* CTA buttons */
+.card .cta {
+  margin-top: 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.card .cta .bookmark {
+  background-color: var(--primary-color);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  color: white;
+  font-size: 24px;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.2rem;
-  align-items: stretch;
-  margin-top: 3rem;
-}
-
-.collage-item {
-  position: relative;
-  border-radius: 18px;
-  overflow: hidden;
-  aspect-ratio: 3/2;
+  place-items: center;
   cursor: pointer;
-  transition: transform 0.3s ease;
+}
+.card .cta .discover {
+  border: 1px solid #fff;
+  background-color: transparent;
+  border-radius: 50px;
+  color: white;
+  padding: 12px 32px;
+  font-size: 16px;
+  text-transform: uppercase;
+  cursor: pointer;
 }
 
-.collage-item:hover {
-  transform: scale(1.03);
+/* ================== Previews ================== */
+#card-previews {
+  position: absolute;
+  bottom: 60px;
+  left: 71%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 16px;
+  z-index: 20;
 }
 
-.collage-item.middle {
-  transform: translateY(-20px);
+.preview-card {
+  width: 250px;
+  height: 300px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; /* pushes title to bottom */
+  padding: 12px;
+  color: white;
+  font-family: "Oswald", sans-serif;
+  font-weight: 600;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
 }
 
-.collage-item img {
+.preview-card:hover {
+  transform: scale(1.05);
+  opacity: 1;
+}
+
+.preview-card .preview-title {
+  font-size: 1.8rem;
+}
+
+.progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
+  height: 4px;
+  background: rgba(255,255,255,0.2);
+  z-index: 100;
+}
+
+.progress-fill {
   height: 100%;
-  object-fit: cover;
+  width: 0%;
+  background: var(--primary-color);
+  transition: width 5s linear;
 }
-
-.collage-item::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    to top,
-    rgba(0,0,0,0.6),
-    rgba(0,0,0,0.1)
-  );
-}
-
-.collage-item span {
-  position: absolute;
-  bottom: 1rem;
-  left: 1rem;
-  right: 1rem;
-  font-size: 1.3rem;
-  font-weight: 500;
-  color: #fff;
-  z-index: 2;
-}
-
-  </style>
+</style>
+</head>
+<body style="background-color: #1a1a1a;">
 
       <!--══✿══╡°˖✧᯽ NAVIGATION BAR ᯽✧˖°╞══✿══-->
 
 
-    <header class="site-header">
-    <div class="container header-inner">
+  <header class="site-header" style="background-color: white;">
+    <div class="container header-inner" style="background-color: white;">
       <nav class="main-nav">
         <div class="nav-left">
           <a href="/homepage/index.html" class="nav-link" data-translate="nav-home">Home</a>
-          <a href="/homepage/forwho.html" class="nav-link " data-translate="nav-forwho">For Who</a>
+          <a href="/homepage/forwho.html" class="nav-link" data-translate="nav-forwho">For Whom</a>
           <a href="/homepage/green recovery space.html" class="nav-link" data-translate="nav-grs">Green Recovery Space</a>
-          <a href="/homepage/offerings.html" class="nav-link active" data-translate="nav-offer">What we offer</a>
         </div>
 
         <!-- ... ✿°•∘ɷ∘•°✿ ..  logo circle  -->
@@ -96,72 +182,159 @@
           <img src="/homepage/images/Logo HK.jpg" alt="PBC logo">
         </div>
 
-        <div class="nav-right">
+        <div class="nav-right">          
+          <a href="/homepage/offerings.html" class="nav-link active" data-translate="nav-offer">What we offer</a>
           <a href="/homepage/about.html" class="nav-link" data-translate="nav-about">About Us</a>
-          <a href="/homepage/projects.html" class="nav-link" data-translate="nav-projects">Projects</a>
-          <a href="/homepage/Portal.html" class="nav-link" data-translate="nav-portals">Portals</a>
           <a href="/homepage/contact.html" class="nav-link" data-translate="nav-contact">Contact</a>
           <div class="language-dropdown">
-            <button class="lang-btn">EN ▾</button>
-            <ul class="lang-menu">
-              <li data-lang="en">English</li>
-              <li data-lang="nl">Dutch</li>
-              <li data-lang="es">Spanish</li>
-            </ul>
+              <button class="lang-btn">EN ▾</button>
+              <ul class="lang-menu">
+                <li data-lang="en">English</li>
+                <li data-lang="nl">Dutch</li>
+                <li data-lang="es">Spanish</li>
+              </ul>
+          </div>        
+          <a href="login.html" class="profile" aria-label="Sign in or register">
+            <img src="/homepage/images/unkown.png" alt="User profile">
+            <span class="profile-tooltip">Sign in / Register</span>
+          </a>
         </div>
-        </div>
-        
       </nav>
 
     </div>
   </header>
 
-  
-<section class="hero-forwho portal-hero" aria-label="What we offer">
 
+<div class="progress-bar">
+  <div class="progress-fill"></div>
+</div>
+<div id="cards-container"></div>
+<div id="card-previews"></div>
 
-    <!-- ... ✿°•∘ɷ∘•°✿ .. background img -->
-  <div class="hero-bg" style="background-image:url('images/Header hofi.png')"></div>
-  <div class="hero-tint"></div>
+<script>
+const data = [
+  {
+    title:'What We Offer', 
+    description:'Discover what you can do with us. Small steps, at your own pace. From getting acquainted to deepening your knowledge.', 
+    image:'https://www.colorhexa.com/b7dfa9.png',
+    link:''
+  },
+  {
+    title:'Program & Activities', 
+    description:'At the Green Recovery Space you can participate in activities, training and self-help methods that contribute to recovery, balance and well-being.', 
+    image:'https://www.thenurtureproject.co.uk/wp-content/uploads/2023/10/MG_0860-1024x682.jpg',
+    link:'program.html'
+  },
+  {
+    title:'Our Projects', 
+    description:'Discover all the amazing projects linked to green recovey space', 
+    image:'https://images.stockcake.com/public/2/4/c/24c193c7-3ec4-4bfd-b24e-cb5b7909b5d5/nature-conservation-effort-stockcake.jpg',
+    link:'construction.html'
+  },
+  {
+    title: 'Stories & Experiences', 
+    description: 'Personal recovery journeys from participants of the Green Recovery Space. Explore freely and read what resonates with you.', 
+    image: 'https://sagaja.com/wp-content/uploads/2024/03/Spacery-zdjecie.jpeg',
+    link:'stories.html'
+  }
+];
 
-  <div class="container hero-forwho-inner">
-    
+const cardsContainer = document.getElementById('cards-container');
+const previewsContainer = document.getElementById('card-previews');
 
-    <h1 class="hero-title">
-      Discover what you can do with us
-    </h1>
+let activeIndex = 0;
+let autoSlide;
 
-    <p class="hero-text hero-text-top">
-      Explore our programs, projects, and stories that support recovery and balance.
-    </p>
+// Create cards
+data.forEach((item, index) => {
 
-    <div class="hero-collage">
+  const card = document.createElement('div');
+  card.classList.add('card');
+  if(index === 0) card.classList.add('active');
 
-      <a href="/homepage/program.html" class="collage-item">
-        <img src="https://assets.simpleviewinc.com/simpleview/image/upload/c_fill,h_630,q_75,w_1200/v1/clients/princegeorgesmd/PGC_Outdoors_Hero_130cc2a0-5f00-44d1-bb3d-3db3df792cd1.jpg" alt="Programs & Activities">
-        <span>Programs & Activities</span>
-      </a>
+  if(item.image) {
+    card.style.backgroundImage = `url(${item.image})`;
+  } else {
+    card.style.background = "linear-gradient(135deg, #1a1a1a, #2c2c2c)";
+  }
 
-      <a href="/homepage/projects.html" class="collage-item middle">
-        <img src="https://naturalengland.blog.gov.uk/wp-content/uploads/sites/183/2022/05/5.jpg" alt="Projects">
-        <span>Projects</span>
-      </a>
+  card.innerHTML = `
+  <div class="card-title">${item.title}</div>
+  <div class="card-desc">${item.description}</div>
+  ${
+    index !== 0 ? `<div class="cta">
+      <button class="bookmark">★</button>
+      <button class="discover" onclick="window.location.href='${item.link}'">Discover</button>
+    </div>` : ''
+  }
+`;
 
-      <a href="/homepage/stories.html" class="collage-item">
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSlFzGlpSW-B0SlFLEyo_mLhidTCZvfu6VysQ&s" alt="Stories & Experiences">
-        <span>Stories & Experiences</span>
-      </a>
+  cardsContainer.appendChild(card);
 
-    </div>
+// Create preview cards for all except first
+if(index !== 0){
+  const preview = document.createElement('div');
+  preview.classList.add('preview-card');
+  preview.style.backgroundImage = `url(${item.image})`;
 
-    <p class="hero-text hero-text-bottom">
-      Whether you want to join a session, follow a project, or get inspired by stories, everything is voluntary and at your own pace.
-    </p>
+  // Wrap title in a div
+  const titleDiv = document.createElement('div');
+  titleDiv.classList.add('preview-title');
+  titleDiv.textContent = item.title;
 
-  </div>
+  preview.appendChild(titleDiv);
 
-</section>
+  preview.addEventListener('click', () => {
+    switchCard(index);
+    resetAutoSlide();
+  });
+  previewsContainer.appendChild(preview);
+}
+});
 
+const progressFill = document.querySelector('.progress-fill');
 
+function switchCard(index){
+  const allCards = document.querySelectorAll('.card');
+  allCards.forEach((c,i)=>{
+    c.classList.toggle('active', i === index);
+  });
 
+  activeIndex = index;
+  updateProgress();
+}
 
+function startAutoSlide(){
+  progressFill.style.transition = "none";
+  progressFill.style.width = "0%";
+
+  setTimeout(()=>{
+    progressFill.style.transition = "width 5s linear";
+    progressFill.style.width = "100%";
+  },50);
+
+  autoSlide = setInterval(() => {
+    let nextIndex = (activeIndex + 1) % data.length;
+    switchCard(nextIndex);
+  }, 5000);
+}
+
+function resetAutoSlide(){
+  clearInterval(autoSlide);
+  startAutoSlide();
+}
+
+function updateProgress(){
+  progressFill.style.transition = "none";
+  progressFill.style.width = "0%";
+  setTimeout(()=>{
+    progressFill.style.transition = "width 5s linear";
+    progressFill.style.width = "100%";
+  },50);
+}
+
+startAutoSlide();
+</script>
+
+</body>
+</html>
