@@ -6,10 +6,9 @@ let hill5 = document.getElementById('hill5');
 let house = document.getElementById('house');
 let plant = document.getElementById('plant');
 let blob1 = document.getElementById('blob1');
-let blob2 = document.getElementById('blob2'); // FIXED
-let blob3 = document.getElementById('blob3'); // FIXED
-let missiontext1 = document.getElementById('missiontext1');
-let missiontext2 = document.getElementById('missiontext2');
+let blob2 = document.getElementById('blob2'); 
+let blob3 = document.getElementById('blob3'); 
+let missiontext = document.getElementById('missiontext');
 let boxleft = document.getElementById('boxleft');
 let boxcenter = document.getElementById('boxcenter');
 let boxright = document.getElementById('boxright');
@@ -34,24 +33,7 @@ window.addEventListener('scroll', () => {
 
 
     /*══✿══╡°˖✧᯽   MISSION SECTION ᯽✧˖°╞══✿══*/
-
-    // ... ✿°•∘ɷ∘•°✿ .. blob1 → slide right into view
-    blob1.style.transform = `translateX(${value * 0.4}px)`;
-
-    // ... ✿°•∘ɷ∘•°✿ .. mission text: → slides with blob1
-    missiontext1.style.transform = `translateY(${-value * 0.3}px)`;
-
-        // ... ✿°•∘ɷ∘•°✿ .. mission text: → slides with blob1
-    missiontext2.style.transform = `translateY(${-value * 0.3}px)`;
-
-
-    // ... ✿°•∘ɷ∘•°✿ .. blob2 → rise into view
-    blob2.style.transform = `translateY(${-value * 0.4}px)`;
-
-    // blob3 → slide left into view
-    blob3.style.transform = `translateX(${-value * 0.3}px)`;
-
-
+    
     const sloganSection = document.getElementById("sloganSection");
     const lineLeft = document.getElementById("lineLeft");
     const lineRight = document.getElementById("lineRight");
@@ -70,6 +52,18 @@ window.addEventListener('scroll', () => {
       lineLeft.style.transform = `translateX(${-(1 - progress) * moveAmount}px)`;
       lineRight.style.transform = `translateX(${(1 - progress) * moveAmount}px)`;
     });
+
+    // ... ✿°•∘ɷ∘•°✿ .. blob1 → slide right into view
+    blob1.style.transform = `translateX(${value * 0.4}px)`;
+
+
+    // ... ✿°•∘ɷ∘•°✿ .. blob2 → rise into view
+    blob2.style.transform = `translateY(${-value * 0.4}px)`;
+
+    // blob3 → slide left into view
+    blob3.style.transform = `translateX(${-value * 0.3}px)`;
+
+
 
 
 
@@ -115,9 +109,6 @@ hamburger.addEventListener('click', () => {
   hamburger.classList.toggle('active');
   navMenu.classList.toggle('active');
 });
-
-
-
 
 
 
