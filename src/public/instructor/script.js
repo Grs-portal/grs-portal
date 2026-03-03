@@ -417,6 +417,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   qs("#backToCourses").onclick = () => showPage("my-courses");
 
+    /* =========================
+     NAVIGATION CLICK HANDLER (FIX)
+  ========================= */
+  qsa(".nav-item").forEach(link => {
+    link.addEventListener("click", e => {
+      e.preventDefault();
+      showPage(link.dataset.page);
+    });
+  });
+
   /* =========================
      REVIEWS
   ========================= */
@@ -457,4 +467,7 @@ document.addEventListener("DOMContentLoaded", () => {
   ========================= */
   buildCoursesSidebar();
   showPage("dashboard");
+
+  
 });
+
