@@ -2794,7 +2794,7 @@ html,body {
 
 
 .portal-card.student .portal-inner-shape {
-    background: #538654;
+    background: #99ce9a;
     border: 2px solid #004d40;
     border-radius: 26px 2px;
 }
@@ -2805,7 +2805,7 @@ html,body {
 
 }
 .portal-card.manager .portal-inner-shape {
-    background: #538654;
+    background: #99ce9a;
     border: 2px solid #004d40;
     border-radius: 2px 26px;
 }
