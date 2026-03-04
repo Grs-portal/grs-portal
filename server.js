@@ -310,6 +310,33 @@ app.post("/api/upload", (req, res) => {
 });
 
 // ---------------- API ROUTES ----------------
+// ---------- ME (profile) ----------
+app.get("/api/me", (req, res) => {
+  const username = String(req.headers["x-username"] || "").trim();
+  const role = String(req.headers["x-role"] || "").trim();
+  if (!username || !role) return res.status(401).json({ success: false, message: "Not logged in" });
+
+  const user = db.accounts.find(a => a.username === username);
+  if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+  res.json({ success: true, user: safeNoPassword(user) });
+});
+
+app.put("/api/me", (req, res) => {
+  const username = String(req.headers["x-username"] || "").trim();
+  const role = String(req.headers["x-role"] || "").trim();
+  if (!username || !role) return res.status(401).json({ success: false, message: "Not logged in" });
+
+  const user = db.accounts.find(a => a.username === username);
+  if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+  const { name, email } = req.body || {};
+  if (typeof name === "string" && name.trim()) user.name = name.trim();
+  if (typeof email === "string") user.email = email.trim();
+
+  saveData();
+  res.json({ success: true, user: safeNoPassword(user) });
+});
 
 // ---------- NOTIFICATIONS ----------
 app.get("/api/notifications", (req, res) => {
@@ -895,6 +922,7 @@ app.get("/homepage/register.html", (req, res) => sendFirstExisting(res, "homepag
 
 // ---------------- START ----------------
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+
 
 
 
