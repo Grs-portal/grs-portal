@@ -1,7 +1,7 @@
 // manager.js
 (() => {
   const API = "/api";
-  const LOGIN = "/homepage/login.html";
+  const LOGIN = "/homepage/login-manager.html"; // recommended: separate login per role
 
   const qs = (s) => document.querySelector(s);
   const qsa = (s) => [...document.querySelectorAll(s)];
@@ -23,6 +23,13 @@
       .replaceAll(">", "&gt;")
       .replaceAll('"', "&quot;");
 
+  function initials(name) {
+    const parts = String(name || "").trim().split(/\s+/).filter(Boolean);
+    const a = parts[0]?.[0] || "M";
+    const b = parts[1]?.[0] || "";
+    return (a + b).toUpperCase();
+  }
+
   const actorHeaders = () => ({
     "x-role": localStorage.getItem("role") || "",
     "x-username": localStorage.getItem("username") || "",
@@ -40,74 +47,89 @@
     if (localStorage.getItem("isLoggedIn") !== "true") return (location.href = LOGIN);
     if (localStorage.getItem("role") !== "manager") return (location.href = LOGIN);
 
-    const name = localStorage.getItem("userName") || "Manager";
-    qs("#userName").textContent = name;
     qs("#y").textContent = new Date().getFullYear();
 
-    qs("#userAvatar").textContent = name
-      .split(" ")
-      .map((x) => x[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
+    // Theme default = LIGHT (as requested)
+    setupThemeUI(true);
 
-    setupThemeUI();
-    setupProfile();
+    // Profile dropdown + topbar avatar
+    setupProfileDropdown();
+    renderTopbarIdentity();
+
+    // personalization modal
+    setupPersonalizeModal();
+
+    // UI basics
     setupMobileSidebar();
     setupNav();
     bindButtons();
 
+    // notifications
     setupNotificationsUI();
     loadNotifications();
     setInterval(loadNotifications, 15000);
 
+    // load server profile email (if present)
+    await loadMeIntoUI();
+
     await loadDashboard();
   }
 
-  // ---------------- THEME SWITCHER ----------------
+  // ---------------- THEME ----------------
   function applyTheme(theme) {
-    const t = theme || "glass";
+    const t = theme || "light";
     document.documentElement.dataset.theme = t;
     localStorage.setItem("theme", t);
   }
 
-  function setupThemeUI() {
-    const saved = localStorage.getItem("theme") || "glass";
-    applyTheme(saved);
-
-    const wrap = qs("#themeWrap");
-    const btn = qs("#themeBtn");
-    const menu = qs("#themeMenu");
-
-    btn?.addEventListener("click", (e) => {
-      e.stopPropagation();
-      menu?.classList.toggle("hidden");
-    });
+  function setupThemeUI(forceDefaultLight = false) {
+    const saved = localStorage.getItem("theme");
+    if (forceDefaultLight && !saved) {
+      applyTheme("light");
+    } else {
+      applyTheme(saved || "light");
+    }
 
     qsa(".themePick").forEach((b) => {
       b.addEventListener("click", (e) => {
         e.preventDefault();
         applyTheme(b.dataset.theme);
-        menu?.classList.add("hidden");
       });
-    });
-
-    document.addEventListener("click", (e) => {
-      if (!wrap || !menu) return;
-      if (!wrap.contains(e.target)) menu.classList.add("hidden");
     });
   }
 
+  // ---------------- AUTH ----------------
   function logout() {
     localStorage.clear();
     location.href = LOGIN;
   }
 
-  function setupProfile() {
+  // ---------------- TOPBAR IDENTITY ----------------
+  function renderTopbarIdentity() {
+    const name = localStorage.getItem("userName") || "Manager";
+    qs("#userName").textContent = name;
+
+    const avatarEl = qs("#userAvatar");
+    const avatarData = localStorage.getItem("userAvatar") || "";
+
+    if (avatarData) {
+      avatarEl.style.backgroundImage = `url(${avatarData})`;
+      avatarEl.style.backgroundSize = "cover";
+      avatarEl.style.backgroundPosition = "center";
+      avatarEl.textContent = "";
+    } else {
+      avatarEl.style.backgroundImage = "";
+      avatarEl.textContent = initials(name);
+    }
+  }
+
+  // ---------------- PROFILE DROPDOWN ----------------
+  function setupProfileDropdown() {
     qs("#userAvatar")?.addEventListener("click", (e) => {
       e.stopPropagation();
       qs("#profileMenu")?.classList.toggle("hidden");
     });
+
     qs("#logoutBtn")?.addEventListener("click", logout);
     qs("#sidebarLogout")?.addEventListener("click", (e) => {
       e.preventDefault();
@@ -120,6 +142,127 @@
     });
   }
 
+  // ---------------- PERSONALIZE MODAL ----------------
+  function openPersonalize() {
+    qs("#personalizeBg")?.classList.remove("hidden");
+    qs("#personalizeBg")?.classList.add("flex");
+    document.body.style.overflow = "hidden";
+    loadPersonalizeFields();
+  }
+
+  function closePersonalize() {
+    qs("#personalizeBg")?.classList.add("hidden");
+    qs("#personalizeBg")?.classList.remove("flex");
+    document.body.style.overflow = "";
+  }
+
+  function loadPersonalizeFields() {
+    const name = localStorage.getItem("userName") || "Manager";
+    const avatarData = localStorage.getItem("userAvatar") || "";
+    const email = localStorage.getItem("userEmail") || "";
+
+    const nameInput = qs("#profileNameInput");
+    const emailInput = qs("#profileEmailInput");
+    const preview = qs("#profileAvatarPreview");
+
+    if (nameInput) nameInput.value = name;
+    if (emailInput) emailInput.value = email;
+
+    if (preview) {
+      if (avatarData) {
+        preview.style.backgroundImage = `url(${avatarData})`;
+        preview.style.backgroundSize = "cover";
+        preview.style.backgroundPosition = "center";
+        preview.textContent = "";
+      } else {
+        preview.style.backgroundImage = "";
+        preview.textContent = initials(name);
+      }
+    }
+  }
+
+  function setupPersonalizeModal() {
+    qs("#openPersonalize")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      qs("#profileMenu")?.classList.add("hidden");
+      openPersonalize();
+    });
+
+    qs("#closePersonalize")?.addEventListener("click", closePersonalize);
+
+    qs("#personalizeBg")?.addEventListener("click", (e) => {
+      if (e.target === qs("#personalizeBg")) closePersonalize();
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closePersonalize();
+    });
+
+    // Avatar upload (localStorage)
+    qs("#profilePhotoInput")?.addEventListener("change", (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        localStorage.setItem("userAvatar", ev.target.result);
+        loadPersonalizeFields();
+        renderTopbarIdentity();
+      };
+      reader.readAsDataURL(file);
+    });
+
+    qs("#removeAvatarBtn")?.addEventListener("click", () => {
+      localStorage.removeItem("userAvatar");
+      loadPersonalizeFields();
+      renderTopbarIdentity();
+    });
+
+    qs("#savePersonalize")?.addEventListener("click", async () => {
+      const newName = (qs("#profileNameInput")?.value || "").trim() || "Manager";
+      const newEmail = (qs("#profileEmailInput")?.value || "").trim();
+
+      // save local immediately
+      localStorage.setItem("userName", newName);
+      localStorage.setItem("userEmail", newEmail);
+
+      // sync to server so it works across the system
+      try {
+        const res = await fetch(`${API}/me`, {
+          method: "PUT",
+          headers: jsonHeaders(),
+          body: JSON.stringify({ name: newName, email: newEmail }),
+        });
+        const out = await safeJson(res);
+        if (!res.ok || !out?.success) {
+          toast(out?.message || "Could not save email to server", "rgba(185,28,28,.85)");
+        } else {
+          toast("Saved", "rgba(34,197,94,.70)");
+        }
+      } catch {
+        toast("Server error saving profile", "rgba(185,28,28,.85)");
+      }
+
+      renderTopbarIdentity();
+      await loadMeIntoUI();
+      closePersonalize();
+    });
+  }
+
+  async function loadMeIntoUI() {
+    // show email on dashboard
+    const topEmail = qs("#topEmail");
+    try {
+      const res = await fetch(`${API}/me`, { headers: actorHeaders() });
+      const out = await safeJson(res);
+      const email = out?.user?.email || localStorage.getItem("userEmail") || "";
+      if (email) localStorage.setItem("userEmail", email);
+      if (topEmail) topEmail.textContent = email || "—";
+    } catch {
+      if (topEmail) topEmail.textContent = localStorage.getItem("userEmail") || "—";
+    }
+  }
+
+  // ---------------- MOBILE SIDEBAR ----------------
   function setupMobileSidebar() {
     const menuBtn = qs("#menuBtn");
     const sidebar = qs("#sidebar");
@@ -137,6 +280,7 @@
     });
   }
 
+  // ---------------- NAV ----------------
   function setupNav() {
     const pages = qsa(".page-section");
     const links = qsa(".nav-item");
@@ -687,7 +831,6 @@
     });
   }
 
-  // ✅ UPDATED: Create user includes Email
   function openCreateUserModal() {
     showModal(`
       <h2 class="text-xl font-extrabold mb-4">Create User</h2>
@@ -698,8 +841,8 @@
       <label class="text-sm font-bold muted">Full name</label>
       <input id="uName" class="input-theme mt-1 mb-3" placeholder="Full name" />
 
-      <label class="text-sm font-bold muted">Email (optional)</label>
-      <input id="uEmail" class="input-theme mt-1 mb-3" placeholder="example@gmail.com" />
+      <label class="text-sm font-bold muted">Gmail</label>
+      <input id="uEmail" class="input-theme mt-1 mb-3" placeholder="name@gmail.com" />
 
       <label class="text-sm font-bold muted">Password</label>
       <input id="uPassword" type="password" class="input-theme mt-1 mb-3" placeholder="Password" />
@@ -779,7 +922,6 @@
     table.querySelectorAll(".del-user").forEach((btn) => {
       btn.addEventListener("click", async () => {
         const username = btn.dataset.username;
-
         if (!(await confirmDeleteUser(username))) return;
 
         const del = await fetch(`${API}/users/${encodeURIComponent(username)}`, {
