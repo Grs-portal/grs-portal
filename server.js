@@ -53,7 +53,7 @@ function defaultData() {
   { username: "root", password: "1234", role: "instructor", name: "Instructor Root", email: "", avatarUrl: "" },
   { username: "manager", password: "9999", role: "manager", name: "Project Manager", email: "", avatarUrl: "" },
   { username: "student", password: "1234", role: "student", name: "Student", email: "", avatarUrl: "" },
-],
+      ],
     ],
     courses: [{ id: 1, title: "Intro to Programming", description: "Learn JS basics", locationType: "in-person" }],
     homework: [
@@ -897,4 +897,5 @@ app.get("/homepage/register.html", (req, res) => sendFirstExisting(res, "homepag
 
 // ---------------- START ----------------
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+
 
