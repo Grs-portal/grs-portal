@@ -12,6 +12,14 @@ try {
   console.warn("⚠️ multer not installed. Uploads will be disabled until you install it.");
 }
 
+// Nodemailer (email)
+let nodemailer = null;
+try {
+  nodemailer = require("nodemailer");
+} catch (e) {
+  console.warn("⚠️ nodemailer not installed. Email sending disabled until you install it (npm i nodemailer).");
+}
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -41,9 +49,9 @@ const DATA_FILE = path.join(__dirname, "data.json");
 function defaultData() {
   return {
     accounts: [
-      { username: "root", password: "1234", role: "instructor", name: "Instructor Root", displayName: "", avatarData: "", theme: "glass" },
-      { username: "manager", password: "9999", role: "manager", name: "Project Manager", displayName: "", avatarData: "", theme: "glass" },
-      { username: "student", password: "1234", role: "student", name: "Student", displayName: "", avatarData: "", theme: "glass" },
+      { username: "root", password: "1234", role: "instructor", name: "Instructor Root", email: "" },
+      { username: "manager", password: "9999", role: "manager", name: "Project Manager", email: "" },
+      { username: "student", password: "1234", role: "student", name: "Student", email: "" },
     ],
     courses: [{ id: 1, title: "Intro to Programming", description: "Learn JS basics", locationType: "in-person" }],
     homework: [
@@ -55,19 +63,10 @@ function defaultData() {
         course: "Intro to Programming",
       },
     ],
-    students: [{ enrollment_id: 1, name: "John Doe", course: "Intro to Programming", grade: 9 }],
+    students: [{ enrollment_id: 1, name: "John Doe", course: "Intro to Programming", grade: 9, username: "" }],
     notifications: [],
     schedule: [] // ✅ schedule events stored here
   };
-}
-
-function normalizeAccount(a) {
-  // auto-upgrade old accounts stored in data.json
-  if (!a) return a;
-  if (typeof a.displayName !== "string") a.displayName = "";
-  if (typeof a.avatarData !== "string") a.avatarData = "";
-  if (typeof a.theme !== "string") a.theme = "glass";
-  return a;
 }
 
 function loadData() {
@@ -85,8 +84,12 @@ function loadData() {
     raw.homework = Array.isArray(raw.homework) ? raw.homework : defaultData().homework;
     raw.students = Array.isArray(raw.students) ? raw.students : defaultData().students;
 
-    // upgrade accounts
-    raw.accounts = raw.accounts.map(normalizeAccount);
+    // ✅ ensure email exists on accounts
+    raw.accounts = raw.accounts.map(a => ({
+      email: "",
+      ...a,
+      email: String(a.email || "").trim()
+    }));
 
     return raw;
   } catch (e) {
@@ -108,6 +111,99 @@ function actorFromReq(req) {
     byRole: String(req.headers["x-role"] || "").trim(),
     byName: String(req.headers["x-name"] || "").trim(),
   };
+}
+
+function requireRole(req, res, allowedRoles = []) {
+  const role = String(req.headers["x-role"] || req.query.role || "").trim();
+  if (!allowedRoles.includes(role)) {
+    return res.status(403).json({ success: false, message: "Forbidden" });
+  }
+  return role;
+}
+
+function safeNoPassword(a) {
+  const { password, ...rest } = a;
+  return rest;
+}
+
+function isISODate(s) {
+  const d = new Date(s);
+  return !isNaN(d.getTime());
+}
+
+function isValidEmail(email) {
+  const e = String(email || "").trim();
+  if (!e) return true; // allow empty
+  // simple validation
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+}
+
+// ---------------- EMAIL (GMAIL) ----------------
+const GMAIL_USER = String(process.env.GMAIL_USER || "").trim();
+const GMAIL_APP_PASSWORD = String(process.env.GMAIL_APP_PASSWORD || "").trim();
+const EMAIL_FROM_NAME = String(process.env.EMAIL_FROM_NAME || "Hofi Korsou Portal").trim();
+
+let mailer = null;
+if (nodemailer && GMAIL_USER && GMAIL_APP_PASSWORD) {
+  mailer = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: GMAIL_USER,
+      pass: GMAIL_APP_PASSWORD,
+    },
+  });
+  console.log("✅ Email enabled via Gmail:", GMAIL_USER);
+} else {
+  console.log("ℹ️ Email disabled (missing nodemailer or env vars).");
+}
+
+// anti-spam: throttle per recipient
+const lastEmailAt = new Map(); // email -> timestamp
+
+async function sendEmail(to, subject, html) {
+  if (!mailer) return;
+  const email = String(to || "").trim();
+  if (!email) return;
+
+  const now = Date.now();
+  const last = lastEmailAt.get(email) || 0;
+  if (now - last < 30_000) return; // 30s throttle
+  lastEmailAt.set(email, now);
+
+  try {
+    await mailer.sendMail({
+      from: `"${EMAIL_FROM_NAME}" <${GMAIL_USER}>`,
+      to: email,
+      subject,
+      html,
+    });
+  } catch (e) {
+    console.warn("✉️ Email send failed:", e.message);
+  }
+}
+
+function getRecipientsForNotification(n) {
+  const accounts = Array.isArray(db.accounts) ? db.accounts : [];
+  const audienceRole = n.audienceRole || "all";
+  const audienceUsername = String(n.audienceUsername || "").trim();
+
+  // collect recipients by visibility
+  let recipients = [];
+
+  if (audienceRole === "all") {
+    recipients = accounts;
+  } else if (audienceRole === "all-students") {
+    recipients = accounts.filter(a => a.role === "student");
+  } else if (audienceRole === "student") {
+    recipients = accounts.filter(a => a.role === "student" && a.username === audienceUsername);
+  } else {
+    recipients = accounts; // fallback
+  }
+
+  // return emails only
+  return recipients
+    .map(a => String(a.email || "").trim())
+    .filter(e => e && isValidEmail(e));
 }
 
 /**
@@ -147,29 +243,24 @@ function addNotification({
   db.notifications.unshift(n);
   db.notifications = db.notifications.slice(0, 200);
   saveData();
+
+  // ✅ EMAIL "NEWS" = send notification to emails
+  const subject = `[Hofi Korsou] ${String(type || "update").toUpperCase()}: ${String(action || "update")}`;
+  const html = `
+    <div style="font-family:Arial, sans-serif; line-height:1.5;">
+      <h2 style="margin:0 0 8px;">Hofi Korsou Portal Update</h2>
+      <p style="margin:0 0 10px;">${String(message || "").replace(/</g, "&lt;")}</p>
+      <p style="margin:0; color:#555; font-size:12px;">
+        By: ${String(byName || byUsername || "System")} (${String(byRole || "")})<br/>
+        Time: ${new Date(n.ts).toLocaleString()}
+      </p>
+    </div>
+  `;
+
+  const recipients = getRecipientsForNotification(n);
+  recipients.forEach((email) => sendEmail(email, subject, html));
+
   return n;
-}
-
-function requireRole(req, res, allowedRoles = []) {
-  const role = String(req.headers["x-role"] || req.query.role || "").trim();
-  if (!allowedRoles.includes(role)) {
-    return res.status(403).json({ success: false, message: "Forbidden" });
-  }
-  return role;
-}
-
-function safeNoPassword(a) {
-  const { password, ...rest } = a;
-  return rest;
-}
-
-function isISODate(s) {
-  const d = new Date(s);
-  return !isNaN(d.getTime());
-}
-
-function getUserByUsername(username) {
-  return db.accounts.find(a => a.username === username);
 }
 
 // ---------------- UPLOADS ----------------
@@ -219,74 +310,6 @@ app.post("/api/upload", (req, res) => {
 });
 
 // ---------------- API ROUTES ----------------
-
-// ---------- PROFILE (persist personalization) ----------
-app.get("/api/profile", (req, res) => {
-  const username = String(req.query.username || "").trim();
-  const role = String(req.query.role || "").trim();
-  if (!username || !role) return res.status(400).json({ success: false, message: "username+role required" });
-
-  const u = getUserByUsername(username);
-  if (!u) return res.status(404).json({ success: false, message: "User not found" });
-
-  // optional safety check
-  if (u.role !== role) return res.status(403).json({ success: false, message: "Forbidden" });
-
-  res.json({
-    success: true,
-    profile: {
-      username: u.username,
-      role: u.role,
-      name: u.name,
-      displayName: u.displayName || "",
-      avatarData: u.avatarData || "",
-      theme: u.theme || "glass"
-    }
-  });
-});
-
-app.put("/api/profile", (req, res) => {
-  const role = String(req.headers["x-role"] || "").trim();
-  const username = String(req.headers["x-username"] || "").trim();
-  if (!username || !role) return res.status(400).json({ success: false, message: "Missing auth headers" });
-
-  const u = getUserByUsername(username);
-  if (!u) return res.status(404).json({ success: false, message: "User not found" });
-
-  if (u.role !== role) return res.status(403).json({ success: false, message: "Forbidden" });
-
-  const { displayName, avatarData, theme } = req.body || {};
-
-  const allowedThemes = ["glass", "light", "dark"];
-  if (theme && !allowedThemes.includes(theme)) {
-    return res.status(400).json({ success: false, message: "Invalid theme" });
-  }
-
-  if (typeof displayName === "string") u.displayName = displayName.slice(0, 40);
-
-  if (typeof avatarData === "string") {
-    // limit to avoid huge data.json
-    if (avatarData.length > 700000) {
-      return res.status(413).json({ success: false, message: "Avatar too large" });
-    }
-    u.avatarData = avatarData;
-  }
-
-  if (typeof theme === "string") u.theme = theme;
-
-  saveData();
-
-  addNotification({
-    type: "profile",
-    action: "updated",
-    message: `Profile updated: "${username}"`,
-    ...actorFromReq(req),
-    targetType: "user",
-    targetId: username
-  });
-
-  res.json({ success: true });
-});
 
 // ---------- NOTIFICATIONS ----------
 app.get("/api/notifications", (req, res) => {
@@ -377,7 +400,6 @@ app.get("/api/schedule", (req, res) => {
   res.json({ success: true, items });
 });
 
-// create schedule (manager or instructor)
 app.post("/api/schedule", (req, res) => {
   const role = requireRole(req, res, ["manager", "instructor"]);
   if (!role) return;
@@ -441,7 +463,6 @@ app.post("/api/schedule", (req, res) => {
   res.json({ success: true, item: ev });
 });
 
-// update schedule (manager or instructor)
 app.put("/api/schedule/:id", (req, res) => {
   const role = requireRole(req, res, ["manager", "instructor"]);
   if (!role) return;
@@ -498,7 +519,6 @@ app.put("/api/schedule/:id", (req, res) => {
   res.json({ success: true, item: ev });
 });
 
-// delete schedule (manager or instructor)
 app.delete("/api/schedule/:id", (req, res) => {
   const role = requireRole(req, res, ["manager", "instructor"]);
   if (!role) return;
@@ -530,11 +550,11 @@ app.delete("/api/schedule/:id", (req, res) => {
   res.json({ success: true });
 });
 
-/* ═════════✿══╡°˖✧᯽   COURSES PAGES    ᯽✧˖°╞══✿═════════*/
+/* ═════════ COURSES ═════════ */
 app.get("/api/courses", (req, res) => res.json(db.courses));
 
 app.post("/api/courses", (req, res) => {
-  const { title, description = "", locationType = "in-person", courseType = "video", cover, pdfUrl = "", pdfName = "" } = req.body || {};
+  const { title, description = "", locationType = "in-person", courseType = "video", cover } = req.body || {};
   if (!title) return res.status(400).json({ success: false, message: "Title required" });
 
   const a = actorFromReq(req);
@@ -550,8 +570,6 @@ app.post("/api/courses", (req, res) => {
     chapters: [],
     reviews: [],
     locationType,
-    pdfUrl,
-    pdfName,
     createdBy: a.byName || a.byUsername || "Unknown",
     createdAt: new Date().toISOString(),
   };
@@ -622,7 +640,7 @@ app.delete("/api/courses/:id", (req, res) => {
   res.json({ success: true });
 });
 
-// ---------- HOMEWORK ----------
+/* ═════════ HOMEWORK ═════════ */
 app.get("/api/homework", (req, res) => res.json(db.homework));
 
 app.post("/api/homework", (req, res) => {
@@ -715,7 +733,7 @@ app.delete("/api/homework/:id", (req, res) => {
   res.json({ success: true });
 });
 
-// ---------- STUDENTS ----------
+/* ═════════ STUDENTS ═════════ */
 app.get("/api/students", (req, res) => res.json(db.students));
 
 app.put("/api/students/:id", (req, res) => {
@@ -728,7 +746,7 @@ app.put("/api/students/:id", (req, res) => {
   res.json(db.students[idx]);
 });
 
-// ---------- USERS (MANAGER ADMIN) ----------
+/* ═════════ USERS (MANAGER ADMIN) ═════════ */
 app.get("/api/users", (req, res) => {
   const role = requireRole(req, res, ["manager"]);
   if (!role) return;
@@ -739,9 +757,13 @@ app.post("/api/users", (req, res) => {
   const role = requireRole(req, res, ["manager"]);
   if (!role) return;
 
-  const { username, password, role: newRole, name } = req.body || {};
+  const { username, password, role: newRole, name, email = "" } = req.body || {};
   if (!username || !password || !newRole) {
     return res.status(400).json({ success: false, message: "Missing username/password/role" });
+  }
+
+  if (!isValidEmail(email)) {
+    return res.status(400).json({ success: false, message: "Invalid email" });
   }
 
   const allowedRoles = ["student", "instructor", "manager"];
@@ -759,10 +781,8 @@ app.post("/api/users", (req, res) => {
     password: String(password),
     role: newRole,
     name: String(name || cleanUsername).trim(),
-    avatarUrl: "",
-    displayName: "",
-    avatarData: "",
-    theme: "glass"
+    email: String(email || "").trim(),
+    avatarUrl: ""
   };
 
   db.accounts.push(newUser);
@@ -826,7 +846,7 @@ app.delete("/api/users/:username", (req, res) => {
   res.json({ success: true });
 });
 
-// ---------- AUTH ----------
+/* ═════════ AUTH ═════════ */
 app.post("/api/login", (req, res) => {
   const { username, password } = req.body || {};
   if (!username || !password) return res.status(400).json({ success: false });
@@ -842,7 +862,14 @@ app.post("/api/login", (req, res) => {
     user.role === "manager" ? "/manager" :
     "/students";
 
-  res.json({ success: true, role: user.role, name: user.name, username: user.username, redirect });
+  res.json({
+    success: true,
+    role: user.role,
+    name: user.name,
+    username: user.username,
+    email: user.email || "",
+    redirect
+  });
 });
 
 // OPTIONAL: disable online register
