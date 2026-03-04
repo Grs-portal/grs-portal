@@ -3,70 +3,238 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Register Info</title>
+  <title>Account Access | Hofi Korsou</title>
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
     body {
-      background: url('/Screenshot 2025-11-05 104653.png') no-repeat center center fixed;
-      background-size: cover;
-      position: relative;
-    }
-    body::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,.55);
-      z-index: 0;
+      background:
+        radial-gradient(900px 400px at 20% 10%, rgba(191,227,180,0.45), transparent 60%),
+        radial-gradient(800px 380px at 85% 15%, rgba(169,214,157,0.35), transparent 55%),
+        linear-gradient(180deg, #0b1220 0%, #0a0f1a 100%);
     }
   </style>
 </head>
 
-<body class="text-white min-h-screen relative">
-  <a href="/homepage/login.html"
-    class="absolute top-6 left-6 z-20 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl font-semibold border border-white/30 backdrop-blur-md transition">
-    ⬅ Back to Login
-  </a>
+<body class="min-h-screen text-white">
+  <!-- Top subtle bar -->
+  <header class="max-w-6xl mx-auto px-4 py-5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center">
+        <span class="text-xl">🌿</span>
+      </div>
+      <div>
+        <div class="font-semibold leading-tight">Portal Access</div>
+        <div class="text-xs text-white/70">Hofi Korsou</div>
+      </div>
+    </div>
 
-  <div class="min-h-screen flex items-center justify-center px-4 relative z-10">
-    <div class="bg-white/10 backdrop-blur-md p-8 rounded-2xl shadow-2xl w-full max-w-lg border border-white/20">
+    <div class="flex items-center gap-2">
+      <!-- WhatsApp quick button in topbar -->
+      <a href="https://wa.me/59990000001" target="_blank"
+         class="hidden sm:inline-flex text-sm px-4 py-2 rounded-xl bg-green-400/15 hover:bg-green-400/20 border border-green-300/20 transition font-semibold text-green-100">
+        WhatsApp Help 💬
+      </a>
 
-      <h1 class="text-2xl font-semibold text-center mb-2">Registration</h1>
-      <p class="text-white/80 text-center mb-6">
-        Online registration is disabled. Please contact a staff member to create an account.
-      </p>
+      <a href="/homepage/login-student.html"
+         class="text-sm px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 transition">
+        Back to Login →
+      </a>
+    </div>
+  </header>
 
-      <!-- ✅ WhatsApp contact -->
-      <div class="bg-white/10 border border-white/20 rounded-2xl p-5">
-        <div class="font-semibold mb-1">Contact us on WhatsApp</div>
-        <div class="text-sm text-white/80 mb-4">
-          Tap a staff member below to message them directly.
+  <main class="max-w-6xl mx-auto px-4 pb-10">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+
+      <!-- Main card -->
+      <section class="rounded-3xl border border-white/10 bg-white/5 backdrop-blur p-7 shadow-[0_10px_35px_rgba(0,0,0,0.35)]">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-400/15 border border-green-300/20 text-green-200 text-xs">
+          <span class="text-sm">ℹ️</span>
+          Account creation is in-person
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <!-- CHANGE THESE NUMBERS (international format, no +) -->
-          <a href="https://wa.me/59990000001" target="_blank"
-             class="bg-green-500/80 hover:bg-green-500 text-white px-4 py-3 rounded-xl font-semibold transition text-center">
-            WhatsApp • Staff 1
+        <h1 class="mt-4 text-3xl font-semibold leading-tight">
+          You can’t create an account online.
+        </h1>
+
+        <p class="mt-3 text-white/80">
+          To keep student and staff accounts secure, new accounts are created only after an in-person verification.
+          Please visit <span class="font-semibold text-white">Hofi Korsou</span> to request access.
+        </p>
+
+        <!-- WhatsApp contact block (creative placement) -->
+        <div class="mt-6 rounded-2xl border border-green-300/20 bg-green-400/10 p-5">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center">
+              💬
+            </div>
+            <div class="flex-1">
+              <div class="font-semibold">Prefer messaging?</div>
+              <p class="mt-1 text-sm text-white/75">
+                You can contact our staff on WhatsApp to ask what info to bring, or to confirm opening hours.
+              </p>
+
+              <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <!-- CHANGE THESE NUMBERS -->
+                <a href="https://wa.me/59990000001" target="_blank"
+                   class="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-green-400 text-slate-900 font-semibold hover:bg-green-300 transition">
+                  WhatsApp • Staff 1
+                  <span>→</span>
+                </a>
+
+                <a href="https://wa.me/59990000002" target="_blank"
+                   class="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-white/10 border border-white/10 hover:bg-white/15 transition font-semibold">
+                  WhatsApp • Staff 2
+                </a>
+              </div>
+
+              <p class="mt-3 text-xs text-white/60">
+                Use full international format (example Curaçao: 599xxxxxxxx). Remove the “+”.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 grid gap-3">
+          <div class="rounded-2xl border border-white/10 bg-black/10 p-4">
+            <div class="flex items-start gap-3">
+              <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center">✅</div>
+              <div>
+                <div class="font-semibold">Info needed</div>
+                <ul class="mt-1 text-sm text-white/75 list-disc ml-5 space-y-1">
+                  <li>Your full name and preferred username</li>
+                  <li>(Optional) Your Gmail for portal updates</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="rounded-2xl border border-white/10 bg-black/10 p-4">
+            <div class="flex items-start gap-3">
+              <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center">🕒</div>
+              <div>
+                <div class="font-semibold">What happens at Hofi Korsou</div>
+                <p class="mt-1 text-sm text-white/75">
+                  Staff will verify your information and create your portal login. You’ll receive your username and a temporary password.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="rounded-2xl border border-white/10 bg-black/10 p-4">
+            <div class="flex items-start gap-3">
+              <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center">🔐</div>
+              <div>
+                <div class="font-semibold">After you get access</div>
+                <p class="mt-1 text-sm text-white/75">
+                  Go back to the login page and sign in. You can change your password later (if/when we enable that feature).
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-7 flex flex-col sm:flex-row gap-3">
+          <a href="/homepage/login-student.html"
+             class="inline-flex justify-center items-center gap-2 px-5 py-3 rounded-2xl bg-green-400 text-slate-900 font-semibold hover:bg-green-300 transition">
+            Go to Login
+            <span>→</span>
           </a>
 
-          <a href="https://wa.me/59990000002" target="_blank"
-             class="bg-green-500/80 hover:bg-green-500 text-white px-4 py-3 rounded-xl font-semibold transition text-center">
-            WhatsApp • Staff 2
+          <a href="/"
+             class="inline-flex justify-center items-center gap-2 px-5 py-3 rounded-2xl bg-white/10 border border-white/10 hover:bg-white/15 transition font-semibold">
+            Back to Homepage
           </a>
         </div>
 
-        <div class="text-xs text-white/70 mt-3">
-          Tip: Use full number with country code (example Curaçao: 599xxxxxxxx).
-        </div>
-      </div>
+        <p class="mt-5 text-xs text-white/55">
+          Note: If you were previously able to register online, that option has been disabled.
+        </p>
+      </section>
 
-      <div class="mt-6 text-center text-white/80">
-        Need to login?
-        <a href="/homepage/login.html" class="text-yellow-300 font-semibold hover:underline">Go to Login</a>
-      </div>
+      <!-- Side info / contact card -->
+      <aside class="rounded-3xl border border-white/10 bg-white/5 backdrop-blur p-7 shadow-[0_10px_35px_rgba(0,0,0,0.35)]">
+        <h2 class="text-xl font-semibold">Need help?</h2>
+        <p class="mt-2 text-white/80 text-sm">
+          If you’re not sure what role you need, ask at Hofi Korsou and they’ll assign the correct portal permissions.
+        </p>
+
+        <div class="mt-6 rounded-2xl border border-white/10 bg-black/10 p-5">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">📍</div>
+            <div>
+              <div class="font-semibold">Visit</div>
+              <div class="text-sm text-white/70">Hofi Korsou</div>
+            </div>
+          </div>
+
+          <div class="mt-4 text-sm text-white/75 space-y-2">
+            <div class="flex items-start gap-2">
+              <span class="opacity-80">•</span>
+              <span>Request portal access in person</span>
+            </div>
+            <div class="flex items-start gap-2">
+              <span class="opacity-80">•</span>
+              <span>Accounts are created for verified users only</span>
+            </div>
+            <div class="flex items-start gap-2">
+              <span class="opacity-80">•</span>
+              <span>Students will be added to the grading list automatically</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- WhatsApp mini card on the side too -->
+        <div class="mt-6 rounded-2xl border border-green-300/20 bg-green-400/10 p-5">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">💚</div>
+            <div>
+              <div class="font-semibold">WhatsApp</div>
+              <div class="text-sm text-white/70">Fastest way to ask</div>
+            </div>
+          </div>
+
+          <div class="mt-4 grid gap-2">
+            <!-- CHANGE THESE NUMBERS -->
+            <a href="https://wa.me/59990000001" target="_blank"
+               class="px-4 py-3 rounded-2xl bg-white/10 border border-white/10 hover:bg-white/15 transition text-sm font-semibold">
+              Message Staff 1
+            </a>
+            <a href="https://wa.me/59990000002" target="_blank"
+               class="px-4 py-3 rounded-2xl bg-white/10 border border-white/10 hover:bg-white/15 transition text-sm font-semibold">
+              Message Staff 2
+            </a>
+          </div>
+
+          <p class="mt-3 text-xs text-white/60">
+            Replace the numbers in the code with your real WhatsApp numbers.
+          </p>
+        </div>
+
+        <div class="mt-6">
+          <div class="text-xs uppercase tracking-wider text-white/60">Quick links</div>
+          <div class="mt-2 flex flex-col gap-2">
+            <a href="/homepage/login-student.html"
+               class="px-4 py-3 rounded-2xl bg-white/10 border border-white/10 hover:bg-white/15 transition text-sm font-semibold">
+              Login
+            </a>
+            <a href="/"
+               class="px-4 py-3 rounded-2xl bg-white/10 border border-white/10 hover:bg-white/15 transition text-sm font-semibold">
+              Homepage
+            </a>
+          </div>
+        </div>
+      </aside>
 
     </div>
-  </div>
+
+    <footer class="mt-10 text-center text-xs text-white/55">
+      © <span id="y"></span> Hofi Korsou · Portal Access
+    </footer>
+  </main>
+
+  <script>
+    document.getElementById("y").textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
