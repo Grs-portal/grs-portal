@@ -104,6 +104,7 @@
         localStorage.setItem("role", data.role);
         localStorage.setItem("userName", data.name);
         localStorage.setItem("username", data.username || username);
+        localStorage.setItem("email", data.email || "");
 
         window.location.href = data.redirect || "/instructor";
 
