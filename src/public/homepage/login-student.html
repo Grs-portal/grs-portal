@@ -108,6 +108,7 @@
         localStorage.setItem("isLoggedIn", "true");
         localStorage.setItem("role", data.role);
         localStorage.setItem("userName", data.name);
+        localStorage.setItem("email", data.email || "");
 
         // ✅ IMPORTANT (needed for notifications + audit trail)
         localStorage.setItem("username", data.username || username);
