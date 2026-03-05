@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>What We Offer</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@500&display=swap">
+<title>Full-Screen Cards</title>
+<link rel="stylesheet" href="/homepage/https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@500&display=swap">
 <link rel="stylesheet" href="/homepage/CSS/style.css">
 <style>
 :root {
@@ -67,6 +67,8 @@ body {
 .card:first-child::before {
   background: none;
 }
+
+
 
 .card.active {
   transform: translateX(0);
@@ -165,7 +167,7 @@ body {
 }
 
 .progress-bar {
-  position: fixed;
+  position:relative;
   top: 0;
   left: 0;
   width: 100%;
@@ -184,25 +186,22 @@ body {
 </head>
 <body style="background-color: #1a1a1a;">
 
-      <!--══✿══╡°˖✧᯽ NAVIGATION BAR ᯽✧˖°╞══✿══-->
+    <!--══✿══╡°˖✧᯽ DESKTOP NAVIGATION BAR ᯽✧˖°╞══✿══-->
 
-  <div class="progress-bar">
-    <div class="progress-fill"></div>
-  </div>
 
   <header class="site-header" style="background-color: white;">
     <div class="container header-inner" style="background-color: white;">
-      <nav class="main-nav">
+      <nav class="main-nav desktop-nav">
         <div class="nav-left">
           <a href="/homepage/index.html" class="nav-link" data-translate="nav-home">Home</a>
-          <a href="/homepage/forwho.html" class="nav-link" data-translate="nav-forwho">For Whom</a>
-          <a href="/homepage/green recovery space.html" class="nav-link" data-translate="nav-grs">Green Recovery Space</a>
+          <a href="/homepage/forwho.html" class="nav-link " data-translate="nav-forwho">For whom</a>
+          <a href="/homepage/green recovery space.html" class="nav-link" data-translate="nav-grs">Recovery Academy</a>
         </div>
 
         <!-- ... ✿°•∘ɷ∘•°✿ ..  logo circle  -->
 
         <div class="logo-circle">
-          <img src="/homepage/images/Logo HK.jpg" alt="PBC logo" style="margin-top: -22px; border-radius: 10%;">
+          <img src="/homepage/images/Logo HK.png" alt="PBC logo">
         </div>
 
         <div class="nav-right">          
@@ -217,14 +216,46 @@ body {
                 <li data-lang="es">Spanish</li>
               </ul>
           </div>        
-          <a href="/homepage/Portal.html" class="profile" aria-label="Sign in or register">
+          <a href="/homepage/Portal.html" class="profile">
             <img src="/homepage/images/unkown.png" alt="User profile">
-            <span class="profile-tooltip">Sign in / Register</span>
+            <p class="profile-text">Sign in</p>
           </a>
         </div>
       </nav>
 
     </div>
+
+
+    <!--══✿══╡°˖✧᯽ MOBILE NAVIGATION BAR ᯽✧˖°╞══✿══-->
+
+    <nav class="mobile-nav">
+      <div class="mobile-header">
+        <button class="lang-btn">EN ▾</button>
+        <div class="logo-circle small-logo">
+          <img src="/homepage/images/Logo HK.png" alt="PBC logo">
+        </div>
+        <button class="hamburger-btn" aria-label="Open menu">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M3.46447 20.5355C4.92893 22 7.28595 22 12 22C16.714 22 19.0711 22 20.5355 20.5355C22 19.0711 22 16.714 22 12C22 7.28595 22 4.92893 20.5355 3.46447C19.0711 2 16.714 2 12 2C7.28595 2 4.92893 2 3.46447 3.46447C2 4.92893 2 7.28595 2 12C2 16.714 2 19.0711 3.46447 20.5355ZM18.75 16C18.75 16.4142 18.4142 16.75 18 16.75H6C5.58579 16.75 5.25 16.4142 5.25 16C5.25 15.5858 5.58579 15.25 6 15.25H18C18.4142 15.25 18.75 15.5858 18.75 16ZM18 12.75C18.4142 12.75 18.75 12.4142 18.75 12C18.75 11.5858 18.4142 11.25 18 11.25H6C5.58579 11.25 5.25 11.5858 5.25 12C5.25 12.4142 5.58579 12.75 6 12.75H18ZM18.75 8C18.75 8.41421 18.4142 8.75 18 8.75H6C5.58579 8.75 5.25 8.41421 5.25 8C5.25 7.58579 5.58579 7.25 6 7.25H18C18.4142 7.25 18.75 7.58579 18.75 8Z" fill="#59b987"></path> </g></svg>
+        </button>
+      </div>
+
+      <ul class="mobile-menu">
+        <!-- User profile at top -->
+        <li class="mobile-profile">
+          <a href="/homepage/Portal.html" class="profile">
+            <img src="/homepage/images/unkown.png" alt="User profile">
+          </a>
+        </li>
+
+        <!-- Rest of the links -->
+        <li><a href="/homepage/index.html" class="nav-link" data-translate="nav-home">Home</a></li>
+        <li><a href="/homepage/forwho.html" class="nav-link" data-translate="nav-forwho">For whom</a></li>
+        <li><a href="/homepage/green recovery space.html" class="nav-link" data-translate="nav-grs">Recovery Academy</a></li>
+        <li><a href="/homepage/offerings.html" class="nav-link active" data-translate="nav-offer">What we offer</a></li>
+        <li><a href="/homepage/about.html" data-translate="nav-about">About Us</a></li>
+        <li><a href="/homepage/contact.html" data-translate="nav-contact">Contact</a></li>
+      </ul>
+    </nav>
   </header>
 
 
@@ -256,7 +287,7 @@ const data = [
     title: 'Stories & Experiences', 
     description: 'Personal recovery journeys from participants of the Green Recovery Space. Explore freely and read what resonates with you.', 
     image: 'https://sagaja.com/wp-content/uploads/2024/03/Spacery-zdjecie.jpeg',
-    link:'stories.html'
+    link:'construction.html'
   }
 ];
 
@@ -359,7 +390,3 @@ startAutoSlide();
 
 </body>
 </html>
-
-
-
-
