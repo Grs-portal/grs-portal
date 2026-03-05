@@ -1,114 +1,90 @@
-let text = document.getElementById('text');
-let leaf = document.getElementById('leaf');
-let hill1 = document.getElementById('hill1');
-let hill4 = document.getElementById('hill4');
-let hill5 = document.getElementById('hill5');
-let house = document.getElementById('house');
-let plant = document.getElementById('plant');
-let blob1 = document.getElementById('blob1');
-let blob2 = document.getElementById('blob2'); 
-let blob3 = document.getElementById('blob3'); 
-let missiontext = document.getElementById('missiontext');
-let boxleft = document.getElementById('boxleft');
-let boxcenter = document.getElementById('boxcenter');
-let boxright = document.getElementById('boxright');
+/*══✿════════╡°˖✧᯽   HOME PAGE JS ᯽✧˖°════════╡✿══*/
 
+/*══✿══╡°˖✧᯽   HERO + SLOGAN SECTIONS ᯽✧˖°╞══✿══*/
+const fullhero = document.querySelector(".parallax-hero");
+const navbar = document.querySelector(".main-nav");
+const sloganSection = document.getElementById("sloganSection");
+const lineLeft = document.getElementById("lineLeft");
+const lineRight = document.getElementById("lineRight");
 
-window.addEventListener('scroll', () => {
-    let value = window.scrollY;
+window.addEventListener("scroll", () => {
+  const scrollY = window.scrollY;
+  const navbarHeight = navbar.offsetHeight;
 
-    /* ══✿══╡°˖✧᯽   HOME PARALLAX ANIMATIONS (already working) ᯽✧˖°╞══✿══*/
+  /*══✿══╡°˖✧᯽   HERO PARALLAX ᯽✧˖°╞══✿══*/
+  let value = Math.max(scrollY - navbarHeight, 0);
+  const isMobile = window.innerWidth < 868;
+  const maxMove = isMobile ? 60 : 120;
+  const maxScale = isMobile ? 1.12 : 1.30;
+  const move = Math.min(value * 0.1, maxMove);
+  const scale = Math.min(1 + value * 0.001, maxScale);
+  fullhero.style.transform = `translateY(${-move}px) scale(${scale})`;
 
-    // ... ✿°•∘ɷ∘•°✿ .. House: move up + scale
-    house.style.transform = `translateX(-50%) translateY(${-value * 0.2}px) scale(${1 + value * 0.001})`;
+  /*══✿══╡°˖✧᯽   SLOGAN LINES ᯽✧˖°╞══✿══*/
+  if (lineLeft && lineRight) {
+    const progress = Math.min(scrollY / 300, 1); // adjust 300px for effect
+    const offsetY = isMobile ? 30 * (1 - progress) : 0;
+    const opacity = progress;
 
-    // ... ✿°•∘ɷ∘•°✿ .. Home title text moves downward (centered)
-    text.style.transform = `translateX(-50%) translateY(${value * 1.8}px)`;
+    lineLeft.style.transform = `translateY(${offsetY}px)`;
+    lineRight.style.transform = `translateY(${offsetY}px)`;
+    lineLeft.style.opacity = opacity;
+    lineRight.style.opacity = opacity;
+  }
+});
 
-    // ... ✿°•∘ɷ∘•°✿ .. Plant moves left
-    plant.style.transform = `translateX(${-value * 0.09}px)`; 
+/*══✿══╡°˖✧᯽   ANNOUNCEMENTS SECTION ᯽✧˖°╞══✿══*/
+document.addEventListener("DOMContentLoaded", () => {
+  const slides = document.querySelectorAll(".announcement-slide");
+  const nextBtn = document.querySelector(".next");
+  const prevBtn = document.querySelector(".prev");
 
-    // ... ✿°•∘ɷ∘•°✿ .. Leaf moves right
-    leaf.style.transform = `translateX(${value * 0.5}px)`;
+  if (slides.length > 0) {
+    let current = 0;
+    const AUTO_TIMEOUT = 10000; // 10 seconds
+    let autoInterval = null;
 
-
-    /*══✿══╡°˖✧᯽   MISSION SECTION ᯽✧˖°╞══✿══*/
-    
-    const sloganSection = document.getElementById("sloganSection");
-    const lineLeft = document.getElementById("lineLeft");
-    const lineRight = document.getElementById("lineRight");
-
-    window.addEventListener("scroll", () => {
-      const rect = sloganSection.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-
-      const progress = Math.min(
-        Math.max((windowHeight - rect.top) / windowHeight, 0),
-        1
-      );
-
-      const moveAmount = 120; //  ... ✿°•∘ɷ∘•°✿ .. how far they slide in
-
-      lineLeft.style.transform = `translateX(${-(1 - progress) * moveAmount}px)`;
-      lineRight.style.transform = `translateX(${(1 - progress) * moveAmount}px)`;
-    });
-
-    // ... ✿°•∘ɷ∘•°✿ .. blob1 → slide right into view
-    blob1.style.transform = `translateX(${value * 0.4}px)`;
-
-
-    // ... ✿°•∘ɷ∘•°✿ .. blob2 → rise into view
-    blob2.style.transform = `translateY(${-value * 0.4}px)`;
-
-    // blob3 → slide left into view
-    blob3.style.transform = `translateX(${-value * 0.3}px)`;
-
-
-
-
-
-    
-
-//  ... ✿°•∘ɷ∘•°✿ .. mission 
-
-});$(document).ready(function() {
-  var $owl = $('.owl-carousel');
-
-  $owl.children().each(function(index) {
-    $(this).attr('data-position', index);
-  });
-
-  $owl.owlCarousel({
-    center: true,
-    loop: true,
-    items: 1,              //  ... ✿°•∘ɷ∘•°✿ .. 1 main visible card
-    margin: 10,
-    autoplay: true,
-    autoplayTimeout: 2500,
-    autoplayHoverPause: true,
-    smartSpeed: 600,
-    stagePadding: 60,      //  ... ✿°•∘ɷ∘•°✿ .. <-- THIS MAKES SIDE CARDS VISIBLE
-    responsive: {
-      0: { items: 1, stagePadding: 40 },
-      480: { items: 1, stagePadding: 60 },
-      768: { items: 3, stagePadding: 0 }  //  ... ✿°•∘ɷ∘•°✿ .. desktop/tablet
+    function showSlide(index) {
+      slides.forEach((slide, i) => {
+        slide.style.display = i === index ? "grid" : "none";
+      });
     }
-  });
 
-  $(document).on('click', '.owl-item>div', function() {
-    var speed = 300;
-    $owl.trigger('to.owl.carousel', [$(this).data('position'), speed]);
-  });
+    function nextSlide() {
+      current = (current + 1) % slides.length;
+      showSlide(current);
+    }
+
+    function prevSlide() {
+      current = (current - 1 + slides.length) % slides.length;
+      showSlide(current);
+    }
+
+    function startAuto() {
+      autoInterval = setInterval(nextSlide, AUTO_TIMEOUT);
+    }
+
+    function resetAuto() {
+      clearInterval(autoInterval);
+      startAuto();
+    }
+
+    if (nextBtn) nextBtn.addEventListener("click", () => { nextSlide(); resetAuto(); });
+    if (prevBtn) prevBtn.addEventListener("click", () => { prevSlide(); resetAuto(); });
+
+    showSlide(current);
+    startAuto();
+  }
 });
 
+/*══✿══╡°˖✧᯽   MOBILE NAV BAR ᯽✧˖°╞══✿══*/
+document.addEventListener("DOMContentLoaded", () => {
+  const hamburger = document.querySelector(".hamburger-btn");
+  const mobileMenu = document.querySelector(".mobile-menu");
 
-const hamburger = document.getElementById('hamburger');
-const navMenu = document.getElementById('nav-menu');
-
-hamburger.addEventListener('click', () => {
-  hamburger.classList.toggle('active');
-  navMenu.classList.toggle('active');
+  if (hamburger && mobileMenu) {
+    hamburger.addEventListener("click", () => {
+      mobileMenu.classList.toggle("active");
+    });
+  }
 });
-
-
-
