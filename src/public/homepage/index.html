@@ -1,98 +1,545 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="CSS/style.css">
-<title>Under Construction</title>
-
-<style>
-  body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    background: #e5ffff;
-    color: #2e3f36;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-
-  .container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-  }
-
-  h1 {
-    font-size: 2.5rem;
-    margin-bottom: 2rem;
-  }
-
-  .icon-space img{
-    width: 100px;
-    height: 100px;
-    margin-bottom: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-
-  p {
-    max-width: 500px;
-    line-height: 1.6;
-    font-size: 1rem;
-  }
-
-  .enter-link {
-    padding: 1.5rem;
-    text-align: center;
-    font-size: 0.9rem;
-  }
-
-  .enter-link a {
-    color: #e0f5e4;
-    text-decoration: none;
-    font-weight: 500;
-  }
-
-  .enter-link a:hover {
-    text-decoration: underline;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Green Recovery Space</title>
+    <link rel="stylesheet" href="/homepage/CSS/style.css">
 </head>
 
-<body>
-
-        <!--══✿══╡°˖✧᯽ NAVIGATION BAR ᯽✧˖°╞══✿══-->
 
 
 
-<div class="container">
-  <h1>We're Building Something Thoughtful</h1>
+    <!--══✿══╡°˖✧᯽ DESKTOP NAVIGATION BAR ᯽✧˖°╞══✿══-->
 
-  <div class="icon-space">
-    <img src="/homepage/images/settings.gif">
+
+  <header class="site-header" style="background-color: white;">
+    <div class="container header-inner" style="background-color: white;">
+      <nav class="main-nav desktop-nav">
+        <div class="nav-left">
+          <a href="/homepage/index.html" class="nav-link active" data-translate="nav-home">Home</a>
+          <a href="/homepage/forwho.html" class="nav-link" data-translate="nav-forwho">For whom</a>
+          <a href="/homepage/green recovery space.html" class="nav-link" data-translate="nav-grs">Green Recovery Space</a>
+        </div>
+
+        <!-- ... ✿°•∘ɷ∘•°✿ ..  logo circle  -->
+
+        <div class="logo-circle">
+          <img src="/homepage/images/Logo HK.png" alt="PBC logo">
+        </div>
+
+        <div class="nav-right">          
+          <a href="/homepage/offerings.html" class="nav-link" data-translate="nav-offer">What we offer</a>
+          <a href="/homepage/about.html" class="nav-link" data-translate="nav-about">About Us</a>
+          <a href="/homepage/contact.html" class="nav-link" data-translate="nav-contact">Contact</a>
+          <div class="language-dropdown">
+              <button class="lang-btn">EN ▾</button>
+              <ul class="lang-menu">
+                <li data-lang="en">English</li>
+                <li data-lang="nl">Dutch</li>
+                <li data-lang="es">Spanish</li>
+              </ul>
+          </div>        
+          <a href="/homepage/Portal.html" class="profile">
+            <img src="/homepage/images/unkown.png" alt="User profile">
+            <p class="profile-text">Sign in</p>
+          </a>
+        </div>
+      </nav>
+
+    </div>
+
+
+    <!--══✿══╡°˖✧᯽ MOBILE NAVIGATION BAR ᯽✧˖°╞══✿══-->
+
+    <nav class="mobile-nav">
+      <div class="mobile-header">
+        <button class="lang-btn">EN ▾</button>
+        <div class="logo-circle small-logo">
+          <img src="/homepage/images/Logo HK.png" alt="PBC logo">
+        </div>
+        <button class="hamburger-btn" aria-label="Open menu">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M3.46447 20.5355C4.92893 22 7.28595 22 12 22C16.714 22 19.0711 22 20.5355 20.5355C22 19.0711 22 16.714 22 12C22 7.28595 22 4.92893 20.5355 3.46447C19.0711 2 16.714 2 12 2C7.28595 2 4.92893 2 3.46447 3.46447C2 4.92893 2 7.28595 2 12C2 16.714 2 19.0711 3.46447 20.5355ZM18.75 16C18.75 16.4142 18.4142 16.75 18 16.75H6C5.58579 16.75 5.25 16.4142 5.25 16C5.25 15.5858 5.58579 15.25 6 15.25H18C18.4142 15.25 18.75 15.5858 18.75 16ZM18 12.75C18.4142 12.75 18.75 12.4142 18.75 12C18.75 11.5858 18.4142 11.25 18 11.25H6C5.58579 11.25 5.25 11.5858 5.25 12C5.25 12.4142 5.58579 12.75 6 12.75H18ZM18.75 8C18.75 8.41421 18.4142 8.75 18 8.75H6C5.58579 8.75 5.25 8.41421 5.25 8C5.25 7.58579 5.58579 7.25 6 7.25H18C18.4142 7.25 18.75 7.58579 18.75 8Z" fill="#59b987"></path> </g></svg>
+        </button>
+      </div>
+
+      <ul class="mobile-menu">
+        <!-- User profile at top -->
+        <li class="mobile-profile">
+          <a href="/homepage/Portal.html" class="profile">
+            <img src="/homepage/images/unkown.png" alt="User profile">
+          </a>
+        </li>
+
+        <!-- Rest of the links -->
+        <li><a href="/homepage/index.html" class="nav-link active" data-translate="nav-home">Home</a></li>
+        <li><a href="/homepage/forwho.html" data-translate="nav-forwho">For whom</a></li>
+        <li><a href="/homepage/green recovery space.html" data-translate="nav-grs">Recovery Academy</a></li>
+        <li><a href="/homepage/offerings.html" data-translate="nav-offer">What we offer</a></li>
+        <li><a href="/homepage/about.html" data-translate="nav-about">About Us</a></li>
+        <li><a href="/homepage/contact.html" data-translate="nav-contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+
+    <!--══✿══╡°˖✧᯽  HERO ᯽✧˖°╞══✿══-->
+
+
+<section class="parallax-hero">
+  <img src="/homepage/images/Hofi Korsow_inganggeheel 2.png" alt="Hero" class="hero-img" />
+</section>
+
+
+
+ <!--══✿══╡°˖✧᯽  MISSION SECTION ᯽✧˖°╞══✿══-->
+
+
+  <section class="parallax-mission-section">
+
+
+    <div class="slogan" id="sloganSection">
+      <div class="slogan-text">
+        <div class="slogan-line left" id="lineLeft" data-translate="slogan-l">
+          <q></q>A place to catch your breath
+        </div>
+        <div class="slogan-line right" id="lineRight" data-translate="slogan-r">
+          and find direction again<q></q>
+        </div>
+
+      <!-- ... ✿°•∘ɷ∘•°✿ ..  our mission  -->
+
+        <div class="mission-intro">
+          <p data-translate="mission-p" id="missiontext">
+            The Green Recovery Space at Hòfi Kòrsou offers a safe, natural place where people are given the space to recover, catch their breath, and find direction again. This is achieved through connecting with peers, accessible activities, and various learning opportunities.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mission-layout">
+      <div class="mission-grid">
+        <!-- ... ✿°•∘ɷ∘•°✿ ..  mission card 1  - For Whom -->
+      <div class="mission-card">
+          <div class="blob-bg"></div>
+              <div class="icon-circle">
+                  <svg class="icon" height="200px" width="200px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 392.598 392.598" xml:space="preserve" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path style="fill:#FFC10D;" d="M214.949,191.16l37.689-23.337c2.263-1.422,5.042-1.939,7.628-1.487 c6.465,1.164,12.994,1.681,19.459,1.681c50.23,0,91.022-32.84,91.022-73.18s-40.792-73.115-90.958-73.115 s-91.022,32.84-91.022,73.18c0,19.523,9.568,38.012,27.022,51.911c3.038,2.392,4.59,6.206,4.008,10.02L214.949,191.16z"></path> <g> <path style="fill:#194F82;" d="M94.319,251.281c32.582,0,59.216-26.57,59.216-59.216s-26.57-59.152-59.216-59.152 s-59.216,26.57-59.216,59.216S61.737,251.281,94.319,251.281z M94.319,154.699c20.622,0,37.43,16.743,37.43,37.43 s-16.743,37.43-37.43,37.43s-37.43-16.743-37.43-37.43C57.018,171.442,73.762,154.699,94.319,154.699z"></path> <path style="fill:#194F82;" d="M127.935,268.994c-4.008,0-7.628,2.133-9.568,5.689l-24.048,44.218l-23.984-44.218 c-1.939-3.491-5.56-5.689-9.568-5.689C27.216,268.994,0,296.275,0,329.762v51.911c0,6.012,4.848,10.925,10.925,10.925h166.853 c6.012,0,10.925-4.848,10.925-10.925v-51.911C188.703,296.275,161.422,268.994,127.935,268.994z M166.917,370.747H21.851v-41.051 c0-19.329,14.158-35.362,32.711-38.4l30.19,55.725c4.267,6.982,14.481,8.21,19.135,0l30.19-55.725 c18.554,3.038,32.711,19.071,32.711,38.4v41.051H166.917z"></path> </g> <path style="fill:#FFFFFF;" d="M94.319,154.699c-20.622,0-37.43,16.743-37.43,37.43s16.743,37.43,37.43,37.43 s37.43-16.743,37.43-37.43S114.941,154.699,94.319,154.699z"></path> <path style="fill:#56ACE0;" d="M21.851,370.747h144.937v-41.051c0-19.329-14.158-35.362-32.711-38.4l-30.19,55.661 c-4.719,8.21-14.933,6.982-19.135,0l-30.19-55.661c-18.554,3.038-32.711,19.071-32.711,38.4V370.747z"></path> <g> <path style="fill:#194F82;" d="M249.471,54.562c-2.392,5.495,0.065,11.96,5.56,14.352c5.495,2.392,11.96-0.065,14.352-5.56 c4.849-9.632,17.067-7.111,19.459,1.616c1.293,5.689-1.875,10.02-5.495,11.83c-9.374,4.59-15.386,14.675-15.386,25.665 c0,0-0.84,13.317,10.925,13.317s10.925-13.317,10.925-13.317c0-2.715,1.293-5.107,3.168-6.012 c13.511-6.594,20.558-21.463,17.131-36.331C303.063,30.966,263.887,25.341,249.471,54.562z"></path> <path style="fill:#194F82;" d="M278.885,125.285c-6.012,0-10.925,4.848-10.925,10.925v7.37c0,6.012,4.848,10.925,10.925,10.925 c6.012,0,10.925-4.848,10.925-10.925v-7.434C289.745,130.133,284.897,125.285,278.885,125.285z"></path> <path style="fill:#194F82;" d="M279.725,0c-62.19,0-112.873,42.602-112.873,94.966c0,24.436,10.731,47.192,30.448,64.84 l-7.24,51.329c-1.422,8.339,7.37,16.162,16.549,10.796l54.044-33.358c6.335,0.905,12.735,1.422,19.071,1.422 c62.19,0,112.873-42.602,112.873-94.966S341.98,0,279.725,0z M279.725,168.081c-6.465,0-12.994-0.517-19.459-1.681 c-2.65-0.453-5.301,0.065-7.628,1.487l-37.689,23.337l4.784-34.327c0.517-3.814-1.034-7.628-4.008-10.02 c-17.455-13.899-27.022-32.323-27.022-51.911c0-40.339,40.857-73.18,91.022-73.18s91.022,32.84,91.022,73.18 C370.812,135.305,329.956,168.081,279.725,168.081z"></path> </g> </g></svg>
+              </div>
+              <div class="text-content">
+                <h3 data-translate="nav-forwho">For whom</h3>
+                <p data-translate="for-p">Do you feel like you are stuck, for example, due to stress, mental overload, or loneliness? This can happen to anyone and is part of life.</p>
+              <p id="know-more" data-translate="know-more" style="margin-top: 2px;">Want to know more?</p>
+              <p id="click-trick" style="margin-top: 20px;"><br></p>
+                <a href="/homepage/forwho.html" class="slide-btn" style="margin: -20px auto;">
+                    <span class="IconContainer">
+                        <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
+                            <path d="M21.883 12l-7.527 6.235.644.765 9-7.521-9-7.479-.645.764 7.529 6.236h-21.884v1h21.883z"/>
+                        </svg>
+                    </span>
+                </a>
+              </div>              
+            </div>
+
+
+          <!-- ... ✿°•∘ɷ∘•°✿ ..  mission card 2 - Program & Registration   -->
+
+        <div class="mission-card">
+            <div class="blob-bg"></div>
+            <div class="icon-circle">
+              <svg class="icon" height="200px" width="200px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 392.543 392.543" xml:space="preserve" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path style="fill:#194F82;" d="M38.141,171.318h11.313l12.347,56.76c1.099,5.042,5.56,8.598,10.667,8.598H181.98 c5.107,0,9.568-3.556,10.667-8.598l12.347-56.824h11.313c6.012,0,10.925-4.848,10.925-10.925c0-6.012-4.848-10.925-10.925-10.925 h-29.091v-24.824c0-18.036-14.675-32.711-32.711-32.711H99.943c-18.036,0-32.711,14.675-32.711,32.711v24.824H38.141 c-6.012,0-10.925,4.848-10.925,10.925C27.281,166.469,32.194,171.318,38.141,171.318z M89.083,124.708 c0-6.012,4.848-10.925,10.925-10.925h54.562c6.012,0,10.925,4.848,10.925,10.925v24.824H89.083V124.708z M182.691,171.318 l-9.503,43.572H81.196l-9.503-43.572H182.691L182.691,171.318z"></path> <path style="fill:#56ACE0;" d="M165.43,124.708c0-6.012-4.848-10.925-10.925-10.925H99.943c-6.012,0-10.925,4.848-10.925,10.925 v24.824h76.347v-24.824H165.43z"></path> <polygon style="fill:#FFC10D;" points="71.758,171.318 81.261,214.954 173.253,214.954 182.691,171.318 "></polygon> <path style="fill:#FFFFFF;" d="M127.289,32.78c-7.499,0-13.705,6.077-13.705,13.576s6.077,13.576,13.576,13.576 c7.499,0,13.576-6.077,13.576-13.576S134.788,32.78,127.289,32.78z"></path> <path style="fill:#194F82;" d="M127.289,10.865c-19.523,0-35.491,15.903-35.491,35.491s15.903,35.491,35.491,35.491 s35.491-15.903,35.491-35.491S146.812,10.865,127.289,10.865z M127.289,59.932c-7.499,0-13.705-6.077-13.705-13.576 s6.077-13.576,13.576-13.576c7.499,0,13.576,6.077,13.576,13.576S134.788,59.932,127.289,59.932z"></path> <path style="fill:#FFFFFF;" d="M58.182,294.081c6.012,0,10.925-4.848,10.925-10.925c0-6.012-4.848-10.925-10.925-10.925 c-6.077,0-10.925,4.849-10.925,10.925C47.257,289.168,52.17,294.081,58.182,294.081z"></path> <path style="fill:#FFC10D;" d="M58.246,345.152c-16.291,0-30.125,10.731-34.78,25.471h69.495 C88.307,355.948,74.473,345.152,58.246,345.152z"></path> <path style="fill:#FFFFFF;" d="M196.267,294.081c6.012,0,10.925-4.848,10.925-10.925c0-6.012-4.848-10.925-10.925-10.925 s-10.925,4.849-10.925,10.925C185.341,289.168,190.255,294.081,196.267,294.081z"></path> <path style="fill:#56ACE0;" d="M196.267,345.152c-16.291,0-30.125,10.731-34.78,25.471h69.56 C226.392,355.948,212.558,345.152,196.267,345.152z"></path> <path style="fill:#FFFFFF;" d="M334.287,294.081c6.012,0,10.925-4.848,10.925-10.925c0-6.012-4.848-10.925-10.925-10.925 c-6.012,0-10.925,4.849-10.925,10.925C323.362,289.168,328.275,294.081,334.287,294.081z"></path> <path style="fill:#FFC10D;" d="M334.287,345.152c-16.291,0-30.125,10.731-34.78,25.471h69.495 C364.347,355.948,350.513,345.152,334.287,345.152z"></path> <g> <path style="fill:#194F82;" d="M196.267,323.366c-32.129,0-58.246,26.117-58.246,58.182c0,6.012,4.848,10.925,10.925,10.925h94.642 h0.065c8.598-0.711,11.442-6.853,10.731-12.606C253.608,348.578,227.814,323.366,196.267,323.366z M161.487,370.752 c4.655-14.739,18.489-25.471,34.78-25.471s30.125,10.731,34.78,25.471H161.487z"></path> <path style="fill:#194F82;" d="M58.246,323.366C26.117,323.366,0,349.483,0,381.613c0,6.012,4.848,10.925,10.925,10.925h94.642 h0.065c8.598-0.711,11.442-6.853,10.731-12.606C115.523,348.578,89.794,323.366,58.246,323.366z M23.467,370.752 c4.655-14.739,18.489-25.471,34.78-25.471s30.125,10.731,34.78,25.471H23.467z"></path> <path style="fill:#194F82;" d="M58.182,315.867c18.036,0,32.711-14.675,32.711-32.711s-14.675-32.711-32.711-32.711 s-32.711,14.61-32.711,32.582C25.471,301.193,40.145,315.867,58.182,315.867z M58.182,272.231c6.012,0,10.925,4.848,10.925,10.925 s-4.848,10.925-10.925,10.925c-6.077,0-10.925-4.848-10.925-10.925C47.257,277.144,52.17,272.231,58.182,272.231z"></path> <path style="fill:#194F82;" d="M196.267,315.867c18.036,0,32.711-14.675,32.711-32.711s-14.675-32.711-32.711-32.711 s-32.711,14.675-32.711,32.711S178.166,315.867,196.267,315.867z M196.267,272.231c6.012,0,10.925,4.848,10.925,10.925 s-4.848,10.925-10.925,10.925s-10.925-4.848-10.925-10.925C185.341,277.144,190.255,272.231,196.267,272.231z"></path> <path style="fill:#194F82;" d="M334.287,315.867c18.036,0,32.711-14.675,32.711-32.711s-14.675-32.711-32.711-32.711 s-32.711,14.675-32.711,32.711C301.511,301.193,316.186,315.867,334.287,315.867z M334.287,272.231 c6.012,0,10.925,4.848,10.925,10.925s-4.848,10.925-10.925,10.925c-6.012,0-10.925-4.848-10.925-10.925 C323.362,277.144,328.275,272.231,334.287,272.231z"></path> <path style="fill:#194F82;" d="M392.469,379.867c-0.905-31.289-26.634-56.501-58.182-56.501c-32.129,0-58.246,26.117-58.246,58.182 c0,6.012,4.848,10.925,10.925,10.925h94.642h0.065C390.271,391.762,393.051,385.685,392.469,379.867z M299.507,370.752 c4.655-14.739,18.489-25.471,34.78-25.471c16.291,0,30.125,10.731,34.78,25.471H299.507z"></path> <path style="fill:#194F82;" d="M317.802,111.843c41.891,0,74.731-24.566,74.731-55.855s-32.84-55.984-74.731-55.984 s-74.731,24.566-74.731,55.855c0,9.956,3.426,19.523,9.891,27.992c-5.042,14.61-8.275,23.208-8.275,23.273 c-3.232,8.275,5.56,16.549,12.541,14.481l49.325-10.537C310.303,111.584,314.117,111.843,317.802,111.843z M271.774,96.263 c1.164-3.297,2.457-7.111,3.879-11.313c1.293-3.943,0.388-8.21-2.521-11.119c-3.814-3.814-8.21-10.02-8.21-17.907 c0-18.489,24.178-34.069,52.881-34.069c28.703,0,52.881,15.58,52.881,34.069s-24.178,34.069-52.881,34.069 c-3.297,0-6.788-0.259-10.343-0.711C306.23,89.088,271.774,96.263,271.774,96.263z"></path> </g> <path style="fill:#FFC10D;" d="M271.774,96.263c0,0,34.457-7.111,35.685-6.982c3.556,0.453,7.046,0.711,10.343,0.711 c28.638,0,52.881-15.58,52.881-34.069s-24.178-34.069-52.881-34.069c-28.703,0-52.881,15.58-52.881,34.069 c0,7.887,4.461,14.158,8.21,17.907c2.844,2.909,3.879,7.24,2.521,11.119C274.23,89.152,272.937,92.902,271.774,96.263z"></path> </g></svg>            </div>
+            <div class="text-content">
+            <h3 data-translate="offer-h">What do we offer?</h3>
+            <p data-translate="offer-p">Support from people who understand what you are going through because they have had similar experiences.</p>
+              <p id="know-more" style="margin-top: 5px;">Want to know more?</p>
+              <p id="click-trick" style="margin-top: 10px;"><br></p>
+            <a href="/homepage/offerings.html" class="slide-btn" style="margin: -18px auto;">
+                <span class="IconContainer">
+                    <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
+                        <path d="M21.883 12l-7.527 6.235.644.765 9-7.521-9-7.479-.645.764 7.529 6.236h-21.884v1h21.883z"/>
+                    </svg>
+                </span>
+            </a>
+          </div>
+        </div>
+
+                  <!-- ... ✿°•∘ɷ∘•°✿ ..  mission card 3 - What We believe In   -->
+
+          <div class="mission-card">
+              <div class="blob-bg"></div>
+              <div class="icon-circle">
+                <svg class="icon" height="200px" width="200px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 392.577 392.577" xml:space="preserve" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path style="fill:#194F82;" d="M362.99,23.511C358.788,8.19,342.045-4.287,321.552,1.402l-3.232,1.034 c-11.507,3.491-19.717,12.735-22.497,23.725L99.103,85.959c-15.063,4.59-24.501,19.006-23.402,34.069L26.247,135.22 c-14.481,4.008-27.927,20.945-22.109,41.309l1.034,3.232c5.172,17.455,23.402,27.539,41.438,22.109l49.519-15.063 c5.818,10.214,16.549,16.743,28.768,16.743c3.232,0,6.465-0.453,9.632-1.487l44.347-13.446v10.408 c0,18.554,12.541,34.263,29.543,39.046v16.679h-36.525c-6.077,0-11.055,4.913-11.055,11.055c0,6.077,4.913,11.055,11.055,11.055 h23.725l-79.903,96.97c-3.879,4.719-3.232,11.636,1.487,15.515s11.636,3.232,15.515-1.487l75.572-91.669v85.333 c0,6.077,4.913,11.055,11.055,11.055c6.141,0,11.055-4.913,11.055-11.055v-84.558l75.572,91.539 c4.073,4.59,11.184,5.236,15.515,1.487c4.719-3.879,5.43-10.796,1.487-15.515l-80.55-97.616h24.501 c6.077,0,11.055-4.978,11.055-11.055c0-6.077-4.913-11.055-11.055-11.055H230.4v-16.679c17.002-4.848,29.543-20.493,29.543-39.046 v-35.168l71.24-21.657c10.796,9.18,22.562,10.02,31.935,7.176l3.232-1.034c17.325-4.784,27.281-23.661,22.109-41.438L362.99,23.511z M40.081,180.731c-5.689,1.681-12.024-1.681-13.834-7.37l-1.034-3.232c-1.228-7.758,1.875-11.83,7.37-13.834l48.679-14.804 l7.434,24.436L40.081,180.731z M237.835,199.091c0,10.214-8.275,18.489-18.489,18.489c-10.214,0-18.489-8.275-18.489-18.489v-17.131 l36.913-11.313v28.444H237.835z M128.065,180.925c-5.689,1.681-12.024-1.681-13.834-7.37l-15.968-52.622 c-1.745-5.818,1.552-12.024,7.37-13.834l72.533-22.109l6.012,19.782c1.164,4.655,7.37,9.438,13.834,7.37 c5.883-1.745,9.115-7.952,7.37-13.834l-6.012-19.782l15.903-4.848l12.218,40.275c1.034,4.655,7.887,9.503,13.834,7.37 c5.883-1.745,9.115-7.952,7.37-13.834l-12.347-40.275l61.349-18.489l0.517,1.875l21.85,71.952L128.065,180.925z M359.822,127.333 l-3.232,1.034c-5.689,2.133-12.283-2.651-13.834-7.37L317.414,37.41c-1.745-5.818,1.552-12.024,7.37-13.77l3.232-1.034 c6.4-1.939,12.218,2.263,13.834,7.37l25.406,83.523C369.002,118.864,365.899,125.329,359.822,127.333z"></path> <path style="fill:#FFC10D;" d="M88.76,165.862l-7.434-24.436l-48.614,14.869c-5.495,2.004-8.598,6.077-7.37,13.834l1.034,3.232 c1.681,5.624,8.016,9.115,13.834,7.37L88.76,165.862z"></path> <path style="fill:#56ACE0;" d="M320.194,122.485l-21.851-71.952l-0.517-1.875l-61.349,18.683l12.218,40.275 c1.745,5.883-1.552,12.024-7.37,13.834c-5.883,2.133-12.8-2.78-13.834-7.37l-12.218-40.275l-15.903,4.848l6.012,19.782 c1.745,5.883-1.552,12.024-7.37,13.834c-6.465,2.069-12.671-2.715-13.834-7.37l-6.012-19.782l-72.533,22.109 c-5.818,1.745-9.115,7.952-7.37,13.834l15.968,52.622c1.681,5.624,8.145,9.115,13.834,7.37L320.194,122.485z"></path> <g> <path style="fill:#FFC10D;" d="M341.851,29.911c-1.552-5.172-7.37-9.244-13.834-7.37l-3.232,1.034 c-5.818,1.745-9.115,7.952-7.37,13.77l25.406,83.523c1.487,4.719,8.016,9.568,13.834,7.37l3.232-1.034 c6.012-2.004,9.051-8.404,7.37-13.77L341.851,29.911z"></path> <path style="fill:#FFC10D;" d="M200.921,199.091c0,10.214,8.275,18.489,18.489,18.489c10.214,0,18.489-8.275,18.489-18.489v-28.444 l-36.913,11.184v17.261H200.921z"></path> </g> </g></svg>
+              </div>
+              <div class="text-content">
+                <h3 data-translate="believe-h">What do we believe in?</h3>  
+                <p data-translate="believe-p">We believe in a society where people who get stuck in their lives.</p>
+                <p id="know-more" data-translate="know-more" style="margin-top: 8px;">Want to know more?</p>
+                <p id="click-trick" style="margin-top: 35px;"><br></p>
+              <a href="/homepage/about.html" class="slide-btn" style="margin: -15px auto;">
+                  <span class="IconContainer">
+                      <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
+                          <path d="M21.883 12l-7.527 6.235.644.765 9-7.521-9-7.479-.645.764 7.529 6.236h-21.884v1h21.883z"/>
+                      </svg>
+                  </span>
+              </a>
+          </div>              
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+      
+<!--══✿══╡°˖✧᯽  STORY BANK SECTION ᯽✧˖°╞══✿══-->
+
+<section class="story-bank-preview">    
+  <h2 id="story-h" data-translate="story-h">Personal Stories</h2>
+  <p id="story-p" data-translate="story-p">How do others work on their recovery?</p>
+  <div class="story-grid-preview">
+
+    <div class="story-card-preview">
+      <img src="https://www.aconsciousrethink.com/wp-content/uploads/2015/08/0-truly-happy-people.jpg" alt="Emma">
+      <div class="story-overlay">
+        <p class="story-quote">“A short quote from the persons…”</p>
+        <p class="story-name">Sharon, deelnemer</p>
+        <a href="/homepage/story-emma.html" class="story-button">Lees haar verhaal</a>
+      </div>
+    </div>
+
+    <div class="story-card-preview">
+      <img src="https://www.publishers.org.uk/wp-content/uploads/2025/10/People25_202506PU0008j_Still-Charlotte_01-1024x576.jpg" alt="Jonas">
+      <div class="story-overlay">
+        <p class="story-quote">“A short quote from the persons…”</p>
+        <p class="story-name">Marlon, deelnemer</p>
+        <a href="/homepage/story-jonas.html" class="story-button">Lees zijn verhaal</a>
+      </div>
+    </div>
+
+    <div class="story-card-preview">
+      <img src="https://www.covenanthouse.org/sites/default/files/styles/805x740/public/2023-08/bipoc-youth.jpg.webp?itok=0gtkoEHM" alt="Noor">
+      <div class="story-overlay">
+        <p class="story-quote">“A short quote from the persons…”</p>
+        <p class="story-name">Noor, deelnemer</p>
+        <a href="story-noor.html" class="story-button">Lees haar verhaal</a>
+      </div>
+    </div>
+
+    <div class="story-card-preview">
+      <img src="https://media.licdn.com/dms/image/v2/D4E03AQGznkuVumCbtg/profile-displayphoto-scale_400_400/B4EZslMykGKMAg-/0/1765855676453?e=2147483647&v=beta&t=m-ByL4TUO0cBRplvt9G5wFfJRX12c8A9NghHki8JO3Q" alt="Lars">
+      <div class="story-overlay">
+        <p class="story-quote">“A short quote from the persons…”</p>
+        <p class="story-name">Anthony, deelnemer</p>
+        <a href="/homepage/story-lars.html" class="story-button">Lees zijn verhaal</a>
+      </div>
+    </div>
+
   </div>
+</section>
 
-  <p>
-    This site is currently being refined and expanded.  
-    We're still working on parts of this site, we'll be up soon to show you everything green recovery space has to offer.
-  </p>
-</div>
 
-<div class="enter-link">
-  <a href="/homepage/index.html">Enter →</a>
-</div>
 
+  <!--══✿══╡°˖✧᯽  STORY BANK SECTION ᯽✧˖°╞══✿══
+
+<section class="story-bank-preview">    
+  <h2 id="story-h">Personal Stories</h2>
+  <p id="story-p">How do others work on their recovery?</p>
+  <div class="story-grid-preview">
+
+    <div class="story-card-preview">
+      <img src="/homepage/https://i.pinimg.com/736x/97/6f/c9/976fc9d4d50b09edc2d9b6dd433d68db.jpg" alt="Emma">
+      <div class="story-overlay">
+        <p class="story-quote" data-translate="main-story1">“After months of surviving, I felt space to breathe for the first time…”</p>
+        <p class="story-name" data-translate="main-story-name1">Emma, Participant</p>
+        <a href="/homepage/story-emma.html" class="story-button" data-translate="read-more">Read more</a>
+      </div>
+    </div>
+
+    <div class="story-card-preview">
+      <img src="/homepage/https://i.pinimg.com/736x/7d/94/62/7d9462aab53cf6a754150d18494fae93.jpg" alt="Jonas">
+      <div class="story-overlay">
+        <p class="story-quote" data-translate="main-story2">“I didn’t know that rest was something you could learn again…”</p>
+        <p class="story-name" data-translate="main-story-name2">Jonas, Participant</p>
+        <a href="/homepage/story-jonas.html" class="story-button" data-translate="read-more">Read more</a>
+      </div>
+    </div>
+
+    <div class="story-card-preview">
+      <img src="/homepage/https://i.pinimg.com/1200x/16/aa/b0/16aab04c4f6fb9b36c951e117197bfd7.jpg" alt="Noor">
+      <div class="story-overlay">
+        <p class="story-quote" data-translate="main-story3">“I discovered that recovery doesn’t have to be a straight line…”</p>
+        <p class="story-name" data-translate="main-story-name3">Noor, Participant</p>
+        <a href="/homepage/story-noor.html" class="story-button" data-translate="read-more">Read more</a>
+      </div>
+    </div>
+
+    <div class="story-card-preview">
+      <img src="/homepage/https://i.pinimg.com/736x/c3/2f/15/c32f1592ce77b4812b6868ab3bc19e4e.jpg" alt="Lars">
+      <div class="story-overlay">
+        <p class="story-quote" data-translate="main-story4">“I learned that small steps can also be progress…”</p>
+        <p class="story-name" data-translate="main-story-name4">Lars, Participant</p>
+        <a href="/homepage/story-lars.html" class="story-button" data-translate="read-more">Read more</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+-->
+
+
+  
+    <!--══✿══╡°˖✧᯽  MENTAL HEALTH AWARENESS SECTION ᯽✧˖°╞══✿══
+
+  <section class="mental-health-grid" id="mentalhealth">
+
+    <div class="mental-grid">
+
+       ... ✿°•∘ɷ∘•°✿ .. Card 1 - depression 
+      <div class="slide-card">
+        <img src="/homepage/https://images.nursinganswers.net/collections/depression.jpg" alt="">
+        <h2 data-translate="depression-h">Depression</h2>
+        <p data-translate="depression-p">
+          Feelings of deep sadness and loss of interest that affect daily life.
+        </p>
+
+        <a href="/homepage/depression.html" class="project-btn" style="margin-top:20px;">
+          <span class="IconContainer">
+            <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd">
+              <path d="M21.883 12l-7.527 6.235.644.765 9-7.521-9-7.479-.645.764 7.529 6.236h-21.884v1h21.883z"/>
+            </svg>
+          </span>
+          <p data-translate="read-more" class="text">Read More</p>
+        </a>
+      </div>
+
+       ... ✿°•∘ɷ∘•°✿ .. Card 2 - anxiety 
+      <div class="slide-card">
+        <img src="/homepage/https://www.mindwellcare.com/mt-content/uploads/2023/08/6425304.webp" alt="">
+        <h2 data-translate="Anxiety-h">Anxiety</h2>
+        <p data-translate="Anxiety-p">
+          Persistent fear or worry that makes normal situations feel overwhelming.
+        </p>
+
+        <a href="/homepage/anxiety.html" class="project-btn" style="margin-top:20px;">
+          <span class="IconContainer">
+            <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd">
+              <path d="M21.883 12l-7.527 6.235.644.765 9-7.521-9-7.479-.645.764 7.529 6.236h-21.884v1h21.883z"/>
+            </svg>
+          </span>
+          <p data-translate="read-more" class="text">Read More</p>
+        </a>
+      </div>
+
+       ... ✿°•∘ɷ∘•°✿ .. Card 3 - stress 
+      <div class="slide-card">
+        <img src="/homepage/https://img.freepik.com/free-vector/hand-drawn-adhd-illustration_23-2149372711.jpg" alt="">
+        <h2 data-translate="stress-h">Stress</h2>
+        <p data-translate="stress-p">
+          Mental and physical tension caused by high pressure or challenges.
+        </p>
+
+        <a href="/homepage/stress.html" class="project-btn" style="margin-top:20px;">
+          <span class="IconContainer">
+            <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd">
+              <path d="M21.883 12l-7.527 6.235.644.765 9-7.521-9-7.479-.645.764 7.529 6.236h-21.884v1h21.883z"/>
+            </svg>
+          </span>
+          <p data-translate="read-more" class="text">Read More</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+-->
+
+     <!--══✿══╡°˖✧᯽  ANNOUNCEMENTS SECTION   ᯽✧˖°╞══✿══-->
+
+  <section class="announcement-section">
+    <!-- Moving Border Threads -->
+    <div class="thread thread-top">
+      <div class="thread-track">ANNOUNCEMENT • ANNOUNCEMENT • ANNOUNCEMENT • ANNOUNCEMENT • ANNOUNCEMENT • ANNOUNCEMENT • ANNOUNCEMENT • ANNOUNCEMENT • ANNOUNCEMENT • ANNOUNCEMENT • ANNOUNCEMENT • ANNOUNCEMENT •</div>
+    </div>
+    <div class="thread thread-bottom">
+      <div class="thread-track">ANNOUNCEMENT • ANNOUNCEMENT • ANNOUNCEMENT • ANNOUNCEMENT • ANNOUNCEMENT • ANNOUNCEMENT • ANNOUNCEMENT • ANNOUNCEMENT • ANNOUNCEMENT • ANNOUNCEMENT • ANNOUNCEMENT • ANNOUNCEMENT • ANNOUNCEMENT • ANNOUNCEMENT • ANNOUNCEMENT • ANNOUNCEMENT •</div>
+    </div>
+
+    <div class="announcement-container">
+
+      <div class="announcement-carousel">
+
+        <!-- Slide 1 -->
+        <div class="announcement-slide">
+          <div class="announcement-media">
+            <img src="/homepage/images/Hofi Korsow tuinfeest.png" alt="Announcement Media">
+          </div>
+          <div class="announcement-content">
+            <h2>New Recovery Program Launch</h2>
+            <p>
+              We are excited to introduce our new holistic recovery pathway. 
+              This program focuses on personalized support, community building, 
+              and long-term sustainability.
+            </p>
+            <button class="announcement-btn">Read More</button>
+          </div>
+        </div>
+
+        <!-- Slide 2 -->
+        <div class="announcement-slide">
+          <div class="announcement-media">
+            <iframe
+              src="https://www.youtube.com/embed/5WuBNMItRbI?si=1Ees0ebFgmQtjoDZ&autoplay=1&loop=1&playlist=5WuBNMItRbI&controls=1&modestbranding=1&rel=0&playsinline=1&mute=1"
+              frameborder="0"
+              allow="autoplay; fullscreen"
+              allowfullscreen>
+            </iframe>
+          </div>
+          <div class="announcement-content">
+            <h2>Community Event This Month</h2>
+            <p>
+              Join us for a guided community session and open discussion.
+              This is a space to reconnect and share experiences together.
+            </p>
+            <button class="announcement-btn">Join Event</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Navigation -->
+      <div class="announcement-nav">
+        <button class="prev">←</button>
+        <button class="next">→</button>
+      </div>
+
+    </div>
+  </section>
+
+  
+
+     <!--══✿══╡°˖✧᯽  VIDEO SECTION   ᯽✧˖°╞══✿══-->
+
+  <section class="video-section">
+    <div class="video-container">
+      <h2 data-translate="video-h">Un oido pa libertad</h2>
+      <div class="video-wrapper">
+      <iframe
+        src="https://www.youtube.com/embed/34xpejifeeU?si=zj6jV3CeDMT5V2qf&autoplay=1&loop=1&playlist=34xpejifeeU&controls=1&modestbranding=1&rel=0&playsinline=1&mute=1"
+        frameborder="0"
+        allow="autoplay; fullscreen"
+        allowfullscreen>
+      </iframe>
+      </div>
+    </div>
+  </section>
+
+
+
+
+
+
+     <!--══✿══╡°˖✧᯽  FOOTER   ᯽✧˖°╞══✿══-->
+
+
+  <footer class="fancy-footer" style="margin-top: 0;">
+    <div class="footer-background-word">Hofi Korsou</div>
+
+    <div class="footer-container">
+      <div class="footer-grid">
+
+        <!-- ... ✿°•∘ɷ∘•°✿ .. LOGO + TEXT -->
+        <div class="footer-col-wide">
+          <img src="/homepage/images/HK logo no bg.png" alt="logo" class="footer-logo" />
+        </div>
+
+        <!-- ... ✿°•∘ɷ∘•°✿ .. COL 1 -->
+        <div class="footer-col">
+          <h3 data-translate="col-com">Company</h3>
+          <ul>
+            <li><a data-translate="nav-about" href="/homepage/about.html">About Us</a></li>
+            <li><a data-translate="nav-contact" href="/homepage/contact.html">Contact Us</a></li>            
+          </ul>
+        </div>
+
+        <!-- ... ✿°•∘ɷ∘•°✿ .. COL 2 -->
+        <div class="footer-col">
+          <h3 data-translate="col-por">Portals</h3>
+          <ul>
+            <li><a data-translate="Students" href="/homepage/#">Students</a></li>
+            <li><a data-translate="Teachers" href="/homepage/#">Teachers</a></li>
+          </ul>
+        </div>
+
+
+
+        <!-- ... ✿°•∘ɷ∘•°✿ .. COL 3 -->
+        <div class="footer-col">
+          <h3 data-translate="col-legal">Legal</h3>
+          <ul>
+            <li><a href="/homepage/#">Privacy Policy</a></li>
+            <li><a href="/homepage/#">Terms of Service</a></li>
+            <li><a href="/homepage/#">Cookie Policy</a></li>
+            <li><a href="/homepage/#">Security</a></li>
+          </ul>
+        </div>
+        <!-- ... ✿°•∘ɷ∘•°✿ .. COL 4 -->
+        <div class="footer-col">
+          <h3 data-translate="col-know">Quick Links </h3>
+          <ul>
+            <li><a data-translate="nav-forwho" href="/homepage/forwho.html">For whom</a></li>
+            <li><a data-translate="nav-grs" href="/homepage/green recovery space.html">Recovery Academy</a></li>
+            <li><a data-translate="nav-offer" href="/homepage/offerings.html">What we offer</a></li>
+            <li><a data-translate="nav-program" href="/homepage/program.html">Program & Activities</a></li>
+            <li><a data-translate="nav-announce" href="/homepage/projects.html">Projects</a></li>
+            <li><a data-translate="nav-stories" href="/homepage/stories.html">Personal Stories</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!--... ✿°•∘ɷ∘•°✿ .. SOCIALS -->
+
+      <div class="footer-bottom">
+        <div class="footer-social-icons">
+          <a href="/homepage/#" class="social"><i class="fab fa-facebook"></i></a>
+          <a href="/homepage/#" class="social"><i class="fab fa-youtube"></i></a>
+          <a href="/homepage/#" class="social"><i class="fab fa-linkedin"></i></a>
+          <a href="/homepage/#" class="social"><i class="fab fa-whatsapp"></i></a>
+        </div>
+
+        <!-- ✿ Email Subscription -->
+        <div class="footer-subscribe">
+          <p class="subscribe-text">
+            Subscribe to receive weekly news and updates about Green Recovery Space.
+          </p>
+
+          <form class="subscribe-form">
+            <input 
+              type="email" 
+              placeholder="Fill in your email" 
+              required
+            />
+            <button type="submit">Subscribe</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+
+
+    <script src="/homepage/JS/script.js"></script>
+    <script src="/homepage/JS/lang-translation.js"></script>    <script>
+      document.querySelectorAll(".lang-menu li").forEach(item => {
+        item.addEventListener("click", function () {
+          const lang = this.getAttribute("data-lang");
+          setLanguage(lang);
+        });
+      });
+    </script>
 </body>
 </html>
-
-
-
-
-
-
