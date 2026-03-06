@@ -649,7 +649,7 @@ html,body {
     align-items: center;
     height: 128vh;
     overflow: visible; 
-    background: #e0f8f4;
+    background-color: var(--bg-green);
 }
 
 .parallax-hero img {
