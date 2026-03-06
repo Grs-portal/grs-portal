@@ -68,6 +68,7 @@
         <li class="mobile-profile">
           <a href="/homepage/Portal.html" class="profile">
             <img src="/homepage/images/unkown.png" alt="User profile">
+            <p class="profile-text">Sign in</p>
           </a>
         </li>
 
@@ -93,13 +94,11 @@
 .section-title {
   font-size: 2.2rem;
   color: #2e5e4e;
-  margin-bottom: 1.2rem;
   text-align: center;
 }
 
 .section-intro {
   max-width: 700px;
-  margin: 0 auto 3rem auto;
   text-align: center;
   line-height: 1.7;
 }
@@ -109,14 +108,13 @@
   display: grid;
   grid-template-columns: 260px 1fr;
   gap: 2rem;
-  padding: 2rem;
-}
+  padding: 0 1rem;}
 
 .programs-sidebar {
   align-self: start;
   position: sticky;
   background: #ffffff;
-  padding: 1.5rem;
+  padding: 1.5rem ;
   border-radius: 10px;
   border: 1px solid #ddd;
 }
@@ -195,8 +193,8 @@
   display: inline-block;
   margin-top: 10px;
   padding: 8px 14px;
-  background: #92dacc;
-  color: var(--bg-green);
+  background: var(--accent-2);
+  color: var(--white);
   text-decoration: none;
   border-radius: 6px;
   font-size: 0.9rem;
@@ -330,176 +328,10 @@
 }
 
 
-/* ‿︵‿︵✿══╡°˖✧୨˚̣̣̣͙୧ REGISTRATION FORM ୨˚̣̣̣͙୧‿╞══✿︵‿︵‿ */
-
-.registration-section {
-  padding: 0 6.5rem 0 6.5rem;
-  text-align: center;
-}
-
-
-/* ... ✿°•∘ɷ∘•°✿ .. Forms */
-
-.registration-form {
-  max-height: 0;
-  overflow: hidden;
-  opacity: 0;
-  transition: max-height 0.5s ease, opacity 0.4s ease;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.registration-form.open {
-  max-height: 900px;
-  opacity: 1;
-}
-
-.modal-box {
-  background: #fff;
-  padding: 2rem;
-  border-radius: 8px;
-  max-width: 500px;
-  width: 90%;
-  position: relative;
-}
-
-.modal-close {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  background: transparent;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-
-
-.modal-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 51, 41, 0.35);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(6px);
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-  z-index: 999;
-}
-
-
-.modal-overlay.active {
-  backdrop-filter: blur(8px);
-  background: rgba(0, 51, 41, 0.35);
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.modal-form label {
-  display: flex;
-  flex-direction: column;
-  font-size: 0.9rem;
-  color: var(--bg-green);
-}
-
-.modal-form input,
-.modal-form textarea {
-  margin-top: 6px;
-  padding: 10px 14px;
-  border-radius: 8px;
-  border: 1px solid #b3c4b3;
-  font-size: 1rem;
-  outline: none;
-  transition: border-color 0.3s, box-shadow 0.3s;
-}
-
-.modal-form input:focus,
-.modal-form textarea:focus {
-  border-color: #4d8658;
-  box-shadow: 0 0 0 3px rgba(77, 134, 88, 0.2);
-}
-
-.submit-button {
-  margin-top: 16px;
-  padding: 12px 18px;
-  background: #4d8658;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background 0.3s;
-}
-
-.submit-button:hover {
-  background: #3b6944;
-}
-
-
-/*... ✿°•∘ɷ∘•°✿ .. Buttons */
-
-.registration-card {
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-  width: 50%;
-}
-
-
-.registration-box {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-}
-
-.choice-button {
-  all: unset;
-  cursor: pointer;
-
-  background: #e6f2ea;
-  border-radius: 12px;
-
-  width: 190px;
-  height: 50px;
-  padding: 0 16px;
-  margin-top: 15px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  color: #223919;
-  transition: background 0.3s ease, transform 0.2s ease;
-}
-
-.icon-form {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-
-.icon-form svg {
-  width: 22px;
-  height: 22px;
-  flex-shrink: 0;
-}
-
-
-.choice-button:hover {
-  background: #d6ebe0;
-  transform: translateY(-2px);
-}
-
-
-
 .programs-offerings {
   max-width: 95%;
-  margin: 0 auto 0px auto;
   padding: 2rem;
+  margin: 0 auto 1rem auto;
   background: #fff;
   border-radius: 14px;
   box-shadow: 4px 4px 4px 4px rgba(165, 188, 177, 0.068);
@@ -546,6 +378,178 @@
 
 .offerings-content p {
   margin-bottom: 1rem;
+}
+
+/* FILTER TOGGLE (hidden on desktop) */
+
+.filter-toggle{
+  display:none;
+  width:100%;
+  background:white;
+  border:none;
+  border-radius:10px;
+  padding:14px;
+  font-size:1.2rem;
+  font-weight:600;
+  color:#3b6944;
+
+  justify-content:space-between;
+  align-items:center;
+  cursor:pointer;
+}
+
+
+/* MOBILE LAYOUT */
+
+@media(max-width:850px){
+
+  .programs-container{
+    grid-template-columns:1fr;
+    gap:1.5rem;
+  }
+
+  .filter-toggle{
+    display:flex;
+  }
+
+  .programs-sidebar{
+    max-height:0;
+    overflow:hidden;
+    opacity:0;
+    transition:max-height .5s ease, opacity .3s ease;
+  }
+
+  .programs-sidebar.open{
+    max-height:1200px;
+    opacity:1;
+  }
+
+}
+
+/* MOBILE RESPONSIVENESS */
+@media(max-width: 850px) {
+
+  /* Container becomes single-column */
+  .programs-container {
+    grid-template-columns: 1fr;
+    margin: 0 0 20px 0;
+  }
+
+  /* Sidebar moves below registration section */
+  .programs-sidebar {
+    position: static;
+    width: 100%;
+  }
+
+  /* Program cards slightly smaller */
+  .programs-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+  }
+
+  .program-card img {
+    height: 180px;
+  }
+
+  .program-content {
+    padding: 0.8rem;
+  }
+
+  .program-content h4 {
+    font-size: 1rem;
+  }
+
+  .program-description {
+    font-size: 0.85rem;
+  }
+
+  .program-meta {
+    font-size: 0.75rem;
+  }
+
+  .program-button {
+    font-size: 0.85rem;
+    padding: 6px 12px;
+  }
+
+  /* Registration Section */
+  .registration-section {
+    padding: 0 1.5rem;
+  }
+
+  /* Registration buttons stacked */
+  .registration-card,
+  .registration-box {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .choice-button {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  /* Offerings toggle content spacing */
+  .offerings-toggle {
+    font-size: 1.5rem;
+  }
+
+  /* Filter toggle visible and placed under registration */
+  .filter-toggle {
+    display: flex;
+    margin-top: 1rem;
+    padding: 12px;
+    font-size: 1rem;
+  }
+
+  /* Calendar */
+  .programs-calendar {
+    padding: 1rem;
+  }
+
+  .calendar-item {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .calendar-date {
+    font-size: 0.85rem;
+  }
+
+  .calendar-grid {
+    grid-template-columns: repeat(7, 1fr);
+    font-size: 0.65rem;
+  }
+}
+
+/* SMALLER DEVICES */
+@media(max-width: 500px) {
+
+  .programs-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .program-card img {
+    height: 160px;
+  }
+
+  .section-title {
+    font-size: 1.8rem;
+  }
+
+  .section-intro {
+    font-size: 0.95rem;
+    padding: 0 1rem;
+  }
+
+  .filter-toggle {
+    font-size: 0.95rem;
+    padding: 10px;
+  }
+
+  .choice-button {
+    height: 45px;
+  }
 }
 
 </style>
@@ -625,6 +629,21 @@
 <!-- 🌱 OUR OFFERINGS -->
 <main class="programs-container" style="background-color: #f4faf7;">
 
+<!-- MOBILE FILTER TOGGLE -->
+<button class="filter-toggle" id="filterToggle">
+  <span>Filter Programs</span>
+
+  <span class="toggle-icon">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <path d="M2.99854 7.00153L12.0006 17.0027L21.0027 7.00153"
+      stroke="#4d8658"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"/>
+    </svg>
+  </span>
+</button>
+
   <!-- SIDEBAR -->
   <aside class="programs-sidebar">
     <h3>Filter Programs</h3>
@@ -696,38 +715,6 @@
 
   <!-- MAIN CONTENT -->
   <section class="programs-main">
-
-    <!-- ══✿══ UPCOMING PROGRAM REGISTRATION ══✿══ -->
-
-<section class="upcoming-registration">
-
-  <div class="card">
-    <h3 class="card-title" style="text-align: center;">Register</h3>
-    <p style="text-align: center; width: 80%; margin: auto;">
-      Whether you're looking for support with your recovery or want to contribute to Green Recovery Space, we always start with a short introduction. Complete the registration form and we'll contact you within 2-3 business days.
-    </p>
-
-    <div class="registration-box">
-      <button class="choice-button" data-modal="participant">
-        <div class="icon-form">
-          <svg fill="#283a22" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg" stroke="#283a22"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M 28.0117 27.3672 C 33.0508 27.3672 37.3867 22.8672 37.3867 17.0078 C 37.3867 11.2187 33.0274 6.9297 28.0117 6.9297 C 22.9961 6.9297 18.6367 11.3125 18.6367 17.0547 C 18.6367 22.8672 22.9961 27.3672 28.0117 27.3672 Z M 13.2930 49.0703 L 42.7305 49.0703 C 46.4101 49.0703 47.7226 48.0156 47.7226 45.9531 C 47.7226 39.9062 40.1523 31.5625 28.0117 31.5625 C 15.8477 31.5625 8.2774 39.9062 8.2774 45.9531 C 8.2774 48.0156 9.5898 49.0703 13.2930 49.0703 Z"></path></g></svg>
-          <span style="text-align: center;">Be part of the recovery</span>      
-      </div>
-        
-      </button>
-
-      <button class="choice-button" data-modal="collaborator">
-        <div class="icon-form">
-          <svg version="1.1" id="_x32_" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" xml:space="preserve" fill="#354d2d" stroke="#354d2d"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <style type="text/css"> .st0{fill:#283a22;} </style> <g> <path class="st0" d="M470.537,137.504H41.471C18.565,137.504,0,156.077,0,178.976v56.797l211.507,44.607V252.1h87.772v28.28 L512,235.489v-56.513C512,156.077,493.435,137.504,470.537,137.504z"></path> <path class="st0" d="M299.279,369.129h-87.772v-57.017L14.633,273.012V439.81c0,22.898,18.557,41.47,41.455,41.47h399.824 c22.898,0,41.463-18.572,41.463-41.47V272.721l-198.096,39.39V369.129z"></path> <rect x="233.452" y="274.044" class="st0" width="43.882" height="73.132"></rect> <path class="st0" d="M193.786,72.206c0.008-1.703,0.638-3.057,1.75-4.208c1.127-1.103,2.49-1.718,4.176-1.734h112.577 c1.686,0.016,3.058,0.631,4.185,1.734c1.103,1.151,1.726,2.505,1.733,4.208v29.627h35.546V72.206 c0.008-11.41-4.665-21.875-12.143-29.329c-7.446-7.485-17.934-12.166-29.321-12.158H199.712 c-11.394-0.008-21.875,4.673-29.32,12.158c-7.47,7.454-12.158,17.918-12.135,29.329v29.627h35.529V72.206z"></path> </g> </g></svg>      
-          <span>Collaborate with us</span>
-        </div>
-        </button>
-    </div>
-  </div>
-
-</section>
-
-
 
     <!-- PROGRAM GRID -->
     <div class="programs-grid">
@@ -823,33 +810,7 @@
       </div>
     </div>
 
-    <div class="modal-overlay" id="greenRecoveryModal">
-      <div class="modal-box">
-        <button class="modal-close">✕</button>
-        <h4>Green Recovery Program Registration</h4>
 
-        <form class="modal-form">
-
-          <label>Full Name
-            <input type="text" required>
-          </label>
-
-          <label>Email
-            <input type="email" required>
-          </label>
-
-          <label>Phone
-            <input type="tel" required>
-          </label>
-
-          <label>Why are you interested?
-            <textarea></textarea>
-          </label>
-
-          <button type="submit" class="submit-button">Submit Registration</button>
-        </form>
-      </div>
-    </div>
 
 
 
@@ -884,23 +845,14 @@
         <div class="footer-col">
           <h3 data-translate="col-por">Portals</h3>
           <ul>
-            <li><a data-translate="Students" href="/homepage/#">Students</a></li>
-            <li><a data-translate="Teachers" href="/homepage/#">Teachers</a></li>
-            <li><a data-translate="Managers" href="/homepage/#">Managers</a></li>
+            <li><a data-translate="Students" href="/homepage/login-students.html">Students</a></li>
+            <li><a data-translate="Teachers" href="/homepage/login-teachers.html">Teachers</a></li>
           </ul>
         </div>
+
+
 
         <!-- ... ✿°•∘ɷ∘•°✿ .. COL 3 -->
-        <div class="footer-col">
-          <h3 data-translate="col-know">Knowledge</h3>
-          <ul>
-            <li><a data-translate="nav-courses" href="/homepage/#">Courses</a></li>
-            <li><a data-translate="nav-projects" href="/homepage/#">Projects</a></li>
-          </ul>
-        </div>
-
-
-        <!-- ... ✿°•∘ɷ∘•°✿ .. COL 4 -->
         <div class="footer-col">
           <h3 data-translate="col-legal">Legal</h3>
           <ul>
@@ -908,6 +860,18 @@
             <li><a href="/homepage/#">Terms of Service</a></li>
             <li><a href="/homepage/#">Cookie Policy</a></li>
             <li><a href="/homepage/#">Security</a></li>
+          </ul>
+        </div>
+        <!-- ... ✿°•∘ɷ∘•°✿ .. COL 4 -->
+        <div class="footer-col">
+          <h3 data-translate="col-know">Quick Links </h3>
+          <ul>
+            <li><a data-translate="nav-forwho" href="/homepage/forwho.html">For whom</a></li>
+            <li><a data-translate="nav-grs" href="/homepage/green recovery space.html">Recovery Academy</a></li>
+            <li><a data-translate="nav-offer" href="/homepage/offerings.html">What we offer</a></li>
+            <li><a data-translate="nav-program" href="/homepage/program.html">Program & Activities</a></li>
+            <li><a data-translate="nav-announce" href="/homepage/projects.html">Projects</a></li>
+            <li><a data-translate="nav-stories" href="/homepage/stories.html">Personal Stories</a></li>
           </ul>
         </div>
 
@@ -918,30 +882,22 @@
       <div class="footer-bottom">
         <div class="footer-social-icons">
           <a href="/homepage/#" class="social"><i class="fab fa-facebook"></i></a>
-          <a href="/homepage/#" class="social"><i class="fab fa-tiktok"></i></a>
-          <a href="/homepage/#" class="social"><i class="fab fa-instagram"></i></a>
+          <a href="/homepage/#" class="social"><i class="fab fa-youtube"></i></a>
           <a href="/homepage/#" class="social"><i class="fab fa-linkedin"></i></a>
-          <a href="/homepage/#" class="social"><i class="fab fa-email"></i></a>
-        </div>
-
-        <!-- ✿ Email Subscription -->
-        <div class="footer-subscribe">
-          <p class="subscribe-text">
-            Subscribe to receive weekly news and updates about Green Recovery Space.
-          </p>
-
-          <form class="subscribe-form">
-            <input 
-              type="email" 
-              placeholder="Fill in your email" 
-              required
-            />
-            <button type="submit">Subscribe</button>
-          </form>
+          <a href="/homepage/#" class="social"><i class="fab fa-whatsapp"></i></a>
         </div>
       </div>
     </div>
   </footer>
+
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+
+
+    <script src="/homepage/JS/script.js"></script>
+    <script src="/homepage/JS/lang-translation.js"></script>  
 
 <script>
 const modalButtons = document.querySelectorAll('.choice-button');
@@ -982,6 +938,17 @@ modalOverlays.forEach(overlay => {
   toggleBtn.addEventListener("click", () => {
     content.classList.toggle("open");
     icon.classList.toggle("rotate");
+  });
+
+  const filterToggle = document.getElementById("filterToggle");
+  const filterSidebar = document.querySelector(".programs-sidebar");
+  const filterIcon = filterToggle.querySelector(".toggle-icon");
+
+  filterToggle.addEventListener("click", () => {
+
+    filterSidebar.classList.toggle("open");
+    filterIcon.classList.toggle("rotate");
+
   });
 
 </script>
