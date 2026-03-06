@@ -485,109 +485,110 @@
 
     <!-- Scrollable Body -->
     <div class="p-6 overflow-y-auto">
-
       <form id="courseForm" class="space-y-4">
-
+      
         <!-- Title -->
         <div>
           <label class="text-sm font-semibold">Title</label>
-          <input type="text" id="courseTitle"
-            class="w-full border rounded-xl p-2 mt-1" required>
+          <input type="text" id="courseTitle" class="w-full border rounded-xl p-2 mt-1" required>
         </div>
-
+      
         <!-- Description -->
         <div>
           <label class="text-sm font-semibold">Description</label>
-          <textarea id="courseDescription" rows="3"
+          <textarea id="courseDescription" rows="4"
             class="w-full border rounded-xl p-2 mt-1" required></textarea>
         </div>
-
-        <!-- Cover -->
+      
+        <!-- Cover Image -->
         <div>
           <label class="text-sm font-semibold">Cover Image</label>
-          <input type="file" id="courseCover"
-            accept="image/*" class="w-full mt-1">
+          <input type="file" id="courseCover" accept="image/*" class="w-full mt-1">
         </div>
-
+      
         <!-- Duration -->
         <div class="flex gap-2">
           <div class="flex-1">
             <label class="text-sm font-semibold">Duration</label>
-            <input type="number" id="courseDurationValue"
-              class="w-full border rounded-xl p-2 mt-1" required>
+            <input type="number" id="courseDurationValue" class="w-full border rounded-xl p-2 mt-1" required>
           </div>
           <div class="flex-1">
             <label class="text-sm font-semibold">Unit</label>
-            <select id="courseDurationUnit"
-              class="w-full border rounded-xl p-2 mt-1">
+            <select id="courseDurationUnit" class="w-full border rounded-xl p-2 mt-1">
               <option>Minutes</option>
               <option>Hours</option>
               <option>Days</option>
-              <option>Weeks</option>
             </select>
           </div>
         </div>
-
-        <!-- Location -->
+      
+        <!-- Sessions -->
+        <div class="flex gap-2">
+          <div class="flex-1">
+            <label class="text-sm font-semibold">Sessions</label>
+            <input type="number" id="courseSessionsValue" class="w-full border rounded-xl p-2 mt-1" required>
+          </div>
+          <div class="flex-1">
+            <label class="text-sm font-semibold">Unit</label>
+            <select id="courseSessionsUnit" class="w-full border rounded-xl p-2 mt-1">
+              <option>Daily</option>
+              <option>Weekly</option>
+              <option>Monthly</option>
+            </select>
+          </div>
+        </div>
+      
+        <!-- Program Type -->
         <div>
-          <label class="text-sm font-semibold">Location</label>
-          <select id="courseLocation"
-            class="w-full border rounded-xl p-2 mt-1">
-            <option value="online">Online</option>
-            <option value="in-person">In Person</option>
-            <option value="both">Both</option>
+          <label class="text-sm font-semibold">Program Type</label>
+          <select id="courseType" class="w-full border rounded-xl p-2 mt-1">
+            <option value="course">Course</option>
+            <option value="workshop">Workshop</option>
+            <option value="activity">Activity</option>
           </select>
         </div>
-
-        <!-- Type -->
-        <div id="typeWrapper">
-          <label class="text-sm font-semibold">Course Type</label>
-          <select id="courseType"
-            class="w-full border rounded-xl p-2 mt-1">
-            <option value="video">Video</option>
-            <option value="readable">Readable</option>
+      
+        <!-- Theme -->
+        <div>
+          <label class="text-sm font-semibold">Theme</label>
+          <select id="courseTheme" class="w-full border rounded-xl p-2 mt-1">
+            <option>Theme 1</option>
+            <option>Theme 2</option>
+            <option>Theme 3</option>
+            <option>Theme 4</option>
           </select>
         </div>
-
-        <!-- Chapters -->
+      
+        <!-- What You Offer -->
         <div>
-          <label class="text-sm font-semibold">Amount of Chapters</label>
-          <input type="number" id="courseChapters"
-            class="w-full border rounded-xl p-2 mt-1" required>
+          <label class="text-sm font-semibold">What You Offer</label>
+          <select id="courseOffer" class="w-full border rounded-xl p-2 mt-1">
+            <option>Option 1</option>
+            <option>Option 2</option>
+            <option>Option 3</option>
+            <option>Option 4</option>
+          </select>
         </div>
-
-        <!-- Preview -->
-        <div>
-          <label class="text-sm font-semibold">Preview Chapter Title</label>
-          <input type="text" id="coursePreview"
-            class="w-full border rounded-xl p-2 mt-1" required>
-        </div>
-
+      
         <!-- Status -->
         <div>
           <label class="text-sm font-semibold">Status</label>
-          <select id="courseStatus"
-            class="w-full border rounded-xl p-2 mt-1">
+          <select id="courseStatus" class="w-full border rounded-xl p-2 mt-1">
             <option value="draft">Draft</option>
             <option value="not-started">Upcoming</option>
             <option value="ongoing">Ongoing</option>
             <option value="finished">Completed</option>
           </select>
         </div>
-
+      
         <!-- Buttons -->
         <div class="flex justify-end gap-2 pt-4">
-          <button type="button"
-            class="px-4 py-2 rounded-xl border"
-            id="saveDraftBtn">
+          <button type="button" class="px-4 py-2 rounded-xl border" id="saveDraftBtn">
             Save as Draft
           </button>
-          <button type="submit"
-            class="btn-primary">
-            Publish Course
-          </button>
+          <button type="submit" class="btn-primary">Publish Course</button>
         </div>
-
+      
       </form>
     </div>
   </div>
@@ -601,6 +602,7 @@
 <script src="/instructor/script.js" defer></script>
 </body>
 </html>
+
 
 
 
