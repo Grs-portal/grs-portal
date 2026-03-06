@@ -278,10 +278,11 @@ document.addEventListener("DOMContentLoaded", () => {
         cover: coverURL,
         durationValue: qs("#courseDurationValue").value,
         durationUnit: qs("#courseDurationUnit").value,
-        location: qs("#courseLocation").value,
-        type: qs("#courseLocation").value === "in-person" ? null : qs("#courseType").value,
-        chapters: qs("#courseChapters").value ? [ { title: qs("#courseChapters").value } ] : [],
-        previewTitle: qs("#coursePreview").value,
+        sessionsValue: qs("#courseSessionsValue").value,
+        sessionsUnit: qs("#courseSessionsUnit").value,
+        type: qs("#courseType").value,
+        theme: qs("#courseTheme").value,
+        offer: qs("#courseOffer").value,
         status: finalStatus
       };
 
@@ -323,99 +324,45 @@ document.addEventListener("DOMContentLoaded", () => {
   /* =========================
      COURSE DETAIL PAGE
   ========================= */
-  function openCourseDetail(courseId) {
-    closeAllSidebars();
+function openCourseDetail(courseId) {
+  closeAllSidebars();
 
-    const courses = JSON.parse(localStorage.getItem("instructor_courses") || "[]");
-    const course = courses.find(c => c.id === courseId);
-    if (!course) return;
+  const courses = JSON.parse(localStorage.getItem("instructor_courses") || "[]");
+  const course = courses.find(c => c.id === courseId);
+  if (!course) return;
 
-    const container = qs("#courseDetailContainer");
-    if (!container) return;
-
-    const chaptersCount = Array.isArray(course.chapters) ? course.chapters.length : Number(course.chapters) || 0;
-
-    container.innerHTML = `
-      <div class="bg-white rounded-2xl overflow-hidden shadow-sm">
-
-        <!-- HERO -->
-        <div class="relative h-72 w-full">
-          <img src="${course.cover || 'https://via.placeholder.com/1200x400'}"
-               class="w-full h-full object-cover">
-          <button id="editCourseTopBtn"
-            class="absolute top-4 right-4 bg-black text-white px-4 py-2 rounded-xl text-sm">
-            Edit Course
-          </button>
-        </div>
-
-        <!-- CONTENT -->
-        <div class="p-8">
-          <h1 class="text-3xl font-bold mb-2">${course.title}</h1>
-          <span class="inline-block bg-gray-100 px-3 py-1 rounded-full text-xs mb-4">${course.type || "Course"}</span>
-          <p class="text-gray-700 mb-6">${course.description}</p>
-
-          <div class="flex items-center gap-4 mb-8">
-            <img src="${localStorage.getItem("userPhoto") || 'https://via.placeholder.com/60'}" class="w-14 h-14 rounded-full object-cover">
-            <span class="font-semibold">${localStorage.getItem("userName") || "Instructor"}</span>
+  const container = qs("#courseDetailContainer");
+  container.innerHTML = `
+    <div class="glass rounded-2xl overflow-hidden">
+      <img src="${course.cover || 'https://via.placeholder.com/1200x400'}" class="w-full h-60 object-cover">
+      <div class="p-6">
+        <h1 class="text-3xl font-bold mb-4">${course.title}</h1>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div class="glass p-4 rounded-xl text-center">
+            <div class="text-xl font-bold">${course.sessionsValue}</div>
+            <div class="text-xs uppercase opacity-60">${course.sessionsUnit}</div>
           </div>
-
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-            <div class="glass p-4 rounded-xl text-center">
-              <div class="text-xl font-bold">${course.durationValue || 0}</div>
-              <div class="text-xs uppercase opacity-60">Duration</div>
-            </div>
-
-            <div class="glass p-4 rounded-xl text-center">
-              <div class="text-xl font-bold">${chaptersCount}</div>
-              <div class="text-xs uppercase opacity-60">Chapters</div>
-            </div>
-
-            <div class="glass p-4 rounded-xl text-center">
-              <div class="text-xs font-semibold">${course.location}</div>
-              <div class="text-xs uppercase opacity-60">Location</div>
-            </div>
-
-            <div class="glass p-4 rounded-xl text-center">
-              <div class="text-xs font-semibold">${course.type || "-"}</div>
-              <div class="text-xs uppercase opacity-60">Type</div>
-            </div>
+          <div class="glass p-4 rounded-xl text-center">
+            <div class="text-xl font-bold">${course.durationValue}</div>
+            <div class="text-xs uppercase opacity-60">${course.durationUnit}</div>
           </div>
-
-          <div class="mb-12">
-            <div class="flex justify-between items-center mb-4">
-              <h2 class="text-xl font-bold">Chapters</h2>
-              <button id="addChapterBtn" class="bg-green-600 text-white px-4 py-2 rounded-xl text-sm">Add Chapter</button>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              ${(Array.isArray(course.chapters) ? course.chapters : []).map(ch => `
-                <div class="bg-gray-50 rounded-xl overflow-hidden relative cursor-pointer">
-                  <img src="${ch.cover || 'https://via.placeholder.com/300x200'}" class="w-full h-32 object-cover">
-                  ${ch.preview
-                    ? `<span class="absolute top-2 right-2 bg-green-600 text-white text-xs px-2 py-1 rounded">Preview</span>`
-                    : `<span class="absolute top-2 right-2 bg-black text-white text-xs px-2 py-1 rounded">Locked</span>`}
-                  <div class="p-3">
-                    <h4 class="font-semibold">${ch.title}</h4>
-                    <p class="text-xs opacity-60">${ch.duration || ""}</p>
-                  </div>
-                </div>
-              `).join("")}
-            </div>
+          <div class="glass p-4 rounded-xl text-center">
+            <div class="text-xs font-semibold">${course.theme}</div>
+            <div class="text-xs uppercase opacity-60">Theme</div>
           </div>
-
-          <div>
-            <h2 class="text-xl font-bold mb-4">Reviews</h2>
-            <div id="reviewSummary" class="mb-6"></div>
-            <div id="reviewsList"></div>
+          <div class="glass p-4 rounded-xl text-center">
+            <div class="text-xs font-semibold">${course.offer}</div>
+            <div class="text-xs uppercase opacity-60">Offering</div>
           </div>
         </div>
+        <p class="text-gray-700 whitespace-pre-wrap">${course.description}</p>
       </div>
-    `;
-
-    renderReviewsSection(course);
-    showPage("course-detail");
-  }
+    </div>
+    <button id="backToCourses" class="mt-4 btn-primary">Back</button>
+  `;
 
   qs("#backToCourses").onclick = () => showPage("my-courses");
+}
 
     /* =========================
      NAVIGATION CLICK HANDLER (FIX)
@@ -470,4 +417,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
   
 });
+
 
