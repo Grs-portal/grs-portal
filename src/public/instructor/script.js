@@ -31,13 +31,13 @@ SIDEBAR CONTROL
 function closeAllSidebars(){
   mainSidebar.classList.remove("active");
   coursesSidebar.classList.remove("active");
-  overlay.classList.add("hidden");
+  overlay.classList.remove("active");
 }
 
 function openMainSidebar(){
   coursesSidebar.classList.remove("active");
   mainSidebar.classList.add("active");
-  if(window.innerWidth < 1024) overlay.classList.remove("hidden");
+  if(window.innerWidth < 1024) overlay.classList.add("active");
 }
 
 function openCoursesSidebar(){
@@ -505,3 +505,4 @@ buildCoursesSidebar();
 showPage("dashboard");
 
 });
+
