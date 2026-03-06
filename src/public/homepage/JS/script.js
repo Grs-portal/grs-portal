@@ -88,3 +88,134 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+
+/*══✿══╡°˖✧᯽   MOBILE GRS ABOUT CARDS CAROUSEL ᯽✧˖°╞══✿══*/
+
+
+document.addEventListener("DOMContentLoaded", function(){
+
+  if(window.innerWidth > 850) return;
+
+  const container = document.querySelector(".cards-cillinder-grs");
+  const cards = Array.from(document.querySelectorAll(".about-cards"));
+  const next = document.querySelector(".carousel-arrow.right");
+  const prev = document.querySelector(".carousel-arrow.left");
+
+  let index = 1; // start at first real card
+
+  // clone first and last
+  const firstClone = cards[0].cloneNode(true);
+  const lastClone = cards[cards.length - 1].cloneNode(true);
+
+  container.appendChild(firstClone);
+  container.insertBefore(lastClone, container.firstChild);
+
+  const cardWidth = cards[0].offsetWidth + 20;
+  container.scrollLeft = cardWidth * index;
+
+  let isSliding = false;
+
+  function goToCard(i){
+    if(isSliding) return;
+    isSliding = true;
+
+    container.scrollTo({
+      left: cardWidth * i,
+      behavior: "smooth"
+    });
+
+    setTimeout(() => {
+      // seamless loop jump
+      if(i === 0){ // jumped to lastClone
+        container.style.scrollBehavior = 'auto'; // disable animation
+        container.scrollLeft = cardWidth * cards.length;
+        index = cards.length;
+        container.style.scrollBehavior = 'smooth'; // restore animation
+      } else if(i === cards.length + 1){ // jumped to firstClone
+        container.style.scrollBehavior = 'auto';
+        container.scrollLeft = cardWidth * 1;
+        index = 1;
+        container.style.scrollBehavior = 'smooth';
+      } else {
+        index = i;
+      }
+
+      isSliding = false;
+    }, 350); // match smooth scroll duration
+  }
+
+  function nextCard(){ goToCard(index + 1); }
+  function prevCard(){ goToCard(index - 1); }
+
+  next.addEventListener("click", nextCard);
+  prev.addEventListener("click", prevCard);
+
+  setInterval(nextCard, 4000);
+});
+
+
+/*══✿══╡°˖✧᯽   MOBILE ABOUT CARDS CAROUSEL ᯽✧˖°╞══✿══*/
+
+document.addEventListener("DOMContentLoaded", function() {
+
+  if (window.innerWidth > 850) return; // only mobile
+
+  const container = document.querySelector(".cards-cillinder-about");
+  const cards = Array.from(document.querySelectorAll(".about-cards"));
+  const next = document.querySelector(".about-cards-c .carousel-arrow.right");
+  const prev = document.querySelector(".about-cards-c .carousel-arrow.left");
+
+  if (!container || cards.length === 0) return;
+
+  let index = 1; // start at first real card
+
+  // Clone first and last for seamless loop
+  const firstClone = cards[0].cloneNode(true);
+  const lastClone = cards[cards.length - 1].cloneNode(true);
+
+  container.appendChild(firstClone);
+  container.insertBefore(lastClone, container.firstChild);
+
+  const cardWidth = cards[0].offsetWidth + 20; // adjust spacing if needed
+  container.scrollLeft = cardWidth * index;
+
+  let isSliding = false;
+
+  function goToCard(i) {
+    if (isSliding) return;
+    isSliding = true;
+
+    container.scrollTo({
+      left: cardWidth * i,
+      behavior: "smooth"
+    });
+
+    setTimeout(() => {
+      // seamless jump
+      if (i === 0) {
+        container.style.scrollBehavior = "auto";
+        container.scrollLeft = cardWidth * cards.length;
+        index = cards.length;
+        container.style.scrollBehavior = "smooth";
+      } else if (i === cards.length + 1) {
+        container.style.scrollBehavior = "auto";
+        container.scrollLeft = cardWidth * 1;
+        index = 1;
+        container.style.scrollBehavior = "smooth";
+      } else {
+        index = i;
+      }
+
+      isSliding = false;
+    }, 350); // match smooth scroll duration
+  }
+
+  function nextCard() { goToCard(index + 1); }
+  function prevCard() { goToCard(index - 1); }
+
+  next.addEventListener("click", nextCard);
+  prev.addEventListener("click", prevCard);
+
+  setInterval(nextCard, 4000); // auto-slide every 4s
+});
