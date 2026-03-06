@@ -133,7 +133,6 @@ document.addEventListener("DOMContentLoaded", () => {
     qs("#newCourseBtn").onclick = () => Courses.openModal();
     qs("#backDashboardBtn").onclick = () => showPage("dashboard");
 
-    // FILTER LOGIC
     const searchInput = qs("#searchCourse");
     const statusFilter = qs("#statusFilter");
     const locationFilter = qs("#locationFilter");
@@ -162,8 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const modal = qs("#courseModal");
     const form = qs("#courseForm");
 
-    const saveCourses = () =>
-      localStorage.setItem(KEY, JSON.stringify(courses));
+    const saveCourses = () => localStorage.setItem(KEY, JSON.stringify(courses));
 
     /* ===== MODAL ===== */
     function openModal() {
@@ -202,7 +200,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       let filteredCourses = [...courses];
 
-      // APPLY FILTERS
       if (filters.search) filteredCourses = filteredCourses.filter(c =>
         c.title.toLowerCase().includes(filters.search.toLowerCase())
       );
@@ -240,10 +237,7 @@ document.addEventListener("DOMContentLoaded", () => {
       `).join("");
 
       container.querySelectorAll(".course-card").forEach(card => {
-        card.addEventListener("click", () => {
-          const id = card.dataset.id;
-          openCourseDetail(id);
-        });
+        card.addEventListener("click", () => openCourseDetail(card.dataset.id));
       });
     }
 
@@ -255,7 +249,6 @@ document.addEventListener("DOMContentLoaded", () => {
         createdAt: new Date().toISOString(),
         chapters: Array.isArray(data.chapters) ? data.chapters : []
       };
-
       courses.push(newCourse);
       saveCourses();
       render();
@@ -291,7 +284,6 @@ document.addEventListener("DOMContentLoaded", () => {
       openCourseDetail(newCourse.id);
     });
 
-    /* ===== DRAFT BUTTON ===== */
     qs("#saveDraftBtn").onclick = () => {
       forceDraft = true;
       form.requestSubmit();
@@ -324,48 +316,47 @@ document.addEventListener("DOMContentLoaded", () => {
   /* =========================
      COURSE DETAIL PAGE
   ========================= */
-function openCourseDetail(courseId) {
-  closeAllSidebars();
+  function openCourseDetail(courseId) {
+    closeAllSidebars();
+    const courses = JSON.parse(localStorage.getItem("instructor_courses") || "[]");
+    const course = courses.find(c => c.id === courseId);
+    if (!course) return;
 
-  const courses = JSON.parse(localStorage.getItem("instructor_courses") || "[]");
-  const course = courses.find(c => c.id === courseId);
-  if (!course) return;
-
-  const container = qs("#courseDetailContainer");
-  container.innerHTML = `
-    <div class="glass rounded-2xl overflow-hidden">
-      <img src="${course.cover || 'https://via.placeholder.com/1200x400'}" class="w-full h-60 object-cover">
-      <div class="p-6">
-        <h1 class="text-3xl font-bold mb-4">${course.title}</h1>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div class="glass p-4 rounded-xl text-center">
-            <div class="text-xl font-bold">${course.sessionsValue}</div>
-            <div class="text-xs uppercase opacity-60">${course.sessionsUnit}</div>
+    const container = qs("#courseDetailContainer");
+    container.innerHTML = `
+      <div class="glass rounded-2xl overflow-hidden">
+        <img src="${course.cover || 'https://via.placeholder.com/1200x400'}" class="w-full h-60 object-cover">
+        <div class="p-6">
+          <h1 class="text-3xl font-bold mb-4">${course.title}</h1>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="glass p-4 rounded-xl text-center">
+              <div class="text-xl font-bold">${course.sessionsValue}</div>
+              <div class="text-xs uppercase opacity-60">${course.sessionsUnit}</div>
+            </div>
+            <div class="glass p-4 rounded-xl text-center">
+              <div class="text-xl font-bold">${course.durationValue}</div>
+              <div class="text-xs uppercase opacity-60">${course.durationUnit}</div>
+            </div>
+            <div class="glass p-4 rounded-xl text-center">
+              <div class="text-xs font-semibold">${course.theme}</div>
+              <div class="text-xs uppercase opacity-60">Theme</div>
+            </div>
+            <div class="glass p-4 rounded-xl text-center">
+              <div class="text-xs font-semibold">${course.offer}</div>
+              <div class="text-xs uppercase opacity-60">Offering</div>
+            </div>
           </div>
-          <div class="glass p-4 rounded-xl text-center">
-            <div class="text-xl font-bold">${course.durationValue}</div>
-            <div class="text-xs uppercase opacity-60">${course.durationUnit}</div>
-          </div>
-          <div class="glass p-4 rounded-xl text-center">
-            <div class="text-xs font-semibold">${course.theme}</div>
-            <div class="text-xs uppercase opacity-60">Theme</div>
-          </div>
-          <div class="glass p-4 rounded-xl text-center">
-            <div class="text-xs font-semibold">${course.offer}</div>
-            <div class="text-xs uppercase opacity-60">Offering</div>
-          </div>
+          <p class="text-gray-700 whitespace-pre-wrap">${course.description}</p>
         </div>
-        <p class="text-gray-700 whitespace-pre-wrap">${course.description}</p>
       </div>
-    </div>
-    <button id="backToCourses" class="mt-4 btn-primary">Back</button>
-  `;
+      <button id="backToCourses" class="mt-4 btn-primary">Back</button>
+    `;
 
-  qs("#backToCourses").onclick = () => showPage("my-courses");
-}
+    qs("#backToCourses").onclick = () => showPage("my-courses");
+  }
 
-    /* =========================
-     NAVIGATION CLICK HANDLER (FIX)
+  /* =========================
+     NAVIGATION CLICK HANDLER
   ========================= */
   qsa(".nav-item").forEach(link => {
     link.addEventListener("click", e => {
@@ -375,47 +366,9 @@ function openCourseDetail(courseId) {
   });
 
   /* =========================
-     REVIEWS
-  ========================= */
-  function renderReviewsSection(course) {
-    const reviews = course.reviews || [];
-    const total = reviews.length;
-    const avg = total === 0 ? 0 : (reviews.reduce((sum, r) => sum + r.rating, 0) / total).toFixed(1);
-
-    const summary = qs("#reviewSummary");
-    if (summary) summary.innerHTML = `
-      <div class="flex items-center gap-4 text-lg">
-        <strong>${avg}</strong>
-        <span>${"★".repeat(Math.round(avg))}${"☆".repeat(5 - Math.round(avg))}</span>
-        <span class="opacity-60">(${total} reviews)</span>
-      </div>
-    `;
-
-    const list = qs("#reviewsList");
-    if (list) {
-      list.innerHTML = reviews.map(r => `
-        <div class="bg-gray-50 p-4 rounded-xl mb-4">
-          <strong>${r.name}</strong>
-          <div>${"★".repeat(r.rating)}${"☆".repeat(5 - r.rating)}</div>
-          <p class="mt-2">${r.comment}</p>
-          ${r.reply ? `
-            <div class="bg-green-50 p-3 rounded-lg mt-3">
-              <strong>Reply:</strong>
-              <p>${r.reply}</p>
-            </div>
-          ` : `<button class="replyBtn mt-3 text-sm text-green-700 underline">Reply</button>`}
-        </div>
-      `).join("");
-    }
-  }
-
-  /* =========================
      INIT
   ========================= */
   buildCoursesSidebar();
   showPage("dashboard");
 
-  
 });
-
-
