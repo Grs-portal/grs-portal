@@ -60,14 +60,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-  /* =========================
+/* =========================
      ROUTER
   ========================= */
-
   function showPage(id) {
-
     qsa(".page-section").forEach(p => p.classList.add("hidden"));
-
     const page = qs("#" + id);
     if (page) page.classList.remove("hidden");
 
@@ -89,44 +86,78 @@ document.addEventListener("DOMContentLoaded", () => {
     openMainSidebar();
   }
 
-
-
   /* =========================
      COURSES SIDEBAR
   ========================= */
-
   function buildCoursesSidebar() {
-
     coursesSidebar.innerHTML = `
       <div class="courses-sidebar-content h-full overflow-y-auto">
 
         <button id="backDashboardBtn"
-        class="nav-item bg-black/90 text-white rounded-xl justify-center mb-3">
-        ☰ Dashboard
+          class="nav-item bg-black/90 text-white rounded-xl justify-center mb-2">
+          ☰ Dashboard
         </button>
 
-        <h3 class="sidebar-title">Search Programs</h3>
+        <h3 class="sidebar-title">Filter Programs</h3>
 
         <div class="filter-group">
           <label>Search</label>
           <input id="searchCourse" type="text" placeholder="Search programs..." />
         </div>
 
-        <button id="newCourseBtn" class="new-course-btn mt-4">
-          + New Program
-        </button>
+        <div class="filter-group">
+          <label>Status</label>
+          <select id="statusFilter">
+            <option value="">All</option>
+            <option>Upcoming</option>
+            <option>Ongoing</option>
+            <option>Completed</option>
+            <option>Draft</option>
+          </select>
+        </div>
 
+        <div class="filter-group">
+          <label>Location</label>
+          <select id="locationFilter">
+            <option value="">All</option>
+            <option>Online</option>
+            <option>In Person</option>
+            <option>Both</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Type</label>
+          <select id="typeFilter">
+            <option value="">All</option>
+            <option>Video</option>
+            <option>PDF</option>
+          </select>
+        </div>
+
+        <button id="newCourseBtn" class="new-course-btn">+ New Course</button>
       </div>
     `;
 
     qs("#newCourseBtn").onclick = () => Courses.openModal();
     qs("#backDashboardBtn").onclick = () => showPage("dashboard");
 
-    qs("#searchCourse").addEventListener("input", e => {
-      Courses.render(e.target.value);
-    });
-  }
+    const searchInput = qs("#searchCourse");
+    const statusFilter = qs("#statusFilter");
+    const locationFilter = qs("#locationFilter");
+    const typeFilter = qs("#typeFilter");
 
+    const applyFilters = () => Courses.render({
+      search: searchInput.value,
+      status: statusFilter.value,
+      location: locationFilter.value,
+      type: typeFilter.value
+    });
+
+    [searchInput, statusFilter, locationFilter, typeFilter].forEach(el =>
+      el.addEventListener("input", applyFilters)
+    );
+  }
 
 
   /* =========================
@@ -436,3 +467,4 @@ document.addEventListener("DOMContentLoaded", () => {
   showPage("dashboard");
 
 });
+
