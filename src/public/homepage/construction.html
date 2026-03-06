@@ -14,7 +14,7 @@
     color: #2e3f36;
     display: flex;
     flex-direction: column;
-    min-height: 200vh;
+    min-height: 250vh;
   }
 
   .container {
@@ -62,6 +62,28 @@
   .enter-link a:hover {
     text-decoration: underline;
   }
+
+  @media (max-width: 600px) {
+
+    body {
+      height: 100vh;
+    }
+    
+    h1 {
+      font-size: 1.8rem;
+    }
+
+    .icon-space img {
+      width: 80px;
+      height: 80px;
+    }
+
+    p {
+      font-size: 0.9rem;
+      padding: 0 1rem;
+    }
+  }
+
 </style>
 </head>
 
@@ -154,7 +176,7 @@
 </div>
 
 <div class="enter-link">
-  <a href="/homepage/projects.html">Enter →</a>
+  <a href="/homepage/stories.html">Enter →</a>
 </div>
 
 
@@ -186,23 +208,14 @@
         <div class="footer-col">
           <h3 data-translate="col-por">Portals</h3>
           <ul>
-            <li><a data-translate="Students" href="/homepage/#">Students</a></li>
-            <li><a data-translate="Teachers" href="/homepage/#">Teachers</a></li>
-            <li><a data-translate="Managers" href="/homepage/#">Managers</a></li>
+            <li><a data-translate="Students" href="/homepage/login-students.html">Students</a></li>
+            <li><a data-translate="Teachers" href="/homepage/login-teachers.html">Teachers</a></li>
           </ul>
         </div>
+
+
 
         <!-- ... ✿°•∘ɷ∘•°✿ .. COL 3 -->
-        <div class="footer-col">
-          <h3 data-translate="col-know">Knowledge</h3>
-          <ul>
-            <li><a data-translate="nav-courses" href="/homepage/#">Courses</a></li>
-            <li><a data-translate="nav-projects" href="/homepage/#">Projects</a></li>
-          </ul>
-        </div>
-
-
-        <!-- ... ✿°•∘ɷ∘•°✿ .. COL 4 -->
         <div class="footer-col">
           <h3 data-translate="col-legal">Legal</h3>
           <ul>
@@ -210,6 +223,18 @@
             <li><a href="/homepage/#">Terms of Service</a></li>
             <li><a href="/homepage/#">Cookie Policy</a></li>
             <li><a href="/homepage/#">Security</a></li>
+          </ul>
+        </div>
+        <!-- ... ✿°•∘ɷ∘•°✿ .. COL 4 -->
+        <div class="footer-col">
+          <h3 data-translate="col-know">Quick Links </h3>
+          <ul>
+            <li><a data-translate="nav-forwho" href="/homepage/forwho.html">For whom</a></li>
+            <li><a data-translate="nav-grs" href="/homepage/green recovery space.html">Recovery Academy</a></li>
+            <li><a data-translate="nav-offer" href="/homepage/offerings.html">What we offer</a></li>
+            <li><a data-translate="nav-program" href="/homepage/program.html">Program & Activities</a></li>
+            <li><a data-translate="nav-announce" href="/homepage/projects.html">Projects</a></li>
+            <li><a data-translate="nav-stories" href="/homepage/stories.html">Personal Stories</a></li>
           </ul>
         </div>
 
@@ -220,30 +245,22 @@
       <div class="footer-bottom">
         <div class="footer-social-icons">
           <a href="/homepage/#" class="social"><i class="fab fa-facebook"></i></a>
-          <a href="/homepage/#" class="social"><i class="fab fa-tiktok"></i></a>
-          <a href="/homepage/#" class="social"><i class="fab fa-instagram"></i></a>
+          <a href="/homepage/#" class="social"><i class="fab fa-youtube"></i></a>
           <a href="/homepage/#" class="social"><i class="fab fa-linkedin"></i></a>
-          <a href="/homepage/#" class="social"><i class="fab fa-email"></i></a>
-        </div>
-
-        <!-- ✿ Email Subscription -->
-        <div class="footer-subscribe">
-          <p class="subscribe-text">
-            Subscribe to receive weekly news and updates about Green Recovery Space.
-          </p>
-
-          <form class="subscribe-form">
-            <input 
-              type="email" 
-              placeholder="Fill in your email" 
-              required
-            />
-            <button type="submit">Subscribe</button>
-          </form>
+          <a href="/homepage/#" class="social"><i class="fab fa-whatsapp"></i></a>
         </div>
       </div>
     </div>
   </footer>
+
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+
+
+    <script src="/homepage/JS/script.js"></script>
+    <script src="/homepage/JS/lang-translation.js"></script>  
 
 </body>
 </html>
