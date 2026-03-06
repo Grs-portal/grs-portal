@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>What we offer</title>
+<title>Full-Screen Cards</title>
 <link rel="stylesheet" href="/homepage/https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@500&display=swap">
 <link rel="stylesheet" href="/homepage/CSS/style.css">
 <style>
@@ -87,7 +87,8 @@ body {
   font-family: "Oswald", sans-serif;
   font-size: 72px;
   font-weight: 600;
-  margin-bottom: 16px;
+  margin-bottom: 26px;
+  top: -25px;
 }
 
 
@@ -95,6 +96,7 @@ body {
   font-size: 20px;
   max-width: 500px;
   line-height: 1.4;
+  top: -25px;
 }
 
 /* CTA buttons */
@@ -103,9 +105,10 @@ body {
   display: flex;
   align-items: center;
   gap: 16px;
+  top: -20px;
 }
 .card .cta .bookmark {
-  background-color: var(--primary-color);
+  background-color: var(--bg-green);
   width: 50px;
   height: 50px;
   border-radius: 50%;
@@ -127,7 +130,8 @@ body {
   cursor: pointer;
 }
 
-/* ================== Previews ================== */
+  /* ══✿══╡°˖✧᯽ PREVIEW CARDS᯽✧˖°╞══✿══ */
+
 #card-previews {
   position: absolute;
   bottom: 60px;
@@ -149,7 +153,7 @@ body {
   transition: transform 0.3s ease, opacity 0.3s ease;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end; /* pushes title to bottom */
+  justify-content: flex-end; 
   padding: 12px;
   color: white;
   font-family: "Oswald", sans-serif;
@@ -167,27 +171,86 @@ body {
 }
 
 .progress-bar {
-  position:relative;
-  top: 0;
+  position: absolute;   
+  top: 0;                
   left: 0;
   width: 100%;
   height: 4px;
   background: rgba(255,255,255,0.2);
-  z-index: 100;
+  z-index: 9999;           
 }
 
 .progress-fill {
   height: 100%;
   width: 0%;
-  background: var(--primary-color);
+  background: var(--accent-2);
   transition: width 5s linear;
 }
+ 
+
+/* Mobile Responsiveness for Carousel */
+@media (max-width: 768px) {
+  #cards-container {
+    height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+
+  .card {
+    padding: 100px 20px;
+    justify-content: flex-start; 
+  }
+
+  .card .card-title {
+    font-size: 3rem;
+  }
+
+  .card .card-desc {
+    font-size: 1rem;
+    max-width: 100%;
+  }
+
+  .card .cta {
+    flex-direction: row;
+    gap: 12px;
+    margin-top: 12px;
+  }
+
+  #card-previews {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    width: 90%;
+    max-width: 600px;
+    z-index: 20;
+  }
+
+  .preview-card {
+    width: 100%;
+    height: 120px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+  }
+
+  .preview-card .preview-title {
+    font-size: 1rem;
+  }
+}
+
+
 </style>
 </head>
 <body style="background-color: #1a1a1a;">
 
     <!--══✿══╡°˖✧᯽ DESKTOP NAVIGATION BAR ᯽✧˖°╞══✿══-->
 
+  <div class="progress-bar">
+    <div class="progress-fill"></div>
+  </div>
 
   <header class="site-header" style="background-color: white;">
     <div class="container header-inner" style="background-color: white;">
@@ -244,6 +307,7 @@ body {
         <li class="mobile-profile">
           <a href="/homepage/Portal.html" class="profile">
             <img src="/homepage/images/unkown.png" alt="User profile">
+            <p class="profile-text">Sign in</p>
           </a>
         </li>
 
@@ -274,19 +338,19 @@ const data = [
   {
     title:'Program & Activities', 
     description:'At the Green Recovery Space you can participate in activities, training and self-help methods that contribute to recovery, balance and well-being.', 
-    image:'https://www.thenurtureproject.co.uk/wp-content/uploads/2023/10/MG_0860-1024x682.jpg',
+    image:'https://i.pinimg.com/736x/40/17/d7/4017d77cbd51f3c0b132bc2c92c4141e.jpg',
     link:'program.html'
   },
   {
     title:'Our Projects', 
-    description:'Discover all the amazing projects linked to green recovey space', 
-    image:'https://images.stockcake.com/public/2/4/c/24c193c7-3ec4-4bfd-b24e-cb5b7909b5d5/nature-conservation-effort-stockcake.jpg',
+    description:'Discover all the amazing projects that Project Bureau Carribean has initiated or formed part of.', 
+    image:'https://i.pinimg.com/736x/1b/d5/44/1bd54470fa1687c8f8795d4b47004455.jpg',
     link:'construction.html'
   },
   {
     title: 'Stories & Experiences', 
     description: 'Personal recovery journeys from participants of the Green Recovery Space. Explore freely and read what resonates with you.', 
-    image: 'https://sagaja.com/wp-content/uploads/2024/03/Spacery-zdjecie.jpeg',
+    image: 'https://i.pinimg.com/736x/38/25/01/382501fc03d4bef77c8c9a99f435107f.jpg',
     link:'construction.html'
   }
 ];
@@ -368,7 +432,7 @@ function startAutoSlide(){
   autoSlide = setInterval(() => {
     let nextIndex = (activeIndex + 1) % data.length;
     switchCard(nextIndex);
-  }, 5000);
+  }, 6000);
 }
 
 function resetAutoSlide(){
@@ -387,7 +451,85 @@ function updateProgress(){
 
 startAutoSlide();
 </script>
+     <!--══✿══╡°˖✧᯽  FOOTER   ᯽✧˖°╞══✿══-->
 
+
+  <footer class="fancy-footer" style="margin-top: 0;">
+    <div class="footer-background-word">Hofi Korsou</div>
+
+    <div class="footer-container">
+      <div class="footer-grid">
+
+        <!-- ... ✿°•∘ɷ∘•°✿ .. LOGO + TEXT -->
+        <div class="footer-col-wide">
+          <img src="/homepage/images/HK logo no bg.png" alt="logo" class="footer-logo" />
+        </div>
+
+        <!-- ... ✿°•∘ɷ∘•°✿ .. COL 1 -->
+        <div class="footer-col">
+          <h3 data-translate="col-com">Company</h3>
+          <ul>
+            <li><a data-translate="nav-about" href="/homepage/about.html">About Us</a></li>
+            <li><a data-translate="nav-contact" href="/homepage/contact.html">Contact Us</a></li>            
+          </ul>
+        </div>
+
+        <!-- ... ✿°•∘ɷ∘•°✿ .. COL 2 -->
+        <div class="footer-col">
+          <h3 data-translate="col-por">Portals</h3>
+          <ul>
+            <li><a data-translate="Students" href="/homepage/login-students.html">Students</a></li>
+            <li><a data-translate="Teachers" href="/homepage/login-teachers.html">Teachers</a></li>
+          </ul>
+        </div>
+
+
+
+        <!-- ... ✿°•∘ɷ∘•°✿ .. COL 3 -->
+        <div class="footer-col">
+          <h3 data-translate="col-legal">Legal</h3>
+          <ul>
+            <li><a href="/homepage/#">Privacy Policy</a></li>
+            <li><a href="/homepage/#">Terms of Service</a></li>
+            <li><a href="/homepage/#">Cookie Policy</a></li>
+            <li><a href="/homepage/#">Security</a></li>
+          </ul>
+        </div>
+        <!-- ... ✿°•∘ɷ∘•°✿ .. COL 4 -->
+        <div class="footer-col">
+          <h3 data-translate="col-know">Quick Links </h3>
+          <ul>
+            <li><a data-translate="nav-forwho" href="/homepage/forwho.html">For whom</a></li>
+            <li><a data-translate="nav-grs" href="/homepage/green recovery space.html">Recovery Academy</a></li>
+            <li><a data-translate="nav-offer" href="/homepage/offerings.html">What we offer</a></li>
+            <li><a data-translate="nav-program" href="/homepage/program.html">Program & Activities</a></li>
+            <li><a data-translate="nav-announce" href="/homepage/projects.html">Projects</a></li>
+            <li><a data-translate="nav-stories" href="/homepage/stories.html">Personal Stories</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!--... ✿°•∘ɷ∘•°✿ .. SOCIALS -->
+
+      <div class="footer-bottom">
+        <div class="footer-social-icons">
+          <a href="/homepage/#" class="social"><i class="fab fa-facebook"></i></a>
+          <a href="/homepage/#" class="social"><i class="fab fa-youtube"></i></a>
+          <a href="/homepage/#" class="social"><i class="fab fa-linkedin"></i></a>
+          <a href="/homepage/#" class="social"><i class="fab fa-whatsapp"></i></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+
+
+    <script src="/homepage/JS/script.js"></script>
+    <script src="/homepage/JS/lang-translation.js"></script>  
 </body>
 </html>
-
