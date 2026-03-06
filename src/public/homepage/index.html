@@ -21,7 +21,7 @@
         <div class="nav-left">
           <a href="/homepage/index.html" class="nav-link active" data-translate="nav-home">Home</a>
           <a href="/homepage/forwho.html" class="nav-link" data-translate="nav-forwho">For whom</a>
-          <a href="/homepage/green recovery space.html" class="nav-link" data-translate="nav-grs">Recovery Academ</a>
+          <a href="/homepage/green recovery space.html" class="nav-link" data-translate="nav-grs">Recovery Academy</a>
         </div>
 
         <!-- ... ✿°•∘ɷ∘•°✿ ..  logo circle  -->
@@ -70,16 +70,17 @@
         <li class="mobile-profile">
           <a href="/homepage/Portal.html" class="profile">
             <img src="/homepage/images/unkown.png" alt="User profile">
+            <p class="profile-text">Sign in</p>
           </a>
         </li>
 
         <!-- Rest of the links -->
         <li><a href="/homepage/index.html" class="nav-link active" data-translate="nav-home">Home</a></li>
-        <li><a href="/homepage/forwho.html" data-translate="nav-forwho">For whom</a></li>
-        <li><a href="/homepage/green recovery space.html" data-translate="nav-grs">Recovery Academy</a></li>
-        <li><a href="/homepage/offerings.html" data-translate="nav-offer">What we offer</a></li>
-        <li><a href="/homepage/about.html" data-translate="nav-about">About Us</a></li>
-        <li><a href="/homepage/contact.html" data-translate="nav-contact">Contact</a></li>
+        <li><a href="/homepage/forwho.html" class="nav-link" data-translate="nav-forwho">For whom</a></li>
+        <li><a href="/homepage/green recovery space.html" class="nav-link" data-translate="nav-grs">Recovery Academy</a></li>
+        <li><a href="/homepage/offerings.html" class="nav-link" data-translate="nav-offer">What we offer</a></li>
+        <li><a href="/homepage/about.html" class="nav-link" data-translate="nav-about">About Us</a></li>
+        <li><a href="/homepage/contact.html" class="nav-link" data-translate="nav-contact">Contact</a></li>
       </ul>
     </nav>
   </header>
@@ -465,8 +466,8 @@
         <div class="footer-col">
           <h3 data-translate="col-por">Portals</h3>
           <ul>
-            <li><a data-translate="Students" href="/homepage/#">Students</a></li>
-            <li><a data-translate="Teachers" href="/homepage/#">Teachers</a></li>
+            <li><a data-translate="Students" href="/homepage/login-students.html">Students</a></li>
+            <li><a data-translate="Teachers" href="/homepage/login-teachers.html">Teachers</a></li>
           </ul>
         </div>
 
@@ -506,22 +507,6 @@
           <a href="/homepage/#" class="social"><i class="fab fa-linkedin"></i></a>
           <a href="/homepage/#" class="social"><i class="fab fa-whatsapp"></i></a>
         </div>
-
-        <!-- ✿ Email Subscription -->
-        <div class="footer-subscribe">
-          <p class="subscribe-text">
-            Subscribe to receive weekly news and updates about Green Recovery Space.
-          </p>
-
-          <form class="subscribe-form">
-            <input 
-              type="email" 
-              placeholder="Fill in your email" 
-              required
-            />
-            <button type="submit">Subscribe</button>
-          </form>
-        </div>
       </div>
     </div>
   </footer>
@@ -533,7 +518,8 @@
 
 
     <script src="/homepage/JS/script.js"></script>
-    <script src="/homepage/JS/lang-translation.js"></script>    <script>
+    <script src="/homepage/JS/lang-translation.js"></script>    
+    <script>
       document.querySelectorAll(".lang-menu li").forEach(item => {
         item.addEventListener("click", function () {
           const lang = this.getAttribute("data-lang");
@@ -543,5 +529,3 @@
     </script>
 </body>
 </html>
-
-
