@@ -323,23 +323,20 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
     
-      const newCourse = {
-        id: Date.now().toString(),
-        title,
-        description: description || "",
-        cover: cover || "/images/course-placeholder.jpg",
-        durationValue,
-        durationUnit,
-        sessionsValue,
-        sessionsUnit,
-        programType,
-        theme,
-        offer,
-        status: status || "draft",
-        startDate: startDate || null,  // <-- new field
-        createdAt: new Date().toISOString(),
-        updatedAt: null
-      };
+    const newCourse = {
+      title: qs("#courseTitle")?.value.trim(),
+      description: qs("#courseDescription")?.value.trim(),
+      cover,
+      durationValue: qs("#courseDurationValue")?.value,
+      durationUnit: qs("#courseDurationUnit")?.value,
+      sessionsValue: qs("#courseSessionsValue")?.value,
+      sessionsUnit: qs("#courseSessionsUnit")?.value,
+      programType: qs("#courseProgramType")?.value,
+      theme: qs("#courseTheme")?.value,
+      offer: qs("#courseOffer")?.value,
+      status: finalStatus,
+      startDate: qs("#courseStartDate")?.value || null 
+    };
     
       closeModal();
     
@@ -521,6 +518,7 @@ document.addEventListener("DOMContentLoaded", () => {
   showPage("dashboard");
 
 });
+
 
 
 
