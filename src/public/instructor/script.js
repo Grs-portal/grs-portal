@@ -261,78 +261,65 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /* ================= CREATE COURSE ================= */
 
-    const createCourse = async (data) => {
-
-      try {
-
-        const res = await fetch(API, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
-        });
-
-        const newCourse = await res.json();
-
-        courses.push(newCourse);
-
-        render();
-
-        openCourseDetail(newCourse.id);
-
-      } catch (err) {
-        console.error("Failed to create course", err);
-      }
-    };
+  const createCourse = async (data, openDetail = true) => {
+    try {
+      const res = await fetch(API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+  
+      const newCourse = await res.json();
+  
+      courses.push(newCourse);
+  
+      render();
+  
+      // Only open detail page if publishing
+      if (openDetail) openCourseDetail(newCourse.id);
+  
+    } catch (err) {
+      console.error("Failed to create course", err);
+    }
+  };
 
     /* ================= FORM SUBMIT ================= */
 
-    if (form) {
-
-      form.addEventListener("submit", async e => {
-
-        e.preventDefault();
-
-        const file = qs("#courseCover")?.files?.[0];
-        const cover = file ? await toBase64(file) : "";
-
-        const selectedStatus = qs("#courseStatus")?.value;
-
-        let finalStatus = forceDraft ? "draft" : selectedStatus;
-
-        if (!forceDraft && selectedStatus === "draft") {
-          alert("Cannot publish a course while status is Draft. Choose another status or Save Draft.");
-          return;
-        }
-
-        const newCourse = {
-
-          title: qs("#courseTitle")?.value.trim(),
-          description: qs("#courseDescription")?.value.trim(),
-
-          cover,
-
-          durationValue: qs("#courseDurationValue")?.value,
-          durationUnit: qs("#courseDurationUnit")?.value,
-
-          sessionsValue: qs("#courseSessionsValue")?.value,
-          sessionsUnit: qs("#courseSessionsUnit")?.value,
-
-          programType: qs("#courseProgramType")?.value,
-          theme: qs("#courseTheme")?.value,
-          offer: qs("#courseOffer")?.value,
-
-          status: finalStatus
-        };
-
-        closeModal();
-
-        forceDraft = false;
-
-        await createCourse(newCourse);
-
-      });
-
-    }
+    form?.addEventListener("submit", async e => {
+      e.preventDefault();
+    
+      const file = qs("#courseCover")?.files?.[0];
+      const cover = file ? await toBase64(file) : "";
+    
+      const selectedStatus = qs("#courseStatus")?.value;
+      let finalStatus = forceDraft ? "draft" : selectedStatus;
+    
+      if (!forceDraft && selectedStatus === "draft") {
+        alert("Cannot publish a course while status is Draft. Choose another status or Save Draft.");
+        return;
+      }
+    
+      const newCourse = {
+        title: qs("#courseTitle")?.value.trim(),
+        description: qs("#courseDescription")?.value.trim(),
+        cover,
+        durationValue: qs("#courseDurationValue")?.value,
+        durationUnit: qs("#courseDurationUnit")?.value,
+        sessionsValue: qs("#courseSessionsValue")?.value,
+        sessionsUnit: qs("#courseSessionsUnit")?.value,
+        programType: qs("#courseProgramType")?.value,
+        theme: qs("#courseTheme")?.value,
+        offer: qs("#courseOffer")?.value,
+        status: finalStatus
+      };
+    
+      closeModal();
+    
+      const openDetail = !forceDraft; // Only open detail if not a draft
+      forceDraft = false;
+    
+      await createCourse(newCourse, openDetail);
+    });
 
     /* ================= MODAL ================= */
 
@@ -499,3 +486,4 @@ document.addEventListener("DOMContentLoaded", () => {
   showPage("dashboard");
 
 });
+
