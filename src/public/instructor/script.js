@@ -428,7 +428,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="flex items-center gap-3 mb-6">
 
             <img
-              src="${course.createdByAvatar || "https://i.pravatar.cc/40"}"
+              src="${course.createdByAvatar || "https://png.pngtree.com/png-clipart/20210915/ourmid/pngtree-avatar-placeholder-abstract-white-blue-green-png-image_3918476.jpg/40"}"
               class="w-8 h-8 rounded-full object-cover"
             >
 
@@ -507,3 +507,4 @@ document.addEventListener("DOMContentLoaded", () => {
   showPage("dashboard");
 
 });
+
