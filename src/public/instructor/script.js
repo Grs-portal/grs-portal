@@ -100,6 +100,10 @@ document.addEventListener("DOMContentLoaded", () => {
           <input id="searchCourse" type="text" placeholder="Search programs..." />
         </div>
 
+        <button id="newCourseBtn" class="new-course-btn">
+          + New Course
+        </button>
+
         <div class="filter-group">
           <label>Status</label>
           <select id="statusFilter">
@@ -111,9 +115,16 @@ document.addEventListener("DOMContentLoaded", () => {
           </select>
         </div>
 
-        <button id="newCourseBtn" class="new-course-btn">
-          + New Course
-        </button>
+        <div class="filter-group">
+          <label>Theme</label>
+          <select id="statusFilter">
+            <option value="">All</option>
+            <option value="rest">Rest & Relaxation</option>
+            <option value="recovery">Recovery & Balance</option>
+            <option value="insight">Self-insight</option>
+            <option value="connection">Connection</option>
+          </select>
+        </div>
 
       </div>
     `;
@@ -486,4 +497,5 @@ document.addEventListener("DOMContentLoaded", () => {
   showPage("dashboard");
 
 });
+
 
