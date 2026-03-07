@@ -608,36 +608,28 @@ app.post("/api/courses", (req, res) => {
   }
 
   const newCourse = {
-
     id: Date.now().toString(),
-
     title,
     description: description || "",
-
     cover: cover || "/images/course-placeholder.jpg",
-
     durationValue,
     durationUnit,
-
     sessionsValue,
     sessionsUnit,
-
     programType,
     theme,
     offer,
-
     status: status || "draft",
-
+    startDate: startDate || null,  // <-- new field
     createdAt: new Date().toISOString(),
     updatedAt: null
-
   };
-
-  db.courses.push(newCourse);
-  saveData();
-
-  res.json(newCourse);
-});
+  
+    db.courses.push(newCourse);
+    saveData();
+  
+    res.json(newCourse);
+  });
 
 
 app.put("/api/courses/:id", (req,res)=>{
@@ -929,6 +921,7 @@ app.get("/homepage/register.html", (req, res) => sendFirstExisting(res, "homepag
 
 // ---------------- START ----------------
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+
 
 
 
