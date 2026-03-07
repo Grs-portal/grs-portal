@@ -577,94 +577,101 @@ app.delete("/api/schedule/:id", (req, res) => {
   res.json({ success: true });
 });
 
-/* ═════════ COURSES ═════════ */
-app.get("/api/courses", (req, res) => res.json(db.courses));
+/* ═════════ COURSES API ═════════ */
+
+app.get("/api/courses", (req, res) => {
+  res.json(db.courses || []);
+});
+
 
 app.post("/api/courses", (req, res) => {
-  const { title, description = "", locationType = "in-person", courseType = "video", cover } = req.body || {};
-  if (!title) return res.status(400).json({ success: false, message: "Title required" });
 
-  const a = actorFromReq(req);
-
-  const newCourse = {
-    id: Date.now(),
+  const {
     title,
     description,
-    courseType,
+    cover,
+    durationValue,
+    durationUnit,
+    sessionsValue,
+    sessionsUnit,
+    programType,
+    theme,
+    offer,
+    status
+  } = req.body || {};
+
+  if (!title) {
+    return res.status(400).json({
+      success:false,
+      message:"Title required"
+    });
+  }
+
+  const newCourse = {
+
+    id: Date.now().toString(),
+
+    title,
+    description: description || "",
+
     cover: cover || "/images/course-placeholder.jpg",
-    duration: req.body.duration || "—",
-    teacher: { name: a.byName || "Staff", photo: "/images/teacher-placeholder.jpg" },
-    chapters: [],
-    reviews: [],
-    locationType,
-    createdBy: a.byName || a.byUsername || "Unknown",
+
+    durationValue,
+    durationUnit,
+
+    sessionsValue,
+    sessionsUnit,
+
+    programType,
+    theme,
+    offer,
+
+    status: status || "draft",
+
     createdAt: new Date().toISOString(),
+    updatedAt: null
+
   };
 
   db.courses.push(newCourse);
   saveData();
 
-  addNotification({
-    type: "course",
-    action: "created",
-    message: `Course created: "${newCourse.title}"`,
-    ...a,
-    targetType: "course",
-    targetId: newCourse.id
-  });
-
   res.json(newCourse);
 });
 
-app.put("/api/courses/:id", (req, res) => {
-  const id = String(req.params.id);
-  const idx = db.courses.findIndex(c => String(c.id) === id);
-  if (idx === -1) return res.status(404).json({ success: false, message: "Course not found" });
 
-  const a = actorFromReq(req);
+app.put("/api/courses/:id", (req,res)=>{
+
+  const id = req.params.id;
+
+  const idx = db.courses.findIndex(c => c.id === id);
+
+  if(idx === -1){
+    return res.status(404).json({success:false});
+  }
 
   db.courses[idx] = {
     ...db.courses[idx],
     ...req.body,
-    updatedBy: a.byName || a.byUsername || "Unknown",
-    updatedByUsername: a.byUsername || "",
-    updatedByRole: a.byRole || "",
     updatedAt: new Date().toISOString()
   };
 
   saveData();
 
-  addNotification({
-    type: "course",
-    action: "updated",
-    message: `Course updated: "${db.courses[idx].title}"`,
-    ...a,
-    targetType: "course",
-    targetId: id
-  });
-
   res.json(db.courses[idx]);
 });
 
-app.delete("/api/courses/:id", (req, res) => {
-  const id = String(req.params.id);
-  const before = db.courses.length;
-  db.courses = db.courses.filter(c => String(c.id) !== id);
+
+app.delete("/api/courses/:id",(req,res)=>{
+
+  const id = req.params.id;
+
+  db.courses = db.courses.filter(c=>c.id!==id);
+
   saveData();
 
-  const a = actorFromReq(req);
-  if (db.courses.length !== before) {
-    addNotification({
-      type: "course",
-      action: "deleted",
-      message: `Course deleted (id: ${id})`,
-      ...a,
-      targetType: "course",
-      targetId: id
-    });
-  }
+  res.json({success:true});
 
-  res.json({ success: true });
 });
 
 /* ═════════ HOMEWORK ═════════ */
@@ -922,6 +929,7 @@ app.get("/homepage/register.html", (req, res) => sendFirstExisting(res, "homepag
 
 // ---------------- START ----------------
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+
 
 
 
