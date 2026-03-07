@@ -126,6 +126,11 @@ document.addEventListener("DOMContentLoaded", () => {
           </select>
         </div>
 
+        <div class="filter-group mt-4">
+          <label>Calendar</label>
+          <input type="date" id="calendarFilter" />
+        </div>
+
       </div>
     `;
 
@@ -244,24 +249,32 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      container.innerHTML = filtered.map(c => `
-        <div class="course-card cursor-pointer relative" data-id="${c.id}">
-          <div class="absolute top-3 left-3 text-xs font-semibold px-2 py-1 rounded-full ${getStatusClass(c.status)}">
-            ${formatStatus(c.status)}
-          </div>
-
-          <img
-            src="${c.cover || "https://via.placeholder.com/400x200"}"
-            class="w-full h-32 object-cover rounded-xl mb-3"
-          >
-
-          <h3 class="title-strong text-lg">${c.title}</h3>
-
-          <p class="subtitle text-sm mt-1 line-clamp-2">
-            ${c.description || ""}
-          </p>
+    container.innerHTML = filtered.map(c => `
+      <div class="course-card cursor-pointer relative" data-id="${c.id}">
+        <div class="absolute top-3 left-3 text-xs font-semibold px-2 py-1 rounded-full ${getStatusClass(c.status)}">
+          ${formatStatus(c.status)}
         </div>
-      `).join("");
+    
+        <img
+          src="${c.cover || 'https://via.placeholder.com/400x200'}"
+          class="w-full h-32 object-cover rounded-xl mb-3"
+        >
+    
+        <div class="flex justify-between items-center mb-1">
+          <h3 class="title-strong text-lg">${c.title}</h3>
+          ${c.startDate ? `<span class="text-sm text-gray-500">${new Date(c.startDate).toLocaleDateString()}</span>` : ''}
+        </div>
+    
+        <div class="text-sm mb-1">
+          ${c.programType ? `<span class="font-semibold">Type:</span> ${c.programType}` : ''}
+        </div>
+    
+        <div class="text-sm">
+          ${c.sessionsValue ? `<span class="font-semibold">Sessions:</span> ${c.sessionsValue} ${c.sessionsUnit}` : ''}
+        </div>
+    
+      </div>
+    `).join("");
 
       container.querySelectorAll(".course-card").forEach(card => {
         card.addEventListener("click", () => {
@@ -311,17 +324,21 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     
       const newCourse = {
-        title: qs("#courseTitle")?.value.trim(),
-        description: qs("#courseDescription")?.value.trim(),
-        cover,
-        durationValue: qs("#courseDurationValue")?.value,
-        durationUnit: qs("#courseDurationUnit")?.value,
-        sessionsValue: qs("#courseSessionsValue")?.value,
-        sessionsUnit: qs("#courseSessionsUnit")?.value,
-        programType: qs("#courseProgramType")?.value,
-        theme: qs("#courseTheme")?.value,
-        offer: qs("#courseOffer")?.value,
-        status: finalStatus
+        id: Date.now().toString(),
+        title,
+        description: description || "",
+        cover: cover || "/images/course-placeholder.jpg",
+        durationValue,
+        durationUnit,
+        sessionsValue,
+        sessionsUnit,
+        programType,
+        theme,
+        offer,
+        status: status || "draft",
+        startDate: startDate || null,  // <-- new field
+        createdAt: new Date().toISOString(),
+        updatedAt: null
       };
     
       closeModal();
@@ -402,18 +419,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
       container.innerHTML = `
         <div class="glass rounded-2xl overflow-hidden">
-
+      
           <img
-            src="${course.cover || "https://via.placeholder.com/1200x400"}"
+            src="${course.cover || 'https://via.placeholder.com/1200x400'}"
             class="w-full h-72 object-cover"
           >
-
+      
           <div class="p-8">
-
-            <h1 class="text-3xl font-bold mb-6">${course.title}</h1>
-
+      
+            <div class="flex justify-between items-center mb-2">
+              <h1 class="text-3xl font-bold">${course.title}</h1>
+              ${course.startDate ? `<span class="text-sm text-gray-500">${new Date(course.startDate).toLocaleDateString()}</span>` : ''}
+            </div>
+      
+            <div class="mb-4 text-gray-600">
+              By: ${course.createdByUsername || 'Unknown'}
+            </div>
+      
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-
+      
               <div class="glass p-4 rounded-xl text-center">
                 <div class="text-lg font-semibold">
                   ${course.sessionsValue} ${course.sessionsUnit}
@@ -422,7 +446,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   Sessions
                 </div>
               </div>
-
+      
               <div class="glass p-4 rounded-xl text-center">
                 <div class="text-lg font-semibold">
                   ${course.durationValue} ${course.durationUnit}
@@ -431,7 +455,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   Duration
                 </div>
               </div>
-
+      
               <div class="glass p-4 rounded-xl text-center">
                 <div class="text-sm font-semibold">
                   ${course.theme}
@@ -440,7 +464,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   Theme
                 </div>
               </div>
-
+      
               <div class="glass p-4 rounded-xl text-center">
                 <div class="text-sm font-semibold">
                   ${course.offer}
@@ -449,16 +473,16 @@ document.addEventListener("DOMContentLoaded", () => {
                   Offering
                 </div>
               </div>
-
+      
             </div>
-
+      
             <div class="text-gray-700 whitespace-pre-wrap leading-relaxed">
               ${course.description}
             </div>
-
+      
           </div>
         </div>
-
+      
         <button id="backToCourses" class="mt-6 btn-primary">
           Back
         </button>
@@ -497,5 +521,6 @@ document.addEventListener("DOMContentLoaded", () => {
   showPage("dashboard");
 
 });
+
 
 
