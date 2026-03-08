@@ -130,7 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         <div class="filter-group">
           <label>Theme</label>
-          <select>
+          <select id="statusFilter">
             <option value="">All</option>
             <option value="rest">Rest & Relaxation</option>
             <option value="recovery">Recovery & Balance</option>
@@ -416,187 +416,191 @@ document.addEventListener("DOMContentLoaded", () => {
   COURSE DETAIL
   ====================================================== */
 
-  const openCourseDetail = async (id) => {
+  
+const openCourseDetail = async (id) => {
 
-    closeAllSidebars();
-    showPage("course-detail");
+  closeAllSidebars();
+  showPage("course-detail");
 
-    const res = await fetch("/api/courses");
-    const allCourses = await res.json();
+  const res = await fetch("/api/courses");
+  const allCourses = await res.json();
 
-    const course = allCourses.find(c => c.id == id);
-    if (!course) return;
+  const course = allCourses.find(c => c.id == id);
+  if (!course) return;
 
-    const container = qs("#courseDetailContainer");
+  const container = qs("#courseDetailContainer");
 
-    container.innerHTML = `
-    
-      <div class="flex justify-between items-center mb-4">
-    
-        <button id="backToCourses"
-          class="btn-primary">
-            X
+  container.innerHTML = `
+
+  <div class="course-detail-wrapper">
+
+    <div class="course-detail-header">
+
+      <button id="backToCourses" class="btn-primary">
+        ← Back
+      </button>
+
+      <div class="relative">
+
+        <button id="courseMenuBtn"
+          class="text-2xl px-3 py-1 rounded-xl hover:bg-black/10">
+          ⋮
         </button>
-    
-        <div class="relative">
-          <button id="courseMenuBtn"
-            class="text-2xl px-3 py-1 rounded-xl hover:bg-black/10">
-            ⋮
+
+        <div id="courseMenu"
+          class="course-menu hidden glass rounded-xl p-2 flex flex-col gap-1">
+
+          <button id="editProgramBtn"
+            class="px-3 py-2 text-left hover:bg-black/10 rounded-lg">
+            Edit Program
           </button>
-    
-          <div id="courseMenu"
-            class="hidden absolute right-0 mt-2 glass rounded-xl p-2 flex flex-col gap-1">
-    
-            <button id="editProgramBtn"
-              class="px-3 py-2 text-left hover:bg-black/10 rounded-lg">
-              Edit Program
-            </button>
-    
-            <button id="deleteProgramBtn"
-              class="px-3 py-2 text-left hover:bg-red-100 text-red-600 rounded-lg">
-              Delete Program
-            </button>
-    
-          </div>
+
+          <button id="deleteProgramBtn"
+            class="px-3 py-2 text-left hover:bg-red-100 text-red-600 rounded-lg">
+            Delete Program
+          </button>
+
         </div>
-    
+
       </div>
-    
-      <div class="glass rounded-2xl overflow-hidden">
 
-        <img
-          src="${course.cover || "https://via.placeholder.com/1200x400"}"
-          class="w-full h-72 object-cover"
-        >
+    </div>
 
-        <div class="p-8">
+    <div class="glass rounded-2xl overflow-hidden">
 
-          <div class="flex justify-between items-center mb-2">
-            <h1 class="text-3xl font-bold">${course.title}</h1>
-            ${course.startDate ? `<span class="text-sm text-gray-500">${new Date(course.startDate).toLocaleDateString()}</span>` : ""}
+      <img
+        src="${course.cover || "https://via.placeholder.com/1200x400"}"
+        class="w-full h-72 object-cover"
+      >
+
+      <div class="p-8">
+
+        <div class="flex justify-between items-center mb-2">
+          <h1 class="text-3xl font-bold">${course.title}</h1>
+          ${course.startDate ? `<span class="text-sm text-gray-500">${new Date(course.startDate).toLocaleDateString()}</span>` : ""}
+        </div>
+
+        <div class="flex items-center gap-3 mb-6">
+
+          <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-sm font-bold">
+            👤
           </div>
 
-          <div class="flex items-center gap-3 mb-6">
+          <span class="text-sm text-gray-600">
+            ${course.createdByUsername || "Instructor"}
+          </span>
 
-            <img
-              src="${course.createdByAvatar || "https://i.pravatar.cc/40"}"
-              class="w-8 h-8 rounded-full object-cover"
-            >
+        </div>
 
-            <span class="text-sm text-gray-600">
-              ${course.createdByUsername || "Unknown"}
-            </span>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
 
+          <div class="glass p-4 rounded-xl text-center">
+            <div class="text-lg font-semibold">
+              ${course.sessionsValue} ${course.sessionsUnit}
+            </div>
+            <div class="text-xs uppercase opacity-60">
+              Sessions
+            </div>
           </div>
 
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-
-            <div class="glass p-4 rounded-xl text-center">
-              <div class="text-lg font-semibold">
-                ${course.sessionsValue} ${course.sessionsUnit}
-              </div>
-              <div class="text-xs uppercase opacity-60">
-                Sessions
-              </div>
+          <div class="glass p-4 rounded-xl text-center">
+            <div class="text-lg font-semibold">
+              ${course.durationValue} ${course.durationUnit}
             </div>
-
-            <div class="glass p-4 rounded-xl text-center">
-              <div class="text-lg font-semibold">
-                ${course.durationValue} ${course.durationUnit}
-              </div>
-              <div class="text-xs uppercase opacity-60">
-                Duration
-              </div>
+            <div class="text-xs uppercase opacity-60">
+              Duration
             </div>
-
-            <div class="glass p-4 rounded-xl text-center">
-              <div class="text-sm font-semibold">
-                ${course.theme}
-              </div>
-              <div class="text-xs uppercase opacity-60">
-                Theme
-              </div>
-            </div>
-
-            <div class="glass p-4 rounded-xl text-center">
-              <div class="text-sm font-semibold">
-                ${course.offer}
-              </div>
-              <div class="text-xs uppercase opacity-60">
-                Offering
-              </div>
-            </div>
-
           </div>
 
-          <div class="text-gray-700 whitespace-pre-wrap leading-relaxed">
-            ${course.description}
+          <div class="glass p-4 rounded-xl text-center">
+            <div class="text-sm font-semibold">
+              ${course.theme}
+            </div>
+            <div class="text-xs uppercase opacity-60">
+              Theme
+            </div>
+          </div>
+
+          <div class="glass p-4 rounded-xl text-center">
+            <div class="text-sm font-semibold">
+              ${course.offer}
+            </div>
+            <div class="text-xs uppercase opacity-60">
+              Offering
+            </div>
           </div>
 
         </div>
+
+        <div class="text-gray-700 whitespace-pre-wrap leading-relaxed">
+          ${course.description}
+        </div>
+
       </div>
-    `;
 
-    
-    const menuBtn = qs("#courseMenuBtn");
-    const menu = qs("#courseMenu");
-    
-    menuBtn?.addEventListener("click", () => {
-      menu.classList.toggle("hidden");
-    });
+    </div>
 
-    qs("#backToCourses")?.addEventListener("click", () => {
-      showPage("my-courses");
-    });
+  </div>
+  `;
 
-    qs("#editProgramBtn")?.addEventListener("click", () => {
+  const menuBtn = qs("#courseMenuBtn");
+  const menu = qs("#courseMenu");
 
-  Courses.openModal();
+  menuBtn?.addEventListener("click", () => {
+    menu.classList.toggle("hidden");
+  });
+
+  qs("#backToCourses")?.addEventListener("click", () => {
+    showPage("my-courses");
+  });
+
+  qs("#editProgramBtn")?.addEventListener("click", () => {
+
+    Courses.openModal();
 
     qs("#courseTitle").value = course.title || "";
     qs("#courseDescription").value = course.description || "";
-  
+
     qs("#courseDurationValue").value = course.durationValue || "";
     qs("#courseDurationUnit").value = course.durationUnit || "";
-  
+
     qs("#courseSessionsValue").value = course.sessionsValue || "";
     qs("#courseSessionsUnit").value = course.sessionsUnit || "";
-  
+
     qs("#courseProgramType").value = course.programType || "";
     qs("#courseTheme").value = course.theme || "";
     qs("#courseOffer").value = course.offer || "";
-  
+
     qs("#courseStartDate").value = course.startDate || "";
     qs("#courseStatus").value = course.status || "";
-  
+
   });
 
-    qs("#deleteProgramBtn")?.addEventListener("click", async () => {
+  qs("#deleteProgramBtn")?.addEventListener("click", async () => {
 
-  const confirmName = prompt(
-    `Type the program name to delete:\n\n"${course.title}"`
-  );
+    const confirmName = prompt(
+      `Type the program name to delete:\n\n"${course.title}"`
+    );
 
-  if (!confirmName) return;
+    if (!confirmName) return;
 
-  if (confirmName !== course.title) {
-    alert("Program name does not match.");
-    return;
-  }
+    if (confirmName !== course.title) {
+      alert("Program name does not match.");
+      return;
+    }
 
-  await fetch(`/api/courses/${course.id}`, {
-    method: "DELETE"
+    await fetch(`/api/courses/${course.id}`, {
+      method: "DELETE"
+    });
+
+    alert("Program deleted");
+
+    showPage("my-courses");
+    Courses.loadCourses();
+
   });
 
-  alert("Program deleted");
-
-  showPage("my-courses");
-  Courses.loadCourses();
-
-});
-
-    
-  };
+};
 
   qsa(".nav-item").forEach(link => {
     link.addEventListener("click", e => {
@@ -609,6 +613,7 @@ document.addEventListener("DOMContentLoaded", () => {
   showPage("dashboard");
 
 });
+
 
 
 
