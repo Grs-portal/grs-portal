@@ -587,18 +587,21 @@ app.get("/api/courses", (req, res) => {
 app.post("/api/courses", (req, res) => {
 
   const {
-    title,
-    description,
-    cover,
-    durationValue,
-    durationUnit,
-    sessionsValue,
-    sessionsUnit,
-    programType,
-    theme,
-    offer,
-    status
-  } = req.body || {};
+      title,
+      description,
+      cover,
+      durationValue,
+      durationUnit,
+      sessionsValue,
+      sessionsUnit,
+      programType,
+      theme,
+      offer,
+      status,
+      startDate,
+      createdByUsername,
+      createdByAvatar
+    } = req.body || {};
 
   if (!title) {
     return res.status(400).json({
@@ -611,16 +614,24 @@ app.post("/api/courses", (req, res) => {
     id: Date.now().toString(),
     title,
     description: description || "",
-    cover: cover || "/images/course-placeholder.jpg",
+    cover: cover || "/images/Logo HK.ppg",
+  
     durationValue,
     durationUnit,
     sessionsValue,
     sessionsUnit,
+  
     programType,
     theme,
     offer,
+  
+    startDate: startDate || null,
+  
     status: status || "draft",
-    startDate: startDate || null,  // <-- new field
+  
+    createdByUsername: createdByUsername || "Unknown",
+    createdByAvatar: createdByAvatar || null,
+  
     createdAt: new Date().toISOString(),
     updatedAt: null
   };
@@ -921,6 +932,7 @@ app.get("/homepage/register.html", (req, res) => sendFirstExisting(res, "homepag
 
 // ---------------- START ----------------
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+
 
 
 
