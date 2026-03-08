@@ -421,6 +421,38 @@ document.addEventListener("DOMContentLoaded", () => {
     const container = qs("#courseDetailContainer");
 
     container.innerHTML = `
+    
+      <div class="flex justify-between items-center mb-4">
+    
+        <button id="backToCourses"
+          class="btn-primary">
+            X
+        </button>
+    
+        <div class="relative">
+          <button id="courseMenuBtn"
+            class="text-2xl px-3 py-1 rounded-xl hover:bg-black/10">
+            ⋮
+          </button>
+    
+          <div id="courseMenu"
+            class="hidden absolute right-0 mt-2 glass rounded-xl p-2 flex flex-col gap-1">
+    
+            <button id="editProgramBtn"
+              class="px-3 py-2 text-left hover:bg-black/10 rounded-lg">
+              Edit Program
+            </button>
+    
+            <button id="deleteProgramBtn"
+              class="px-3 py-2 text-left hover:bg-red-100 text-red-600 rounded-lg">
+              Delete Program
+            </button>
+    
+          </div>
+        </div>
+    
+      </div>
+    
       <div class="glass rounded-2xl overflow-hidden">
 
         <img
@@ -494,16 +526,67 @@ document.addEventListener("DOMContentLoaded", () => {
 
         </div>
       </div>
-
-      <button id="backToCourses" class="mt-6 btn-primary">
-        Back
-      </button>
     `;
+
+    
+    const menuBtn = qs("#courseMenuBtn");
+    const menu = qs("#courseMenu");
+    
+    menuBtn?.addEventListener("click", () => {
+      menu.classList.toggle("hidden");
+    });
 
     qs("#backToCourses")?.addEventListener("click", () => {
       showPage("my-courses");
     });
 
+    qs("#editProgramBtn")?.addEventListener("click", () => {
+
+  Courses.openModal();
+
+    qs("#courseTitle").value = course.title || "";
+    qs("#courseDescription").value = course.description || "";
+  
+    qs("#courseDurationValue").value = course.durationValue || "";
+    qs("#courseDurationUnit").value = course.durationUnit || "";
+  
+    qs("#courseSessionsValue").value = course.sessionsValue || "";
+    qs("#courseSessionsUnit").value = course.sessionsUnit || "";
+  
+    qs("#courseProgramType").value = course.programType || "";
+    qs("#courseTheme").value = course.theme || "";
+    qs("#courseOffer").value = course.offer || "";
+  
+    qs("#courseStartDate").value = course.startDate || "";
+    qs("#courseStatus").value = course.status || "";
+  
+  });
+
+    qs("#deleteProgramBtn")?.addEventListener("click", async () => {
+
+  const confirmName = prompt(
+    `Type the program name to delete:\n\n"${course.title}"`
+  );
+
+  if (!confirmName) return;
+
+  if (confirmName !== course.title) {
+    alert("Program name does not match.");
+    return;
+  }
+
+  await fetch(`/api/courses/${course.id}`, {
+    method: "DELETE"
+  });
+
+  alert("Program deleted");
+
+  showPage("my-courses");
+  Courses.loadCourses();
+
+});
+
+    
   };
 
   qsa(".nav-item").forEach(link => {
@@ -517,4 +600,5 @@ document.addEventListener("DOMContentLoaded", () => {
   showPage("dashboard");
 
 });
+
 
