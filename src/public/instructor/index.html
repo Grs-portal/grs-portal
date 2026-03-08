@@ -274,6 +274,25 @@ COURSE DETAIL PAGE
   top: 40px;
   z-index: 100;
 }
+
+/* Course Detail Overlay */
+#course-detail {
+  position: fixed;
+  inset: 0;           /* top:0; right:0; bottom:0; left:0 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0,0,0,0.3); /* blurred bg */
+  backdrop-filter: blur(6px);
+  z-index: 1000;      /* make sure it's above everything else */
+  overflow-y: auto;
+}
+
+#courseDetailContainer {
+  max-width: 1100px;
+  width: 95%;
+  margin: 2rem 0;
+}
   
 </style>
 </head>
@@ -610,5 +629,6 @@ COURSE DETAIL PAGE
 <script src="/instructor/script.js" defer></script>
 </body>
 </html>
+
 
 
