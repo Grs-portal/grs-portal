@@ -428,6 +428,13 @@
         <p class="subtitle text-center mt-2">You can wire this page to an API later.</p>
       </section>
     </div>
+
+    <!-- Course Detail -->
+    <div id="course-detail" class="page-section hidden">
+      <section class="w-full flex justify-center">
+        <div id="courseDetailContainer" class="w-full max-w-5xl"></div>
+      </section>
+    </div>
   </main>
 </div>
 
@@ -506,10 +513,11 @@
         <!-- Program Type -->
         <div>
           <label class="text-sm font-semibold">Program Type</label>
-          <select id="courseProgramType" class="w-full border rounded-xl p-2 mt-1">
-            <option value="course">Course</option>
-            <option value="workshop">Workshop</option>
-            <option value="activity">Activity</option>
+          <select id="typeFilter">
+            <option value="">All</option>
+            <option value="course">Courses</option>
+            <option value="workshop">Workshops</option>
+            <option value="activity">Activities</option>
           </select>
         </div>
       
@@ -573,7 +581,3 @@
 <script src="/instructor/script.js" defer></script>
 </body>
 </html>
-
-
-
-
