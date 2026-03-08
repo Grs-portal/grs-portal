@@ -441,28 +441,35 @@
           
               <div class="grid grid-cols-2 md:grid-cols-4 gap-4 course-info"></div>
           
-              <!-- Chapters -->
-              <h3 class="text-lg font-bold mt-4">Chapters</h3>
-              <div id="chaptersGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-            </div>
-          
-            <!-- Reviews Section -->
-            <div class="flex-1 space-y-4">
-              <h3 class="text-lg font-bold">Reviews</h3>
-              <div id="reviewsGrid" class="space-y-2"></div>
-            </div>
-          </div>
-          
-          <!-- Action Buttons -->
-          <div class="mt-6 flex gap-2">
-            <button id="editCourseBtn" class="btn-primary">Edit Course</button>
-            <button id="addChapterBtn" class="btn-primary">Add Chapter</button>
-          </div>
-        </div>
 
-        <button id="backToCourses" class="mb-4 btn-primary">
-          x
-        </button>
+        <div class="flex justify-between items-center mb-4">
+        
+          <button id="backToCourses" class="btn-primary">
+            X
+          </button>
+        
+          <div class="relative">
+            <button id="courseMenuBtn" class="btn-primary px-3">
+              ⋮
+            </button>
+        
+            <div id="courseMenu"
+              class="hidden absolute right-0 mt-2 w-44 glass rounded-xl overflow-hidden">
+        
+              <button id="editProgramBtn"
+                class="w-full text-left px-4 py-3 text-sm hover:bg-black/5 font-semibold">
+                Edit Program
+              </button>
+        
+              <button id="deleteProgramBtn"
+                class="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-black/5 font-semibold">
+                Delete Program
+              </button>
+        
+            </div>
+          </div>
+        
+        </div>
       </section>
     </div>
 
@@ -611,6 +618,7 @@
 <script src="/instructor/script.js" defer></script>
 </body>
 </html>
+
 
 
 
