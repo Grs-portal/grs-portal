@@ -152,14 +152,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const searchInput = qs("#searchCourse");
     const statusFilter = qs("#statusFilter");
+    const typeFilter = qs("#typeFilter");
 
     const applyFilters = () => {
       Courses.render({
         search: searchInput?.value || "",
-        status: statusFilter?.value || ""
+        status: statusFilter?.value || "",
+        type: typeFilter?.value || ""
       });
     };
 
+    typeFilter?.addEventListener("change", applyFilters);
     searchInput?.addEventListener("input", applyFilters);
     statusFilter?.addEventListener("change", applyFilters);
   };
@@ -238,6 +241,12 @@ document.addEventListener("DOMContentLoaded", () => {
       if (filters.status) {
         filtered = filtered.filter(c =>
           c.status === filters.status
+        );
+      }
+
+      if (filters.type) {
+        filtered = filtered.filter(c =>
+          c.programType === filters.type
         );
       }
 
@@ -600,5 +609,6 @@ document.addEventListener("DOMContentLoaded", () => {
   showPage("dashboard");
 
 });
+
 
 
