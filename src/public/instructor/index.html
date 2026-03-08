@@ -236,14 +236,43 @@
   margin-top: .4rem;
 }
 
+/* ===============================
+COURSE DETAIL PAGE
+================================ */
+
 #course-detail {
   display: flex;
   justify-content: center;
+  width: 100%;
 }
 
 #courseDetailContainer {
   width: 100%;
-  max-width: 1000px;
+  max-width: 1100px;
+}
+
+.course-detail-wrapper {
+  width: 100%;
+  padding: 24px;
+  border-radius: 24px;
+  background: rgba(255,255,255,.65);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+}
+
+.course-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.course-menu {
+  position: absolute;
+  right: 0;
+  top: 40px;
+  z-index: 100;
 }
   
 </style>
@@ -513,7 +542,7 @@
         <!-- Program Type -->
         <div>
           <label class="text-sm font-semibold">Program Type</label>
-          <select id="typeFilter">
+          <select id="courseProgramType">
             <option value="">All</option>
             <option value="course">Courses</option>
             <option value="workshop">Workshops</option>
@@ -581,4 +610,5 @@
 <script src="/instructor/script.js" defer></script>
 </body>
 </html>
+
 
