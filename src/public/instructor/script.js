@@ -545,3 +545,4 @@ qsa(".nav-item").forEach(link => {
 
 buildCoursesSidebar();
 showPage("dashboard");
+
