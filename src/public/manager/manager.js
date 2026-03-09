@@ -1,7 +1,7 @@
 // manager.js
 (() => {
   const API = "/api";
-  const LOGIN = "/homepage/login-manager.html"; // recommended: separate login per role
+  const LOGIN = "/homepage/login-manager.html";
 
   const qs = (s) => document.querySelector(s);
   const qsa = (s) => [...document.querySelectorAll(s)];
@@ -49,33 +49,22 @@
 
     qs("#y").textContent = new Date().getFullYear();
 
-    // Theme default = LIGHT (as requested)
     setupThemeUI(true);
-
-    // Profile dropdown + topbar avatar
     setupProfileDropdown();
     renderTopbarIdentity();
-
-    // personalization modal
     setupPersonalizeModal();
-
-    // UI basics
     setupMobileSidebar();
     setupNav();
     bindButtons();
 
-    // notifications
     setupNotificationsUI();
     loadNotifications();
     setInterval(loadNotifications, 15000);
 
-    // load server profile email (if present)
     await loadMeIntoUI();
-
     await loadDashboard();
   }
 
-  // ---------------- THEME ----------------
   function applyTheme(theme) {
     const t = theme || "light";
     document.documentElement.dataset.theme = t;
@@ -84,11 +73,8 @@
 
   function setupThemeUI(forceDefaultLight = false) {
     const saved = localStorage.getItem("theme");
-    if (forceDefaultLight && !saved) {
-      applyTheme("light");
-    } else {
-      applyTheme(saved || "light");
-    }
+    if (forceDefaultLight && !saved) applyTheme("light");
+    else applyTheme(saved || "light");
 
     qsa(".themePick").forEach((b) => {
       b.addEventListener("click", (e) => {
@@ -98,19 +84,19 @@
     });
   }
 
-  // ---------------- AUTH ----------------
   function logout() {
     localStorage.clear();
     location.href = LOGIN;
   }
 
-  // ---------------- TOPBAR IDENTITY ----------------
   function renderTopbarIdentity() {
     const name = localStorage.getItem("userName") || "Manager";
     qs("#userName").textContent = name;
 
     const avatarEl = qs("#userAvatar");
     const avatarData = localStorage.getItem("userAvatar") || "";
+
+    if (!avatarEl) return;
 
     if (avatarData) {
       avatarEl.style.backgroundImage = `url(${avatarData})`;
@@ -123,7 +109,6 @@
     }
   }
 
-  // ---------------- PROFILE DROPDOWN ----------------
   function setupProfileDropdown() {
     qs("#userAvatar")?.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -142,7 +127,6 @@
     });
   }
 
-  // ---------------- PERSONALIZE MODAL ----------------
   function openPersonalize() {
     qs("#personalizeBg")?.classList.remove("hidden");
     qs("#personalizeBg")?.classList.add("flex");
@@ -198,7 +182,6 @@
       if (e.key === "Escape") closePersonalize();
     });
 
-    // Avatar upload (localStorage)
     qs("#profilePhotoInput")?.addEventListener("change", (e) => {
       const file = e.target.files?.[0];
       if (!file) return;
@@ -221,11 +204,9 @@
       const newName = (qs("#profileNameInput")?.value || "").trim() || "Manager";
       const newEmail = (qs("#profileEmailInput")?.value || "").trim();
 
-      // save local immediately
       localStorage.setItem("userName", newName);
       localStorage.setItem("userEmail", newEmail);
 
-      // sync to server so it works across the system
       try {
         const res = await fetch(`${API}/me`, {
           method: "PUT",
@@ -249,7 +230,6 @@
   }
 
   async function loadMeIntoUI() {
-    // show email on dashboard
     const topEmail = qs("#topEmail");
     try {
       const res = await fetch(`${API}/me`, { headers: actorHeaders() });
@@ -262,7 +242,6 @@
     }
   }
 
-  // ---------------- MOBILE SIDEBAR ----------------
   function setupMobileSidebar() {
     const menuBtn = qs("#menuBtn");
     const sidebar = qs("#sidebar");
@@ -280,7 +259,6 @@
     });
   }
 
-  // ---------------- NAV ----------------
   function setupNav() {
     const pages = qsa(".page-section");
     const links = qsa(".nav-item");
@@ -302,6 +280,7 @@
         if (page === "submitted-homework") await loadHomework();
         if (page === "submitted-courses") await loadCourses();
         if (page === "users") await loadUsers();
+        if (page === "news") await loadNews();
       });
     });
   }
@@ -309,12 +288,11 @@
   function bindButtons() {
     qs("#openCreateHw")?.addEventListener("click", openCreateHomeworkModal);
     qs("#openCreateCourse")?.addEventListener("click", openCreateCourseModal);
-
     qs("#refreshUsersBtn")?.addEventListener("click", loadUsers);
     qs("#createUserBtn")?.addEventListener("click", openCreateUserModal);
+    qs("#createNewsBtn")?.addEventListener("click", openCreateNewsModal);
   }
 
-  // ---------------- MODAL ----------------
   function showModal(html) {
     closeModal();
     const bg = document.createElement("div");
@@ -342,7 +320,6 @@
     return typed === username;
   }
 
-  // ---------------- NOTIFICATIONS ----------------
   function setupNotificationsUI() {
     const btn = qs("#notifBtn");
     const menu = qs("#notifMenu");
@@ -411,7 +388,6 @@
       .join("");
   }
 
-  // ---------------- DASHBOARD ----------------
   async function loadDashboard() {
     const [courses, hw] = await Promise.all([fetchJSON("/courses"), fetchJSON("/homework")]);
 
@@ -465,7 +441,6 @@
     });
   }
 
-  // ---------------- COURSES PAGE ----------------
   async function loadCourses() {
     const courses = await fetchJSON("/courses");
     const list = qs("#submitted-courses-list");
@@ -515,7 +490,6 @@
     });
   }
 
-  // ---------------- STUDENTS ----------------
   async function loadStudents() {
     const students = await fetchJSON("/students");
     const table = qs("#studentTable");
@@ -535,7 +509,6 @@
       .join("");
   }
 
-  // ---------------- HOMEWORK ----------------
   async function loadHomework() {
     const hw = await fetchJSON("/homework");
     const list = qs("#homework-list");
@@ -585,7 +558,150 @@
     });
   }
 
-  // ---------------- UPLOAD HELPER ----------------
+  async function loadNews() {
+    const list = qs("#newsList");
+    if (!list) return;
+
+    const res = await fetch(`${API}/news`);
+    const out = await safeJson(res);
+    const items = out?.items || [];
+
+    if (!items.length) {
+      list.innerHTML = `<div class="surface-2 p-4 rounded-[18px] text-sm muted">No news posted yet.</div>`;
+      return;
+    }
+
+    list.innerHTML = items.map(n => `
+      <div class="surface-2 p-4 rounded-[18px]">
+        <div class="flex items-start justify-between gap-4">
+          <div class="flex-1">
+            <div class="font-extrabold text-lg">${esc(n.title)}</div>
+            ${n.summary ? `<div class="text-sm muted mt-1">${esc(n.summary)}</div>` : ""}
+            ${n.content ? `<div class="text-sm mt-3 whitespace-pre-wrap">${esc(n.content)}</div>` : ""}
+            <div class="text-xs muted mt-3">
+              By ${esc(n.createdBy || "Manager")} · ${new Date(n.createdAt).toLocaleString()}
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button class="edit-news icon-btn" data-id="${n.id}" title="Edit">✏️</button>
+            <button class="del-news icon-btn" data-id="${n.id}" title="Delete">🗑</button>
+          </div>
+        </div>
+      </div>
+    `).join("");
+
+    list.querySelectorAll(".edit-news").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const id = btn.dataset.id;
+        const found = items.find(x => String(x.id) === String(id));
+        if (found) openEditNewsModal(found);
+      });
+    });
+
+    list.querySelectorAll(".del-news").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const id = btn.dataset.id;
+        if (!confirm("Delete this news item?")) return;
+
+        const res = await fetch(`${API}/news/${id}`, {
+          method: "DELETE",
+          headers: actorHeaders()
+        });
+
+        const out = await safeJson(res);
+        if (!res.ok || !out?.success) return toast(out?.message || "Delete failed", "rgba(185,28,28,.85)");
+
+        toast("News deleted", "rgba(185,28,28,.85)");
+        loadNews();
+        loadNotifications();
+      });
+    });
+  }
+
+  function openCreateNewsModal() {
+    showModal(`
+      <h2 class="text-xl font-extrabold mb-4">Create News</h2>
+
+      <label class="text-sm font-bold muted">Title</label>
+      <input id="newsTitle" class="input-theme mt-1 mb-3" placeholder="Title" />
+
+      <label class="text-sm font-bold muted">Summary</label>
+      <input id="newsSummary" class="input-theme mt-1 mb-3" placeholder="Short summary" />
+
+      <label class="text-sm font-bold muted">Content</label>
+      <textarea id="newsContent" class="input-theme mt-1 mb-4 min-h-[140px]" placeholder="Write the news content here..."></textarea>
+
+      <div class="flex justify-end gap-2">
+        <button id="cancelModal" class="btn-theme">Cancel</button>
+        <button id="submitNews" class="btn-theme">Post</button>
+      </div>
+    `);
+
+    qs("#submitNews")?.addEventListener("click", async () => {
+      const title = qs("#newsTitle")?.value.trim();
+      const summary = qs("#newsSummary")?.value.trim();
+      const content = qs("#newsContent")?.value.trim();
+
+      if (!title) return toast("Title required", "rgba(185,28,28,.85)");
+
+      const res = await fetch(`${API}/news`, {
+        method: "POST",
+        headers: jsonHeaders(),
+        body: JSON.stringify({ title, summary, content })
+      });
+
+      const out = await safeJson(res);
+      if (!res.ok || !out?.success) return toast(out?.message || "Create failed", "rgba(185,28,28,.85)");
+
+      closeModal();
+      toast("News posted", "rgba(34,197,94,.70)");
+      loadNews();
+      loadNotifications();
+    });
+  }
+
+  function openEditNewsModal(item) {
+    showModal(`
+      <h2 class="text-xl font-extrabold mb-4">Edit News</h2>
+
+      <label class="text-sm font-bold muted">Title</label>
+      <input id="newsTitle" class="input-theme mt-1 mb-3" value="${esc(item.title)}" />
+
+      <label class="text-sm font-bold muted">Summary</label>
+      <input id="newsSummary" class="input-theme mt-1 mb-3" value="${esc(item.summary || "")}" />
+
+      <label class="text-sm font-bold muted">Content</label>
+      <textarea id="newsContent" class="input-theme mt-1 mb-4 min-h-[140px]">${esc(item.content || "")}</textarea>
+
+      <div class="flex justify-end gap-2">
+        <button id="cancelModal" class="btn-theme">Cancel</button>
+        <button id="saveNews" class="btn-theme">Save</button>
+      </div>
+    `);
+
+    qs("#saveNews")?.addEventListener("click", async () => {
+      const title = qs("#newsTitle")?.value.trim();
+      const summary = qs("#newsSummary")?.value.trim();
+      const content = qs("#newsContent")?.value.trim();
+
+      if (!title) return toast("Title required", "rgba(185,28,28,.85)");
+
+      const res = await fetch(`${API}/news/${item.id}`, {
+        method: "PUT",
+        headers: jsonHeaders(),
+        body: JSON.stringify({ title, summary, content })
+      });
+
+      const out = await safeJson(res);
+      if (!res.ok || !out?.success) return toast(out?.message || "Update failed", "rgba(185,28,28,.85)");
+
+      closeModal();
+      toast("News updated", "rgba(34,197,94,.70)");
+      loadNews();
+      loadNotifications();
+    });
+  }
+
   async function uploadPdf(file) {
     const fd = new FormData();
     fd.append("file", file);
@@ -593,30 +709,24 @@
     const res = await fetch(`${API}/upload`, { method: "POST", body: fd });
     const out = await safeJson(res);
     if (!res.ok || !out?.success) throw new Error(out?.message || "Upload failed");
-    return out; // {url, originalName}
+    return out;
   }
 
-  // ---------------- CREATE/EDIT MODALS ----------------
   function openCreateCourseModal() {
     showModal(`
       <h2 class="text-xl font-extrabold mb-4">Create Course</h2>
-
       <label class="text-sm font-bold muted">Title</label>
       <input id="courseTitle" class="input-theme mt-1 mb-3" placeholder="Title" />
-
       <label class="text-sm font-bold muted">Description</label>
       <textarea id="courseDesc" class="input-theme mt-1 mb-3" placeholder="Description"></textarea>
-
       <label class="text-sm font-bold muted">Type</label>
       <select id="courseType" class="select-theme mt-1 mb-3">
         <option value="in-person">In-person</option>
         <option value="online">Online</option>
         <option value="hybrid">Hybrid</option>
       </select>
-
       <label class="text-sm font-bold muted">PDF (optional)</label>
       <input id="coursePdf" type="file" accept=".pdf" class="mt-2 mb-4 w-full text-sm" />
-
       <div class="flex justify-end gap-2">
         <button id="cancelModal" class="btn-theme">Cancel</button>
         <button id="submitCourse" class="btn-theme">Create</button>
@@ -660,25 +770,18 @@
   function openEditCourseModal(course) {
     showModal(`
       <h2 class="text-xl font-extrabold mb-4">Edit Course</h2>
-
       <label class="text-sm font-bold muted">Title</label>
       <input id="courseTitle" class="input-theme mt-1 mb-3" value="${esc(course.title)}" />
-
       <label class="text-sm font-bold muted">Description</label>
       <textarea id="courseDesc" class="input-theme mt-1 mb-3">${esc(course.description || "")}</textarea>
-
       <label class="text-sm font-bold muted">Type</label>
       <select id="courseType" class="select-theme mt-1 mb-3">
         <option value="in-person" ${course.locationType === "in-person" ? "selected" : ""}>In-person</option>
         <option value="online" ${course.locationType === "online" ? "selected" : ""}>Online</option>
         <option value="hybrid" ${course.locationType === "hybrid" ? "selected" : ""}>Hybrid</option>
       </select>
-
-      <div class="text-xs muted mb-2">
-        ${course.pdfUrl ? `Current PDF: ${esc(course.pdfName || "Attached")}` : "No PDF attached"}
-      </div>
+      <div class="text-xs muted mb-2">${course.pdfUrl ? `Current PDF: ${esc(course.pdfName || "Attached")}` : "No PDF attached"}</div>
       <input id="coursePdf" type="file" accept=".pdf" class="mt-1 mb-4 w-full text-sm" />
-
       <div class="flex justify-end gap-2">
         <button id="cancelModal" class="btn-theme">Cancel</button>
         <button id="saveCourse" class="btn-theme">Save</button>
@@ -722,19 +825,14 @@
   function openCreateHomeworkModal() {
     showModal(`
       <h2 class="text-xl font-extrabold mb-4">Create Homework</h2>
-
       <label class="text-sm font-bold muted">Title</label>
       <input id="hwTitle" class="input-theme mt-1 mb-3" placeholder="Title" />
-
       <label class="text-sm font-bold muted">Description</label>
       <textarea id="hwDesc" class="input-theme mt-1 mb-3" placeholder="Description"></textarea>
-
       <label class="text-sm font-bold muted">Course</label>
       <input id="hwCourse" class="input-theme mt-1 mb-3" placeholder="Course name" />
-
       <label class="text-sm font-bold muted">PDF (optional)</label>
       <input id="hwPdf" type="file" accept=".pdf" class="mt-2 mb-4 w-full text-sm" />
-
       <div class="flex justify-end gap-2">
         <button id="cancelModal" class="btn-theme">Cancel</button>
         <button id="submitHw" class="btn-theme">Create</button>
@@ -777,21 +875,14 @@
   function openEditHomeworkModal(hw) {
     showModal(`
       <h2 class="text-xl font-extrabold mb-4">Edit Homework</h2>
-
       <label class="text-sm font-bold muted">Title</label>
       <input id="hwTitle" class="input-theme mt-1 mb-3" value="${esc(hw.title)}" />
-
       <label class="text-sm font-bold muted">Description</label>
       <textarea id="hwDesc" class="input-theme mt-1 mb-3">${esc(hw.description || "")}</textarea>
-
       <label class="text-sm font-bold muted">Course</label>
       <input id="hwCourse" class="input-theme mt-1 mb-3" value="${esc(hw.course || "")}" />
-
-      <div class="text-xs muted mb-2">
-        ${hw.pdfUrl ? `Current PDF: ${esc(hw.pdfName || "Attached")}` : "No PDF attached"}
-      </div>
+      <div class="text-xs muted mb-2">${hw.pdfUrl ? `Current PDF: ${esc(hw.pdfName || "Attached")}` : "No PDF attached"}</div>
       <input id="hwPdf" type="file" accept=".pdf" class="mt-1 mb-4 w-full text-sm" />
-
       <div class="flex justify-end gap-2">
         <button id="cancelModal" class="btn-theme">Cancel</button>
         <button id="saveHw" class="btn-theme">Save</button>
@@ -834,26 +925,20 @@
   function openCreateUserModal() {
     showModal(`
       <h2 class="text-xl font-extrabold mb-4">Create User</h2>
-
       <label class="text-sm font-bold muted">Username</label>
       <input id="uUsername" class="input-theme mt-1 mb-3" placeholder="Username" />
-
       <label class="text-sm font-bold muted">Full name</label>
       <input id="uName" class="input-theme mt-1 mb-3" placeholder="Full name" />
-
       <label class="text-sm font-bold muted">Gmail</label>
       <input id="uEmail" class="input-theme mt-1 mb-3" placeholder="name@gmail.com" />
-
       <label class="text-sm font-bold muted">Password</label>
       <input id="uPassword" type="password" class="input-theme mt-1 mb-3" placeholder="Password" />
-
       <label class="text-sm font-bold muted">Role</label>
       <select id="uRole" class="select-theme mt-1 mb-4">
         <option value="student">student</option>
         <option value="instructor">instructor</option>
         <option value="manager">manager</option>
       </select>
-
       <div class="flex justify-end gap-2">
         <button id="cancelModal" class="btn-theme">Cancel</button>
         <button id="submitUser" class="btn-theme">Create</button>
@@ -885,7 +970,6 @@
     });
   }
 
-  // ---------------- USERS ----------------
   async function loadUsers() {
     const table = qs("#usersTable");
     if (!table) return toast("Missing #usersTable", "rgba(185,28,28,.85)");
@@ -939,7 +1023,6 @@
     });
   }
 
-  // ---------------- UTIL ----------------
   async function fetchJSON(path) {
     try {
       const r = await fetch(API + path);
