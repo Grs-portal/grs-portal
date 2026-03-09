@@ -12,14 +12,6 @@ try {
   console.warn("⚠️ multer not installed. Uploads will be disabled until you install it.");
 }
 
-// Nodemailer (email)
-let nodemailer = null;
-try {
-  nodemailer = require("nodemailer");
-} catch (e) {
-  console.warn("⚠️ nodemailer not installed. Email sending disabled until you install it (npm i nodemailer).");
-}
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -49,11 +41,20 @@ const DATA_FILE = path.join(__dirname, "data.json");
 function defaultData() {
   return {
     accounts: [
-  { username: "root", password: "1234", role: "instructor", name: "Instructor Root", email: "", avatarUrl: "" },
-  { username: "manager", password: "9999", role: "manager", name: "Project Manager", email: "", avatarUrl: "" },
-  { username: "student", password: "1234", role: "student", name: "Student", email: "", avatarUrl: "" },
+      { username: "root", password: "1234", role: "instructor", name: "Instructor Root", email: "", avatarUrl: "" },
+      { username: "manager", password: "9999", role: "manager", name: "Project Manager", email: "", avatarUrl: "" },
+      { username: "student", password: "1234", role: "student", name: "Student", email: "", avatarUrl: "" },
     ],
-    courses: [{ id: 1, title: "Intro to Programming", description: "Learn JS basics", locationType: "in-person" }],
+    courses: [
+      {
+        id: 1,
+        title: "Intro to Programming",
+        description: "Learn JS basics",
+        locationType: "in-person",
+        pdfUrl: "",
+        pdfName: ""
+      }
+    ],
     homework: [
       {
         id: 1,
@@ -61,11 +62,16 @@ function defaultData() {
         description: "Intro tasks",
         submitted_by: "John Doe",
         course: "Intro to Programming",
+        pdfUrl: "",
+        pdfName: ""
       },
     ],
-    students: [{ enrollment_id: 1, name: "John Doe", course: "Intro to Programming", grade: 9, username: "" }],
+    students: [
+      { enrollment_id: 1, name: "John Doe", course: "Intro to Programming", grade: 9, username: "student" }
+    ],
     notifications: [],
-    schedule: [] // ✅ schedule events stored here
+    schedule: [],
+    news: []
   };
 }
 
@@ -74,21 +80,23 @@ function loadData() {
     if (!fs.existsSync(DATA_FILE)) {
       fs.writeFileSync(DATA_FILE, JSON.stringify(defaultData(), null, 2));
     }
-    const raw = JSON.parse(fs.readFileSync(DATA_FILE, "utf-8"));
 
+    const raw = JSON.parse(fs.readFileSync(DATA_FILE, "utf-8"));
+    const defs = defaultData();
+
+    raw.accounts = Array.isArray(raw.accounts) ? raw.accounts : defs.accounts;
+    raw.courses = Array.isArray(raw.courses) ? raw.courses : defs.courses;
+    raw.homework = Array.isArray(raw.homework) ? raw.homework : defs.homework;
+    raw.students = Array.isArray(raw.students) ? raw.students : defs.students;
     raw.notifications = Array.isArray(raw.notifications) ? raw.notifications : [];
     raw.schedule = Array.isArray(raw.schedule) ? raw.schedule : [];
+    raw.news = Array.isArray(raw.news) ? raw.news : [];
 
-    raw.accounts = Array.isArray(raw.accounts) ? raw.accounts : defaultData().accounts;
-    raw.courses = Array.isArray(raw.courses) ? raw.courses : defaultData().courses;
-    raw.homework = Array.isArray(raw.homework) ? raw.homework : defaultData().homework;
-    raw.students = Array.isArray(raw.students) ? raw.students : defaultData().students;
-
-    // ✅ ensure email exists on accounts
-    raw.accounts = raw.accounts.map(a => ({
+    // make sure old accounts still get new fields
+    raw.accounts = raw.accounts.map((a) => ({
       email: "",
+      avatarUrl: "",
       ...a,
-      email: String(a.email || "").trim()
     }));
 
     return raw;
@@ -113,6 +121,39 @@ function actorFromReq(req) {
   };
 }
 
+function addNotification({
+  type,
+  action,
+  message,
+  byRole,
+  byName,
+  byUsername,
+  targetType,
+  targetId,
+  audienceRole = "all",
+  audienceUsername = ""
+}) {
+  const n = {
+    id: Date.now() + Math.floor(Math.random() * 1000),
+    ts: new Date().toISOString(),
+    type,
+    action,
+    message,
+    byRole,
+    byName,
+    byUsername,
+    targetType,
+    targetId,
+    audienceRole,
+    audienceUsername,
+    readBy: []
+  };
+  db.notifications.unshift(n);
+  db.notifications = db.notifications.slice(0, 300);
+  saveData();
+  return n;
+}
+
 function requireRole(req, res, allowedRoles = []) {
   const role = String(req.headers["x-role"] || req.query.role || "").trim();
   if (!allowedRoles.includes(role)) {
@@ -131,143 +172,15 @@ function isISODate(s) {
   return !isNaN(d.getTime());
 }
 
-function isValidEmail(email) {
-  const e = String(email || "").trim();
-  if (!e) return true; // allow empty
-  // simple validation
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
-}
-
-// ---------------- EMAIL (GMAIL) ----------------
-const GMAIL_USER = String(process.env.GMAIL_USER || "").trim();
-const GMAIL_APP_PASSWORD = String(process.env.GMAIL_APP_PASSWORD || "").trim();
-const EMAIL_FROM_NAME = String(process.env.EMAIL_FROM_NAME || "Hofi Korsou Portal").trim();
-
-let mailer = null;
-if (nodemailer && GMAIL_USER && GMAIL_APP_PASSWORD) {
-  mailer = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: GMAIL_USER,
-      pass: GMAIL_APP_PASSWORD,
-    },
-  });
-  console.log("✅ Email enabled via Gmail:", GMAIL_USER);
-} else {
-  console.log("ℹ️ Email disabled (missing nodemailer or env vars).");
-}
-
-// anti-spam: throttle per recipient
-const lastEmailAt = new Map(); // email -> timestamp
-
-async function sendEmail(to, subject, html) {
-  if (!mailer) return;
-  const email = String(to || "").trim();
-  if (!email) return;
-
-  const now = Date.now();
-  const last = lastEmailAt.get(email) || 0;
-  if (now - last < 30_000) return; // 30s throttle
-  lastEmailAt.set(email, now);
-
-  try {
-    await mailer.sendMail({
-      from: `"${EMAIL_FROM_NAME}" <${GMAIL_USER}>`,
-      to: email,
-      subject,
-      html,
-    });
-  } catch (e) {
-    console.warn("✉️ Email send failed:", e.message);
-  }
-}
-
-function getRecipientsForNotification(n) {
-  const accounts = Array.isArray(db.accounts) ? db.accounts : [];
-  const audienceRole = n.audienceRole || "all";
-  const audienceUsername = String(n.audienceUsername || "").trim();
-
-  // collect recipients by visibility
-  let recipients = [];
-
-  if (audienceRole === "all") {
-    recipients = accounts;
-  } else if (audienceRole === "all-students") {
-    recipients = accounts.filter(a => a.role === "student");
-  } else if (audienceRole === "student") {
-    recipients = accounts.filter(a => a.role === "student" && a.username === audienceUsername);
-  } else {
-    recipients = accounts; // fallback
-  }
-
-  // return emails only
-  return recipients
-    .map(a => String(a.email || "").trim())
-    .filter(e => e && isValidEmail(e));
-}
-
-/**
- * addNotification supports targeting:
- * audienceRole:
- *  - "all" (default)
- *  - "all-students"
- *  - "student" + audienceUsername
- */
-function addNotification({
-  type,
-  action,
-  message,
-  byRole,
-  byName,
-  byUsername,
-  targetType,
-  targetId,
-  audienceRole = "all",
-  audienceUsername = ""
-}) {
-  const n = {
-    id: Date.now(),
-    ts: new Date().toISOString(),
-    type,
-    action,
-    message,
-    byRole,
-    byName,
-    byUsername,
-    targetType,
-    targetId,
-    audienceRole,
-    audienceUsername,
-    readBy: []
-  };
-  db.notifications.unshift(n);
-  db.notifications = db.notifications.slice(0, 200);
-  saveData();
-
-  // ✅ EMAIL "NEWS" = send notification to emails
-  const subject = `[Hofi Korsou] ${String(type || "update").toUpperCase()}: ${String(action || "update")}`;
-  const html = `
-    <div style="font-family:Arial, sans-serif; line-height:1.5;">
-      <h2 style="margin:0 0 8px;">Hofi Korsou Portal Update</h2>
-      <p style="margin:0 0 10px;">${String(message || "").replace(/</g, "&lt;")}</p>
-      <p style="margin:0; color:#555; font-size:12px;">
-        By: ${String(byName || byUsername || "System")} (${String(byRole || "")})<br/>
-        Time: ${new Date(n.ts).toLocaleString()}
-      </p>
-    </div>
-  `;
-
-  const recipients = getRecipientsForNotification(n);
-  recipients.forEach((email) => sendEmail(email, subject, html));
-
-  return n;
+function validEmail(email) {
+  if (!email) return true;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).trim());
 }
 
 // ---------------- UPLOADS ----------------
 const uploadsDir = path.join(__dirname, "uploads");
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 
-// serve uploaded files
 app.use("/uploads", express.static(uploadsDir));
 
 let upload = null;
@@ -282,17 +195,15 @@ if (multer) {
 
   upload = multer({
     storage,
-    limits: { fileSize: 15 * 1024 * 1024 }, // 15MB
+    limits: { fileSize: 15 * 1024 * 1024 },
   });
 }
 
-// Upload endpoint (PDF)
 app.post("/api/upload", (req, res) => {
   if (!upload) return res.status(500).json({ success: false, message: "Uploads not enabled (multer missing)" });
 
   upload.single("file")(req, res, (err) => {
     if (err) return res.status(400).json({ success: false, message: err.message });
-
     if (!req.file) return res.status(400).json({ success: false, message: "No file uploaded" });
 
     const ext = path.extname(req.file.originalname).toLowerCase();
@@ -310,33 +221,6 @@ app.post("/api/upload", (req, res) => {
 });
 
 // ---------------- API ROUTES ----------------
-// ---------- ME (profile) ----------
-app.get("/api/me", (req, res) => {
-  const username = String(req.headers["x-username"] || "").trim();
-  const role = String(req.headers["x-role"] || "").trim();
-  if (!username || !role) return res.status(401).json({ success: false, message: "Not logged in" });
-
-  const user = db.accounts.find(a => a.username === username);
-  if (!user) return res.status(404).json({ success: false, message: "User not found" });
-
-  res.json({ success: true, user: safeNoPassword(user) });
-});
-
-app.put("/api/me", (req, res) => {
-  const username = String(req.headers["x-username"] || "").trim();
-  const role = String(req.headers["x-role"] || "").trim();
-  if (!username || !role) return res.status(401).json({ success: false, message: "Not logged in" });
-
-  const user = db.accounts.find(a => a.username === username);
-  if (!user) return res.status(404).json({ success: false, message: "User not found" });
-
-  const { name, email } = req.body || {};
-  if (typeof name === "string" && name.trim()) user.name = name.trim();
-  if (typeof email === "string") user.email = email.trim();
-
-  saveData();
-  res.json({ success: true, user: safeNoPassword(user) });
-});
 
 // ---------- NOTIFICATIONS ----------
 app.get("/api/notifications", (req, res) => {
@@ -356,7 +240,6 @@ app.get("/api/notifications", (req, res) => {
       if (aRole === "all") return true;
       if (aRole === "all-students") return role === "student";
       if (aRole === "student") return role === "student" && aUser === username;
-
       return true;
     })
     .slice(0, 50)
@@ -392,7 +275,155 @@ app.post("/api/notifications/read-all", (req, res) => {
   res.json({ success: true });
 });
 
-// ---------- SCHEDULE (v1) ----------
+// ---------- ME (profile) ----------
+app.get("/api/me", (req, res) => {
+  const username = String(req.headers["x-username"] || "").trim();
+  const role = String(req.headers["x-role"] || "").trim();
+  if (!username || !role) return res.status(401).json({ success: false, message: "Not logged in" });
+
+  const user = db.accounts.find(a => a.username === username);
+  if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+  res.json({ success: true, user: safeNoPassword(user) });
+});
+
+app.put("/api/me", (req, res) => {
+  const username = String(req.headers["x-username"] || "").trim();
+  const role = String(req.headers["x-role"] || "").trim();
+  if (!username || !role) return res.status(401).json({ success: false, message: "Not logged in" });
+
+  const user = db.accounts.find(a => a.username === username);
+  if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+  const { name, email } = req.body || {};
+
+  if (typeof name === "string" && name.trim()) user.name = name.trim();
+
+  if (typeof email === "string") {
+    const cleanEmail = email.trim();
+    if (!validEmail(cleanEmail)) {
+      return res.status(400).json({ success: false, message: "Invalid email" });
+    }
+    user.email = cleanEmail;
+  }
+
+  saveData();
+  res.json({ success: true, user: safeNoPassword(user) });
+});
+
+// ---------- NEWS ----------
+app.get("/api/news", (req, res) => {
+  const items = (db.news || [])
+    .slice()
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  res.json({ success: true, items });
+});
+
+app.post("/api/news", (req, res) => {
+  const role = requireRole(req, res, ["manager"]);
+  if (!role) return;
+
+  const a = actorFromReq(req);
+  const { title, content = "", summary = "" } = req.body || {};
+
+  if (!title || !String(title).trim()) {
+    return res.status(400).json({ success: false, message: "Title required" });
+  }
+
+  const item = {
+    id: Date.now(),
+    title: String(title).trim(),
+    summary: String(summary || "").trim(),
+    content: String(content || "").trim(),
+    createdBy: a.byName || a.byUsername || "Manager",
+    createdByUsername: a.byUsername || "",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+
+  db.news = Array.isArray(db.news) ? db.news : [];
+  db.news.unshift(item);
+  saveData();
+
+  addNotification({
+    type: "news",
+    action: "created",
+    message: `News posted: "${item.title}"`,
+    ...a,
+    targetType: "news",
+    targetId: item.id,
+    audienceRole: "all"
+  });
+
+  res.json({ success: true, item });
+});
+
+app.put("/api/news/:id", (req, res) => {
+  const role = requireRole(req, res, ["manager"]);
+  if (!role) return;
+
+  const id = String(req.params.id);
+  const idx = db.news.findIndex(n => String(n.id) === id);
+  if (idx === -1) return res.status(404).json({ success: false, message: "News not found" });
+
+  const a = actorFromReq(req);
+  const { title, summary, content } = req.body || {};
+
+  if (typeof title === "string" && !title.trim()) {
+    return res.status(400).json({ success: false, message: "Title cannot be empty" });
+  }
+
+  db.news[idx] = {
+    ...db.news[idx],
+    ...(typeof title === "string" ? { title: title.trim() } : {}),
+    ...(typeof summary === "string" ? { summary: summary.trim() } : {}),
+    ...(typeof content === "string" ? { content: content.trim() } : {}),
+    updatedAt: new Date().toISOString(),
+    updatedBy: a.byName || a.byUsername || "Manager"
+  };
+
+  saveData();
+
+  addNotification({
+    type: "news",
+    action: "updated",
+    message: `News updated: "${db.news[idx].title}"`,
+    ...a,
+    targetType: "news",
+    targetId: id,
+    audienceRole: "all"
+  });
+
+  res.json({ success: true, item: db.news[idx] });
+});
+
+app.delete("/api/news/:id", (req, res) => {
+  const role = requireRole(req, res, ["manager"]);
+  if (!role) return;
+
+  const id = String(req.params.id);
+  const idx = db.news.findIndex(n => String(n.id) === id);
+  if (idx === -1) return res.status(404).json({ success: false, message: "News not found" });
+
+  const item = db.news[idx];
+  db.news.splice(idx, 1);
+  saveData();
+
+  const a = actorFromReq(req);
+  addNotification({
+    type: "news",
+    action: "deleted",
+    message: `News deleted: "${item.title}"`,
+    ...a,
+    targetType: "news",
+    targetId: id,
+    audienceRole: "all"
+  });
+
+  res.json({ success: true });
+});
+
+// ---------- SCHEDULE ----------
 app.get("/api/schedule", (req, res) => {
   const role = String(req.query.role || req.headers["x-role"] || "").trim();
   const username = String(req.query.username || req.headers["x-username"] || "").trim();
@@ -510,6 +541,7 @@ app.put("/api/schedule/:id", (req, res) => {
   if (patch.audienceRole && !["all-students", "student"].includes(patch.audienceRole)) {
     return res.status(400).json({ success: false, message: "audienceRole must be all-students or student" });
   }
+
   if ((patch.audienceRole || prev.audienceRole) === "student") {
     const u = String(patch.audienceUsername ?? prev.audienceUsername ?? "").trim();
     if (!u) return res.status(400).json({ success: false, message: "audienceUsername required for audienceRole=student" });
@@ -577,107 +609,104 @@ app.delete("/api/schedule/:id", (req, res) => {
   res.json({ success: true });
 });
 
-/* ═════════ COURSES API ═════════ */
-
-app.get("/api/courses", (req, res) => {
-  res.json(db.courses || []);
-});
-
+// ---------- COURSES ----------
+app.get("/api/courses", (req, res) => res.json(db.courses));
 
 app.post("/api/courses", (req, res) => {
+  const { title, description = "", locationType = "in-person", pdfUrl = "", pdfName = "" } = req.body || {};
+  if (!title) return res.status(400).json({ success: false, message: "Title required" });
 
-  const {
-      title,
-      description,
-      cover,
-      durationValue,
-      durationUnit,
-      sessionsValue,
-      sessionsUnit,
-      programType,
-      theme,
-      offer,
-      status,
-      startDate,
-      createdByUsername,
-      createdByAvatar
-    } = req.body || {};
-
-  if (!title) {
-    return res.status(400).json({
-      success:false,
-      message:"Title required"
-    });
-  }
+  const a = actorFromReq(req);
 
   const newCourse = {
-    id: Date.now().toString(),
+    id: Date.now(),
     title,
-    description: description || "",
-    cover: cover || "/images/Logo HK.ppg",
-  
-    durationValue,
-    durationUnit,
-    sessionsValue,
-    sessionsUnit,
-  
-    programType,
-    theme,
-    offer,
-  
-    startDate: startDate || null,
-  
-    status: status || "draft",
-  
-    createdByUsername: createdByUsername || "Unknown",
-    createdByAvatar: createdByAvatar || null,
-  
-    createdAt: new Date().toISOString(),
-    updatedAt: null
+    description,
+    cover: "/images/course-placeholder.jpg",
+    duration: "—",
+    teacher: {
+      name: a.byName || "Staff",
+      photo: "/images/teacher-placeholder.jpg"
+    },
+    chapters: [],
+    reviews: [],
+    locationType,
+    pdfUrl,
+    pdfName,
+    createdBy: a.byName || a.byUsername || "Unknown",
+    createdAt: new Date().toISOString()
   };
-  
-    db.courses.push(newCourse);
-    saveData();
-  
-    res.json(newCourse);
+
+  db.courses.push(newCourse);
+  saveData();
+
+  addNotification({
+    type: "course",
+    action: "created",
+    message: `Course created: "${newCourse.title}"`,
+    ...a,
+    targetType: "course",
+    targetId: newCourse.id,
+    audienceRole: "all"
   });
 
+  res.json(newCourse);
+});
 
-app.put("/api/courses/:id", (req,res)=>{
+app.put("/api/courses/:id", (req, res) => {
+  const id = String(req.params.id);
+  const idx = db.courses.findIndex(c => String(c.id) === id);
+  if (idx === -1) return res.status(404).json({ success: false, message: "Course not found" });
 
-  const id = req.params.id;
-
-  const idx = db.courses.findIndex(c => c.id === id);
-
-  if(idx === -1){
-    return res.status(404).json({success:false});
-  }
+  const a = actorFromReq(req);
 
   db.courses[idx] = {
     ...db.courses[idx],
     ...req.body,
+    updatedBy: a.byName || a.byUsername || "Unknown",
+    updatedByUsername: a.byUsername || "",
+    updatedByRole: a.byRole || "",
     updatedAt: new Date().toISOString()
   };
 
   saveData();
 
+  addNotification({
+    type: "course",
+    action: "updated",
+    message: `Course updated: "${db.courses[idx].title}"`,
+    ...a,
+    targetType: "course",
+    targetId: id,
+    audienceRole: "all"
+  });
+
   res.json(db.courses[idx]);
 });
 
-
-app.delete("/api/courses/:id",(req,res)=>{
-
-  const id = req.params.id;
-
-  db.courses = db.courses.filter(c=>c.id!==id);
-
+app.delete("/api/courses/:id", (req, res) => {
+  const id = String(req.params.id);
+  const before = db.courses.length;
+  db.courses = db.courses.filter(c => String(c.id) !== id);
   saveData();
 
-  res.json({success:true});
+  const a = actorFromReq(req);
+  if (db.courses.length !== before) {
+    addNotification({
+      type: "course",
+      action: "deleted",
+      message: `Course deleted (id: ${id})`,
+      ...a,
+      targetType: "course",
+      targetId: id,
+      audienceRole: "all"
+    });
+  }
 
+  res.json({ success: true });
 });
 
-/* ═════════ HOMEWORK ═════════ */
+// ---------- HOMEWORK ----------
 app.get("/api/homework", (req, res) => res.json(db.homework));
 
 app.post("/api/homework", (req, res) => {
@@ -770,7 +799,7 @@ app.delete("/api/homework/:id", (req, res) => {
   res.json({ success: true });
 });
 
-/* ═════════ STUDENTS ═════════ */
+// ---------- STUDENTS ----------
 app.get("/api/students", (req, res) => res.json(db.students));
 
 app.put("/api/students/:id", (req, res) => {
@@ -783,7 +812,7 @@ app.put("/api/students/:id", (req, res) => {
   res.json(db.students[idx]);
 });
 
-/* ═════════ USERS (MANAGER ADMIN) ═════════ */
+// ---------- USERS (MANAGER ADMIN) ----------
 app.get("/api/users", (req, res) => {
   const role = requireRole(req, res, ["manager"]);
   if (!role) return;
@@ -799,16 +828,18 @@ app.post("/api/users", (req, res) => {
     return res.status(400).json({ success: false, message: "Missing username/password/role" });
   }
 
-  if (!isValidEmail(email)) {
-    return res.status(400).json({ success: false, message: "Invalid email" });
-  }
-
   const allowedRoles = ["student", "instructor", "manager"];
   if (!allowedRoles.includes(newRole)) {
     return res.status(400).json({ success: false, message: "Invalid role" });
   }
 
   const cleanUsername = String(username).trim();
+  const cleanEmail = String(email || "").trim();
+
+  if (!validEmail(cleanEmail)) {
+    return res.status(400).json({ success: false, message: "Invalid email" });
+  }
+
   if (db.accounts.find(a => a.username === cleanUsername)) {
     return res.status(400).json({ success: false, message: "Username already exists" });
   }
@@ -818,7 +849,7 @@ app.post("/api/users", (req, res) => {
     password: String(password),
     role: newRole,
     name: String(name || cleanUsername).trim(),
-    email: String(email || "").trim(),
+    email: cleanEmail,
     avatarUrl: ""
   };
 
@@ -883,7 +914,7 @@ app.delete("/api/users/:username", (req, res) => {
   res.json({ success: true });
 });
 
-/* ═════════ AUTH ═════════ */
+// ---------- AUTH ----------
 app.post("/api/login", (req, res) => {
   const { username, password } = req.body || {};
   if (!username || !password) return res.status(400).json({ success: false });
@@ -909,7 +940,6 @@ app.post("/api/login", (req, res) => {
   });
 });
 
-// OPTIONAL: disable online register
 app.post("/api/register", (req, res) => {
   return res.status(403).json({ success: false, message: "Online registration disabled. Visit Hofi Korsou." });
 });
@@ -928,14 +958,10 @@ app.get("/instructor", (req, res) => sendFirstExisting(res, "instructor/index.ht
 app.get("/manager", (req, res) => sendFirstExisting(res, "manager/manager.html"));
 app.get("/students", (req, res) => sendFirstExisting(res, "students/student.html"));
 app.get("/homepage/login.html", (req, res) => sendFirstExisting(res, "homepage/login.html"));
+app.get("/homepage/login-student.html", (req, res) => sendFirstExisting(res, "homepage/login-student.html", "homepage/login.html"));
+app.get("/homepage/login-instructor.html", (req, res) => sendFirstExisting(res, "homepage/login-instructor.html", "homepage/login.html"));
+app.get("/homepage/login-manager.html", (req, res) => sendFirstExisting(res, "homepage/login-manager.html", "homepage/login.html"));
 app.get("/homepage/register.html", (req, res) => sendFirstExisting(res, "homepage/register.html", "register.html"));
 
 // ---------------- START ----------------
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
-
-
-
-
-
-
-
