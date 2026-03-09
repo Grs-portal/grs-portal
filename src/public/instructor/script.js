@@ -606,9 +606,9 @@ document.addEventListener("DOMContentLoaded", () => {
   buildCoursesSidebar();
   showPage("dashboard");
 
-  console.log("Opening page:", id);
 
 });
+
 
 
 
