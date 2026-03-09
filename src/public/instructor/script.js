@@ -123,8 +123,8 @@ document.addEventListener("DOMContentLoaded", () => {
           <select id="typeFilter">
             <option value="">All</option>
             <option value="course">Courses</option>
-            <option value="workshops">Workshops</option>
-            <option value="activities">Activities</option>
+            <option value="workshop">Workshops</option>
+            <option value="activity">Activities</option>
           </select>
         </div>
 
@@ -203,8 +203,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
     const init = async () => {
-      if (initialized) return;
-      initialized = true;
       await loadCourses();
     };
 
@@ -418,8 +416,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const openCourseDetail = async (id) => {
 
-    closeAllSidebars();
     showPage("course-detail");
+    closeAllSidebars();
 
     const res = await fetch("/api/courses");
     const allCourses = await res.json();
@@ -608,7 +606,10 @@ document.addEventListener("DOMContentLoaded", () => {
   buildCoursesSidebar();
   showPage("dashboard");
 
+  console.log("Opening page:", id);
+
 });
+
 
 
 
