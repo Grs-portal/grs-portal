@@ -504,6 +504,8 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   buildCoursesSidebar();
+  Courses.init();   
   showPage("dashboard");
 
 });
+
