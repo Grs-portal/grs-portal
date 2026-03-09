@@ -118,9 +118,9 @@ document.addEventListener("DOMContentLoaded", () => {
           </select>
         </div>
 
-        <div class="filter-group">
-          <label>Program Type</label>
-          <select id="statusFilter">
+      <div class="filter-group">
+        <label>Program Type</label>
+          <select id="typeFilter">
             <option value="">All</option>
             <option value="course">Courses</option>
             <option value="workshops">Workshops</option>
@@ -609,5 +609,6 @@ document.addEventListener("DOMContentLoaded", () => {
   showPage("dashboard");
 
 });
+
 
 
