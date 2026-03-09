@@ -1,633 +1,432 @@
 <!doctype html>
 <html lang="en">
+
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Teacher Portal</title>
 
-<!-- Tailwind CSS -->
+<!-- Tailwind -->
 <script src="https://cdn.tailwindcss.com"></script>
 
-<!-- Inter font -->
+<!-- Font -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-  /* ------------------------------
-     Root Variables
-  ------------------------------- */
-  :root {
-    --soft-green: #BFE3B4;
-    --soft-green-light: #E6F5E2;
-    --soft-green-dark: #A9D69D;
-    --text-dark: #1C1820;
-    --border: rgba(0,0,0,.10);
-    --sidebar-w: 260px;
-    --header-h: 64px;
-  }
 
-  /* ------------------------------
-     Base Styles
-  ------------------------------- */
-  html, body {
-    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-    color: var(--text-dark);
-  }
-  body {
-    background:
-      radial-gradient(900px 420px at 18% 8%, rgba(191,227,180,.55), transparent 55%),
-      radial-gradient(900px 420px at 90% 12%, rgba(169,214,157,.40), transparent 55%),
-      linear-gradient(180deg, #f2fbf0 0%, #e6f5e2 55%, #f2fbf0 100%);
-    overflow-x: hidden;
-  }
-  .title-strong { font-weight: 700; letter-spacing: -0.01em; }
-  .subtitle { font-weight: 500; opacity: .8; }
-
-  /* ------------------------------
-     Navigation Items
-  ------------------------------- */
-  .nav-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: 14px;
-    color: var(--text-dark);
-    font-weight: 600;
-    transition: 150ms;
-  }
-  .nav-item:hover { background: rgba(191,227,180,0.35); }
-  .nav-item.active { background: rgba(28,24,32,.92); color: #e9f7e6; }
-
-  /* ------------------------------
-     Glass / Card / Buttons
-  ------------------------------- */
-  .glass {
-    background: rgba(255,255,255,.70);
-    border: 1px solid var(--border);
-    box-shadow: 0 10px 26px rgba(0,0,0,0.06);
-    backdrop-filter: blur(12px);
-  }
-  .hero {
-    background: linear-gradient(to bottom right, var(--soft-green), var(--soft-green-dark));
-    border: 1px solid var(--border);
-    box-shadow: 0 10px 26px rgba(0,0,0,0.08);
-  }
-  .btn-primary {
-    background: rgba(28,24,32,.92);
-    color: #e9f7e6;
-    border-radius: 16px;
-    padding: 10px 16px;
-    font-weight: 600;
-    transition: 0.15s;
-  }
-  .btn-primary:hover { opacity: .92; }
-
-  /* ------------------------------
-     Sidebar Layout
-  ------------------------------- */
-  #mainSidebar, #coursesSidebar {
-    grid-column: span 3 / span 3;
-    display: none;
-    height: fit-content;
-    transition: transform .35s ease, opacity .25s ease;
-  }
-  #coursesSidebar { flex-direction: column; width: var(--sidebar-w); padding: 1rem; gap: 1rem; }
-
-  #mainSidebar.active, #coursesSidebar.active { display: flex; flex-direction: column; }
-
-  @media (max-width: 1024px) {
-    #mainSidebar, #coursesSidebar {
-      position: fixed; top: 0; left: 0; width: var(--sidebar-w);
-      height: 100vh; z-index: 40; transform: translateX(-100%);
-      transition: transform .35s ease;
-      transform: translateX(-16px);
-    }
-    #mainSidebar.active, 
-    #coursesSidebar.active { 
-      transform: translateX(0);
-      opacity: 1;
-    }
-  }
-
-  /* Overlay */
-  #overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,.4);
-    backdrop-filter: blur(3px); display: none; z-index: 30;
-  }
-  #overlay.active { display: block; }
-
-  /* Animations */
-  .fade-in { animation: fadeIn 0.25s ease; }
-  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-
-  /* Courses Grid */
-  #my-courses-grid .course-card {
-    background: rgba(255,255,255,0.75);
-    border: 1px solid var(--border);
-    border-radius: 1rem;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-
-  #my-courses-grid .course-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-  }
-  #dashboard-courses {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 1rem;
-  }
-
-  /* =========================
-   COURSES SIDEBAR DESIGN
-========================= */
-
-.courses-sidebar-content {
-  background: #ffffff;
-  padding: 1.5rem;
-  border-radius: 14px;
-  border: 1px solid #ddd;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+:root{
+--soft-green:#BFE3B4;
+--soft-green-light:#E6F5E2;
+--soft-green-dark:#A9D69D;
+--text-dark:#1C1820;
+--border:rgba(0,0,0,.10);
+--sidebar-w:260px;
+--header-h:64px;
 }
 
-.sidebar-title {
-  font-weight: 700;
-  font-size: 1.05rem;
+html,body{
+font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+color:var(--text-dark);
 }
 
-.filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+body{
+background:
+radial-gradient(900px 420px at 18% 8%, rgba(191,227,180,.55), transparent 55%),
+radial-gradient(900px 420px at 90% 12%, rgba(169,214,157,.40), transparent 55%),
+linear-gradient(180deg,#f2fbf0 0%,#e6f5e2 55%,#f2fbf0 100%);
+overflow-x:hidden;
 }
 
-.filter-group label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  opacity: .8;
+/* NAV ITEMS */
+
+.nav-item{
+display:flex;
+align-items:center;
+gap:10px;
+padding:10px 12px;
+border-radius:14px;
+font-weight:600;
+transition:.15s;
 }
 
-.filter-group input,
-.filter-group select {
-  width: 100%;
-  padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  background: white;
+.nav-item:hover{
+background:rgba(191,227,180,.35);
 }
 
-/* new course button */
-.new-course-btn {
-  background: rgba(28,24,32,.92);
-  color: #fff;
-  padding: 10px;
-  border-radius: 10px;
-  font-weight: 600;
-  transition: .15s;
+.nav-item.active{
+background:rgba(28,24,32,.92);
+color:#e9f7e6;
 }
 
-.new-course-btn:hover {
-  opacity: .9;
+/* GLASS */
+
+.glass{
+background:rgba(255,255,255,.7);
+border:1px solid var(--border);
+box-shadow:0 10px 26px rgba(0,0,0,0.06);
+backdrop-filter:blur(12px);
 }
 
-/* calendar */
-.sidebar-calendar {
-  border-top: 1px solid #eee;
-  padding-top: 1rem;
+/* BUTTON */
+
+.btn-primary{
+background:rgba(28,24,32,.92);
+color:#e9f7e6;
+border-radius:16px;
+padding:10px 16px;
+font-weight:600;
 }
 
-.calendar-header {
-  font-weight: 600;
-  text-align: center;
-  margin-bottom: .5rem;
+.btn-primary:hover{
+opacity:.9;
 }
 
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
-  font-size: 0.75rem;
-  text-align: center;
+/* COURSE GRID */
+
+.course-card{
+background:rgba(255,255,255,.75);
+border:1px solid var(--border);
+border-radius:1rem;
+padding:1rem;
+transition:.2s;
+cursor:pointer;
 }
 
-.calendar-grid span {
-  padding: 4px 0;
-  border-radius: 6px;
+.course-card:hover{
+transform:translateY(-3px);
+box-shadow:0 8px 20px rgba(0,0,0,0.08);
 }
 
-.event-day {
-  background: var(--soft-green);
-  font-weight: 700;
+/* COURSE DETAIL OVERLAY */
+
+#course-detail{
+position:fixed;
+inset:0;
+display:flex;
+align-items:center;
+justify-content:center;
+z-index:1000;
+overflow-y:auto;
 }
 
-.calendar-hint {
-  font-size: 0.7rem;
-  text-align: center;
-  opacity: .6;
-  margin-top: .4rem;
+#courseDetailContainer{
+width:95%;
+max-width:1100px;
+margin:2rem 0;
 }
 
-/* ===============================
-COURSE DETAIL PAGE
-================================ */
-
-#course-detail {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-}
-
-#courseDetailContainer {
-  width: 100%;
-  max-width: 1100px;
-}
-
-.course-detail-wrapper {
-  width: 100%;
-  padding: 24px;
-  border-radius: 24px;
-  background: rgba(255,255,255,.65);
-  border: 1px solid var(--border);
-  backdrop-filter: blur(16px);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
-}
-
-.course-detail-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.course-menu {
-  position: absolute;
-  right: 0;
-  top: 40px;
-  z-index: 100;
-}
-
-/* Course Detail Overlay */
-#course-detail {
-  position: fixed;
-  inset: 0;           /* top:0; right:0; bottom:0; left:0 */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;      /* make sure it's above everything else */
-  overflow-y: auto;
-}
-
-#courseDetailContainer {
-  max-width: 1100px;
-  width: 95%;
-  margin: 2rem 0;
-}
-  
 </style>
 </head>
-<body class="min-h-screen overflow-x-hidden">
 
-<!-- Topbar -->
-  <header class="sticky top-0 z-50 border-b glass">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+<body class="min-h-screen">
 
-      <div class="flex items-center gap-3">
-        <button id="menuBtn" class="lg:hidden text-2xl leading-none hover:opacity-70 transition" aria-label="Open menu">☰</button>
-        <div>
-          <div class="title-strong text-[15px]">Teacher Portal</div>
-          <div class="text-xs subtitle">Dashboard • Courses • Homework • Grades</div>
-        </div>
-      </div>
+<!-- TOPBAR -->
 
-      <div class="flex items-center gap-3">
-        <span id="userName" class="text-sm font-semibold"></span>
+<header class="sticky top-0 z-50 border-b glass">
 
-        <!-- 🔔 Notifications -->
-        <div class="relative" id="notifWrap">
-          <button id="notifBtn"
-            class="w-10 h-10 rounded-2xl glass flex items-center justify-center hover:bg-white transition"
-            title="Notifications">
-            🔔
-            <span id="notifBadge"
-              class="hidden absolute -top-1 -right-1 text-[11px] px-1.5 py-0.5 rounded-full bg-red-500 text-white font-bold">
-              0
-            </span>
-          </button>
+<div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
 
-          <div id="notifMenu"
-            class="hidden absolute right-0 mt-2 w-80 max-w-[90vw] glass rounded-2xl overflow-hidden">
-            <div class="px-4 py-3 flex items-center justify-between border-b border-black/10">
-              <div class="font-semibold">Notifications</div>
-              <button id="notifReadAll"
-                class="text-xs font-semibold px-2 py-1 rounded-xl bg-slate-100 hover:bg-slate-200">
-                Mark all read
-              </button>
-            </div>
-            <div id="notifList" class="max-h-80 overflow-auto"></div>
-            <div class="px-4 py-3 text-xs text-slate-500 border-t border-black/10">
-              Uploads • edits • deletes
-            </div>
-          </div>
-        </div>
+<div class="flex items-center gap-3">
 
-        <!-- Avatar dropdown -->
-        <div id="topAvatarWrap" class="relative">
-          <div id="userAvatar"
-            class="w-10 h-10 rounded-full bg-[var(--soft-green)] border border-black/10 flex items-center justify-center font-semibold cursor-pointer select-none">
-          </div>
+<button id="menuBtn" class="lg:hidden text-2xl">☰</button>
 
-          <div id="profileMenu"
-            class="hidden absolute right-0 mt-2 w-44 glass rounded-2xl overflow-hidden">
-            <button id="logoutBtn"
-              class="w-full text-left px-4 py-3 text-sm hover:bg-black/5 font-semibold">
-              Logout
-            </button>
-          </div>
-        </div>
+<div>
+<div class="font-bold text-[15px]">Teacher Portal</div>
+<div class="text-xs opacity-70">Dashboard • Courses • Homework • Grades</div>
+</div>
 
-      </div>
-    </div>
-  </header>
+</div>
 
-<div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 px-4 py-6 relative">
+<div class="flex items-center gap-3">
 
-  <!-- Main Sidebar -->
-  <aside id="mainSidebar" class="sidebar active glass p-4 flex flex-col justify-between  rounded-3xl p-6">
-    <div>
-      <div class="title-strong text-sm">Navigation</div>
-      <div class="text-xs subtitle">Jump between sections</div>
-      <nav class="mt-4">
-        <ul class="space-y-1">
-          <li><a href="#" data-page="dashboard" class="nav-item active">🏠 <span>Dashboard</span></a></li>
-          <li><a href="#" data-page="students" class="nav-item">🎓 <span>Students & Grades</span></a></li>
-          <li><a href="#" data-page="submitted" class="nav-item">📥 <span>Submitted Homework</span></a></li>
-          <li><a href="#" data-page="my-courses" class="nav-item">📚 <span>My Courses</span></a></li>
-          <li><a href="#" data-page="create-homework" class="nav-item">📝 <span>Create Homework</span></a></li>
-          <li><a href="#" data-page="news" class="nav-item">📰 <span>News</span></a></li>
-        </ul>
-      </nav>
-      <div class="mt-6 grid grid-cols-2 gap-3">
-        <section class="glass p-4 rounded-2xl text-center">
-          <p class="text-xs subtitle">Active courses</p>
-          <p id="activeCoursesCount" class="text-2xl font-semibold mt-1">0</p>
-        </section>
-        <section class="glass p-4 rounded-2xl text-center">
-          <p class="text-xs subtitle">To grade</p>
-          <p id="toGradeCount" class="text-2xl font-semibold mt-1">0</p>
-        </section>
-      </div>
-    </div>
-    <div>
-      <button id="sidebarLogout" class="w-full rounded-2xl border border-black/10 bg-white/70 hover:bg-white px-4 py-3 text-left font-semibold transition shadow-sm">
-        🚪 Logout
-      </button>
-    </div>
-  </aside>
+<span id="userName" class="text-sm font-semibold"></span>
 
-  <!-- Courses Sidebar -->
-  <aside id="coursesSidebar" class="sidebar glass p-4 hidden flex-col gap-3"></aside>
-  
+<!-- NOTIFICATIONS -->
 
-  <!-- Overlay for mobile -->
-  <div id="overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-30 lg:hidden"></div>
+<div class="relative">
 
-  <!-- Main Content -->
-  <main class="lg:col-span-9 space-y-6">
+<button id="notifBtn"
+class="w-10 h-10 rounded-2xl glass flex items-center justify-center">
 
-    <!-- Dashboard -->
-    <div id="dashboard" class="page-section">
-      <section class="hero rounded-2xl p-6">
-        <h2 class="text-2xl title-strong">Welcome, Teacher!</h2>
-        <p class="mt-1 subtitle">Manage your courses, homework, and grading from here.</p>
-      </section>
-      <section class="glass rounded-2xl p-6 mt-6">
-        <div class="flex items-center justify-between gap-3">
-          <h3 class="text-lg title-strong">My Courses</h3>
-          <div class="text-xs subtitle">Overview of what you teach</div>
-        </div>
-        <div id="dashboard-courses" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-          <!-- dynamically added dashboard courses -->
-        </div>
-      </section>
-    </div>
+🔔
 
-    <!-- Students -->
-    <div id="students" class="page-section hidden">
-      <section class="glass rounded-2xl p-6">
-        <h2 class="text-xl title-strong">Students & Grades</h2>
-        <div class="overflow-x-auto mt-4">
-          <table class="min-w-full text-sm text-left">
-            <thead class="bg-[rgba(191,227,180,.85)] text-[var(--text-dark)] uppercase text-[0.75rem]">
-              <tr>
-                <th class="px-6 py-3">Student</th>
-                <th class="px-6 py-3">Course</th>
-                <th class="px-6 py-3">Grade</th>
-                <th class="px-6 py-3 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="studentTable"></tbody>
-          </table>
-        </div>
-      </section>
-    </div>
+<span id="notifBadge"
+class="hidden absolute -top-1 -right-1 text-[11px] px-1.5 py-0.5 rounded-full bg-red-500 text-white">
+0
+</span>
 
-    <!-- Submitted Homework -->
-    <div id="submitted" class="page-section hidden">
-      <section class="glass rounded-2xl p-6 min-h-[60vh]">
-        <h2 class="text-xl title-strong">Submitted Homework</h2>
-        <div id="homework-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4"></div>
-      </section>
-    </div>
+</button>
 
-    <!-- My Courses -->
-    <div id="my-courses" class="page-section hidden">
-      <section class="glass rounded-2xl p-6">
-        <h2 class="text-xl title-strong mb-4">My Courses</h2>
-        <div id="my-courses-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <!-- dynamically added course cards -->
-        </div>
-      </section>
-    </div>
+<div id="notifMenu"
+class="hidden absolute right-0 mt-2 w-80 glass rounded-2xl overflow-hidden">
 
-    <!-- Create Homework -->
-    <div id="create-homework" class="page-section hidden">
-      <section class="glass rounded-2xl p-6 min-h-[60vh] flex flex-col items-center justify-center text-center">
-        <h2 class="text-2xl title-strong">Create Homework</h2>
-        <p class="subtitle mt-1">Create an assignment and attach a PDF if needed.</p>
-        <button id="addHomeworkBtn" class="btn-primary mt-5">+ Add Homework</button>
-      </section>
-    </div>
+<div class="px-4 py-3 border-b font-semibold">
+Notifications
+</div>
 
-    <!-- News -->
-    <div id="news" class="page-section hidden">
-      <section class="glass rounded-2xl p-6 min-h-[60vh]">
-        <h2 class="text-2xl title-strong text-center">News</h2>
-        <p class="subtitle text-center mt-2">You can wire this page to an API later.</p>
-      </section>
-    </div>
+<div id="notifList" class="max-h-80 overflow-auto"></div>
 
-    <!-- Course Detail -->
-    <div id="course-detail" class="page-section hidden">
-      <section class="w-full flex justify-center">
-        <div id="courseDetailContainer" class="w-full max-w-5xl"></div>
-      </section>
-    </div>
-  </main>
+</div>
+
+</div>
+
+<!-- AVATAR -->
+
+<div class="relative">
+
+<div id="userAvatar"
+class="w-10 h-10 rounded-full bg-[var(--soft-green)] border flex items-center justify-center font-semibold cursor-pointer">
+</div>
+
+<div id="profileMenu"
+class="hidden absolute right-0 mt-2 w-44 glass rounded-2xl overflow-hidden">
+
+<button id="logoutBtn"
+class="w-full text-left px-4 py-3 text-sm hover:bg-black/5 font-semibold">
+Logout
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</header>
+
+<!-- PAGE LAYOUT -->
+
+<div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 px-4 py-6">
+
+<!-- MAIN SIDEBAR -->
+
+<aside id="mainSidebar"
+class="lg:col-span-3 glass p-6 rounded-3xl flex flex-col justify-between">
+
+<div>
+
+<div class="font-bold text-sm">Navigation</div>
+
+<nav class="mt-4 space-y-1">
+
+<a href="#" data-page="dashboard" class="nav-item active">🏠 Dashboard</a>
+
+<a href="#" data-page="students" class="nav-item">🎓 Students</a>
+
+<a href="#" data-page="submitted" class="nav-item">📥 Submitted Homework</a>
+
+<a href="#" data-page="my-courses" class="nav-item">📚 My Courses</a>
+
+<a href="#" data-page="create-homework" class="nav-item">📝 Create Homework</a>
+
+<a href="#" data-page="news" class="nav-item">📰 News</a>
+
+</nav>
+
+</div>
+
+<button id="sidebarLogout"
+class="rounded-2xl border px-4 py-3 font-semibold">
+🚪 Logout
+</button>
+
+</aside>
+
+<!-- COURSES SIDEBAR -->
+
+<aside id="coursesSidebar"
+class="lg:col-span-3 glass p-4 rounded-3xl hidden flex-col gap-4">
+
+<div class="font-semibold">Filter Programs</div>
+
+<input id="searchCourse"
+type="text"
+placeholder="Search programs..."
+class="border rounded-lg p-2">
+
+<button id="newCourseBtn"
+class="btn-primary">
++ New Course
+</button>
+
+<select id="statusFilter" class="border rounded-lg p-2">
+<option value="">All Status</option>
+<option value="draft">Draft</option>
+<option value="not-started">Upcoming</option>
+<option value="ongoing">Ongoing</option>
+<option value="finished">Completed</option>
+</select>
+
+<select id="typeFilter" class="border rounded-lg p-2">
+<option value="">All Types</option>
+<option value="course">Courses</option>
+<option value="workshop">Workshops</option>
+<option value="activity">Activities</option>
+</select>
+
+</aside>
+
+<!-- MAIN CONTENT -->
+
+<main class="lg:col-span-9 space-y-6">
+
+<!-- DASHBOARD -->
+
+<div id="dashboard" class="page-section">
+
+<section class="glass rounded-2xl p-6">
+
+<h2 class="text-2xl font-bold">Welcome Teacher</h2>
+<p class="opacity-70">Manage your programs here.</p>
+
+</section>
+
+<section class="glass rounded-2xl p-6">
+
+<h3 class="font-bold mb-4">My Courses</h3>
+
+<div id="dashboard-courses"
+class="grid grid-cols-1 md:grid-cols-2 gap-4">
+</div>
+
+</section>
+
+</div>
+
+<!-- STUDENTS -->
+
+<div id="students" class="page-section hidden">
+
+<section class="glass rounded-2xl p-6">
+
+<h2 class="text-xl font-bold">Students & Grades</h2>
+
+<table class="min-w-full mt-4 text-sm">
+
+<thead class="bg-[rgba(191,227,180,.85)] uppercase text-xs">
+
+<tr>
+<th class="px-6 py-3">Student</th>
+<th class="px-6 py-3">Course</th>
+<th class="px-6 py-3">Grade</th>
+<th class="px-6 py-3 text-right">Actions</th>
+</tr>
+
+</thead>
+
+<tbody id="studentTable"></tbody>
+
+</table>
+
+</section>
+
+</div>
+
+<!-- COURSES PAGE -->
+
+<div id="my-courses" class="page-section hidden">
+
+<section class="glass rounded-2xl p-6">
+
+<h2 class="text-xl font-bold mb-4">My Courses</h2>
+
+<div id="my-courses-grid"
+class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+</div>
+
+</section>
+
+</div>
+
+<!-- CREATE HOMEWORK -->
+
+<div id="create-homework" class="page-section hidden">
+
+<section class="glass rounded-2xl p-6 text-center">
+
+<h2 class="text-2xl font-bold">Create Homework</h2>
+
+<button id="addHomeworkBtn"
+class="btn-primary mt-4">
++ Add Homework
+</button>
+
+</section>
+
+</div>
+
+<!-- NEWS -->
+
+<div id="news" class="page-section hidden">
+
+<section class="glass rounded-2xl p-6 text-center">
+
+<h2 class="text-2xl font-bold">News</h2>
+
+<p class="opacity-70">Connect to API later.</p>
+
+</section>
+
+</div>
+
+</main>
+
+</div>
+
+<!-- COURSE DETAIL OVERLAY -->
+
+<div id="course-detail" class="page-section hidden">
+
+<div id="courseDetailContainer"></div>
+
 </div>
 
 <!-- CREATE COURSE MODAL -->
+
 <div id="courseModal"
-  class="fixed inset-0 hidden items-center justify-center bg-black/40 backdrop-blur-sm z-50 p-4">
+class="fixed inset-0 hidden items-center justify-center bg-black/40 backdrop-blur-sm z-50">
 
-  <!-- Modal Card -->
-  <div
-    class="bg-white w-full max-w-xl max-h-[90vh] rounded-3xl shadow-xl relative fade-in flex flex-col">
+<div class="bg-white w-full max-w-xl rounded-3xl shadow-xl">
 
-    <!-- Header -->
-    <div class="p-6 border-b flex justify-between items-center">
-      <h2 class="text-xl font-bold">Create New Course</h2>
-      <button id="closeCourseModal"
-        class="text-xl font-bold opacity-60 hover:opacity-100">
-        ✕
-      </button>
-    </div>
+<div class="p-6 border-b flex justify-between">
 
-    <!-- Scrollable Body -->
-    <div class="p-6 overflow-y-auto">
-      <form id="courseForm" class="space-y-4">
-      
-        <!-- Title -->
-        <div>
-          <label class="text-sm font-semibold">Title</label>
-          <input type="text" id="courseTitle" class="w-full border rounded-xl p-2 mt-1" required>
-        </div>
-      
-        <!-- Description -->
-        <div>
-          <label class="text-sm font-semibold">Description</label>
-          <textarea id="courseDescription" rows="4"
-            class="w-full border rounded-xl p-2 mt-1" required></textarea>
-        </div>
-      
-        <!-- Cover Image -->
-        <div>
-          <label class="text-sm font-semibold">Cover Image</label>
-          <input type="file" id="courseCover" accept="image/*" class="w-full mt-1">
-        </div>
-      
-        <!-- Duration -->
-        <div class="flex gap-2">
-          <div class="flex-1">
-            <label class="text-sm font-semibold">Duration</label>
-            <input type="number" id="courseDurationValue" class="w-full border rounded-xl p-2 mt-1" required>
-          </div>
-          <div class="flex-1">
-            <label class="text-sm font-semibold">Unit</label>
-            <select id="courseDurationUnit" class="w-full border rounded-xl p-2 mt-1">
-              <option>Minutes</option>
-              <option>Hours</option>
-              <option>Days</option>
-            </select>
-          </div>
-        </div>
-      
-        <!-- Sessions -->
-        <div class="flex gap-2">
-          <div class="flex-1">
-            <label class="text-sm font-semibold">Sessions</label>
-            <input type="number" id="courseSessionsValue" class="w-full border rounded-xl p-2 mt-1" required>
-          </div>
-          <div class="flex-1">
-            <label class="text-sm font-semibold">Unit</label>
-            <select id="courseSessionsUnit" class="w-full border rounded-xl p-2 mt-1">
-              <option>Daily</option>
-              <option>Weekly</option>
-              <option>Monthly</option>
-            </select>
-          </div>
-        </div>
-      
-        <!-- Program Type -->
-        <div>
-          <label class="text-sm font-semibold">Program Type</label>
-          <select id="courseProgramType">
-            <option value="">All</option>
-            <option value="course">Courses</option>
-            <option value="workshop">Workshops</option>
-            <option value="activity">Activities</option>
-          </select>
-        </div>
-      
-        <!-- Theme -->
-        <div>
-          <label class="text-sm font-semibold">Theme</label>
-          <select id="courseTheme" class="w-full border rounded-xl p-2 mt-1">
-            <option>Theme 1</option>
-            <option>Theme 2</option>
-            <option>Theme 3</option>
-            <option>Theme 4</option>
-          </select>
-        </div>
-      
-        <!-- What You Offer -->
-        <div>
-          <label class="text-sm font-semibold">What You Offer</label>
-          <select id="courseOffer" class="w-full border rounded-xl p-2 mt-1">
-            <option>Option 1</option>
-            <option>Option 2</option>
-            <option>Option 3</option>
-            <option>Option 4</option>
-          </select>
-        </div>
-        
-        <!-- calendar -->
-        <div class="form-group">
-          <label for="courseStartDate">Start Date</label>
-          <input type="date" id="courseStartDate" name="startDate" />
-        </div>
-      
-        <!-- Status -->
-        <div>
-          <label class="text-sm font-semibold">Status</label>
-          <select id="courseStatus" class="w-full border rounded-xl p-2 mt-1">
-            <option value="draft">Draft</option>
-            <option value="not-started">Upcoming</option>
-            <option value="ongoing">Ongoing</option>
-            <option value="finished">Completed</option>
-          </select>
-        </div>
-      
-        <!-- Buttons -->
-        <div class="flex justify-end gap-2 pt-4">
-          <button type="button" class="px-4 py-2 rounded-xl border" id="saveDraftBtn">
-            Save as Draft
-          </button>
-          <button type="submit" class="btn-primary">Publish Course</button>
-        </div>
-      
-      </form>
-    </div>
-  </div>
+<h2 class="text-xl font-bold">Create Course</h2>
+
+<button id="closeCourseModal">✕</button>
+
 </div>
 
+<div class="p-6">
 
-<footer class="w-full py-6 text-center text-xs border-t border-black/10 opacity-80">
-  © <span id="y"></span> Teacher Portal · Privacy · Terms
-</footer>
+<form id="courseForm" class="space-y-4">
+
+<input id="courseTitle"
+placeholder="Course Title"
+class="w-full border p-2 rounded-xl">
+
+<textarea id="courseDescription"
+placeholder="Description"
+class="w-full border p-2 rounded-xl"></textarea>
+
+<input type="file" id="courseCover">
+
+<button type="submit" class="btn-primary w-full">
+Publish Course
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
 
 <script src="/instructor/script.js" defer></script>
+
 </body>
 </html>
-
-
-
-
