@@ -482,7 +482,22 @@
           <button id="openCreateCourse" class="btn-theme mt-5">+ Add Course</button>
         </section>
       </div>
+      
 
+      <!-- News -->
+<div id="news" class="page-section hidden">
+  <section class="surface p-6">
+    <div class="flex items-center justify-between gap-3 mb-4">
+      <div>
+        <h2 class="text-xl title-strong">News</h2>
+        <div class="text-xs muted">Post updates to all portals</div>
+      </div>
+      <button id="createNewsBtn" class="btn-theme">+ Create News</button>
+    </div>
+
+    <div id="newsList" class="grid gap-4"></div>
+  </section>
+</div>
       <!-- Users -->
       <div id="users" class="page-section hidden">
         <section class="surface p-6 overflow-auto">
@@ -493,6 +508,7 @@
               <button id="refreshUsersBtn" class="btn-theme">Refresh</button>
             </div>
           </div>
+          
 
           <div class="overflow-x-auto">
             <table class="min-w-full text-sm">
@@ -510,7 +526,6 @@
           </div>
         </section>
       </div>
-
     </main>
   </div>
 
@@ -582,6 +597,7 @@
   <script src="manager.js" defer></script>
 </body>
 </html>
+
 
 
 
