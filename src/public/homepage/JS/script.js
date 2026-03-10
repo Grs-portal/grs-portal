@@ -6,6 +6,7 @@ const navbar = document.querySelector(".main-nav");
 const sloganSection = document.getElementById("sloganSection");
 const lineLeft = document.getElementById("lineLeft");
 const lineRight = document.getElementById("lineRight");
+const texthero = document.getElementById('text');
 
 window.addEventListener("scroll", () => {
   const scrollY = window.scrollY;
@@ -19,6 +20,7 @@ window.addEventListener("scroll", () => {
   const move = Math.min(value * 0.1, maxMove);
   const scale = Math.min(1 + value * 0.001, maxScale);
   fullhero.style.transform = `translateY(${-move}px) scale(${scale})`;
+
 
   /*══✿══╡°˖✧᯽   SLOGAN LINES ᯽✧˖°╞══✿══*/
   if (lineLeft && lineRight) {
