@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/homepage/CSS/style.css">
+  <title>News</title>
+  <style>
+    /* --- General Reset & Body --- */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #ffffff; 
+      color: var(--bg-green);
+      line-height: 1.7;
+      overflow: hidden;
+    }
+
+    /* --- Article Section --- */
+    .news-article {
+      max-width: 900px;
+      margin: 40px auto;
+      background-color: #daedda; /* slightly lighter card color */
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    /* --- Header --- */
+    .news-title {
+      margin-top: 80px;
+      text-align: center;
+      padding: 0px 20px 20px;
+    }
+
+    .news-title h1 {
+      font-size: 2.8rem;
+      margin-bottom: 10px;
+    }
+
+    .news-intro p {
+      font-size: 1.2rem;
+      color: #000000; 
+    }
+
+  .news-date{
+      color: rgb(58, 58, 58);
+      font-size: 0.9rem;
+      margin-bottom: 25px;
+  }
+
+  .news-date span {
+    font-style: italic;
+  }
+
+  .news-intro{
+      font-size: 1.2rem;
+      margin-bottom: 30px;
+  }
+
+  .news-image{
+      float: right;
+      width: 300px;
+      margin: 0 20px 10px 0;
+      border-radius: 6px;
+  }
+
+  .news-body p{
+      color: #000000;
+      margin-bottom: 18px;
+  }
+
+/* mobile fix */
+@media (max-width: 700px){
+
+.news-image{
+    float: none;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+}
+
+  </style>
+</head>
+<body>
+    <!--══✿══╡°˖✧᯽ DESKTOP NAVIGATION BAR ᯽✧˖°╞══✿══-->
+
+
+  <header class="site-header" style="background-color: white;">
+    <div class="container header-inner" style="background-color: white;">
+      <nav class="main-nav desktop-nav">
+        <div class="nav-left">
+          <a href="/homepage/index.html" class="nav-link active" data-translate="nav-home">Home</a>
+          <a href="/homepage/forwho.html" class="nav-link" data-translate="nav-forwho">For whom</a>
+          <a href="/homepage/green recovery space.html" class="nav-link" data-translate="nav-grs">Recovery Academy</a>
+        </div>
+
+        <!-- ... ✿°•∘ɷ∘•°✿ ..  logo circle  -->
+
+        <div class="logo-circle">
+          <img src="/homepage/images/Logo HK.png" alt="PBC logo">
+        </div>
+
+        <div class="nav-right">          
+          <a href="/homepage/offerings.html" class="nav-link" data-translate="nav-offer">What we offer</a>
+          <a href="/homepage/about.html" class="nav-link" data-translate="nav-about">About Us</a>
+          <a href="/homepage/contact.html" class="nav-link" data-translate="nav-contact">Contact</a>
+          <div class="language-dropdown">
+              <button class="lang-btn">EN ▾</button>
+              <ul class="lang-menu">
+                <li data-lang="en">English</li>
+                <li data-lang="nl">Dutch</li>
+                <li data-lang="es">Spanish</li>
+              </ul>
+          </div>        
+          <a href="/homepage/Portal.html" class="profile">
+            <img src="/homepage/images/unkown.png" alt="User profile">
+            <p class="profile-text">Sign in</p>
+          </a>
+        </div>
+      </nav>
+
+    </div>
+
+
+    <!--══✿══╡°˖✧᯽ MOBILE NAVIGATION BAR ᯽✧˖°╞══✿══-->
+
+    <nav class="mobile-nav">
+      <div class="mobile-header">
+        <button class="lang-btn">EN ▾</button>
+        <div class="logo-circle small-logo">
+          <img src="/homepage/images/Logo HK.png" alt="PBC logo">
+        </div>
+        <button class="hamburger-btn" aria-label="Open menu">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M3.46447 20.5355C4.92893 22 7.28595 22 12 22C16.714 22 19.0711 22 20.5355 20.5355C22 19.0711 22 16.714 22 12C22 7.28595 22 4.92893 20.5355 3.46447C19.0711 2 16.714 2 12 2C7.28595 2 4.92893 2 3.46447 3.46447C2 4.92893 2 7.28595 2 12C2 16.714 2 19.0711 3.46447 20.5355ZM18.75 16C18.75 16.4142 18.4142 16.75 18 16.75H6C5.58579 16.75 5.25 16.4142 5.25 16C5.25 15.5858 5.58579 15.25 6 15.25H18C18.4142 15.25 18.75 15.5858 18.75 16ZM18 12.75C18.4142 12.75 18.75 12.4142 18.75 12C18.75 11.5858 18.4142 11.25 18 11.25H6C5.58579 11.25 5.25 11.5858 5.25 12C5.25 12.4142 5.58579 12.75 6 12.75H18ZM18.75 8C18.75 8.41421 18.4142 8.75 18 8.75H6C5.58579 8.75 5.25 8.41421 5.25 8C5.25 7.58579 5.58579 7.25 6 7.25H18C18.4142 7.25 18.75 7.58579 18.75 8Z" fill="#59b987"></path> </g></svg>
+        </button>
+      </div>
+
+      <ul class="mobile-menu">
+        <!-- User profile at top -->
+        <li class="mobile-profile">
+          <a href="/homepage/Portal.html" class="profile">
+            <img src="/homepage/images/unkown.png" alt="User profile">
+            <p class="profile-text">Sign in</p>
+          </a>
+        </li>
+
+        <!-- Rest of the links -->
+        <li><a href="/homepage/index.html" class="nav-link active" data-translate="nav-home">Home</a></li>
+        <li><a href="/homepage/forwho.html" class="nav-link" data-translate="nav-forwho">For whom</a></li>
+        <li><a href="/homepage/green recovery space.html" class="nav-link" data-translate="nav-grs">Recovery Academy</a></li>
+        <li><a href="/homepage/offerings.html" class="nav-link" data-translate="nav-offer">What we offer</a></li>
+        <li><a href="/homepage/about.html" class="nav-link" data-translate="nav-about">About Us</a></li>
+        <li><a href="/homepage/contact.html" class="nav-link" data-translate="nav-contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+
+
+        <!--══✿══╡°˖✧᯽ HEADER SECTION ᯽✧˖°╞══✿══-->
+
+
+  <article class="news-article">
+
+  <h1 class="news-title">
+    New step for experiential expertise in Curaçao  
+  </h1>
+
+  <p class="news-date">posted on: <span> 2 march 2026 </span></p>
+
+
+  <div class="news-intro">
+
+    <img src="/homepage/images/news article 1 (Nieuwe stap voor ervaringsdeskundigheid op Curaçao).png" 
+         alt="Ervaringsdeskundigen bijeenkomst"
+         class="news-image">
+
+    <p>
+      At Green Recovery Space, another group of professionals has completed the postgraduate program in Experience-Based Expertise. They are part of a growing Caribbean movement and are contributing to the development of the recovery workshop that will open soon.
+    </p>
+
+  </div>
+
+  <div class="news-body">
+
+    <p>
+      During the training, offered in collaboration with Windesheim University of Applied Sciences, the ten new experts learned how to use their personal experiences with life's challenges to support others in recovery, regaining balance, and reshaping their lives.
+    </p>
+
+    <p>
+      In addition, four participants completed a follow-up program to become
+      Basic Trainer & Facilitator, which allows them to train future
+      experts by experience and thus further professionalize the field.
+    </p>
+
+    <p>
+      During an inspiring gathering, the participants showcased
+      their creative side. Using music, poetry, spoken word,
+      theater, and painting, they took the audience on a journey through their
+      personal stories: how they got stuck, but also how they rediscovered
+      their direction, balance, and meaning.
+    </p>
+
+    <p>
+      We are proud of all the participants and look forward to working together
+      to build a movement that offers people who are stuck the space,
+      support, and confidence to experience recovery
+      and meaning at their own pace.
+    </p>
+
+  </div>
+
+</article>
+
+
+  
+
+     <!--══✿══╡°˖✧᯽  FOOTER   ᯽✧˖°╞══✿══-->
+
+
+  <footer class="fancy-footer" style="margin-top: 0;">
+    <div class="footer-background-word">Hofi Korsou</div>
+
+    <div class="footer-container">
+      <div class="footer-grid">
+
+        <!-- ... ✿°•∘ɷ∘•°✿ .. LOGO + TEXT -->
+        <div class="footer-col-wide">
+          <img src="/homepage/images/HK logo no bg.png" alt="logo" class="footer-logo" />
+        </div>
+
+        <!-- ... ✿°•∘ɷ∘•°✿ .. COL 1 -->
+        <div class="footer-col">
+          <h3 data-translate="col-com">Company</h3>
+          <ul>
+            <li><a data-translate="nav-about" href="/homepage/about.html">About Us</a></li>
+            <li><a data-translate="nav-contact" href="/homepage/contact.html">Contact Us</a></li>            
+          </ul>
+        </div>
+
+        <!-- ... ✿°•∘ɷ∘•°✿ .. COL 2 -->
+        <div class="footer-col">
+          <h3 data-translate="col-por">Portals</h3>
+          <ul>
+            <li><a data-translate="Students" href="/homepage/login-students.html">Students</a></li>
+            <li><a data-translate="Teachers" href="/homepage/login-teachers.html">Teachers</a></li>
+          </ul>
+        </div>
+
+
+
+        <!-- ... ✿°•∘ɷ∘•°✿ .. COL 3 -->
+        <div class="footer-col">
+          <h3 data-translate="col-legal">Legal</h3>
+          <ul>
+            <li><a href="/homepage/#">Privacy Policy</a></li>
+            <li><a href="/homepage/#">Terms of Service</a></li>
+            <li><a href="/homepage/#">Cookie Policy</a></li>
+            <li><a href="/homepage/#">Security</a></li>
+          </ul>
+        </div>
+        <!-- ... ✿°•∘ɷ∘•°✿ .. COL 4 -->
+        <div class="footer-col">
+          <h3 data-translate="col-know">Quick Links </h3>
+          <ul>
+            <li><a data-translate="nav-forwho" href="/homepage/forwho.html">For whom</a></li>
+            <li><a data-translate="nav-grs" href="/homepage/green recovery space.html">Recovery Academy</a></li>
+            <li><a data-translate="nav-offer" href="/homepage/offerings.html">What we offer</a></li>
+            <li><a data-translate="nav-program" href="/homepage/program.html">Program & Activities</a></li>
+            <li><a data-translate="nav-announce" href="/homepage/projects.html">Projects</a></li>
+            <li><a data-translate="nav-stories" href="/homepage/stories.html">Personal Stories</a></li>
+          </ul>
+        </div>
+
+      <!--... ✿°•∘ɷ∘•°✿ .. SOCIALS -->
+
+      <div class="footer-bottom">
+        <div class="footer-social-icons">
+          <a href="https://www.facebook.com/projectbureaucaribbean" class="social"><i class="fab fa-facebook"></i></a>
+          <a href="https://www.youtube.com/@projectbureaucaribbean9600" class="social"><i class="fab fa-youtube"></i></a>
+          <a href="https://www.linkedin.com/company/projectbureau-caribbean/" class="social"><i class="fab fa-linkedin"></i></a>
+          <a href="/homepage/#" class="social"><i class="fab fa-whatsapp"></i></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+    <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+
+</body>
+</html>
