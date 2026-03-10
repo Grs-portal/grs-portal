@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
+const nodemailer = require("nodemailer");
 
 // Multer (uploads)
 let multer = null;
@@ -14,6 +15,24 @@ try {
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// ---------------- EMAIL SETUP ----------------
+const EMAIL_USER = process.env.EMAIL_USER || "";
+const EMAIL_PASS = process.env.EMAIL_PASS || "";
+
+let mailer = null;
+if (EMAIL_USER && EMAIL_PASS) {
+  mailer = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: EMAIL_USER,
+      pass: EMAIL_PASS,
+    },
+  });
+  console.log("✅ Email transport ready");
+} else {
+  console.warn("⚠️ EMAIL_USER / EMAIL_PASS missing. News emails will be disabled.");
+}
 
 // ---------------- MIDDLEWARES ----------------
 app.use(cors());
@@ -92,7 +111,6 @@ function loadData() {
     raw.schedule = Array.isArray(raw.schedule) ? raw.schedule : [];
     raw.news = Array.isArray(raw.news) ? raw.news : [];
 
-    // make sure old accounts still get new fields
     raw.accounts = raw.accounts.map((a) => ({
       email: "",
       avatarUrl: "",
@@ -175,6 +193,78 @@ function isISODate(s) {
 function validEmail(email) {
   if (!email) return true;
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).trim());
+}
+
+async function sendNewsEmails(newsItem) {
+  if (!mailer) {
+    console.warn("⚠️ Email skipped: mailer not configured");
+    return;
+  }
+
+  const recipients = db.accounts
+    .map((a) => String(a.email || "").trim())
+    .filter((email) => email && validEmail(email));
+
+  if (!recipients.length) {
+    console.warn("⚠️ No valid email recipients found for news");
+    return;
+  }
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #1f2937;">
+      <div style="max-width: 700px; margin: 0 auto; padding: 24px;">
+        <div style="background: #d1fae5; padding: 10px 14px; border-radius: 999px; display: inline-block; font-size: 12px; font-weight: bold; color: #065f46;">
+          Hofi Korsou Portal News
+        </div>
+
+        <h1 style="margin-top: 18px; font-size: 28px; color: #111827;">${escapeHtml(newsItem.title)}</h1>
+
+        ${
+          newsItem.summary
+            ? `<p style="font-size: 16px; color: #4b5563; margin-top: 12px;">${escapeHtml(newsItem.summary)}</p>`
+            : ""
+        }
+
+        ${
+          newsItem.content
+            ? `<div style="margin-top: 20px; white-space: pre-wrap; font-size: 15px; color: #111827;">${escapeHtml(newsItem.content)}</div>`
+            : ""
+        }
+
+        <p style="margin-top: 24px; font-size: 13px; color: #6b7280;">
+          Posted by ${escapeHtml(newsItem.createdBy || "Manager")} on ${new Date(newsItem.createdAt).toLocaleString()}.
+        </p>
+
+        <hr style="margin: 24px 0; border: none; border-top: 1px solid #e5e7eb;" />
+
+        <p style="font-size: 12px; color: #9ca3af;">
+          This email was sent from the Hofi Korsou portal news system.
+        </p>
+      </div>
+    </div>
+  `;
+
+  try {
+    await mailer.sendMail({
+      from: `"Hofi Korsou Portal" <${EMAIL_USER}>`,
+      bcc: recipients,
+      subject: `Hofi Korsou News: ${newsItem.title}`,
+      html
+    });
+
+    console.log(`✅ News email sent to ${recipients.length} recipient(s)`);
+  } catch (err) {
+    console.error("❌ Failed to send news email:", err);
+  }
+}
+
+function escapeHtml(str) {
+  return String(str ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
 // ---------------- UPLOADS ----------------
@@ -275,7 +365,7 @@ app.post("/api/notifications/read-all", (req, res) => {
   res.json({ success: true });
 });
 
-// ---------- ME (profile) ----------
+// ---------- ME ----------
 app.get("/api/me", (req, res) => {
   const username = String(req.headers["x-username"] || "").trim();
   const role = String(req.headers["x-role"] || "").trim();
@@ -319,7 +409,7 @@ app.get("/api/news", (req, res) => {
   res.json({ success: true, items });
 });
 
-app.post("/api/news", (req, res) => {
+app.post("/api/news", async (req, res) => {
   const role = requireRole(req, res, ["manager"]);
   if (!role) return;
 
@@ -354,6 +444,9 @@ app.post("/api/news", (req, res) => {
     targetId: item.id,
     audienceRole: "all"
   });
+
+  // send email in background of same request flow
+  await sendNewsEmails(item);
 
   res.json({ success: true, item });
 });
@@ -812,7 +905,7 @@ app.put("/api/students/:id", (req, res) => {
   res.json(db.students[idx]);
 });
 
-// ---------- USERS (MANAGER ADMIN) ----------
+// ---------- USERS ----------
 app.get("/api/users", (req, res) => {
   const role = requireRole(req, res, ["manager"]);
   if (!role) return;
