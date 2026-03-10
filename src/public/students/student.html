@@ -378,14 +378,19 @@
       </section>
 
       <!-- NEWS -->
-      <section id="news" class="page-section hidden">
-        <div class="panel min-h-[50vh] flex items-center justify-center p-6">
-          <div class="text-center">
-            <div class="text-2xl font-extrabold">News</div>
-            <div class="muted text-sm mt-1">Coming soon.</div>
-          </div>
-        </div>
-      </section>
+<section id="news" class="page-section hidden">
+  <div class="panel p-6">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <div class="text-2xl font-extrabold">News</div>
+        <div class="muted text-sm mt-1">Updates from the portal</div>
+      </div>
+      <button id="refreshNewsBtn" class="btn">Refresh</button>
+    </div>
+
+    <div id="newsList" class="grid grid-cols-1 gap-4"></div>
+  </div>
+</section>
 
     </main>
   </div>
@@ -452,4 +457,5 @@
   <script src="/students/script.js"></script>
 </body>
 </html>
+
 
