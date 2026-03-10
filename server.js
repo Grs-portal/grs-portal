@@ -3,7 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
 
 // Multer (uploads)
 let multer = null;
@@ -16,22 +16,16 @@ try {
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ---------------- EMAIL SETUP ----------------
-const EMAIL_USER = process.env.EMAIL_USER || "";
-const EMAIL_PASS = process.env.EMAIL_PASS || "";
+// ---------------- EMAIL SETUP (RESEND API) ----------------
+const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
+const RESEND_FROM = process.env.RESEND_FROM || "Hofi Korsou <onboarding@resend.dev>";
 
-let mailer = null;
-if (EMAIL_USER && EMAIL_PASS) {
-  mailer = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: EMAIL_USER,
-      pass: EMAIL_PASS,
-    },
-  });
-  console.log("✅ Email transport ready");
+let resend = null;
+if (RESEND_API_KEY) {
+  resend = new Resend(RESEND_API_KEY);
+  console.log("✅ Resend email API ready");
 } else {
-  console.warn("⚠️ EMAIL_USER / EMAIL_PASS missing. News emails will be disabled.");
+  console.warn("⚠️ RESEND_API_KEY missing. News emails will be disabled.");
 }
 
 // ---------------- MIDDLEWARES ----------------
@@ -195,9 +189,18 @@ function validEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).trim());
 }
 
+function escapeHtml(str) {
+  return String(str ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 async function sendNewsEmails(newsItem) {
-  if (!mailer) {
-    console.warn("⚠️ Email skipped: mailer not configured");
+  if (!resend) {
+    console.warn("⚠️ Email skipped: Resend not configured");
     return;
   }
 
@@ -211,60 +214,80 @@ async function sendNewsEmails(newsItem) {
   }
 
   const html = `
-    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #1f2937;">
-      <div style="max-width: 700px; margin: 0 auto; padding: 24px;">
-        <div style="background: #d1fae5; padding: 10px 14px; border-radius: 999px; display: inline-block; font-size: 12px; font-weight: bold; color: #065f46;">
-          Hofi Korsou Portal News
-        </div>
+  <div style="font-family: Inter, Arial, sans-serif; background:#f4f7f5; padding:40px 0;">
+    <div style="max-width:700px;margin:auto;background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e5e7eb">
 
-        <h1 style="margin-top: 18px; font-size: 28px; color: #111827;">${escapeHtml(newsItem.title)}</h1>
+      <div style="background:#22c55e;padding:20px 30px;color:white">
+        <h2 style="margin:0;font-size:22px;">🌿 Hofi Korsou Portal</h2>
+        <p style="margin:4px 0 0 0;font-size:13px;opacity:.9">Official portal notification</p>
+      </div>
+
+      <div style="padding:30px">
+        <h1 style="margin-top:0;font-size:26px;color:#111827">
+          ${escapeHtml(newsItem.title)}
+        </h1>
 
         ${
           newsItem.summary
-            ? `<p style="font-size: 16px; color: #4b5563; margin-top: 12px;">${escapeHtml(newsItem.summary)}</p>`
+            ? `<p style="color:#4b5563;font-size:16px;margin-top:10px">
+                ${escapeHtml(newsItem.summary)}
+              </p>`
             : ""
         }
 
         ${
           newsItem.content
-            ? `<div style="margin-top: 20px; white-space: pre-wrap; font-size: 15px; color: #111827;">${escapeHtml(newsItem.content)}</div>`
+            ? `<div style="margin-top:20px;font-size:15px;color:#111827;line-height:1.6;white-space:pre-wrap">
+                ${escapeHtml(newsItem.content)}
+              </div>`
             : ""
         }
 
-        <p style="margin-top: 24px; font-size: 13px; color: #6b7280;">
-          Posted by ${escapeHtml(newsItem.createdBy || "Manager")} on ${new Date(newsItem.createdAt).toLocaleString()}.
-        </p>
+        <div style="margin-top:30px;padding:15px;border-radius:8px;background:#f0fdf4;border:1px solid #bbf7d0">
+          <strong>Posted by:</strong> ${escapeHtml(newsItem.createdBy || "Manager")} <br>
+          <strong>Date:</strong> ${new Date(newsItem.createdAt).toLocaleString()}
+        </div>
 
-        <hr style="margin: 24px 0; border: none; border-top: 1px solid #e5e7eb;" />
+        <div style="margin-top:30px;text-align:center">
+          <a href="https://www.greenrecoveryspace.com"
+             style="display:inline-block;background:#22c55e;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold">
+             Open Portal
+          </a>
+        </div>
 
-        <p style="font-size: 12px; color: #9ca3af;">
-          This email was sent from the Hofi Korsou portal news system.
+        <p style="margin-top:15px;font-size:13px;color:#6b7280;text-align:center">
+          Need help?
+          <a href="https://wa.me/59990000001" style="color:#16a34a;">Contact us on WhatsApp</a>
         </p>
       </div>
+
+      <div style="padding:18px 30px;background:#f9fafb;font-size:12px;color:#6b7280">
+        This message was sent automatically from the Hofi Korsou Portal.<br>
+        If you were not expecting this email, you can ignore it.
+      </div>
+
     </div>
+  </div>
   `;
 
   try {
-    await mailer.sendMail({
-      from: `"Hofi Korsou Portal" <${EMAIL_USER}>`,
+    const { error } = await resend.emails.send({
+      from: RESEND_FROM,
+      to: [RESEND_FROM],
       bcc: recipients,
       subject: `Hofi Korsou News: ${newsItem.title}`,
-      html
+      html,
     });
+
+    if (error) {
+      console.error("❌ Failed to send news email via Resend:", error);
+      return;
+    }
 
     console.log(`✅ News email sent to ${recipients.length} recipient(s)`);
   } catch (err) {
-    console.error("❌ Failed to send news email:", err);
+    console.error("❌ Failed to send news email via Resend:", err);
   }
-}
-
-function escapeHtml(str) {
-  return String(str ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
 }
 
 // ---------------- UPLOADS ----------------
@@ -445,7 +468,6 @@ app.post("/api/news", async (req, res) => {
     audienceRole: "all"
   });
 
-  // send email in background of same request flow
   await sendNewsEmails(item);
 
   res.json({ success: true, item });
