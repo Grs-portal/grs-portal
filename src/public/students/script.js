@@ -121,6 +121,37 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+qs("#refreshNewsBtn")?.addEventListener("click", renderNewsPage);
+
+  async function renderNewsPage() {
+  const list = qs("#newsList");
+  if (!list) return;
+
+  try {
+    const res = await fetch(`${API}/news`);
+    const out = await safeJson(res);
+    const items = out?.items || [];
+
+    if (!items.length) {
+      list.innerHTML = `<div class="card"><div class="text-sm opacity-70">No news yet.</div></div>`;
+      return;
+    }
+
+    list.innerHTML = items.map((n) => `
+      <div class="card">
+        <h3 class="text-lg font-extrabold">${escapeHtml(n.title)}</h3>
+        ${n.summary ? `<p class="text-sm opacity-70 mt-1">${escapeHtml(n.summary)}</p>` : ""}
+        ${n.content ? `<div class="text-sm mt-3 whitespace-pre-wrap">${escapeHtml(n.content)}</div>` : ""}
+        <div class="text-xs opacity-60 mt-3">
+          By ${escapeHtml(n.createdBy || "Manager")} · ${new Date(n.createdAt).toLocaleString()}
+        </div>
+      </div>
+    `).join("");
+  } catch {
+    list.innerHTML = `<div class="card"><div class="text-sm text-red-500">Failed to load news.</div></div>`;
+  }
+}
+  
   // ---------- Sidebar mobile toggle ----------
   const sidebar = qs("#sidebar");
   const overlay = qs("#overlay");
@@ -164,6 +195,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (id === "courses") renderCoursesPage();
     if (id === "assignments") renderAssignmentsPage();
     if (id === "schedule") renderSchedulePage();
+    if (id === "news") renderNewsPage();
   }
 
   navItems.forEach((it) => {
