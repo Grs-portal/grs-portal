@@ -78,9 +78,50 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    if (id === "news") loadNews();
+
     openMainSidebar();
   };
 
+
+
+
+  
+async function loadNews() {
+  const list = qs("#newsList");
+  if (!list) return;
+
+  try {
+    const res = await fetch(`${API}/news`);
+    const out = await safeJson(res);
+    const items = out?.items || [];
+
+    if (!items.length) {
+      list.innerHTML = `<div class="bg-white rounded-2xl border border-black/10 p-4 text-sm opacity-70">No news yet.</div>`;
+      return;
+    }
+
+    list.innerHTML = items.map(n => `
+      <article class="bg-white rounded-2xl border border-[#A5C8A1]/60 p-4 shadow-sm">
+        <h3 class="text-lg font-extrabold">${esc(n.title)}</h3>
+        ${n.summary ? `<p class="text-sm opacity-70 mt-1">${esc(n.summary)}</p>` : ""}
+        ${n.content ? `<div class="text-sm mt-3 whitespace-pre-wrap">${esc(n.content)}</div>` : ""}
+        <div class="text-xs opacity-60 mt-3">
+          By ${esc(n.createdBy || "Manager")} · ${new Date(n.createdAt).toLocaleString()}
+        </div>
+      </article>
+    `).join("");
+  } catch {
+    list.innerHTML = `<div class="bg-white rounded-2xl border border-black/10 p-4 text-sm text-red-600">Failed to load news.</div>`;
+  }
+}
+
+  
+  
+  
+  
+  
+  
   /* =====================================================
   COURSES SIDEBAR
   ====================================================== */
@@ -508,4 +549,5 @@ document.addEventListener("DOMContentLoaded", () => {
   showPage("dashboard");
 
 });
+
 
