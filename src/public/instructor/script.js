@@ -1,509 +1,294 @@
-document.addEventListener("DOMContentLoaded", () => {
+```javascript
+// teacher.js
+(() => {
+  const API = "/api";
+  const LOGIN = "/homepage/login-teacher.html";
 
-  const qs = s => document.querySelector(s);
-  const qsa = s => [...document.querySelectorAll(s)];
+  const qs = (s) => document.querySelector(s);
+  const qsa = (s) => [...document.querySelectorAll(s)];
 
-  const mainSidebar = qs("#mainSidebar");
-  const coursesSidebar = qs("#coursesSidebar");
-  const overlay = qs("#overlay");
-  const menuBtn = qs("#menuBtn");
+  const toast = (msg, color = "rgba(0,0,0,.75)") => {
+    const t = document.createElement("div");
+    t.className =
+      "fixed bottom-4 right-4 px-4 py-2 rounded-xl text-white shadow z-[9999] backdrop-blur-md border border-white/15";
+    t.style.background = color;
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2500);
+  };
 
-  /* =====================================================
-  AUTH
-  ====================================================== */
-  const LOGIN_URL = "/homepage/login.html";
-  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-  const role = localStorage.getItem("role");
+  const esc = (s) =>
+    String(s || "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;");
 
-  const username = localStorage.getItem("username");
-  const profilePic = localStorage.getItem("profilePic");
-
-  if (!isLoggedIn || role !== "instructor") {
-    window.location.replace(LOGIN_URL);
-    return;
+  function initials(name) {
+    const parts = String(name || "").trim().split(/\s+/).filter(Boolean);
+    const a = parts[0]?.[0] || "T";
+    const b = parts[1]?.[0] || "";
+    return (a + b).toUpperCase();
   }
 
-  /* =====================================================
-  SIDEBAR CONTROL
-  ====================================================== */
-  const closeAllSidebars = () => {
-    mainSidebar?.classList.remove("active");
-    coursesSidebar?.classList.remove("active");
-    overlay?.classList.remove("active");
-  };
-
-  const openMainSidebar = () => {
-    coursesSidebar?.classList.remove("active");
-    mainSidebar?.classList.add("active");
-    if (window.innerWidth < 1024) overlay?.classList.add("active");
-  };
-
-  const openCoursesSidebar = () => {
-    mainSidebar?.classList.remove("active");
-    coursesSidebar?.classList.add("active");
-    if (window.innerWidth < 1024) overlay?.classList.add("active");
-  };
-
-  if (menuBtn) {
-    menuBtn.addEventListener("click", () => {
-      if (mainSidebar?.classList.contains("active")) closeAllSidebars();
-      else openMainSidebar();
-    });
-  }
-
-  overlay?.addEventListener("click", closeAllSidebars);
-
-  /* =====================================================
-  ROUTER
-  ====================================================== */
-  const showPage = (id) => {
-
-    qsa(".page-section").forEach(p => p.classList.add("hidden"));
-
-    const page = qs("#" + id);
-    if (page) page.classList.remove("hidden");
-
-    qsa(".nav-item").forEach(a => {
-      a.classList.toggle("active", a.dataset.page === id);
-    });
-
-    if (id === "my-courses") {
-      openCoursesSidebar();
-      Courses.init();
-      return;
-    }
-
-    if (id === "course-detail") {
-      closeAllSidebars();
-      return;
-    }
-
-    openMainSidebar();
-  };
-
-  /* =====================================================
-  COURSES SIDEBAR
-  ====================================================== */
-  const buildCoursesSidebar = () => {
-
-    if (!coursesSidebar) return;
-
-    coursesSidebar.innerHTML = `
-      <div class="courses-sidebar-content h-full overflow-y-auto">
-
-        <button id="backDashboardBtn"
-        class="nav-item bg-black/90 text-white rounded-xl justify-center mb-2">
-        ☰ Dashboard
-        </button>
-
-        <h3 class="sidebar-title">Filter Programs</h3>
-
-        <div class="filter-group">
-          <label>Search</label>
-          <input id="searchCourse" type="text" placeholder="Search programs..." />
-        </div>
-
-        <button id="newCourseBtn" class="new-course-btn">
-          + New Course
-        </button>
-
-        <div class="filter-group">
-          <label>Status</label>
-          <select id="statusFilter">
-            <option value="">All</option>
-            <option value="draft">Draft</option>
-            <option value="not-started">Upcoming</option>
-            <option value="ongoing">Ongoing</option>
-            <option value="finished">Completed</option>
-          </select>
-        </div>
-
-        <div class="filter-group">
-          <label>Theme</label>
-          <select>
-            <option value="">All</option>
-            <option value="rest">Rest & Relaxation</option>
-            <option value="recovery">Recovery & Balance</option>
-            <option value="insight">Self-insight</option>
-            <option value="connection">Connection</option>
-          </select>
-        </div>
-
-        <div class="filter-group mt-4">
-          <label>Calendar</label>
-          <input type="date" id="calendarFilter"/>
-        </div>
-
-      </div>
-    `;
-
-    qs("#newCourseBtn")?.addEventListener("click", () => Courses.openModal());
-    qs("#backDashboardBtn")?.addEventListener("click", () => showPage("dashboard"));
-
-    const searchInput = qs("#searchCourse");
-    const statusFilter = qs("#statusFilter");
-
-    const applyFilters = () => {
-      Courses.render({
-        search: searchInput?.value || "",
-        status: statusFilter?.value || ""
-      });
-    };
-
-    searchInput?.addEventListener("input", applyFilters);
-    statusFilter?.addEventListener("change", applyFilters);
-  };
-
-  /* =====================================================
-  COURSES MODULE
-  ====================================================== */
-  const Courses = (() => {
-
-    const API = "/api/courses";
-
-    const modal = qs("#courseModal");
-    const form = qs("#courseForm");
-
-    let courses = [];
-    let forceDraft = false;
-    let initialized = false;
-
-    const formatStatus = s =>
-      (s || "").replace("-", " ").toUpperCase();
-
-    const getStatusClass = status => {
-      switch (status) {
-        case "draft": return "bg-gray-200 text-gray-800";
-        case "not-started": return "bg-yellow-100 text-yellow-800";
-        case "ongoing": return "bg-blue-100 text-blue-800";
-        case "finished": return "bg-green-100 text-green-800";
-        default: return "bg-gray-200 text-gray-800";
-      }
-    };
-
-    const toBase64 = file =>
-      new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-
-    const init = async () => {
-      if (initialized) return;
-      initialized = true;
-      await loadCourses();
-    };
-
-    const loadCourses = async () => {
-
-      try {
-
-        const res = await fetch(API);
-        courses = await res.json();
-
-        render();
-
-      } catch (err) {
-        console.error("Failed to load courses", err);
-      }
-
-    };
-
-    /* ================= RENDER ================= */
-
-    const render = (filters = {}) => {
-
-      const container = qs("#my-courses-grid");
-      if (!container) return;
-
-      let filtered = [...courses];
-
-      if (filters.search) {
-        filtered = filtered.filter(c =>
-          c.title.toLowerCase().includes(filters.search.toLowerCase())
-        );
-      }
-
-      if (filters.status) {
-        filtered = filtered.filter(c =>
-          c.status === filters.status
-        );
-      }
-
-      if (!filtered.length) {
-
-        container.innerHTML = `
-          <div class="glass p-6 rounded-2xl text-center">
-            <p>No programs yet</p>
-            <button id="createCourseBtn" class="btn-primary mt-4">
-              Create Program
-            </button>
-          </div>
-        `;
-
-        qs("#createCourseBtn")?.addEventListener("click", openModal);
-        return;
-      }
-
-      container.innerHTML = filtered.map(c => `
-        <div class="course-card cursor-pointer relative" data-id="${c.id}">
-
-          <div class="absolute top-3 left-3 text-xs font-semibold px-2 py-1 rounded-full ${getStatusClass(c.status)}">
-            ${formatStatus(c.status)}
-          </div>
-
-          <img
-            src="${c.cover || "https://via.placeholder.com/400x200"}"
-            class="w-full h-32 object-cover rounded-xl mb-3"
-          >
-
-          <div class="flex justify-between items-center mb-1">
-            <h3 class="title-strong text-lg">${c.title}</h3>
-            ${c.startDate ? `<span class="text-xs text-gray-500">${new Date(c.startDate).toLocaleDateString()}</span>` : ""}
-          </div>
-
-          <div class="text-sm">
-            <span class="font-semibold">Type:</span> ${c.programType || "-"}
-          </div>
-
-          <div class="text-sm">
-            <span class="font-semibold">Sessions:</span> ${c.sessionsValue || "-"} ${c.sessionsUnit || ""}
-          </div>
-
-        </div>
-      `).join("");
-
-      container.querySelectorAll(".course-card").forEach(card => {
-        card.addEventListener("click", () => {
-          openCourseDetail(card.dataset.id);
-        });
-      });
-
-    };
-
-    /* ================= CREATE COURSE ================= */
-
-    const createCourse = async (data, openDetail = true) => {
-
-      try {
-
-        const res = await fetch(API, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
-        });
-
-        const newCourse = await res.json();
-
-        courses.push(newCourse);
-
-        render();
-
-        if (openDetail) openCourseDetail(newCourse.id);
-
-      } catch (err) {
-        console.error("Failed to create course", err);
-      }
-    };
-
-    /* ================= FORM SUBMIT ================= */
-
-    form?.addEventListener("submit", async e => {
-
-      e.preventDefault();
-
-      const file = qs("#courseCover")?.files?.[0];
-      const cover = file ? await toBase64(file) : "";
-
-      const selectedStatus = qs("#courseStatus")?.value;
-
-      let finalStatus = forceDraft ? "draft" : selectedStatus;
-
-      const newCourse = {
-
-        title: qs("#courseTitle")?.value.trim(),
-        description: qs("#courseDescription")?.value.trim(),
-        cover,
-
-        durationValue: qs("#courseDurationValue")?.value,
-        durationUnit: qs("#courseDurationUnit")?.value,
-
-        sessionsValue: qs("#courseSessionsValue")?.value,
-        sessionsUnit: qs("#courseSessionsUnit")?.value,
-
-        programType: qs("#courseProgramType")?.value,
-        theme: qs("#courseTheme")?.value,
-        offer: qs("#courseOffer")?.value,
-
-        startDate: qs("#courseStartDate")?.value || null,
-
-        status: finalStatus,
-
-        createdByUsername: username,
-        createdByAvatar: profilePic
-      };
-
-      closeModal();
-
-      const openDetail = !forceDraft;
-      forceDraft = false;
-
-      await createCourse(newCourse, openDetail);
-
-    });
-
-    /* ================= MODAL ================= */
-
-    const openModal = () => {
-
-      modal?.classList.remove("hidden");
-      modal?.classList.add("flex");
-
-      document.body.style.overflow = "hidden";
-
-    };
-
-    const closeModal = () => {
-
-      modal?.classList.add("hidden");
-      modal?.classList.remove("flex");
-
-      form?.reset();
-
-      forceDraft = false;
-
-      document.body.style.overflow = "";
-
-    };
-
-    qs("#closeCourseModal")?.addEventListener("click", closeModal);
-
-    qs("#saveDraftBtn")?.addEventListener("click", () => {
-      forceDraft = true;
-      form?.requestSubmit();
-    });
-
-    return {
-      init,
-      openModal,
-      render,
-      loadCourses
-    };
-
-  })();
-
-  /* =====================================================
-  COURSE DETAIL
-  ====================================================== */
-
-  const openCourseDetail = async (id) => {
-
-    closeAllSidebars();
-    showPage("course-detail");
-
-    const res = await fetch("/api/courses");
-    const allCourses = await res.json();
-
-    const course = allCourses.find(c => c.id == id);
-    if (!course) return;
-
-    const container = qs("#courseDetailContainer");
-
-    container.innerHTML = `
-      <div class="glass rounded-2xl overflow-hidden">
-
-        <img
-          src="${course.cover || "https://via.placeholder.com/1200x400"}"
-          class="w-full h-72 object-cover"
-        >
-
-        <div class="p-8">
-
-          <div class="flex justify-between items-center mb-2">
-            <h1 class="text-3xl font-bold">${course.title}</h1>
-            ${course.startDate ? `<span class="text-sm text-gray-500">${new Date(course.startDate).toLocaleDateString()}</span>` : ""}
-          </div>
-
-          <div class="flex items-center gap-3 mb-6">
-
-            <img
-              src="${course.createdByAvatar || "https://png.pngtree.com/png-clipart/20210915/ourmid/pngtree-avatar-placeholder-abstract-white-blue-green-png-image_3918476.jpg/40"}"
-              class="w-8 h-8 rounded-full object-cover"
-            >
-
-            <span class="text-sm text-gray-600">
-              ${course.createdByUsername || "Unknown"}
-            </span>
-
-          </div>
-
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-
-            <div class="glass p-4 rounded-xl text-center">
-              <div class="text-lg font-semibold">
-                ${course.sessionsValue} ${course.sessionsUnit}
-              </div>
-              <div class="text-xs uppercase opacity-60">
-                Sessions
-              </div>
-            </div>
-
-            <div class="glass p-4 rounded-xl text-center">
-              <div class="text-lg font-semibold">
-                ${course.durationValue} ${course.durationUnit}
-              </div>
-              <div class="text-xs uppercase opacity-60">
-                Duration
-              </div>
-            </div>
-
-            <div class="glass p-4 rounded-xl text-center">
-              <div class="text-sm font-semibold">
-                ${course.theme}
-              </div>
-              <div class="text-xs uppercase opacity-60">
-                Theme
-              </div>
-            </div>
-
-            <div class="glass p-4 rounded-xl text-center">
-              <div class="text-sm font-semibold">
-                ${course.offer}
-              </div>
-              <div class="text-xs uppercase opacity-60">
-                Offering
-              </div>
-            </div>
-
-          </div>
-
-          <div class="text-gray-700 whitespace-pre-wrap leading-relaxed">
-            ${course.description}
-          </div>
-
-        </div>
-      </div>
-
-      <button id="backToCourses" class="mt-6 btn-primary">
-        Back
-      </button>
-    `;
-
-    qs("#backToCourses")?.addEventListener("click", () => {
-      showPage("my-courses");
-    });
-
-  };
-
-  qsa(".nav-item").forEach(link => {
-    link.addEventListener("click", e => {
-      e.preventDefault();
-      showPage(link.dataset.page);
-    });
+  const actorHeaders = () => ({
+    "x-role": localStorage.getItem("role") || "",
+    "x-username": localStorage.getItem("username") || "",
+    "x-name": localStorage.getItem("userName") || "",
   });
 
-  buildCoursesSidebar();
-  showPage("dashboard");
+  const jsonHeaders = () => ({
+    ...actorHeaders(),
+    "Content-Type": "application/json",
+  });
 
-});
+  document.addEventListener("DOMContentLoaded", init);
+
+  async function init() {
+    if (localStorage.getItem("isLoggedIn") !== "true") return (location.href = LOGIN);
+    if (localStorage.getItem("role") !== "teacher") return (location.href = LOGIN);
+
+    qs("#y").textContent = new Date().getFullYear();
+
+    setupThemeUI(true);
+    setupProfileDropdown();
+    renderTopbarIdentity();
+    setupPersonalizeModal();
+    setupMobileSidebar();
+    setupNav();
+    bindButtons();
+
+    setupNotificationsUI();
+    loadNotifications();
+    setInterval(loadNotifications, 15000);
+
+    await loadMeIntoUI();
+    await loadDashboard();
+  }
+
+  function applyTheme(theme) {
+    const t = theme || "light";
+    document.documentElement.dataset.theme = t;
+    localStorage.setItem("theme", t);
+  }
+
+  function setupThemeUI(forceDefaultLight = false) {
+    const saved = localStorage.getItem("theme");
+    if (forceDefaultLight && !saved) applyTheme("light");
+    else applyTheme(saved || "light");
+
+    qsa(".themePick").forEach((b) => {
+      b.addEventListener("click", (e) => {
+        e.preventDefault();
+        applyTheme(b.dataset.theme);
+      });
+    });
+  }
+
+  function logout() {
+    localStorage.clear();
+    location.href = LOGIN;
+  }
+
+  function renderTopbarIdentity() {
+    const name = localStorage.getItem("userName") || "Teacher";
+    qs("#userName").textContent = name;
+
+    const avatarEl = qs("#userAvatar");
+    const avatarData = localStorage.getItem("userAvatar") || "";
+
+    if (!avatarEl) return;
+
+    if (avatarData) {
+      avatarEl.style.backgroundImage = `url(${avatarData})`;
+      avatarEl.style.backgroundSize = "cover";
+      avatarEl.style.backgroundPosition = "center";
+      avatarEl.textContent = "";
+    } else {
+      avatarEl.style.backgroundImage = "";
+      avatarEl.textContent = initials(name);
+    }
+  }
+
+  function setupProfileDropdown() {
+    qs("#userAvatar")?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      qs("#profileMenu")?.classList.toggle("hidden");
+    });
+
+    qs("#logoutBtn")?.addEventListener("click", logout);
+    qs("#sidebarLogout")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      logout();
+    });
+
+    document.addEventListener("click", (e) => {
+      const wrap = qs("#topAvatarWrap");
+      if (wrap && !wrap.contains(e.target)) qs("#profileMenu")?.classList.add("hidden");
+    });
+  }
+
+  function openPersonalize() {
+    qs("#personalizeBg")?.classList.remove("hidden");
+    qs("#personalizeBg")?.classList.add("flex");
+    document.body.style.overflow = "hidden";
+    loadPersonalizeFields();
+  }
+
+  function closePersonalize() {
+    qs("#personalizeBg")?.classList.add("hidden");
+    qs("#personalizeBg")?.classList.remove("flex");
+    document.body.style.overflow = "";
+  }
+
+  function loadPersonalizeFields() {
+    const name = localStorage.getItem("userName") || "Teacher";
+    const avatarData = localStorage.getItem("userAvatar") || "";
+    const email = localStorage.getItem("userEmail") || "";
+
+    const nameInput = qs("#profileNameInput");
+    const emailInput = qs("#profileEmailInput");
+    const preview = qs("#profileAvatarPreview");
+
+    if (nameInput) nameInput.value = name;
+    if (emailInput) emailInput.value = email;
+
+    if (preview) {
+      if (avatarData) {
+        preview.style.backgroundImage = `url(${avatarData})`;
+        preview.style.backgroundSize = "cover";
+        preview.style.backgroundPosition = "center";
+        preview.textContent = "";
+      } else {
+        preview.style.backgroundImage = "";
+        preview.textContent = initials(name);
+      }
+    }
+  }
+
+  function setupPersonalizeModal() {
+    qs("#openPersonalize")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      qs("#profileMenu")?.classList.add("hidden");
+      openPersonalize();
+    });
+
+    qs("#closePersonalize")?.addEventListener("click", closePersonalize);
+
+    qs("#personalizeBg")?.addEventListener("click", (e) => {
+      if (e.target === qs("#personalizeBg")) closePersonalize();
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closePersonalize();
+    });
+
+    qs("#profilePhotoInput")?.addEventListener("change", (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        localStorage.setItem("userAvatar", ev.target.result);
+        loadPersonalizeFields();
+        renderTopbarIdentity();
+      };
+      reader.readAsDataURL(file);
+    });
+
+    qs("#removeAvatarBtn")?.addEventListener("click", () => {
+      localStorage.removeItem("userAvatar");
+      loadPersonalizeFields();
+      renderTopbarIdentity();
+    });
+
+    qs("#savePersonalize")?.addEventListener("click", async () => {
+      const newName = (qs("#profileNameInput")?.value || "").trim() || "Teacher";
+      const newEmail = (qs("#profileEmailInput")?.value || "").trim();
+
+      localStorage.setItem("userName", newName);
+      localStorage.setItem("userEmail", newEmail);
+
+      try {
+        const res = await fetch(`${API}/me`, {
+          method: "PUT",
+          headers: jsonHeaders(),
+          body: JSON.stringify({ name: newName, email: newEmail }),
+        });
+        const out = await safeJson(res);
+        if (!res.ok || !out?.success) {
+          toast(out?.message || "Could not save email to server", "rgba(185,28,28,.85)");
+        } else {
+          toast("Saved", "rgba(34,197,94,.70)");
+        }
+      } catch {
+        toast("Server error saving profile", "rgba(185,28,28,.85)");
+      }
+
+      renderTopbarIdentity();
+      await loadMeIntoUI();
+      closePersonalize();
+    });
+  }
+
+  async function loadMeIntoUI() {
+    const topEmail = qs("#topEmail");
+    try {
+      const res = await fetch(`${API}/me`, { headers: actorHeaders() });
+      const out = await safeJson(res);
+      const email = out?.user?.email || localStorage.getItem("userEmail") || "";
+      if (email) localStorage.setItem("userEmail", email);
+      if (topEmail) topEmail.textContent = email || "—";
+    } catch {
+      if (topEmail) topEmail.textContent = localStorage.getItem("userEmail") || "—";
+    }
+  }
+
+  /* remaining logic unchanged except role lists */
+
+  async function loadNotifications() {
+    const role = localStorage.getItem("role") || "";
+    const username = localStorage.getItem("username") || "";
+    if (!username || !["teacher", "instructor", "student"].includes(role)) return;
+
+    const res = await fetch(
+      `${API}/notifications?role=${encodeURIComponent(role)}&username=${encodeURIComponent(username)}`
+    );
+    const out = await safeJson(res);
+    if (!out?.success) return;
+
+    const items = out.items || [];
+    const unreadCount = items.filter((x) => x.unread).length;
+
+    const badge = qs("#notifBadge");
+    if (badge) {
+      badge.textContent = String(unreadCount);
+      badge.classList.toggle("hidden", unreadCount === 0);
+    }
+
+    const list = qs("#notifList");
+    if (!list) return;
+
+    list.innerHTML = items
+      .map(
+        (n) => `
+      <div class="px-4 py-3 border-b border-white/10 ${n.unread ? "bg-white/10" : ""}">
+        <div class="text-sm font-extrabold">${esc(n.message || "")}</div>
+        <div class="text-xs muted mt-1">
+          ${esc(n.byName || n.byUsername || "Someone")} · ${esc(n.byRole || "")} ·
+          ${new Date(n.ts).toLocaleString()}
+        </div>
+      </div>
+    `
+      )
+      .join("");
+  }
+
+  async function safeJson(res) {
+    try {
+      return await res.json();
+    } catch {
+      return null;
+    }
+  }
+})();
+```
