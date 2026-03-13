@@ -1,4 +1,4 @@
-```javascript
+javascript
 // teacher.js
 (() => {
   const API = "/api";
@@ -291,4 +291,3 @@
     }
   }
 })();
-```
