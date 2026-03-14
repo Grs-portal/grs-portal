@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Project Teacher Portal</title>
+<title>Teacher Portal</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 
@@ -230,108 +230,306 @@
 
 <body>
 
-<header class="sticky top-0 z-50 surface rounded-none border-x-0 border-t-0">
-<div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+   <!-- Topbar -->
+  <header class="sticky top-0 z-50 surface rounded-none border-x-0 border-t-0">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
 
-<div class="flex items-center gap-3">
-<button id="menuBtn" class="lg:hidden text-2xl leading-none hover:opacity-80 transition">☰</button>
-<div class="leading-tight">
-<div class="title-strong text-[15px]">Project Teacher Portal</div>
-<div class="text-xs muted">Dashboard • Projects • Courses • Homework • Users</div>
-</div>
-</div>
+      <div class="flex items-center gap-3">
+        <button id="menuBtn" class="lg:hidden text-2xl leading-none hover:opacity-80 transition" aria-label="Open menu">☰</button>
+        <div class="leading-tight">
+          <div class="title-strong text-[15px]">Teacher Portal</div>
+          <div class="text-xs muted">Dashboard • Projects • Courses • Homework • Users</div>
+        </div>
+      </div>
 
-<div class="flex items-center gap-3">
-<span id="userName" class="text-sm font-bold"></span>
+      <div class="flex items-center gap-3">
+        <span id="userName" class="text-sm font-bold"></span>
 
-<a href="https://wa.me/59990000001" target="_blank"
-class="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-green-500/15 hover:bg-green-500/20 border border-green-400/20 transition text-sm font-bold">
-💬 WhatsApp Help
-</a>
+        <!-- WhatsApp help (topbar quick) -->
+        <!-- CHANGE NUMBERS -->
+        <a href="https://wa.me/59990000001" target="_blank"
+           class="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-green-500/15 hover:bg-green-500/20 border border-green-400/20 transition text-sm font-bold">
+          💬 WhatsApp Help
+        </a>
 
-<div id="topAvatarWrap" class="relative">
-<div id="userAvatar"
-class="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center font-bold cursor-pointer"></div>
+        <!-- Notifications -->
+        <div class="relative" id="notifWrap">
+          <button id="notifBtn" class="icon-btn" title="Notifications">
+            🔔
+            <span id="notifBadge"
+              class="hidden absolute -top-1 -right-1 text-[11px] px-1.5 py-0.5 rounded-full bg-red-500 text-white font-extrabold">
+              0
+            </span>
+          </button>
 
-<div id="profileMenu"
-class="hidden absolute right-0 mt-2 w-64 surface-2 overflow-hidden z-50">
+          <div id="notifMenu" class="hidden absolute right-0 mt-2 w-80 max-w-[90vw] surface-2 overflow-hidden">
+            <div class="px-4 py-3 flex items-center justify-between border-b border-white/10">
+              <div class="font-bold">Notifications</div>
+              <button id="notifReadAll" class="text-xs font-bold px-3 py-1 rounded-xl btn-theme">
+                Mark all read
+              </button>
+            </div>
+            <div id="notifList" class="max-h-80 overflow-auto"></div>
+            <div class="px-4 py-3 text-xs muted border-t border-white/10">
+              Uploads • edits • deletes
+            </div>
+          </div>
+        </div>
 
-<button id="openPersonalize"
-class="w-full text-left px-4 py-3 text-sm hover:bg-white/10 font-bold">
-✨ Personalize
-</button>
+        <!-- Avatar dropdown -->
+        <div id="topAvatarWrap" class="relative">
+          <div id="userAvatar" class="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center font-bold cursor-pointer select-none"></div>
 
-<button id="logoutBtn"
-class="w-full text-left px-4 py-3 text-sm hover:bg-white/10 font-bold border-t border-white/10">
-Logout
-</button>
+          <!-- Dropdown: Personalize + Theme + Logout -->
+          <div id="profileMenu" class="hidden absolute right-0 mt-2 w-64 surface-2 overflow-hidden z-50">
+            <button id="openPersonalize" class="w-full text-left px-4 py-3 text-sm hover:bg-white/10 font-bold">
+              ✨ Personalize
+            </button>
+            </div>
 
-</div>
-</div>
-</div>
-</div>
-</header>
+            <button id="logoutBtn" class="w-full text-left px-4 py-3 text-sm hover:bg-white/10 font-bold border-t border-white/10">
+              Logout
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 px-4 py-6 relative">
 
 
-<div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 px-4 py-6">
+    <!-- Sidebar -->
+    <aside id="sidebar"
+      class="lg:col-span-3 fixed lg:static top-0 left-0 h-full lg:h-auto w-72 lg:w-auto
+      surface rounded-none lg:rounded-[22px]
+      p-3 shadow-md transform -translate-x-full lg:translate-x-0 transition-transform duration-300
+      z-40 flex flex-col justify-between">
 
-<aside id="sidebar"
-class="lg:col-span-3 surface p-3 flex flex-col justify-between">
+      <div>
+        <div class="px-2 pt-2">
+          <div class="title-strong text-sm">Menu</div>
+          <div class="text-xs muted">Teacher navigation</div>
+        </div>
 
-<div>
+        <div class="mt-4 text-[11px] uppercase tracking-widest muted px-2">Navigation</div>
+        <nav class="mt-2">
+          <ul class="space-y-1">
+            <li><a data-page="dashboard" class="nav-item active" href="#">📊 <span>Dashboard</span></a></li>
+            <li><a data-page="projects" class="nav-item" href="#">🧩 <span>Projects</span></a></li>
+            <li><a data-page="students" class="nav-item" href="#">🎓 <span>Students & Grades</span></a></li>
+            <li><a data-page="submitted-homework" class="nav-item" href="#">📥 <span>Submitted Homework</span></a></li>
+            <li><a data-page="submitted-courses" class="nav-item" href="#">📚 <span>Courses</span></a></li>
+            <li><a data-page="news" class="nav-item" href="#">📰 <span>News</span></a></li>
+          </ul>
+        </nav>
 
-<div class="px-2 pt-2">
-<div class="title-strong text-sm">Menu</div>
-<div class="text-xs muted">Teacher navigation</div>
-</div>
+        <div class="mt-5 text-[11px] uppercase tracking-widest muted px-2">Create</div>
+        <nav class="mt-2">
+          <ul class="space-y-1">
+            <li><a data-page="create-homework" class="nav-item" href="#">➕ <span>Create Homework</span></a></li>
+            <li><a data-page="create-course" class="nav-item" href="#">➕ <span>Create Course</span></a></li>
+            <li><a data-page="users" class="nav-item" href="#">👥 <span>Users</span></a></li>
+          </ul>
+        </nav>
 
-<nav class="mt-4">
-<ul class="space-y-1">
-<li><a data-page="dashboard" class="nav-item active">📊 Dashboard</a></li>
-<li><a data-page="projects" class="nav-item">🧩 Projects</a></li>
-<li><a data-page="students" class="nav-item">🎓 Students & Grades</a></li>
-<li><a data-page="submitted-homework" class="nav-item">📥 Submitted Homework</a></li>
-<li><a data-page="submitted-courses" class="nav-item">📚 Courses</a></li>
-<li><a data-page="news" class="nav-item">📰 News</a></li>
-</ul>
-</nav>
+        <div class="mt-6 grid grid-cols-2 gap-3 px-1">
+          <section class="surface-2 p-4 rounded-[18px]">
+            <p class="text-xs muted font-bold">Active</p>
+            <p id="activeCoursesCount" class="text-2xl font-extrabold mt-1">0</p>
+          </section>
+          <section class="surface-2 p-4 rounded-[18px]">
+            <p class="text-xs muted font-bold">To Grade</p>
+            <p id="toGradeCount" class="text-2xl font-extrabold mt-1">0</p>
+          </section>
+        </div>
 
-<div class="mt-5">
-<ul class="space-y-1">
-<li><a data-page="create-homework" class="nav-item">➕ Create Homework</a></li>
-<li><a data-page="create-course" class="nav-item">➕ Create Course</a></li>
-<li><a data-page="users" class="nav-item">👥 Users</a></li>
-</ul>
-</div>
+      </div>
 
-</div>
+      <div class="p-2">
+        <a id="sidebarLogout" href="#" class="block w-full rounded-[18px] border border-white/15 bg-white/10 hover:bg-white/15 px-4 py-3 text-left font-bold transition">
+          🚪 Logout
+        </a>
+      </div>
+    </aside>
 
-<div class="p-2">
-<a id="sidebarLogout"
-class="block w-full rounded-[18px] border border-white/15 bg-white/10 px-4 py-3 font-bold">
-🚪 Logout
-</a>
-</div>
+    <div id="overlay" class="fixed inset-0 overlay hidden z-30 lg:hidden"></div>
 
-</aside>
+    <!-- Main -->
+    <main class="lg:col-span-9 space-y-6">
 
-<main class="lg:col-span-9 space-y-6">
+      <!-- Dashboard -->
+      <div id="dashboard" class="page-section">
+        <section class="surface p-6 mb-6">
+          <h2 class="text-2xl title-strong">Welcome, Manager!</h2>
+          <p class="muted mt-1">Manage courses, homework, projects, grading, and users.</p>
+          <p class="mt-3 text-xs muted">
+            Your Gmail (for news / updates): <span id="topEmail" class="font-bold">—</span>
+          </p>
+        </section>
 
-<div id="dashboard" class="page-section">
-<section class="surface p-6 mb-6">
-<h2 class="text-2xl title-strong">Welcome, Teacher!</h2>
-<p class="muted mt-1">Manage courses, homework, projects, grading, and users.</p>
-</section>
-</div>
+        <section class="surface p-6 mb-6">
+          <div class="flex items-center justify-between gap-3">
+            <h3 class="text-lg title-strong">All Courses</h3>
+            <div class="text-xs muted">System-wide overview</div>
+          </div>
+          <div id="courses" class="grid gap-4 mt-4"></div>
+        </section>
 
-</main>
-</div>
+        <section class="surface p-6">
+          <div class="flex items-center justify-between gap-3">
+            <h3 class="text-lg title-strong">Projects</h3>
+            <div class="text-xs muted">Quick overview</div>
+          </div>
+          <div id="dashboardProjects" class="grid gap-4 mt-4"></div>
+        </section>
+      </div>
 
-<footer class="text-center py-6 text-xs muted">
-© <span id="y"></span> Project Teacher Portal · Privacy · Terms
-</footer>
+      <!-- Projects -->
+      <div id="projects" class="page-section hidden">
+        <section class="surface p-6">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl title-strong">Projects</h2>
+            <div class="text-xs muted">All projects</div>
+          </div>
+          <div id="projectsFullList" class="space-y-3 mt-4"></div>
+        </section>
+      </div>
 
-<script src="teacher.js" defer></script>
+      <!-- Students -->
+      <div id="students" class="page-section hidden">
+        <section class="surface p-6 overflow-auto">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl title-strong">Students & Grades</h2>
+            <div class="text-xs muted">View students</div>
+          </div>
+
+          <div class="overflow-x-auto mt-4">
+            <table class="min-w-full text-sm">
+              <thead class="thead text-xs uppercase">
+                <tr>
+                  <th class="px-6 py-3 text-left">Student</th>
+                  <th class="px-6 py-3 text-left">Course</th>
+                  <th class="px-6 py-3 text-left">Grade</th>
+                  <th class="px-6 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="studentTable"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <!-- Submitted Homework -->
+      <div id="submitted-homework" class="page-section hidden">
+        <section class="surface p-6">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl title-strong">Submitted Homework</h2>
+            <div class="text-xs muted">Review + manage</div>
+          </div>
+          <div id="homework-list" class="grid gap-4 mt-4"></div>
+        </section>
+      </div>
+
+      <!-- Courses list -->
+      <div id="submitted-courses" class="page-section hidden">
+        <section class="surface p-6">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl title-strong">Courses</h2>
+            <div class="text-xs muted">Manage all</div>
+          </div>
+          <div id="submitted-courses-list" class="mt-4"></div>
+        </section>
+      </div>
+
+      <!-- Create Homework -->
+      <div id="create-homework" class="page-section hidden">
+        <section class="surface p-6 min-h-[55vh] flex flex-col items-center justify-center text-center">
+          <h2 class="text-2xl title-strong">Create Homework</h2>
+          <p class="muted mt-1">Create an assignment and attach a PDF if needed.</p>
+          <button id="openCreateHw" class="btn-theme mt-5">+ Add Homework</button>
+        </section>
+      </div>
+
+      <!-- Create Course -->
+      <div id="create-course" class="page-section hidden">
+        <section class="surface p-6 min-h-[55vh] flex flex-col items-center justify-center text-center">
+          <h2 class="text-2xl title-strong">Create Course</h2>
+          <p class="muted mt-1">Create a course with an optional PDF.</p>
+          <button id="openCreateCourse" class="btn-theme mt-5">+ Add Course</button>
+        </section>
+      </div>
+      
+    </main>
+  </div>
+
+  <!-- PERSONALIZE MODAL -->
+  <div id="personalizeBg" class="fixed inset-0 overlay hidden items-center justify-center z-50 p-4">
+    <div class="surface-2 p-5 w-full max-w-xl">
+      <div class="flex items-center justify-between gap-3">
+        <div>
+          <div class="font-extrabold text-lg">Personalize</div>
+          <div class="text-xs muted">Nickname, profile picture, theme, and Gmail.</div>
+        </div>
+        <button id="closePersonalize" class="icon-btn" title="Close">✕</button>
+      </div>
+
+      <div class="mt-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        <!-- Avatar -->
+        <div class="surface p-4 rounded-[18px]">
+          <div class="text-sm font-extrabold mb-3">Profile Picture</div>
+          <div class="flex items-center gap-3">
+            <div id="profileAvatarPreview"
+              class="w-16 h-16 rounded-[18px] bg-white/10 border border-white/20 flex items-center justify-center font-extrabold overflow-hidden">
+              M
+            </div>
+            <div class="flex-1">
+              <input id="profilePhotoInput" type="file" accept="image/*" class="w-full text-sm" />
+              <button id="removeAvatarBtn" class="mt-3 w-full btn-theme">Remove</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nickname -->
+        <div class="surface p-4 rounded-[18px]">
+          <div class="text-sm font-extrabold mb-3">Nickname</div>
+          <input id="profileNameInput" class="input-theme" placeholder="Enter nickname" />
+          <div class="text-xs muted mt-2">Updates the name in the topbar.</div>
+        </div>
+
+        <!-- Gmail -->
+        <div class="surface p-4 rounded-[18px] md:col-span-2">
+          <div class="text-sm font-extrabold mb-3">Gmail (News / Updates)</div>
+          <input id="profileEmailInput" class="input-theme" placeholder="name@gmail.com" />
+          <div class="text-xs muted mt-2">
+            Saved to your account (server) so the system can email updates later.
+          </div>
+        </div>
+
+        <!-- Theme -->
+        <div class="surface p-4 rounded-[18px] md:col-span-2">
+          <div class="text-sm font-extrabold mb-3">Theme</div>
+          <div class="grid grid-cols-3 gap-2">
+            <button class="themePick btn-theme !px-3 !py-2 !text-sm" data-theme="glass">Glass</button>
+            <button class="themePick btn-theme !px-3 !py-2 !text-sm" data-theme="light">Light</button>
+            <button class="themePick btn-theme !px-3 !py-2 !text-sm" data-theme="dark">Dark</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-5 flex justify-end gap-2">
+        <button id="savePersonalize" class="btn-theme">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="text-center py-6 text-xs muted">
+    © <span id="y"></span> Teacher Portal · Privacy · Terms
+  </footer>
+
+<script src="script.js" defer></script>
 
 </body>
 </html>
