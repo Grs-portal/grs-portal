@@ -11,9 +11,221 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-<style>
-/* CSS unchanged */
-</style>
+  <style>
+    :root{
+      --radius-outer: 22px;
+      --radius-inner: 16px;
+
+      /* DEFAULT = GLASS */
+      --page-bg:
+        radial-gradient(900px 520px at 15% 10%, rgba(191,227,180,.18), transparent 60%),
+        radial-gradient(900px 520px at 88% 10%, rgba(169,214,157,.14), transparent 60%),
+        linear-gradient(180deg, rgba(3,7,6,.85) 0%, rgba(9,16,12,.88) 55%, rgba(3,7,6,.85) 100%),
+        url("/Screenshot 2025-11-05 104653.png") center/cover fixed no-repeat;
+
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.70);
+
+      --surface: rgba(255,255,255,.10);
+      --surface-2: rgba(255,255,255,.14);
+      --border: rgba(255,255,255,.18);
+      --shadow: 0 18px 45px rgba(0,0,0,.38);
+
+      --accent: rgba(191,227,180,.55);
+      --accent-strong: rgba(169,214,157,.85);
+
+      --btn-bg: rgba(255,255,255,.18);
+      --btn-bg-hover: rgba(255,255,255,.26);
+      --btn-text: rgba(255,255,255,.92);
+
+      --danger: rgba(248,113,113,.85);
+      --warn: rgba(251,191,36,.92);
+      --good: rgba(34,197,94,.80);
+    }
+
+    /* LIGHT */
+    html[data-theme="light"]{
+      --page-bg:
+        radial-gradient(900px 520px at 15% 10%, rgba(191,227,180,.55), transparent 60%),
+        radial-gradient(900px 520px at 88% 10%, rgba(169,214,157,.40), transparent 60%),
+        linear-gradient(180deg, #f6fbf4 0%, #eaf6e6 60%, #f6fbf4 100%);
+
+      --text: #1C1820;
+      --muted: rgba(28,24,32,.68);
+
+      --surface: rgba(255,255,255,.82);
+      --surface-2: rgba(255,255,255,.92);
+      --border: rgba(0,0,0,.10);
+      --shadow: 0 12px 28px rgba(0,0,0,.08);
+
+      --btn-bg: rgba(28,24,32,.92);
+      --btn-bg-hover: rgba(28,24,32,.82);
+      --btn-text: #e9f7e6;
+    }
+
+    /* DARK GREEN */
+    html[data-theme="dark"]{
+      --page-bg:
+        radial-gradient(900px 560px at 15% 10%, rgba(34,197,94,.18), transparent 62%),
+        radial-gradient(900px 560px at 88% 10%, rgba(16,185,129,.14), transparent 62%),
+        linear-gradient(180deg, #070b0a 0%, #0b1411 60%, #070b0a 100%);
+
+      --text: rgba(238,255,245,.92);
+      --muted: rgba(238,255,245,.68);
+
+      --surface: rgba(255,255,255,.06);
+      --surface-2: rgba(255,255,255,.10);
+      --border: rgba(255,255,255,.12);
+      --shadow: 0 18px 45px rgba(0,0,0,.55);
+
+      --btn-bg: rgba(34,197,94,.22);
+      --btn-bg-hover: rgba(34,197,94,.32);
+      --btn-text: rgba(238,255,245,.95);
+    }
+
+    html, body{
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+
+    body{
+      background: var(--page-bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .muted{ color: var(--muted); }
+
+    /* Glass surfaces */
+    .surface{
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-outer);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+    .surface-2{
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-outer);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+    }
+
+    .title-strong{ font-weight: 800; letter-spacing: -0.01em; }
+
+    /* nav */
+    .nav-item{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border-radius: 14px;
+      font-weight: 700;
+      transition: 150ms;
+      color: var(--text);
+      opacity: .92;
+    }
+    html[data-theme="light"] .nav-item{ color: #1C1820; }
+    .nav-item:hover{ background: rgba(255,255,255,.10); }
+    html[data-theme="light"] .nav-item:hover{ background: rgba(0,0,0,.05); }
+    .nav-item.active{
+      background: rgba(255,255,255,.14);
+      outline: 1px solid rgba(255,255,255,.22);
+    }
+    html[data-theme="light"] .nav-item.active{
+      background: rgba(28,24,32,.92);
+      color: #e9f7e6;
+      outline: none;
+    }
+
+    /* buttons */
+    .btn-theme{
+      background: var(--btn-bg);
+      color: var(--btn-text);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 10px 16px;
+      font-weight: 700;
+      transition: 150ms;
+    }
+    .btn-theme:hover{ background: var(--btn-bg-hover); }
+
+    .icon-btn{
+      width: 42px; height: 42px;
+      border-radius: 16px;
+      display:flex; align-items:center; justify-content:center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      transition: 150ms;
+    }
+    .icon-btn:hover{ background: var(--surface-2); }
+
+    /* inputs */
+    .input-theme{
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.10);
+      color: var(--text);
+      outline: none;
+    }
+    html[data-theme="light"] .input-theme{
+      background: rgba(0,0,0,.04);
+      color: #1C1820;
+    }
+    .input-theme:focus{
+      box-shadow: 0 0 0 3px rgba(169,214,157,.25);
+      border-color: rgba(169,214,157,.50);
+    }
+
+    /* select dropdown fix */
+    select.select-theme{
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.10);
+      color: var(--text);
+      outline: none;
+      appearance: none;
+    }
+    html[data-theme="light"] select.select-theme{
+      background: rgba(0,0,0,.04);
+      color: #1C1820;
+    }
+
+    html[data-theme="glass"] select.select-theme,
+    html[data-theme="dark"]  select.select-theme{
+      color-scheme: dark;
+    }
+    html[data-theme="glass"] select.select-theme option,
+    html[data-theme="dark"]  select.select-theme option{
+      background: #0b1220;
+      color: rgba(255,255,255,.95);
+    }
+
+    /* tables */
+    .thead{
+      background: rgba(255,255,255,.10);
+      border-bottom: 1px solid var(--border);
+    }
+    html[data-theme="light"] .thead{
+      background: rgba(191,227,180,.65);
+    }
+
+    /* overlay */
+    .overlay{
+      background: rgba(0,0,0,.45);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+  </style>
 </head>
 
 <body>
