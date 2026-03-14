@@ -45,7 +45,7 @@
 
   async function init() {
     if (localStorage.getItem("isLoggedIn") !== "true") return (location.href = LOGIN);
-    if (localStorage.getItem("role") !== "manager") return (location.href = LOGIN);
+    if (localStorage.getItem("role") !== "teacher") return (location.href = LOGIN);
 
     qs("#y").textContent = new Date().getFullYear();
 
