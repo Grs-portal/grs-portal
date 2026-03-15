@@ -796,6 +796,83 @@
 
   setupCourseForm();
 }
+
+let forceDraft = false;
+
+function setupCourseForm() {
+
+  const form = qs("#courseForm");
+  const username = localStorage.getItem("username");
+  const profilePic = localStorage.getItem("userAvatar") || "";
+
+  qs("#saveDraftBtn")?.addEventListener("click", () => {
+    forceDraft = true;
+    form.requestSubmit();
+  });
+
+  form?.addEventListener("submit", async (e) => {
+
+    e.preventDefault();
+
+    const file = qs("#courseCover")?.files?.[0];
+    const cover = file ? await toBase64(file) : "";
+
+    const selectedStatus = qs("#courseStatus")?.value;
+    const finalStatus = forceDraft ? "draft" : selectedStatus;
+
+    const newCourse = {
+
+      title: qs("#courseTitle")?.value.trim(),
+      description: qs("#courseDescription")?.value.trim(),
+      cover,
+
+      durationValue: qs("#courseDurationValue")?.value,
+      durationUnit: qs("#courseDurationUnit")?.value,
+
+      sessionsValue: qs("#courseSessionsValue")?.value,
+      sessionsUnit: qs("#courseSessionsUnit")?.value,
+
+      programType: qs("#courseProgramType")?.value,
+      theme: qs("#courseTheme")?.value,
+      offer: qs("#courseOffer")?.value,
+
+      startDate: qs("#courseStartDate")?.value || null,
+
+      status: finalStatus,
+
+      createdByUsername: username,
+      createdByAvatar: profilePic
+    };
+
+    closeModal();
+    forceDraft = false;
+
+    try {
+
+      const res = await fetch(`${API}/courses`, {
+        method: "POST",
+        headers: jsonHeaders(),
+        body: JSON.stringify(newCourse)
+      });
+
+      if (!res.ok) throw new Error("Create failed");
+
+      toast("Course created", "rgba(34,197,94,.7)");
+
+      loadCourses();
+      loadDashboard();
+      loadNotifications();
+
+    } catch (err) {
+      console.error(err);
+      toast("Failed to create course", "rgba(185,28,28,.85)");
+    }
+
+  });
+
+}
+
+  
   function openEditCourseModal(course) {
     showModal(`
       <h2 class="text-xl font-extrabold mb-4">Edit Course</h2>
