@@ -293,17 +293,16 @@
     qs("#createNewsBtn")?.addEventListener("click", openCreateNewsModal);
   }
 
-  function showModal(html) {
+ function showModal(html) {
   closeModal();
 
   const bg = document.createElement("div");
   bg.id = "modalBg";
-
   bg.className =
-    "fixed inset-0 bg-black/45 flex items-center justify-center z-50 backdrop-blur-sm overflow-y-auto p-4";
+    "fixed inset-0 bg-black/45 flex items-start justify-center z-50 backdrop-blur-sm overflow-y-auto p-6";
 
   bg.innerHTML = `
-    <div class="surface-2 p-6 w-[92%] max-w-md max-h-[90vh] overflow-y-auto">
+    <div class="surface-2 p-6 w-[92%] max-w-lg max-h-[90vh] overflow-y-auto rounded-[18px]">
       ${html}
     </div>
   `;
@@ -627,7 +626,12 @@
   function openCreateNewsModal() {
     showModal(`
       <h2 class="text-xl font-extrabold mb-4">Create News</h2>
-
+      
+      <div class="flex justify-end gap-2">
+        <button id="cancelModal" class="btn-theme">Cancel</button>
+        <button id="submitNews" class="btn-theme">Post</button>
+      </div>
+      
       <label class="text-sm font-bold muted">Title</label>
       <input id="newsTitle" class="input-theme mt-1 mb-3" placeholder="Title" />
 
@@ -637,10 +641,7 @@
       <label class="text-sm font-bold muted">Content</label>
       <textarea id="newsContent" class="input-theme mt-1 mb-4 min-h-[140px]" placeholder="Write the news content here..."></textarea>
 
-      <div class="flex justify-end gap-2">
-        <button id="cancelModal" class="btn-theme">Cancel</button>
-        <button id="submitNews" class="btn-theme">Post</button>
-      </div>
+
     `);
 
     qs("#submitNews")?.addEventListener("click", async () => {
@@ -721,7 +722,11 @@
   function openCreateCourseModal() {
 
   showModal(`
-    <h2 class="text-xl font-extrabold mb-4">Create Course</h2>
+
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-extrabold">Create Course</h2>
+      <button id="cancelModal" class="btn-theme text-sm">Cancel</button>
+    </div>
 
     <form id="courseForm">
 
@@ -767,7 +772,7 @@
       </div>
 
       <label class="text-sm font-bold muted">Program Type</label>
-      <input id="courseProgramType" class="input-theme mt-1 mb-3" placeholder="Workshop / Training">
+      <input id="courseProgramType" class="input-theme mt-1 mb-3">
 
       <label class="text-sm font-bold muted">Theme</label>
       <input id="courseTheme" class="input-theme mt-1 mb-3">
@@ -776,24 +781,17 @@
       <input id="courseOffer" class="input-theme mt-1 mb-3">
 
       <label class="text-sm font-bold muted">Start Date</label>
-      <input id="courseStartDate" type="date" class="input-theme mt-1 mb-3">
+      <input id="courseStartDate" type="date" class="input-theme mt-4 mb-4">
 
-      <label class="text-sm font-bold muted">Status</label>
-      <select id="courseStatus" class="select-theme mt-1 mb-4">
-        <option value="published">Published</option>
-        <option value="draft">Draft</option>
-      </select>
-
-      <div class="flex justify-between gap-2">
+      <div class="flex justify-end gap-3 mt-4">
 
         <button type="button" id="saveDraftBtn" class="btn-theme">
           Save Draft
         </button>
 
-        <div class="flex gap-2">
-          <button type="button" id="cancelModal" class="btn-theme">Cancel</button>
-          <button type="submit" class="btn-theme">Create</button>
-        </div>
+        <button type="button" id="publishCourseBtn" class="btn-theme">
+          Publish
+        </button>
 
       </div>
 
@@ -813,6 +811,11 @@ function setupCourseForm() {
 
   qs("#saveDraftBtn")?.addEventListener("click", () => {
     forceDraft = true;
+    form.requestSubmit();
+  });
+
+  qs("#publishCourseBtn")?.addEventListener("click", () => {
+    forceDraft = false;
     form.requestSubmit();
   });
 
