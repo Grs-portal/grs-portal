@@ -681,7 +681,7 @@
       <textarea id="newsContent" class="input-theme mt-1 mb-4 min-h-[140px]">${esc(item.content || "")}</textarea>
 
       <div class="flex justify-end gap-2">
-        <button id="cancelModal" class="btn-theme">Cancel</button>
+        <button id="cancelModal" class="btn-theme">X</button>
         <button id="saveNews" class="btn-theme">Save</button>
       </div>
     `);
