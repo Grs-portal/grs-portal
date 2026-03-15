@@ -713,60 +713,89 @@
   }
 
   function openCreateCourseModal() {
-    showModal(`
-      <h2 class="text-xl font-extrabold mb-4">Create Course</h2>
+
+  showModal(`
+    <h2 class="text-xl font-extrabold mb-4">Create Course</h2>
+
+    <form id="courseForm">
+
       <label class="text-sm font-bold muted">Title</label>
-      <input id="courseTitle" class="input-theme mt-1 mb-3" placeholder="Title" />
+      <input id="courseTitle" class="input-theme mt-1 mb-3" required />
+
       <label class="text-sm font-bold muted">Description</label>
-      <textarea id="courseDesc" class="input-theme mt-1 mb-3" placeholder="Description"></textarea>
-      <label class="text-sm font-bold muted">Type</label>
-      <select id="courseType" class="select-theme mt-1 mb-3">
-        <option value="in-person">In-person</option>
-        <option value="online">Online</option>
-        <option value="hybrid">Hybrid</option>
-      </select>
-      <label class="text-sm font-bold muted">PDF (optional)</label>
-      <input id="coursePdf" type="file" accept=".pdf" class="mt-2 mb-4 w-full text-sm" />
-      <div class="flex justify-end gap-2">
-        <button id="cancelModal" class="btn-theme">Cancel</button>
-        <button id="submitCourse" class="btn-theme">Create</button>
+      <textarea id="courseDescription" class="input-theme mt-1 mb-3"></textarea>
+
+      <label class="text-sm font-bold muted">Cover</label>
+      <input id="courseCover" type="file" accept="image/*" class="mb-3"/>
+
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <div>
+          <label class="text-sm font-bold muted">Duration</label>
+          <input id="courseDurationValue" class="input-theme mt-1" placeholder="12">
+        </div>
+
+        <div>
+          <label class="text-sm font-bold muted">Unit</label>
+          <select id="courseDurationUnit" class="select-theme mt-1">
+            <option value="weeks">Weeks</option>
+            <option value="months">Months</option>
+            <option value="days">Days</option>
+          </select>
+        </div>
       </div>
-    `);
 
-    qs("#submitCourse").addEventListener("click", async () => {
-      const title = qs("#courseTitle").value.trim();
-      const description = qs("#courseDesc").value.trim();
-      const locationType = qs("#courseType").value;
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <div>
+          <label class="text-sm font-bold muted">Sessions</label>
+          <input id="courseSessionsValue" class="input-theme mt-1" placeholder="8">
+        </div>
 
-      if (!title) return toast("Title required", "rgba(185,28,28,.85)");
+        <div>
+          <label class="text-sm font-bold muted">Unit</label>
+          <select id="courseSessionsUnit" class="select-theme mt-1">
+            <option value="lessons">Lessons</option>
+            <option value="classes">Classes</option>
+            <option value="meetings">Meetings</option>
+          </select>
+        </div>
+      </div>
 
-      let pdfUrl = "", pdfName = "";
-      const file = qs("#coursePdf")?.files?.[0];
-      try {
-        if (file) {
-          const up = await uploadPdf(file);
-          pdfUrl = up.url; pdfName = up.originalName;
-        }
-      } catch (e) {
-        return toast(e.message, "rgba(185,28,28,.85)");
-      }
+      <label class="text-sm font-bold muted">Program Type</label>
+      <input id="courseProgramType" class="input-theme mt-1 mb-3" placeholder="Workshop / Training">
 
-      const res = await fetch(`${API}/courses`, {
-        method: "POST",
-        headers: jsonHeaders(),
-        body: JSON.stringify({ title, description, locationType, pdfUrl, pdfName }),
-      });
+      <label class="text-sm font-bold muted">Theme</label>
+      <input id="courseTheme" class="input-theme mt-1 mb-3">
 
-      if (!res.ok) return toast("Create course failed", "rgba(185,28,28,.85)");
+      <label class="text-sm font-bold muted">Offer</label>
+      <input id="courseOffer" class="input-theme mt-1 mb-3">
 
-      closeModal();
-      toast("Course created", "rgba(34,197,94,.70)");
-      loadCourses();
-      loadDashboard();
-      loadNotifications();
-    });
-  }
+      <label class="text-sm font-bold muted">Start Date</label>
+      <input id="courseStartDate" type="date" class="input-theme mt-1 mb-3">
 
+      <label class="text-sm font-bold muted">Status</label>
+      <select id="courseStatus" class="select-theme mt-1 mb-4">
+        <option value="published">Published</option>
+        <option value="draft">Draft</option>
+      </select>
+
+      <div class="flex justify-between gap-2">
+
+        <button type="button" id="saveDraftBtn" class="btn-theme">
+          Save Draft
+        </button>
+
+        <div class="flex gap-2">
+          <button type="button" id="cancelModal" class="btn-theme">Cancel</button>
+          <button type="submit" class="btn-theme">Create</button>
+        </div>
+
+      </div>
+
+    </form>
+  `);
+
+  setupCourseForm();
+}
   function openEditCourseModal(course) {
     showModal(`
       <h2 class="text-xl font-extrabold mb-4">Edit Course</h2>
