@@ -294,22 +294,28 @@
   }
 
   function showModal(html) {
-    closeModal();
-    const bg = document.createElement("div");
-    bg.id = "modalBg";
-    bg.className = "fixed inset-0 bg-black/45 flex items-center justify-center z-50 backdrop-blur-sm";
-    bg.innerHTML = `
-      <div class="surface-2 p-6 w-[92%] max-w-md">
-        ${html}
-      </div>
-    `;
-    document.body.appendChild(bg);
+  closeModal();
 
-    bg.addEventListener("click", (e) => {
-      if (e.target === bg) closeModal();
-    });
-    bg.querySelector("#cancelModal")?.addEventListener("click", closeModal);
-  }
+  const bg = document.createElement("div");
+  bg.id = "modalBg";
+
+  bg.className =
+    "fixed inset-0 bg-black/45 flex items-center justify-center z-50 backdrop-blur-sm overflow-y-auto p-4";
+
+  bg.innerHTML = `
+    <div class="surface-2 p-6 w-[92%] max-w-md max-h-[90vh] overflow-y-auto">
+      ${html}
+    </div>
+  `;
+
+  document.body.appendChild(bg);
+
+  bg.addEventListener("click", (e) => {
+    if (e.target === bg) closeModal();
+  });
+
+  bg.querySelector("#cancelModal")?.addEventListener("click", closeModal);
+}
 
   function closeModal() {
     qs("#modalBg")?.remove();
