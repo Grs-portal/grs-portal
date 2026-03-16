@@ -827,7 +827,6 @@ function setupCourseForm() {
     const cover = file ? await toBase64(file) : "";
 
     const finalStatus = forceDraft ? "draft" : "published";
-    const finalStatus = forceDraft ? "draft" : selectedStatus;
 
     const newCourse = {
 
