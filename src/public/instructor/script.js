@@ -748,8 +748,8 @@
         <div>
           <label class="text-sm font-bold muted">Unit</label>
           <select id="courseDurationUnit" class="select-theme mt-1">
-            <option value="weeks">Weeks</option>
-            <option value="months">Months</option>
+            <option value="minutes">Minutes</option>
+            <option value="hours">Hours</option>
             <option value="days">Days</option>
           </select>
         </div>
@@ -764,24 +764,62 @@
         <div>
           <label class="text-sm font-bold muted">Unit</label>
           <select id="courseSessionsUnit" class="select-theme mt-1">
-            <option value="lessons">Lessons</option>
-            <option value="classes">Classes</option>
-            <option value="meetings">Meetings</option>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
           </select>
         </div>
       </div>
 
-      <label class="text-sm font-bold muted">Program Type</label>
-      <input id="courseProgramType" class="input-theme mt-1 mb-3">
+      <div>
+        <label class="text-sm font-bold muted">Program Type</label>
+        <select id="courseProgramType" class="select-theme mt-1">
+          <option value="">All</option>
+          <option value="course">Courses</option>
+          <option value="workshop">Workshops</option>
+          <option value="activity">Activities</option>
+        </select>
+      </div>
 
-      <label class="text-sm font-bold muted">Theme</label>
-      <input id="courseTheme" class="input-theme mt-1 mb-3">
+      <div>
+        <label class="text-sm font-bold muted">Theme</label>
+        <select id="courseTheme" class="select-theme mt-1">
+          <option value="">All</option>
+          <option value="rest">Rest & Relaxation</option>
+          <option value="recovery">Recovery & Balance</option>
+          <option value="insight">Self-insight</option>
+          <option value="connection">Connection</option>
+        </select>
+      </div>
 
-      <label class="text-sm font-bold muted">Offer</label>
-      <input id="courseOffer" class="input-theme mt-1 mb-3">
+      <div>
+        <label class="text-sm font-bold muted">What You Offer</label>
+        <select id="courseOffer" class="select-theme mt-1">
+          <option value="">All</option>
+          <option>Activities</option>
+          <option>Learning & deepening recovery knowledge</option>
+          <option>Regular offerings</option>
+          <option>Lived-experience training</option>
+        </select>
+      </div>
+
+      <div>
+          <label class="text-sm font-bold muted">Status</label>
+          <select id="courseStatus" class="select-theme mt-1">
+            <option value="">All</option>
+            <option value="draft">Draft</option>
+            <option value="not-started">Upcoming</option>
+            <option value="ongoing">Ongoing</option>
+            <option value="finished">Completed</option>
+          </select>
+      </div>
+
 
       <label class="text-sm font-bold muted">Start Date</label>
       <input id="courseStartDate" type="date" class="input-theme mt-4 mb-4">
+
+      <label class="text-sm font-bold muted">End Date</label>
+      <input id="courseEndDate" type="date" class="input-theme mt-4 mb-4">
 
       <div class="flex justify-end gap-3 mt-4">
 
@@ -843,8 +881,10 @@ function setupCourseForm() {
       programType: qs("#courseProgramType")?.value,
       theme: qs("#courseTheme")?.value,
       offer: qs("#courseOffer")?.value,
+      status: qs("#courseStatus")?.value,
 
       startDate: qs("#courseStartDate")?.value || null,
+      endDate: qs("#courseEndDate")?.value || null,
 
       status: finalStatus,
 
