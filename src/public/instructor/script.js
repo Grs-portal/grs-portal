@@ -53,9 +53,10 @@
     setupProfileDropdown();
     renderTopbarIdentity();
     setupPersonalizeModal();
-    const sidebarSystem = setupSidebarSystem();
-    setupNav(sidebarSystem);    
+    setupMobileSidebar();
+    setupNav();
     bindButtons();
+
     setupNotificationsUI();
     loadNotifications();
     setInterval(loadNotifications, 15000);
@@ -241,145 +242,48 @@
     }
   }
 
-function setupSidebarSystem() {
-  const mainSidebar = qs("#mainSidebar");
-  const coursesSidebar = qs("#coursesSidebar");
-  const overlay = qs("#overlay");
-  const menuBtn = qs("#menuBtn");
+  function setupMobileSidebar() {
+    const menuBtn = qs("#menuBtn");
+    const sidebar = qs("#sidebar");
+    const overlay = qs("#overlay");
+    if (!menuBtn || !sidebar || !overlay) return;
 
-  const closeAllSidebars = () => {
-    mainSidebar?.classList.remove("active");
-    coursesSidebar?.classList.remove("active");
-    overlay?.classList.remove("active");
-  };
+    menuBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("-translate-x-full");
+      overlay.classList.toggle("hidden");
+    });
 
-  const openMainSidebar = () => {
-    coursesSidebar?.classList.remove("active");
-    mainSidebar?.classList.add("active");
-    if (window.innerWidth < 1024) overlay?.classList.add("active");
-  };
+    overlay.addEventListener("click", () => {
+      sidebar.classList.add("-translate-x-full");
+      overlay.classList.add("hidden");
+    });
+  }
 
-  const openCoursesSidebar = () => {
-    mainSidebar?.classList.remove("active");
-    coursesSidebar?.classList.add("active");
-    if (window.innerWidth < 1024) overlay?.classList.add("active");
-  };
-
-  menuBtn?.addEventListener("click", () => {
-    if (mainSidebar?.classList.contains("active")) closeAllSidebars();
-    else openMainSidebar();
-  });
-
-  overlay?.addEventListener("click", closeAllSidebars);
-
-  return {
-    openMainSidebar,
-    openCoursesSidebar,
-    closeAllSidebars
-  };
-}
-
-  function setupNav(sidebarSystem) {
+  function setupNav() {
     const pages = qsa(".page-section");
     const links = qsa(".nav-item");
 
     links.forEach((link) => {
       link.addEventListener("click", async (e) => {
         e.preventDefault();
-
         const page = link.dataset.page;
         if (!page) return;
 
-        // Hide all pages
         pages.forEach((p) => p.classList.add("hidden"));
         qs(`#${page}`)?.classList.remove("hidden");
 
-        // Active link
         links.forEach((l) => l.classList.remove("active"));
         link.classList.add("active");
-
-        /* ================================
-          COURSES TAKE OVER
-        ================================= */
-        if (page === "submitted-courses") {
-          sidebarSystem.openCoursesSidebar();
-          buildCoursesSidebar();   // 👈 build sidebar UI
-          await loadCourses();
-          return;
-        }
-
-        // Normal pages → main sidebar
-        sidebarSystem.openMainSidebar();
 
         if (page === "dashboard") await loadDashboard();
         if (page === "students") await loadStudents();
         if (page === "submitted-homework") await loadHomework();
+        if (page === "submitted-courses") await loadCourses();
         if (page === "users") await loadUsers();
         if (page === "news") await loadNews();
       });
     });
   }
-
-
-  function buildCoursesSidebar() {
-  const coursesSidebar = qs("#coursesSidebar");
-  if (!coursesSidebar) return;
-
-  coursesSidebar.innerHTML = `
-    <div class="courses-sidebar-content h-full overflow-y-auto">
-
-      <button id="backDashboardBtn"
-      class="nav-item bg-black/90 text-white rounded-xl justify-center mb-2">
-      ☰ Dashboard
-      </button>
-
-      <h3 class="sidebar-title">Filter Programs</h3>
-
-      <div class="filter-group">
-        <label>Search</label>
-        <input id="searchCourse" type="text" placeholder="Search programs..." />
-      </div>
-
-      <button id="newCourseBtn" class="new-course-btn">
-        + New Course
-      </button>
-
-      <div class="filter-group">
-        <label>Status</label>
-        <select id="statusFilter">
-          <option value="">All</option>
-          <option value="draft">Draft</option>
-          <option value="not-started">Upcoming</option>
-          <option value="ongoing">Ongoing</option>
-          <option value="finished">Completed</option>
-        </select>
-      </div>
-
-      <div class="filter-group mt-4">
-        <label>Calendar</label>
-        <input type="date" id="calendarFilter"/>
-      </div>
-
-    </div>
-  `;
-
-    qs("#newCourseBtn")?.addEventListener("click", openCreateCourseModal);
-
-    qs("#backDashboardBtn")?.addEventListener("click", () => {
-      qs('[data-page="dashboard"]')?.click();
-    });
-
-    const searchInput = qs("#searchCourse");
-    const statusFilter = qs("#statusFilter");
-
-    const applyFilters = () => {
-      loadCourses(); // you can later enhance filtering
-    };
-
-    searchInput?.addEventListener("input", applyFilters);
-    statusFilter?.addEventListener("change", applyFilters);
-  }
-
 
   function bindButtons() {
     qs("#openCreateHw")?.addEventListener("click", openCreateHomeworkModal);
@@ -1179,6 +1083,107 @@ function setupCourseForm() {
       loadHomework();
       loadDashboard();
       loadNotifications();
+    });
+  }
+
+  function openCreateUserModal() {
+    showModal(`
+      <h2 class="text-xl font-extrabold mb-4">Create User</h2>
+      <label class="text-sm font-bold muted">Username</label>
+      <input id="uUsername" class="input-theme mt-1 mb-3" placeholder="Username" />
+      <label class="text-sm font-bold muted">Full name</label>
+      <input id="uName" class="input-theme mt-1 mb-3" placeholder="Full name" />
+      <label class="text-sm font-bold muted">Gmail</label>
+      <input id="uEmail" class="input-theme mt-1 mb-3" placeholder="name@gmail.com" />
+      <label class="text-sm font-bold muted">Password</label>
+      <input id="uPassword" type="password" class="input-theme mt-1 mb-3" placeholder="Password" />
+      <label class="text-sm font-bold muted">Role</label>
+      <select id="uRole" class="select-theme mt-1 mb-4">
+        <option value="student">student</option>
+        <option value="instructor">instructor</option>
+        <option value="manager">manager</option>
+      </select>
+      <div class="flex justify-end gap-2">
+        <button id="cancelModal" class="btn-theme">Cancel</button>
+        <button id="submitUser" class="btn-theme">Create</button>
+      </div>
+    `);
+
+    qs("#submitUser").addEventListener("click", async () => {
+      const username = qs("#uUsername").value.trim();
+      const name = qs("#uName").value.trim() || username;
+      const email = qs("#uEmail").value.trim();
+      const password = qs("#uPassword").value.trim();
+      const role = qs("#uRole").value;
+
+      if (!username || !password) return toast("Username + password required", "rgba(185,28,28,.85)");
+
+      const res = await fetch(`${API}/users`, {
+        method: "POST",
+        headers: jsonHeaders(),
+        body: JSON.stringify({ username, password, role, name, email }),
+      });
+
+      const out = await safeJson(res);
+      if (!res.ok || !out?.success) return toast(out?.message || "Create failed", "rgba(185,28,28,.85)");
+
+      closeModal();
+      toast("User created", "rgba(34,197,94,.70)");
+      loadUsers();
+      loadNotifications();
+    });
+  }
+
+  async function loadUsers() {
+    const table = qs("#usersTable");
+    if (!table) return toast("Missing #usersTable", "rgba(185,28,28,.85)");
+
+    const res = await fetch(`${API}/users`, { headers: actorHeaders() });
+
+    if (res.status === 403) {
+      table.innerHTML = "";
+      return toast("Forbidden: missing manager role", "rgba(185,28,28,.85)");
+    }
+
+    const users = await safeJson(res);
+    if (!Array.isArray(users)) {
+      table.innerHTML = "";
+      return toast("Failed to load users", "rgba(185,28,28,.85)");
+    }
+
+    table.innerHTML = users
+      .map(
+        (u) => `
+      <tr class="border-t border-white/10">
+        <td class="px-6 py-3 font-bold">${esc(u.username)}</td>
+        <td class="px-6 py-3">${esc(u.name || "")}</td>
+        <td class="px-6 py-3">${esc(u.role || "")}</td>
+        <td class="px-6 py-3">${esc(u.email || "")}</td>
+        <td class="px-6 py-3 text-right">
+          <button class="del-user btn-theme px-3 py-2" data-username="${esc(u.username)}">Delete</button>
+        </td>
+      </tr>
+    `
+      )
+      .join("");
+
+    table.querySelectorAll(".del-user").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const username = btn.dataset.username;
+        if (!(await confirmDeleteUser(username))) return;
+
+        const del = await fetch(`${API}/users/${encodeURIComponent(username)}`, {
+          method: "DELETE",
+          headers: actorHeaders(),
+        });
+
+        const out = await safeJson(del);
+        if (!del.ok || !out?.success) return toast(out?.message || "Delete failed", "rgba(185,28,28,.85)");
+
+        toast("User deleted", "rgba(185,28,28,.85)");
+        loadUsers();
+        loadNotifications();
+      });
     });
   }
 
