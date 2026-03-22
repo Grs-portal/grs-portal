@@ -815,11 +815,17 @@
       </div>
 
 
-      <label class="text-sm font-bold muted">Start Date</label>
-      <input id="courseStartDate" type="date" class="input-theme mt-4 mb-4">
-
-      <label class="text-sm font-bold muted">End Date</label>
-      <input id="courseEndDate" type="date" class="input-theme mt-4 mb-4">
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <div>
+          <label class="text-sm font-bold muted">Start Date</label>
+          <input id="courseStartDate" type="date" class="input-theme mt-1">
+        </div>
+      
+        <div>
+          <label class="text-sm font-bold muted">End Date</label>
+          <input id="courseEndDate" type="date" class="input-theme mt-1">
+        </div>
+      </div>
 
       <div class="flex justify-end gap-3 mt-4">
 
@@ -864,8 +870,14 @@ function setupCourseForm() {
     const file = qs("#courseCover")?.files?.[0];
     const cover = file ? await toBase64(file) : "";
 
-    const finalStatus = forceDraft ? "draft" : "published";
-
+    const selectedStatus = qs("#courseStatus")?.value;
+    
+    // If trying to save draft but status is not draft
+    if (forceDraft && selectedStatus && selectedStatus !== "draft") {
+      toast("Set status to 'Draft' or click Publish instead.", "rgba(185,28,28,.85)");
+      return;
+    }
+    
     const newCourse = {
 
       title: qs("#courseTitle")?.value.trim(),
@@ -884,9 +896,7 @@ function setupCourseForm() {
       status: qs("#courseStatus")?.value,
 
       startDate: qs("#courseStartDate")?.value || null,
-      endDate: qs("#courseEndDate")?.value || null,
-
-      status: finalStatus,
+      status: forceDraft ? "draft" : selectedStatus || "published",
 
       createdByUsername: username,
       createdByAvatar: profilePic
