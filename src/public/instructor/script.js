@@ -402,7 +402,8 @@
     const box = qs("#courses");
     if (!box) return;
 
-    box.innerHTML = courses.map((c) => {
+    list.innerHTML = courses
+      .map((c) => {
         const statusColor = {
           draft: "bg-gray-400",
           "not-started": "bg-blue-400",
@@ -423,8 +424,8 @@
                 </button>
                 <div class="course-menu hidden origin-top-right absolute right-0 mt-2 w-28 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                   <div class="py-1">
-                    <button class="edit-course w-full text-left px-4 py-2 text-sm text-gray-700" data-id="${c.id}">Edit</button>
-                    <button class="del-course w-full text-left px-4 py-2 text-sm text-red-600" data-id="${c.id}">Delete</button>
+                    <button class="edit-course w-full text-left px-4 py-2 text-sm text-gray-700">Edit</button>
+                    <button class="del-course w-full text-left px-4 py-2 text-sm text-red-600">Delete</button>
                   </div>
                 </div>
               </div>
