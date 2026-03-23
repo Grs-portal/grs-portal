@@ -409,7 +409,7 @@
         <div>
           <div class="font-extrabold">${esc(c.title)}</div>
           <div class="text-sm muted">${esc(c.description || "")}</div>
-          <div class="text-xs muted mt-1">Type: ${esc(c.locationType || "in-person")}</div>
+          <div class="text-xs muted mt-1">Type: ${esc(c.programType || "N/A")}</div>
           ${
             c.pdfUrl
               ? `<a class="text-xs underline" href="${esc(c.pdfUrl)}" target="_blank">PDF: ${esc(c.pdfName || "View")}</a>`
@@ -932,9 +932,9 @@ function setupCourseForm() {
       programType: qs("#courseProgramType")?.value,
       theme: qs("#courseTheme")?.value,
       offer: qs("#courseOffer")?.value,
-      status: qs("#courseStatus")?.value,
 
       startDate: qs("#courseStartDate")?.value || null,
+      endDate: qs("#courseEndDate")?.value || null,
       status: forceDraft ? "draft" : selectedStatus || "published",
 
       createdByUsername: username,
