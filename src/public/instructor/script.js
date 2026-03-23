@@ -477,8 +477,8 @@ async function loadCourses() {
               </button>
               <div class="course-menu hidden origin-top-right absolute right-0 mt-2 w-28 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                 <div class="py-1">
-                  <button class="edit-course w-full text-left px-4 py-2 text-sm text-gray-700">Edit</button>
-                  <button class="del-course w-full text-left px-4 py-2 text-sm text-red-600">Delete</button>
+                  <button class="edit-course w-full text-left px-4 py-2 text-sm text-gray-700" data-id="${c.id}">Edit</button>
+                  <button class="del-course w-full text-left px-4 py-2 text-sm text-red-600" data-id="${c.id}">Delete</button>
                 </div>
               </div>
             </div>
@@ -514,24 +514,33 @@ async function loadCourses() {
   });
 
   // Edit & Delete handlers
-  qsa(".edit-course").forEach((btn, idx) => {
-    btn.addEventListener("click", async () => {
-      const course = courses[idx];
-      openEditCourseModal(course);
-    });
+  qsa(".edit-course").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const id = btn.dataset.id;
+    const course = courses.find(c => String(c.id) === String(id));
+    openEditCourseModal(course);
   });
+});
 
-  qsa(".del-course").forEach((btn, idx) => {
+  qsa(".del-course").forEach((btn) => {
     btn.addEventListener("click", async () => {
-      const course = courses[idx];
+      const id = btn.dataset.id;
+      const course = courses.find(c => String(c.id) === String(id));
+
       if (!confirm("Delete course?")) return;
-      const r = await fetch(`${API}/courses/${course.id}`, { method: "DELETE", headers: actorHeaders() });
+
+      const r = await fetch(`${API}/courses/${course.id}`, {
+        method: "DELETE",
+        headers: actorHeaders()
+      });
+
       if (!r.ok) return toast("Delete failed", "rgba(185,28,28,.85)");
+
       toast("Deleted", "rgba(185,28,28,.85)");
       loadCourses();
       loadDashboard();
     });
-  });
+  }); 
 }
 
   async function loadStudents() {
