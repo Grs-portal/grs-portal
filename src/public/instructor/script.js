@@ -394,6 +394,21 @@
       .join("");
   }
 
+  function getStatusColor(status) {
+  switch (status) {
+    case "draft":
+      return "bg-gray-400 text-black";
+    case "not-started":
+      return "bg-blue-500 text-white";
+    case "ongoing":
+      return "bg-green-500 text-white";
+    case "finished":
+      return "bg-purple-500 text-white";
+    default:
+      return "bg-gray-300 text-black";
+  }
+}
+
   async function loadDashboard() {
     const [courses, hw] = await Promise.all([fetchJSON("/courses"), fetchJSON("/homework")]);
 
@@ -406,7 +421,12 @@
     box.innerHTML = courses
       .map((c) => `
         <div class="surface-2 rounded-[18px] overflow-hidden relative group">
-      
+
+          <!-- STATUS TAG -->
+          <div class="absolute top-3 left-3 px-3 py-1 text-xs font-bold rounded-full ${getStatusColor(c.status)}">
+            ${esc(c.status || "unknown")}
+          </div>
+
           <!-- COVER IMAGE -->
           <div class="h-40 w-full bg-gray-200">
             ${
@@ -415,40 +435,51 @@
                 : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
             }
           </div>
-      
+
           <!-- 3 DOT MENU -->
           <div class="absolute top-3 right-3">
             <button class="menu-btn text-xl px-2 py-1 rounded-lg bg-black/40 text-white" data-id="${c.id}">
               ⋮
             </button>
-      
+
             <div class="menu hidden absolute right-0 mt-2 w-32 surface-2 rounded-xl shadow-lg p-2 z-50">
               <button class="edit-course block w-full text-left px-3 py-2 hover:bg-white/10 rounded" data-id="${c.id}">
-                 Edit
+                Edit
               </button>
               <button class="del-course block w-full text-left px-3 py-2 hover:bg-white/10 rounded text-red-400" data-id="${c.id}">
-                 Delete
+                Delete
               </button>
             </div>
           </div>
-      
+
           <!-- CONTENT -->
           <div class="p-4 space-y-2">
+
+            <!-- TITLE -->
             <div class="font-extrabold text-lg">${esc(c.title)}</div>
-      
-            <div class="text-sm muted">
-               ${esc(c.durationValue || "-")} ${esc(c.durationUnit || "")}
+
+            <!-- PROGRAM TYPE -->
+            <div class="text-xs font-semibold text-indigo-400">
+              ${esc(c.programType || "—")}
             </div>
-      
+
+            <!-- DURATION -->
             <div class="text-sm muted">
-               ${esc(c.sessionsValue || "-")} ${esc(c.sessionsUnit || "")}
+              ${esc(c.durationValue || "-")} ${esc(c.durationUnit || "")}
             </div>
-      
+
+            <!-- SESSIONS -->
+            <div class="text-sm muted">
+              ${esc(c.sessionsValue || "-")} ${esc(c.sessionsUnit || "")}
+            </div>
+
+            <!-- DATES -->
             <div class="text-xs muted">
-               ${c.startDate ? new Date(c.startDate).toLocaleDateString() : "-"} 
+              ${c.startDate ? new Date(c.startDate).toLocaleDateString() : "-"} 
               → 
               ${c.endDate ? new Date(c.endDate).toLocaleDateString() : "-"}
             </div>
+
           </div>
         </div>
       `)
@@ -484,7 +515,12 @@
     list.innerHTML = courses
       .map((c) => `
         <div class="surface-2 rounded-[18px] overflow-hidden relative group">
-      
+
+          <!-- STATUS TAG -->
+          <div class="absolute top-3 left-3 px-3 py-1 text-xs font-bold rounded-full ${getStatusColor(c.status)}">
+            ${esc(c.status || "unknown")}
+          </div>
+
           <!-- COVER IMAGE -->
           <div class="h-40 w-full bg-gray-200">
             ${
@@ -493,40 +529,51 @@
                 : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
             }
           </div>
-      
+
           <!-- 3 DOT MENU -->
           <div class="absolute top-3 right-3">
             <button class="menu-btn text-xl px-2 py-1 rounded-lg bg-black/40 text-white" data-id="${c.id}">
               ⋮
             </button>
-      
+
             <div class="menu hidden absolute right-0 mt-2 w-32 surface-2 rounded-xl shadow-lg p-2 z-50">
               <button class="edit-course block w-full text-left px-3 py-2 hover:bg-white/10 rounded" data-id="${c.id}">
-                 Edit
+                Edit
               </button>
               <button class="del-course block w-full text-left px-3 py-2 hover:bg-white/10 rounded text-red-400" data-id="${c.id}">
-                 Delete
+                Delete
               </button>
             </div>
           </div>
-      
+
           <!-- CONTENT -->
           <div class="p-4 space-y-2">
+
+            <!-- TITLE -->
             <div class="font-extrabold text-lg">${esc(c.title)}</div>
-      
-            <div class="text-sm muted">
-               ${esc(c.durationValue || "-")} ${esc(c.durationUnit || "")}
+
+            <!-- PROGRAM TYPE -->
+            <div class="text-xs font-semibold text-indigo-400">
+              ${esc(c.programType || "—")}
             </div>
-      
+
+            <!-- DURATION -->
             <div class="text-sm muted">
-               ${esc(c.sessionsValue || "-")} ${esc(c.sessionsUnit || "")}
+              ${esc(c.durationValue || "-")} ${esc(c.durationUnit || "")}
             </div>
-      
+
+            <!-- SESSIONS -->
+            <div class="text-sm muted">
+              ${esc(c.sessionsValue || "-")} ${esc(c.sessionsUnit || "")}
+            </div>
+
+            <!-- DATES -->
             <div class="text-xs muted">
-               ${c.startDate ? new Date(c.startDate).toLocaleDateString() : "-"} 
+              ${c.startDate ? new Date(c.startDate).toLocaleDateString() : "-"} 
               → 
               ${c.endDate ? new Date(c.endDate).toLocaleDateString() : "-"}
             </div>
+
           </div>
         </div>
       `)
