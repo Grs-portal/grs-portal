@@ -404,44 +404,91 @@
     if (!box) return;
 
     box.innerHTML = courses
-      .map(
-        (c) => `
-      <div class="surface-2 p-4 rounded-[18px] flex justify-between items-center">
-        <div>
-          <div class="font-extrabold">${esc(c.title)}</div>
-          <div class="text-sm muted">${esc(c.description || "")}</div>
-          <div class="text-xs muted mt-1">Type: ${esc(c.locationType || "in-person")}</div>
-          ${
-            c.pdfUrl
-              ? `<a class="text-xs underline" href="${esc(c.pdfUrl)}" target="_blank">PDF: ${esc(c.pdfName || "View")}</a>`
-              : ""
-          }
+      .map((c) => `
+        <div class="surface-2 rounded-[18px] overflow-hidden relative group">
+      
+          <!-- COVER IMAGE -->
+          <div class="h-40 w-full bg-gray-200">
+            ${
+              c.cover
+                ? `<img src="${c.cover}" class="w-full h-full object-cover"/>`
+                : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
+            }
+          </div>
+      
+          <!-- 3 DOT MENU -->
+          <div class="absolute top-3 right-3">
+            <button class="menu-btn text-xl px-2 py-1 rounded-lg bg-black/40 text-white" data-id="${c.id}">
+              ⋮
+            </button>
+      
+            <div class="menu hidden absolute right-0 mt-2 w-32 surface-2 rounded-xl shadow-lg p-2 z-50">
+              <button class="edit-course block w-full text-left px-3 py-2 hover:bg-white/10 rounded" data-id="${c.id}">
+                 Edit
+              </button>
+              <button class="del-course block w-full text-left px-3 py-2 hover:bg-white/10 rounded text-red-400" data-id="${c.id}">
+                 Delete
+              </button>
+            </div>
+          </div>
+      
+          <!-- CONTENT -->
+          <div class="p-4 space-y-2">
+            <div class="font-extrabold text-lg">${esc(c.title)}</div>
+      
+            <div class="text-sm muted">
+               ${esc(c.durationValue || "-")} ${esc(c.durationUnit || "")}
+            </div>
+      
+            <div class="text-sm muted">
+               ${esc(c.sessionsValue || "-")} ${esc(c.sessionsUnit || "")}
+            </div>
+      
+            <div class="text-xs muted">
+               ${c.startDate ? new Date(c.startDate).toLocaleDateString() : "-"} 
+              → 
+              ${c.endDate ? new Date(c.endDate).toLocaleDateString() : "-"}
+            </div>
+          </div>
         </div>
-        <div class="flex gap-2">
-          <button class="edit-course icon-btn" data-id="${c.id}" title="Edit">✏️</button>
-          <button class="del-course icon-btn" data-id="${c.id}" title="Delete">🗑</button>
-        </div>
-      </div>
-    `
-      )
+      `)
       .join("");
+        // TOGGLE MENU
+    container.querySelectorAll(".menu-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
 
-    box.querySelectorAll(".del-course").forEach((btn) => {
+        document.querySelectorAll(".menu").forEach(m => m.classList.add("hidden"));
+
+        const menu = btn.nextElementSibling;
+        menu.classList.toggle("hidden");
+      });
+    });
+    
+    // CLOSE ON OUTSIDE CLICK
+    if (!window.menuListenerAdded) {
+      document.addEventListener("click", () => {
+        document.querySelectorAll(".menu").forEach(m => m.classList.add("hidden"));
+      });
+      window.menuListenerAdded = true;
+    }
+
+    list.querySelectorAll(".del-course").forEach((btn) => {
       btn.addEventListener("click", async () => {
         const id = btn.dataset.id;
         if (!confirm("Delete course?")) return;
         const r = await fetch(`${API}/courses/${id}`, { method: "DELETE", headers: actorHeaders() });
         if (!r.ok) return toast("Delete failed", "rgba(185,28,28,.85)");
         toast("Deleted", "rgba(185,28,28,.85)");
+        loadCourses();
         loadDashboard();
       });
     });
 
-    box.querySelectorAll(".edit-course").forEach((btn) => {
+    list.querySelectorAll(".edit-course").forEach((btn) => {
       btn.addEventListener("click", async () => {
         const id = btn.dataset.id;
-        const coursesNow = await fetchJSON("/courses");
-        const found = coursesNow.find((x) => String(x.id) === String(id));
+        const found = courses.find((x) => String(x.id) === String(id));
         if (found) openEditCourseModal(found);
       });
     });
@@ -450,30 +497,79 @@
   async function loadCourses() {
     const courses = await fetchJSON("/courses");
     const list = qs("#submitted-courses-list");
+    const container = list;
     if (!list) return;
 
     list.innerHTML = courses
-      .map(
-        (c) => `
-      <div class="surface-2 p-4 rounded-[18px] mb-3 flex justify-between items-center">
-        <div>
-          <div class="font-extrabold">${esc(c.title)}</div>
-          <div class="text-sm muted">${esc(c.description || "")}</div>
-          <div class="text-xs muted mt-1">Type: ${esc(c.locationType || "in-person")}</div>
-          ${
-            c.pdfUrl
-              ? `<a class="text-xs underline" href="${esc(c.pdfUrl)}" target="_blank">PDF: ${esc(c.pdfName || "View")}</a>`
-              : ""
-          }
+      .map((c) => `
+        <div class="surface-2 rounded-[18px] overflow-hidden relative group">
+      
+          <!-- COVER IMAGE -->
+          <div class="h-40 w-full bg-gray-200">
+            ${
+              c.cover
+                ? `<img src="${c.cover}" class="w-full h-full object-cover"/>`
+                : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
+            }
+          </div>
+      
+          <!-- 3 DOT MENU -->
+          <div class="absolute top-3 right-3">
+            <button class="menu-btn text-xl px-2 py-1 rounded-lg bg-black/40 text-white" data-id="${c.id}">
+              ⋮
+            </button>
+      
+            <div class="menu hidden absolute right-0 mt-2 w-32 surface-2 rounded-xl shadow-lg p-2 z-50">
+              <button class="edit-course block w-full text-left px-3 py-2 hover:bg-white/10 rounded" data-id="${c.id}">
+                 Edit
+              </button>
+              <button class="del-course block w-full text-left px-3 py-2 hover:bg-white/10 rounded text-red-400" data-id="${c.id}">
+                 Delete
+              </button>
+            </div>
+          </div>
+      
+          <!-- CONTENT -->
+          <div class="p-4 space-y-2">
+            <div class="font-extrabold text-lg">${esc(c.title)}</div>
+      
+            <div class="text-sm muted">
+               ${esc(c.durationValue || "-")} ${esc(c.durationUnit || "")}
+            </div>
+      
+            <div class="text-sm muted">
+               ${esc(c.sessionsValue || "-")} ${esc(c.sessionsUnit || "")}
+            </div>
+      
+            <div class="text-xs muted">
+               ${c.startDate ? new Date(c.startDate).toLocaleDateString() : "-"} 
+              → 
+              ${c.endDate ? new Date(c.endDate).toLocaleDateString() : "-"}
+            </div>
+          </div>
         </div>
-        <div class="flex gap-2">
-          <button class="edit-course icon-btn" data-id="${c.id}" title="Edit">✏️</button>
-          <button class="del-course icon-btn" data-id="${c.id}" title="Delete">🗑</button>
-        </div>
-      </div>
-    `
-      )
+      `)
       .join("");
+
+        // TOGGLE MENU
+    container.querySelectorAll(".menu-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+
+        document.querySelectorAll(".menu").forEach(m => m.classList.add("hidden"));
+
+        const menu = btn.nextElementSibling;
+        menu.classList.toggle("hidden");
+      });
+    });
+    
+    // CLOSE ON OUTSIDE CLICK
+    if (!window.menuListenerAdded) {
+      document.addEventListener("click", () => {
+        document.querySelectorAll(".menu").forEach(m => m.classList.add("hidden"));
+      });
+      window.menuListenerAdded = true;
+    }
 
     list.querySelectorAll(".del-course").forEach((btn) => {
       btn.addEventListener("click", async () => {
