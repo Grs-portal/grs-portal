@@ -453,42 +453,23 @@
         </div>
       `)
       .join("");
-        // TOGGLE MENU
-    container.querySelectorAll(".menu-btn").forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
 
-        document.querySelectorAll(".menu").forEach(m => m.classList.add("hidden"));
-
-        const menu = btn.nextElementSibling;
-        menu.classList.toggle("hidden");
-      });
-    });
-    
-    // CLOSE ON OUTSIDE CLICK
-    if (!window.menuListenerAdded) {
-      document.addEventListener("click", () => {
-        document.querySelectorAll(".menu").forEach(m => m.classList.add("hidden"));
-      });
-      window.menuListenerAdded = true;
-    }
-
-    list.querySelectorAll(".del-course").forEach((btn) => {
+    box.querySelectorAll(".del-course").forEach((btn) => {
       btn.addEventListener("click", async () => {
         const id = btn.dataset.id;
         if (!confirm("Delete course?")) return;
         const r = await fetch(`${API}/courses/${id}`, { method: "DELETE", headers: actorHeaders() });
         if (!r.ok) return toast("Delete failed", "rgba(185,28,28,.85)");
         toast("Deleted", "rgba(185,28,28,.85)");
-        loadCourses();
         loadDashboard();
       });
     });
 
-    list.querySelectorAll(".edit-course").forEach((btn) => {
+    box.querySelectorAll(".edit-course").forEach((btn) => {
       btn.addEventListener("click", async () => {
         const id = btn.dataset.id;
-        const found = courses.find((x) => String(x.id) === String(id));
+        const coursesNow = await fetchJSON("/courses");
+        const found = coursesNow.find((x) => String(x.id) === String(id));
         if (found) openEditCourseModal(found);
       });
     });
