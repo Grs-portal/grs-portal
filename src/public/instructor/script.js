@@ -485,6 +485,14 @@
       `)
       .join("");
 
+    box.querySelectorAll(".menu-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        document.querySelectorAll(".menu").forEach(m => m.classList.add("hidden"));
+        btn.nextElementSibling.classList.toggle("hidden");
+      });
+    });
+
     box.querySelectorAll(".del-course").forEach((btn) => {
       btn.addEventListener("click", async () => {
         const id = btn.dataset.id;
@@ -492,7 +500,7 @@
         const r = await fetch(`${API}/courses/${id}`, { method: "DELETE", headers: actorHeaders() });
         if (!r.ok) return toast("Delete failed", "rgba(185,28,28,.85)");
         toast("Deleted", "rgba(185,28,28,.85)");
-        loadDashboard();
+        await loadDashboard();
       });
     });
 
@@ -504,7 +512,13 @@
         if (found) openEditCourseModal(found);
       });
     });
-  }
+  
+    if (!window.menuListenerAdded) {
+      window.menuListenerAdded = true;
+      document.addEventListener("click", () => {
+        document.querySelectorAll(".menu").forEach((m) => m.classList.add("hidden"));
+      });
+    }
 
   async function loadCourses() {
     const courses = await fetchJSON("/courses");
@@ -593,10 +607,10 @@
     
     // CLOSE ON OUTSIDE CLICK
     if (!window.menuListenerAdded) {
-      document.addEventListener("click", () => {
-        document.querySelectorAll(".menu").forEach(m => m.classList.add("hidden"));
-      });
       window.menuListenerAdded = true;
+      document.addEventListener("click", () => {
+        document.querySelectorAll(".menu").forEach((m) => m.classList.add("hidden"));
+      });
     }
 
     list.querySelectorAll(".del-course").forEach((btn) => {
@@ -618,7 +632,13 @@
         if (found) openEditCourseModal(found);
       });
     });
-  }
+  
+    if (!window.menuListenerAdded) {
+      window.menuListenerAdded = true;
+      document.addEventListener("click", () => {
+        document.querySelectorAll(".menu").forEach((m) => m.classList.add("hidden"));
+      });
+    }
 
   async function loadStudents() {
     const students = await fetchJSON("/students");
@@ -1058,24 +1078,125 @@ function setupCourseForm() {
   
   function openEditCourseModal(course) {
     showModal(`
-      <h2 class="text-xl font-extrabold mb-4">Edit Course</h2>
+
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-extrabold">Create Course</h2>
+      <button id="cancelModal" class="btn-theme text-sm">Cancel</button>
+    </div>
+
+    <form id="courseForm">
+
       <label class="text-sm font-bold muted">Title</label>
-      <input id="courseTitle" class="input-theme mt-1 mb-3" value="${esc(course.title)}" />
+      <input id="courseTitle" class="input-theme mt-1 mb-3" required />
+
       <label class="text-sm font-bold muted">Description</label>
-      <textarea id="courseDesc" class="input-theme mt-1 mb-3">${esc(course.description || "")}</textarea>
-      <label class="text-sm font-bold muted">Type</label>
-      <select id="courseType" class="select-theme mt-1 mb-3">
-        <option value="in-person" ${course.locationType === "in-person" ? "selected" : ""}>In-person</option>
-        <option value="online" ${course.locationType === "online" ? "selected" : ""}>Online</option>
-        <option value="hybrid" ${course.locationType === "hybrid" ? "selected" : ""}>Hybrid</option>
-      </select>
-      <div class="text-xs muted mb-2">${course.pdfUrl ? `Current PDF: ${esc(course.pdfName || "Attached")}` : "No PDF attached"}</div>
-      <input id="coursePdf" type="file" accept=".pdf" class="mt-1 mb-4 w-full text-sm" />
-      <div class="flex justify-end gap-2">
-        <button id="cancelModal" class="btn-theme">Cancel</button>
-        <button id="saveCourse" class="btn-theme">Save</button>
+      <textarea id="courseDescription" class="input-theme mt-1 mb-3"></textarea>
+
+      <label class="text-sm font-bold muted">Cover</label>
+      <input id="courseCover" type="file" accept="image/*" class="mb-3"/>
+
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <div>
+          <label class="text-sm font-bold muted">Duration</label>
+          <input id="courseDurationValue" class="input-theme mt-1" placeholder="12">
+        </div>
+
+        <div>
+          <label class="text-sm font-bold muted">Unit</label>
+          <select id="courseDurationUnit" class="select-theme mt-1">
+            <option value="minutes">Minutes</option>
+            <option value="hours">Hours</option>
+            <option value="days">Days</option>
+          </select>
+        </div>
       </div>
-    `);
+
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <div>
+          <label class="text-sm font-bold muted">Sessions</label>
+          <input id="courseSessionsValue" class="input-theme mt-1" placeholder="8">
+        </div>
+
+        <div>
+          <label class="text-sm font-bold muted">Unit</label>
+          <select id="courseSessionsUnit" class="select-theme mt-1">
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="text-sm font-bold muted">Program Type</label>
+        <select id="courseProgramType" class="select-theme mt-1">
+          <option value="">All</option>
+          <option value="course">Courses</option>
+          <option value="workshop">Workshops</option>
+          <option value="activity">Activities</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="text-sm font-bold muted">Theme</label>
+        <select id="courseTheme" class="select-theme mt-1">
+          <option value="">All</option>
+          <option value="rest">Rest & Relaxation</option>
+          <option value="recovery">Recovery & Balance</option>
+          <option value="insight">Self-insight</option>
+          <option value="connection">Connection</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="text-sm font-bold muted">What You Offer</label>
+        <select id="courseOffer" class="select-theme mt-1">
+          <option value="">All</option>
+          <option>Activities</option>
+          <option>Learning & deepening recovery knowledge</option>
+          <option>Regular offerings</option>
+          <option>Lived-experience training</option>
+        </select>
+      </div>
+
+      <div>
+          <label class="text-sm font-bold muted">Status</label>
+          <select id="courseStatus" class="select-theme mt-1">
+            <option value="">All</option>
+            <option value="draft">Draft</option>
+            <option value="not-started">Upcoming</option>
+            <option value="ongoing">Ongoing</option>
+            <option value="finished">Completed</option>
+          </select>
+      </div>
+
+
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <div>
+          <label class="text-sm font-bold muted">Start Date</label>
+          <input id="courseStartDate" type="date" class="input-theme mt-1">
+        </div>
+      
+        <div>
+          <label class="text-sm font-bold muted">End Date</label>
+          <input id="courseEndDate" type="date" class="input-theme mt-1">
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-3 mt-4">
+
+        <button type="button" id="saveDraftBtn" class="btn-theme">
+          Save Draft
+        </button>
+
+        <button type="button" id="publishCourseBtn" class="btn-theme">
+          Publish
+        </button>
+
+      </div>
+
+    </form>
+  `);
 
     qs("#saveCourse").addEventListener("click", async () => {
       const title = qs("#courseTitle").value.trim();
