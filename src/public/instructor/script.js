@@ -519,6 +519,7 @@
         document.querySelectorAll(".menu").forEach((m) => m.classList.add("hidden"));
       });
     }
+  }
 
   async function loadCourses() {
     const courses = await fetchJSON("/courses");
@@ -639,6 +640,7 @@
         document.querySelectorAll(".menu").forEach((m) => m.classList.add("hidden"));
       });
     }
+  }
 
   async function loadStudents() {
     const students = await fetchJSON("/students");
