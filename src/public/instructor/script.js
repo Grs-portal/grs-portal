@@ -605,14 +605,6 @@
         menu.classList.toggle("hidden");
       });
     });
-    
-    // CLOSE ON OUTSIDE CLICK
-    if (!window.menuListenerAdded) {
-      window.menuListenerAdded = true;
-      document.addEventListener("click", () => {
-        document.querySelectorAll(".menu").forEach((m) => m.classList.add("hidden"));
-      });
-    }
 
     list.querySelectorAll(".del-course").forEach((btn) => {
       btn.addEventListener("click", async () => {
