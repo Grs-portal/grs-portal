@@ -865,7 +865,7 @@
   showModal(`
 
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-extrabold">Create Course</h2>
+      <h2 class="text-xl font-extrabold">Create Programs</h2>
       <button id="cancelModal" class="btn-theme text-sm">Cancel</button>
     </div>
 
@@ -1036,7 +1036,6 @@ function setupCourseForm() {
       programType: qs("#courseProgramType")?.value,
       theme: qs("#courseTheme")?.value,
       offer: qs("#courseOffer")?.value,
-      status: qs("#courseStatus")?.value,
 
       startDate: qs("#courseStartDate")?.value || null,
       status: forceDraft ? "draft" : selectedStatus || "published",
@@ -1078,7 +1077,7 @@ function setupCourseForm() {
     showModal(`
 
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-extrabold">Create Course</h2>
+      <h2 class="text-xl font-extrabold">Create Programs</h2>
       <button id="cancelModal" class="btn-theme text-sm">Cancel</button>
     </div>
 
