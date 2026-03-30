@@ -388,6 +388,22 @@
       .join("");
   }
 
+  function getStatusColor(status) {
+    switch (status) {
+      case "draft":
+        return "bg-gray-400 text-black";
+      case "not-started":
+        return "bg-blue-500 text-white";
+      case "ongoing":
+        return "bg-green-500 text-white";
+      case "finished":
+        return "bg-purple-500 text-white";
+      default:
+        return "bg-gray-300 text-black";
+    }
+  }
+    
+
   async function loadDashboard() {
     const [courses, hw] = await Promise.all([fetchJSON("/courses"), fetchJSON("/homework")]);
 
@@ -398,27 +414,79 @@
     if (!box) return;
 
     box.innerHTML = courses
-      .map(
-        (c) => `
-      <div class="surface-2 p-4 rounded-[18px] flex justify-between items-center">
-        <div>
-          <div class="font-extrabold">${esc(c.title)}</div>
-          <div class="text-sm muted">${esc(c.description || "")}</div>
-          <div class="text-xs muted mt-1">Type: ${esc(c.locationType || "in-person")}</div>
-          ${
-            c.pdfUrl
-              ? `<a class="text-xs underline" href="${esc(c.pdfUrl)}" target="_blank">PDF: ${esc(c.pdfName || "View")}</a>`
-              : ""
-          }
+      .map((c) => `
+        <div class="surface-2 rounded-[18px] overflow-hidden relative group">
+
+          <!-- STATUS TAG -->
+          <div class="absolute top-3 left-3 px-3 py-1 text-xs font-bold rounded-full ${getStatusColor(c.status)}">
+            ${esc(c.status || "unknown")}
+          </div>
+
+          <!-- COVER IMAGE -->
+          <div class="h-40 w-full bg-gray-200">
+            ${
+              c.cover
+                ? `<img src="${c.cover}" class="w-full h-full object-cover"/>`
+                : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
+            }
+          </div>
+
+          <!-- 3 DOT MENU -->
+          <div class="absolute top-3 right-3">
+            <button class="menu-btn text-xl px-2 py-1 rounded-lg bg-black/40 text-white" data-id="${c.id}">
+              ⋮
+            </button>
+
+            <div class="menu hidden absolute right-0 mt-2 w-32 surface-2 rounded-xl shadow-lg p-2 z-50">
+              <button class="edit-course block w-full text-left px-3 py-2 hover:bg-white/10 rounded" data-id="${c.id}">
+                Edit
+              </button>
+              <button class="del-course block w-full text-left px-3 py-2 hover:bg-white/10 rounded text-red-400" data-id="${c.id}">
+                Delete
+              </button>
+            </div>
+          </div>
+
+          <!-- CONTENT -->
+          <div class="p-4 space-y-2">
+
+            <!-- TITLE -->
+            <div class="font-extrabold text-lg">${esc(c.title)}</div>
+
+            <!-- PROGRAM TYPE -->
+            <div class="text-xs font-semibold text-indigo-400">
+              ${esc(c.programType || "—")}
+            </div>
+
+            <!-- DURATION -->
+            <div class="text-sm muted">
+              ${esc(c.durationValue || "-")} ${esc(c.durationUnit || "")}
+            </div>
+
+            <!-- SESSIONS -->
+            <div class="text-sm muted">
+              ${esc(c.sessionsValue || "-")} ${esc(c.sessionsUnit || "")}
+            </div>
+
+            <!-- DATES -->
+            <div class="text-xs muted">
+              ${c.startDate ? new Date(c.startDate).toLocaleDateString() : "-"} 
+              → 
+              ${c.endDate ? new Date(c.endDate).toLocaleDateString() : "-"}
+            </div>
+
+          </div>
         </div>
-        <div class="flex gap-2">
-          <button class="edit-course icon-btn" data-id="${c.id}" title="Edit">✏️</button>
-          <button class="del-course icon-btn" data-id="${c.id}" title="Delete">🗑</button>
-        </div>
-      </div>
-    `
-      )
+      `)
       .join("");
+
+    box.querySelectorAll(".menu-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        document.querySelectorAll(".menu").forEach(m => m.classList.add("hidden"));
+        btn.nextElementSibling.classList.toggle("hidden");
+      });
+    });
 
     box.querySelectorAll(".del-course").forEach((btn) => {
       btn.addEventListener("click", async () => {
@@ -427,7 +495,7 @@
         const r = await fetch(`${API}/courses/${id}`, { method: "DELETE", headers: actorHeaders() });
         if (!r.ok) return toast("Delete failed", "rgba(185,28,28,.85)");
         toast("Deleted", "rgba(185,28,28,.85)");
-        loadDashboard();
+        await loadDashboard();
       });
     });
 
@@ -439,35 +507,99 @@
         if (found) openEditCourseModal(found);
       });
     });
+  
+    if (!window.menuListenerAdded) {
+      window.menuListenerAdded = true;
+      document.addEventListener("click", () => {
+        document.querySelectorAll(".menu").forEach((m) => m.classList.add("hidden"));
+      });
+    }
   }
 
   async function loadCourses() {
     const courses = await fetchJSON("/courses");
     const list = qs("#submitted-courses-list");
+    const container = list;
     if (!list) return;
 
     list.innerHTML = courses
-      .map(
-        (c) => `
-      <div class="surface-2 p-4 rounded-[18px] mb-3 flex justify-between items-center">
-        <div>
-          <div class="font-extrabold">${esc(c.title)}</div>
-          <div class="text-sm muted">${esc(c.description || "")}</div>
-          <div class="text-xs muted mt-1">Type: ${esc(c.locationType || "in-person")}</div>
-          ${
-            c.pdfUrl
-              ? `<a class="text-xs underline" href="${esc(c.pdfUrl)}" target="_blank">PDF: ${esc(c.pdfName || "View")}</a>`
-              : ""
-          }
+      .map((c) => `
+        <div class="surface-2 rounded-[18px] overflow-hidden relative group">
+
+          <!-- STATUS TAG -->
+          <div class="absolute top-3 left-3 px-3 py-1 text-xs font-bold rounded-full ${getStatusColor(c.status)}">
+            ${esc(c.status || "unknown")}
+          </div>
+
+          <!-- COVER IMAGE -->
+          <div class="h-40 w-full bg-gray-200">
+            ${
+              c.cover
+                ? `<img src="${c.cover}" class="w-full h-full object-cover"/>`
+                : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
+            }
+          </div>
+
+          <!-- 3 DOT MENU -->
+          <div class="absolute top-3 right-3">
+            <button class="menu-btn text-xl px-2 py-1 rounded-lg bg-black/40 text-white" data-id="${c.id}">
+              ⋮
+            </button>
+
+            <div class="menu hidden absolute right-0 mt-2 w-32 surface-2 rounded-xl shadow-lg p-2 z-50">
+              <button class="edit-course block w-full text-left px-3 py-2 hover:bg-white/10 rounded" data-id="${c.id}">
+                Edit
+              </button>
+              <button class="del-course block w-full text-left px-3 py-2 hover:bg-white/10 rounded text-red-400" data-id="${c.id}">
+                Delete
+              </button>
+            </div>
+          </div>
+
+          <!-- CONTENT -->
+          <div class="p-4 space-y-2">
+
+            <!-- TITLE -->
+            <div class="font-extrabold text-lg">${esc(c.title)}</div>
+
+            <!-- PROGRAM TYPE -->
+            <div class="text-xs font-semibold text-indigo-400">
+              ${esc(c.programType || "—")}
+            </div>
+
+            <!-- DURATION -->
+            <div class="text-sm muted">
+              ${esc(c.durationValue || "-")} ${esc(c.durationUnit || "")}
+            </div>
+
+            <!-- SESSIONS -->
+            <div class="text-sm muted">
+              ${esc(c.sessionsValue || "-")} ${esc(c.sessionsUnit || "")}
+            </div>
+
+            <!-- DATES -->
+            <div class="text-xs muted">
+              ${c.startDate ? new Date(c.startDate).toLocaleDateString() : "-"} 
+              → 
+              ${c.endDate ? new Date(c.endDate).toLocaleDateString() : "-"}
+            </div>
+
+          </div>
         </div>
-        <div class="flex gap-2">
-          <button class="edit-course icon-btn" data-id="${c.id}" title="Edit">✏️</button>
-          <button class="del-course icon-btn" data-id="${c.id}" title="Delete">🗑</button>
-        </div>
-      </div>
-    `
-      )
+      `)
       .join("");
+
+        // TOGGLE MENU
+    container.querySelectorAll(".menu-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+
+        document.querySelectorAll(".menu").forEach(m => m.classList.add("hidden"));
+
+        const menu = btn.nextElementSibling;
+        menu.classList.toggle("hidden");
+      });
+    });
 
     list.querySelectorAll(".del-course").forEach((btn) => {
       btn.addEventListener("click", async () => {
@@ -488,6 +620,13 @@
         if (found) openEditCourseModal(found);
       });
     });
+  
+    if (!window.menuListenerAdded) {
+      window.menuListenerAdded = true;
+      document.addEventListener("click", () => {
+        document.querySelectorAll(".menu").forEach((m) => m.classList.add("hidden"));
+      });
+    }
   }
 
   async function loadStudents() {
@@ -712,81 +851,341 @@
     return out;
   }
 
-  function openCreateCourseModal() {
-    showModal(`
-      <h2 class="text-xl font-extrabold mb-4">Create Course</h2>
+
+    function openCreateCourseModal() {
+
+  showModal(`
+
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-extrabold">Create Programs</h2>
+      <button id="cancelModal" class="btn-theme text-sm">Cancel</button>
+    </div>
+
+    <form id="courseForm">
+
       <label class="text-sm font-bold muted">Title</label>
-      <input id="courseTitle" class="input-theme mt-1 mb-3" placeholder="Title" />
+      <input id="courseTitle" class="input-theme mt-1 mb-3" required />
+
       <label class="text-sm font-bold muted">Description</label>
-      <textarea id="courseDesc" class="input-theme mt-1 mb-3" placeholder="Description"></textarea>
-      <label class="text-sm font-bold muted">Type</label>
-      <select id="courseType" class="select-theme mt-1 mb-3">
-        <option value="in-person">In-person</option>
-        <option value="online">Online</option>
-        <option value="hybrid">Hybrid</option>
-      </select>
-      <label class="text-sm font-bold muted">PDF (optional)</label>
-      <input id="coursePdf" type="file" accept=".pdf" class="mt-2 mb-4 w-full text-sm" />
-      <div class="flex justify-end gap-2">
-        <button id="cancelModal" class="btn-theme">Cancel</button>
-        <button id="submitCourse" class="btn-theme">Create</button>
+      <textarea id="courseDescription" class="input-theme mt-1 mb-3"></textarea>
+
+      <label class="text-sm font-bold muted">Cover</label>
+      <input id="courseCover" type="file" accept="image/*" class="mb-3"/>
+
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <div>
+          <label class="text-sm font-bold muted">Duration</label>
+          <input id="courseDurationValue" class="input-theme mt-1" placeholder="12">
+        </div>
+
+        <div>
+          <label class="text-sm font-bold muted">Unit</label>
+          <select id="courseDurationUnit" class="select-theme mt-1">
+            <option value="minutes">Minutes</option>
+            <option value="hours">Hours</option>
+            <option value="days">Days</option>
+          </select>
+        </div>
       </div>
-    `);
 
-    qs("#submitCourse").addEventListener("click", async () => {
-      const title = qs("#courseTitle").value.trim();
-      const description = qs("#courseDesc").value.trim();
-      const locationType = qs("#courseType").value;
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <div>
+          <label class="text-sm font-bold muted">Sessions</label>
+          <input id="courseSessionsValue" class="input-theme mt-1" placeholder="8">
+        </div>
 
-      if (!title) return toast("Title required", "rgba(185,28,28,.85)");
+        <div>
+          <label class="text-sm font-bold muted">Unit</label>
+          <select id="courseSessionsUnit" class="select-theme mt-1">
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+          </select>
+        </div>
+      </div>
 
-      let pdfUrl = "", pdfName = "";
-      const file = qs("#coursePdf")?.files?.[0];
-      try {
-        if (file) {
-          const up = await uploadPdf(file);
-          pdfUrl = up.url; pdfName = up.originalName;
-        }
-      } catch (e) {
-        return toast(e.message, "rgba(185,28,28,.85)");
-      }
+      <div>
+        <label class="text-sm font-bold muted">Program Type</label>
+        <select id="courseProgramType" class="select-theme mt-1">
+          <option value="">All</option>
+          <option value="course">Courses</option>
+          <option value="workshop">Workshops</option>
+          <option value="activity">Activities</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="text-sm font-bold muted">Theme</label>
+        <select id="courseTheme" class="select-theme mt-1">
+          <option value="">All</option>
+          <option value="rest">Rest & Relaxation</option>
+          <option value="recovery">Recovery & Balance</option>
+          <option value="insight">Self-insight</option>
+          <option value="connection">Connection</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="text-sm font-bold muted">What You Offer</label>
+        <select id="courseOffer" class="select-theme mt-1">
+          <option value="">All</option>
+          <option>Activities</option>
+          <option>Learning & deepening recovery knowledge</option>
+          <option>Regular offerings</option>
+          <option>Lived-experience training</option>
+        </select>
+      </div>
+
+      <div>
+          <label class="text-sm font-bold muted">Status</label>
+          <select id="courseStatus" class="select-theme mt-1">
+            <option value="">All</option>
+            <option value="draft">Draft</option>
+            <option value="not-started">Upcoming</option>
+            <option value="ongoing">Ongoing</option>
+            <option value="finished">Completed</option>
+          </select>
+      </div>
+
+
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <div>
+          <label class="text-sm font-bold muted">Start Date</label>
+          <input id="courseStartDate" type="date" class="input-theme mt-1">
+        </div>
+      
+        <div>
+          <label class="text-sm font-bold muted">End Date</label>
+          <input id="courseEndDate" type="date" class="input-theme mt-1">
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-3 mt-4">
+
+        <button type="button" id="saveDraftBtn" class="btn-theme">
+          Save Draft
+        </button>
+
+        <button type="button" id="publishCourseBtn" class="btn-theme">
+          Publish
+        </button>
+
+      </div>
+
+    </form>
+  `);
+
+  setupCourseForm();
+}
+
+
+
+let forceDraft = false;
+
+function setupCourseForm() {
+
+  const form = qs("#courseForm");
+  const username = localStorage.getItem("username");
+  const profilePic = localStorage.getItem("userAvatar") || "";
+
+  qs("#saveDraftBtn")?.addEventListener("click", () => {
+    forceDraft = true;
+    form.requestSubmit();
+  });
+
+  qs("#publishCourseBtn")?.addEventListener("click", () => {
+    forceDraft = false;
+    form.requestSubmit();
+  });
+
+  form?.addEventListener("submit", async (e) => {
+
+    e.preventDefault();
+
+    const file = qs("#courseCover")?.files?.[0];
+    const cover = file ? await toBase64(file) : "";
+
+    const selectedStatus = qs("#courseStatus")?.value;
+    
+    // If trying to save draft but status is not draft
+    if (forceDraft && selectedStatus && selectedStatus !== "draft") {
+      toast("Set status to 'Draft' or click Publish instead.", "rgba(185,28,28,.85)");
+      return;
+    }
+    
+    const newCourse = {
+
+      title: qs("#courseTitle")?.value.trim(),
+      description: qs("#courseDescription")?.value.trim(),
+      cover,
+
+      durationValue: qs("#courseDurationValue")?.value,
+      durationUnit: qs("#courseDurationUnit")?.value,
+
+      sessionsValue: qs("#courseSessionsValue")?.value,
+      sessionsUnit: qs("#courseSessionsUnit")?.value,
+
+      programType: qs("#courseProgramType")?.value,
+      theme: qs("#courseTheme")?.value,
+      offer: qs("#courseOffer")?.value,
+
+      startDate: qs("#courseStartDate")?.value || null,
+      status: forceDraft ? "draft" : selectedStatus || "published",
+
+      createdByUsername: username,
+      createdByAvatar: profilePic
+    };
+
+    closeModal();
+    forceDraft = false;
+
+    try {
 
       const res = await fetch(`${API}/courses`, {
         method: "POST",
         headers: jsonHeaders(),
-        body: JSON.stringify({ title, description, locationType, pdfUrl, pdfName }),
+        body: JSON.stringify(newCourse)
       });
 
-      if (!res.ok) return toast("Create course failed", "rgba(185,28,28,.85)");
+      if (!res.ok) throw new Error("Create failed");
 
-      closeModal();
-      toast("Course created", "rgba(34,197,94,.70)");
+      toast("Course created", "rgba(34,197,94,.7)");
+
       loadCourses();
       loadDashboard();
       loadNotifications();
-    });
-  }
 
+    } catch (err) {
+      console.error(err);
+      toast("Failed to create course", "rgba(185,28,28,.85)");
+    }
+
+  });
+
+}
+
+  
   function openEditCourseModal(course) {
     showModal(`
-      <h2 class="text-xl font-extrabold mb-4">Edit Course</h2>
+
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-extrabold">Create Programs</h2>
+      <button id="cancelModal" class="btn-theme text-sm">Cancel</button>
+    </div>
+
+    <form id="courseForm">
+
       <label class="text-sm font-bold muted">Title</label>
-      <input id="courseTitle" class="input-theme mt-1 mb-3" value="${esc(course.title)}" />
+      <input id="courseTitle" class="input-theme mt-1 mb-3" required />
+
       <label class="text-sm font-bold muted">Description</label>
-      <textarea id="courseDesc" class="input-theme mt-1 mb-3">${esc(course.description || "")}</textarea>
-      <label class="text-sm font-bold muted">Type</label>
-      <select id="courseType" class="select-theme mt-1 mb-3">
-        <option value="in-person" ${course.locationType === "in-person" ? "selected" : ""}>In-person</option>
-        <option value="online" ${course.locationType === "online" ? "selected" : ""}>Online</option>
-        <option value="hybrid" ${course.locationType === "hybrid" ? "selected" : ""}>Hybrid</option>
-      </select>
-      <div class="text-xs muted mb-2">${course.pdfUrl ? `Current PDF: ${esc(course.pdfName || "Attached")}` : "No PDF attached"}</div>
-      <input id="coursePdf" type="file" accept=".pdf" class="mt-1 mb-4 w-full text-sm" />
-      <div class="flex justify-end gap-2">
-        <button id="cancelModal" class="btn-theme">Cancel</button>
-        <button id="saveCourse" class="btn-theme">Save</button>
+      <textarea id="courseDescription" class="input-theme mt-1 mb-3"></textarea>
+
+      <label class="text-sm font-bold muted">Cover</label>
+      <input id="courseCover" type="file" accept="image/*" class="mb-3"/>
+
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <div>
+          <label class="text-sm font-bold muted">Duration</label>
+          <input id="courseDurationValue" class="input-theme mt-1" placeholder="12">
+        </div>
+
+        <div>
+          <label class="text-sm font-bold muted">Unit</label>
+          <select id="courseDurationUnit" class="select-theme mt-1">
+            <option value="minutes">Minutes</option>
+            <option value="hours">Hours</option>
+            <option value="days">Days</option>
+          </select>
+        </div>
       </div>
-    `);
+
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <div>
+          <label class="text-sm font-bold muted">Sessions</label>
+          <input id="courseSessionsValue" class="input-theme mt-1" placeholder="8">
+        </div>
+
+        <div>
+          <label class="text-sm font-bold muted">Unit</label>
+          <select id="courseSessionsUnit" class="select-theme mt-1">
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="text-sm font-bold muted">Program Type</label>
+        <select id="courseProgramType" class="select-theme mt-1">
+          <option value="">All</option>
+          <option value="course">Courses</option>
+          <option value="workshop">Workshops</option>
+          <option value="activity">Activities</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="text-sm font-bold muted">Theme</label>
+        <select id="courseTheme" class="select-theme mt-1">
+          <option value="">All</option>
+          <option value="rest">Rest & Relaxation</option>
+          <option value="recovery">Recovery & Balance</option>
+          <option value="insight">Self-insight</option>
+          <option value="connection">Connection</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="text-sm font-bold muted">What You Offer</label>
+        <select id="courseOffer" class="select-theme mt-1">
+          <option value="">All</option>
+          <option>Activities</option>
+          <option>Learning & deepening recovery knowledge</option>
+          <option>Regular offerings</option>
+          <option>Lived-experience training</option>
+        </select>
+      </div>
+
+      <div>
+          <label class="text-sm font-bold muted">Status</label>
+          <select id="courseStatus" class="select-theme mt-1">
+            <option value="">All</option>
+            <option value="draft">Draft</option>
+            <option value="not-started">Upcoming</option>
+            <option value="ongoing">Ongoing</option>
+            <option value="finished">Completed</option>
+          </select>
+      </div>
+
+
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <div>
+          <label class="text-sm font-bold muted">Start Date</label>
+          <input id="courseStartDate" type="date" class="input-theme mt-1">
+        </div>
+      
+        <div>
+          <label class="text-sm font-bold muted">End Date</label>
+          <input id="courseEndDate" type="date" class="input-theme mt-1">
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-3 mt-4">
+
+        <button type="button" id="saveDraftBtn" class="btn-theme">
+          Save Draft
+        </button>
+
+        <button type="button" id="publishCourseBtn" class="btn-theme">
+          Publish
+        </button>
+
+      </div>
+
+    </form>
+  `);
 
     qs("#saveCourse").addEventListener("click", async () => {
       const title = qs("#courseTitle").value.trim();
@@ -822,6 +1221,115 @@
     });
   }
 
+
+  function openCreateProjectModal() {
+  showModal(`
+
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-extrabold">Create Project</h2>
+      <button id="cancelModal" class="btn-theme text-sm">Cancel</button>
+    </div>
+
+    <label class="text-sm font-bold muted">Title</label>
+    <input id="projectTitle" class="input-theme mt-1 mb-3" />
+
+    <label class="text-sm font-bold muted">Cover</label>
+    <input id="projectCover" type="file" accept="image/*" class="mb-3"/>
+
+    <label class="text-sm font-bold muted">Content</label>
+
+    <!-- TOOLBAR -->
+    <div class="flex gap-2 mb-2">
+      <button class="btn-theme text-sm" onclick="document.execCommand('bold')">B</button>
+      <button class="btn-theme text-sm" onclick="document.execCommand('italic')">I</button>
+      <button class="btn-theme text-sm" onclick="document.execCommand('insertUnorderedList')">• List</button>
+      <button class="btn-theme text-sm" onclick="addImage()">Img</button>
+      <button class="btn-theme text-sm" onclick="addLink()">Link</button>
+    </div>
+
+    <!-- EDITOR -->
+    <div id="projectContent"
+      contenteditable="true"
+      class="input-theme min-h-[200px] mb-4 overflow-y-auto">
+    </div>
+
+    <div class="flex justify-end gap-3">
+      <button id="saveProjectBtn" class="btn-theme">Save</button>
+    </div>
+
+  `);
+
+  qs("#saveProjectBtn")?.addEventListener("click", createProject);
+}
+
+window.addImage = function () {
+  const url = prompt("Enter image URL:");
+  if (url) document.execCommand("insertImage", false, url);
+};
+
+window.addLink = function () {
+  const url = prompt("Enter link URL:");
+  if (url) document.execCommand("createLink", false, url);
+};
+
+
+async function createProject() {
+  const title = qs("#projectTitle")?.value.trim();
+  const file = qs("#projectCover")?.files?.[0];
+  const content = qs("#projectContent")?.innerHTML;
+
+  if (!title) return toast("Title required", "rgba(185,28,28,.85)");
+
+  const cover = file ? await toBase64(file) : "";
+
+  const newProject = {
+    title,
+    cover,
+    content
+  };
+
+  try {
+    const res = await fetch(`${API}/projects`, {
+      method: "POST",
+      headers: jsonHeaders(),
+      body: JSON.stringify(newProject)
+    });
+
+    if (!res.ok) throw new Error();
+
+    closeModal();
+    toast("Project created", "rgba(34,197,94,.7)");
+
+    loadProjects(); // you'll add this next
+  } catch {
+    toast("Failed to create project", "rgba(185,28,28,.85)");
+  }
+}
+
+async function loadProjects() {
+  const projects = await fetchJSON("/projects");
+  const box = qs("#projects");
+  if (!box) return;
+
+  box.innerHTML = projects.map(p => `
+    <div class="surface-2 rounded-[18px] overflow-hidden">
+
+      <div class="h-40 w-full bg-gray-200">
+        ${
+          p.cover
+            ? `<img src="${p.cover}" class="w-full h-full object-cover"/>`
+            : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
+        }
+      </div>
+
+      <div class="p-4">
+        <div class="font-extrabold text-lg">${esc(p.title)}</div>
+      </div>
+
+    </div>
+  `).join("");
+}
+  
   function openCreateHomeworkModal() {
     showModal(`
       <h2 class="text-xl font-extrabold mb-4">Create Homework</h2>
