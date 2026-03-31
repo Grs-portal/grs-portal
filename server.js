@@ -728,27 +728,51 @@ app.delete("/api/schedule/:id", (req, res) => {
 app.get("/api/courses", (req, res) => res.json(db.courses));
 
 app.post("/api/courses", (req, res) => {
-  const { title, description = "", locationType = "in-person", pdfUrl = "", pdfName = "" } = req.body || {};
-  if (!title) return res.status(400).json({ success: false, message: "Title required" });
-
   const a = actorFromReq(req);
+
+  const {
+    title,
+    description = "",
+    cover = "",
+    durationValue = "",
+    durationUnit = "",
+    sessionsValue = "",
+    sessionsUnit = "",
+    programType = "",
+    theme = "",
+    offer = "",
+    startDate = null,
+    endDate = null,
+    status = "draft"
+  } = req.body || {};
+
+  if (!title) {
+    return res.status(400).json({ success: false, message: "Title required" });
+  }
 
   const newCourse = {
     id: Date.now(),
+
     title,
     description,
-    cover: "/images/course-placeholder.jpg",
-    duration: "—",
-    teacher: {
-      name: a.byName || "Staff",
-      photo: "/images/teacher-placeholder.jpg"
-    },
-    chapters: [],
-    reviews: [],
-    locationType,
-    pdfUrl,
-    pdfName,
+    cover,
+
+    durationValue,
+    durationUnit,
+
+    sessionsValue,
+    sessionsUnit,
+
+    programType,
+    theme,
+    offer,
+
+    startDate,
+    endDate,
+    status,
+
     createdBy: a.byName || a.byUsername || "Unknown",
+    createdByUsername: a.byUsername || "",
     createdAt: new Date().toISOString()
   };
 
