@@ -282,7 +282,6 @@
         if (page === "submitted-courses") await loadCourses();
         if (page === "users") await loadUsers();
         if (page === "news") await loadNews();
-        if (page === "projects") await loadProjects();
       });
     });
   }
@@ -293,7 +292,6 @@
     qs("#refreshUsersBtn")?.addEventListener("click", loadUsers);
     qs("#createUserBtn")?.addEventListener("click", openCreateUserModal);
     qs("#createNewsBtn")?.addEventListener("click", openCreateNewsModal);
-    qs("#openCreateProject")?.addEventListener("click", openCreateProjectModal);
   }
 
  function showModal(html) {
@@ -1228,115 +1226,6 @@ function setupCourseForm() {
       loadNotifications();
     });
   }
-
-
-  function openCreateProjectModal() {
-  showModal(`
-
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-extrabold">Create Project</h2>
-      <button id="cancelModal" class="btn-theme text-sm">Cancel</button>
-    </div>
-
-    <label class="text-sm font-bold muted">Title</label>
-    <input id="projectTitle" class="input-theme mt-1 mb-3" />
-
-    <label class="text-sm font-bold muted">Cover</label>
-    <input id="projectCover" type="file" accept="image/*" class="mb-3"/>
-
-    <label class="text-sm font-bold muted">Content</label>
-
-    <!-- TOOLBAR -->
-    <div class="flex gap-2 mb-2">
-      <button class="btn-theme text-sm" onclick="document.execCommand('bold')">B</button>
-      <button class="btn-theme text-sm" onclick="document.execCommand('italic')">I</button>
-      <button class="btn-theme text-sm" onclick="document.execCommand('insertUnorderedList')">• List</button>
-      <button class="btn-theme text-sm" onclick="addImage()">Img</button>
-      <button class="btn-theme text-sm" onclick="addLink()">Link</button>
-    </div>
-
-    <!-- EDITOR -->
-    <div id="projectContent"
-      contenteditable="true"
-      class="input-theme min-h-[200px] mb-4 overflow-y-auto">
-    </div>
-
-    <div class="flex justify-end gap-3">
-      <button id="saveProjectBtn" class="btn-theme">Save</button>
-    </div>
-
-  `);
-
-  qs("#saveProjectBtn")?.addEventListener("click", createProject);
-}
-
-window.addImage = function () {
-  const url = prompt("Enter image URL:");
-  if (url) document.execCommand("insertImage", false, url);
-};
-
-window.addLink = function () {
-  const url = prompt("Enter link URL:");
-  if (url) document.execCommand("createLink", false, url);
-};
-
-
-async function createProject() {
-  const title = qs("#projectTitle")?.value.trim();
-  const file = qs("#projectCover")?.files?.[0];
-  const content = qs("#projectContent")?.innerHTML;
-
-  if (!title) return toast("Title required", "rgba(185,28,28,.85)");
-
-  const cover = file ? await toBase64(file) : "";
-
-  const newProject = {
-    title,
-    cover,
-    content
-  };
-
-  try {
-    const res = await fetch(`${API}/projects`, {
-      method: "POST",
-      headers: jsonHeaders(),
-      body: JSON.stringify(newProject)
-    });
-
-    if (!res.ok) throw new Error();
-
-    closeModal();
-    toast("Project created", "rgba(34,197,94,.7)");
-
-    loadProjects(); // you'll add this next
-  } catch {
-    toast("Failed to create project", "rgba(185,28,28,.85)");
-  }
-}
-
-async function loadProjects() {
-  const projects = await fetchJSON("/projects");
-  const box = qs("#projects");
-  if (!box) return;
-
-  box.innerHTML = projects.map(p => `
-    <div class="surface-2 rounded-[18px] overflow-hidden">
-
-      <div class="h-40 w-full bg-gray-200">
-        ${
-          p.cover
-            ? `<img src="${p.cover}" class="w-full h-full object-cover"/>`
-            : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
-        }
-      </div>
-
-      <div class="p-4">
-        <div class="font-extrabold text-lg">${esc(p.title)}</div>
-      </div>
-
-    </div>
-  `).join("");
-}
 
 
   function openCreateHomeworkModal() {
