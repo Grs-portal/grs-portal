@@ -291,6 +291,7 @@
     qs("#refreshUsersBtn")?.addEventListener("click", loadUsers);
     qs("#createUserBtn")?.addEventListener("click", openCreateUserModal);
     qs("#createNewsBtn")?.addEventListener("click", openCreateNewsModal);
+    qs("#openCreateProject")?.addEventListener("click", openCreateProjectModal);
   }
 
   function showModal(html) {
@@ -299,7 +300,7 @@
     bg.id = "modalBg";
     bg.className = "fixed inset-0 bg-black/45 flex items-center justify-center z-50 backdrop-blur-sm";
     bg.innerHTML = `
-      <div class="surface-2 p-6 w-[92%] max-w-md">
+      <div class="surface-2 p-6 w-[92%] max-w-md max-h-[90vh] overflow-y-auto">
         ${html}
       </div>
     `;
@@ -978,6 +979,14 @@
   setupCourseForm();
 }
 
+function toBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
 
 let forceDraft = false;
