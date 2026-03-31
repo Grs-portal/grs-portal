@@ -63,9 +63,21 @@ function defaultData() {
         id: 1,
         title: "Intro to Programming",
         description: "Learn JS basics",
-        locationType: "in-person",
-        pdfUrl: "",
-        pdfName: ""
+        cover: "",
+    
+        durationValue: "2",
+        durationUnit: "hours",
+    
+        sessionsValue: "8",
+        sessionsUnit: "weekly",
+    
+        programType: "ALL",
+        theme: "ALL",
+        offer: "ALL",
+    
+        startDate: null,
+        endDate: null,
+        status: "draft"
       }
     ],
     homework: [
@@ -84,7 +96,8 @@ function defaultData() {
     ],
     notifications: [],
     schedule: [],
-    news: []
+    news: [],
+    Project []
   };
 }
 
@@ -104,6 +117,7 @@ function loadData() {
     raw.notifications = Array.isArray(raw.notifications) ? raw.notifications : [];
     raw.schedule = Array.isArray(raw.schedule) ? raw.schedule : [];
     raw.news = Array.isArray(raw.news) ? raw.news : [];
+    raw.projects = Array.isArray(raw.projects) ? raw.projects : [];
 
     raw.accounts = raw.accounts.map((a) => ({
       email: "",
@@ -844,6 +858,35 @@ app.delete("/api/courses/:id", (req, res) => {
 
   res.json({ success: true });
 });
+
+
+// ---------- PROJECTS ----------
+app.get("/api/projects", (req, res) => {
+  res.json(db.projects || []);
+});
+
+app.post("/api/projects", (req, res) => {
+  const { title, cover = "", content = "" } = req.body || {};
+
+  if (!title) {
+    return res.status(400).json({ success: false, message: "Title required" });
+  }
+
+  const newProject = {
+    id: Date.now(),
+    title,
+    cover,
+    content,
+    createdAt: new Date().toISOString()
+  };
+
+  db.projects = db.projects || [];
+  db.projects.push(newProject);
+  saveData();
+
+  res.json(newProject);
+});
+
 
 // ---------- HOMEWORK ----------
 app.get("/api/homework", (req, res) => res.json(db.homework));
