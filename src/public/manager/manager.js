@@ -1235,86 +1235,123 @@ function setupCourseForm() {
   }
 
 
-  async function openProgramDetail(id) {
-    try {
-      const program = await fetchJSON(`/courses/${id}`);
-      if (!program) return toast("Program not found", "rgba(185,28,28,.85)");
+async function openProgramDetail(id) {
+  try {
+    const program = await fetchJSON(`/courses/${id}`);
+    if (!program) return toast("Program not found", "rgba(185,28,28,.85)");
 
-      const publisherName = localStorage.getItem("publisherName") || "Your Company";
-      const publisherImg = localStorage.getItem("publisherImg") || ""; // optional
+    const publisherName = program.createdByUsername || "Unknown";
+    const publisherImg = program.createdByAvatar || "";
 
-      const html = `
-        <div class="max-w-4xl mx-auto p-6 space-y-6">
+    const page = document.createElement("div");
+    page.id = "programDetailPage";
+    page.className = "fixed inset-0 bg-black/60 backdrop-blur-md z-[9999] overflow-y-auto";
 
-          <!-- COVER IMAGE -->
-          <div class="w-full h-60 bg-gray-200 rounded-lg overflow-hidden">
-            ${
-              program.cover
-                ? `<img src="${program.cover}" class="w-full h-full object-cover"/>`
-                : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
-            }
-          </div>
+    page.innerHTML = `
+      <div class="w-full min-h-screen bg-[var(--surface-1)]">
+
+        <!-- TOP BAR -->
+        <div class="flex justify-end p-4">
+          <button id="closeDetail" class="px-4 py-2 bg-black/60 text-white rounded-lg">
+            ✕ Close
+          </button>
+        </div>
+
+        <!-- COVER IMAGE (FULL WIDTH) -->
+        <div class="w-full h-[300px] bg-gray-200">
+          ${
+            program.cover
+              ? `<img src="${program.cover}" class="w-full h-full object-cover"/>`
+              : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
+          }
+        </div>
+
+        <!-- CONTENT -->
+        <div class="max-w-6xl mx-auto p-6 space-y-6">
 
           <!-- TITLE -->
-          <div class="text-3xl font-extrabold">${esc(program.title)}</div>
+          <div class="text-4xl font-extrabold">${esc(program.title)}</div>
 
-          <!-- PUBLISHER -->
-          <div class="flex items-center gap-3 text-sm muted">
+          <!-- PUBLISHER (FROM SYSTEM) -->
+          <div class="flex items-center gap-3">
             ${
               publisherImg
-                ? `<img src="${publisherImg}" class="w-8 h-8 rounded-full object-cover"/>`
-                : `<div class="w-8 h-8 rounded-full bg-indigo-400 flex items-center justify-center text-white font-bold">${initials(publisherName)}</div>`
+                ? `<img src="${publisherImg}" class="w-10 h-10 rounded-full object-cover"/>`
+                : `<div class="w-10 h-10 rounded-full bg-indigo-400 flex items-center justify-center text-white font-bold">
+                    ${initials(publisherName)}
+                  </div>`
             }
-            <div>${esc(publisherName)}</div>
+            <div class="font-semibold">${esc(publisherName)}</div>
           </div>
 
-          <!-- DATA BLOCKS -->
-          <div class="grid grid-cols-3 gap-4 text-center">
-            <div class="surface-2 p-4 rounded-lg">
-              <div class="text-xl font-bold">${esc(program.programType || "-")}</div>
-              <div class="text-xs text-muted">Type</div>
+          <!-- DATA BLOCKS (6 COL SAME ROW) -->
+          <div class="grid grid-cols-6 gap-4 text-center">
+
+            <div class="surface-2 p-4 rounded-xl">
+              <div class="font-bold text-lg">${esc(program.programType || "-")}</div>
+              <div class="text-xs muted">Type</div>
             </div>
-            <div class="surface-2 p-4 rounded-lg">
-              <div class="text-xl font-bold">${esc(program.durationValue || "-")}</div>
-              <div class="text-xs text-muted">${esc(program.durationUnit || "days")}</div>
+
+            <div class="surface-2 p-4 rounded-xl">
+              <div class="font-bold text-lg">${esc(program.durationValue || "-")}</div>
+              <div class="text-xs muted">${esc(program.durationUnit || "")}</div>
             </div>
-            <div class="surface-2 p-4 rounded-lg">
-              <div class="text-xl font-bold">${esc(program.sessionsValue || "-")}</div>
-              <div class="text-xs text-muted">${esc(program.sessionsUnit || "sessions")}</div>
+
+            <div class="surface-2 p-4 rounded-xl">
+              <div class="font-bold text-lg">${esc(program.sessionsValue || "-")}</div>
+              <div class="text-xs muted">${esc(program.sessionsUnit || "")}</div>
             </div>
-            <div class="surface-2 p-4 rounded-lg">
-              <div class="text-xl font-bold">${esc(program.theme || "-")}</div>
-              <div class="text-xs text-muted">Theme</div>
+
+            <div class="surface-2 p-4 rounded-xl">
+              <div class="font-bold text-lg">${esc(program.theme || "-")}</div>
+              <div class="text-xs muted">Theme</div>
             </div>
-            <div class="surface-2 p-4 rounded-lg">
-              <div class="text-xl font-bold">${esc(program.offering || "-")}</div>
-              <div class="text-xs text-muted">Offering</div>
+
+            <div class="surface-2 p-4 rounded-xl">
+              <div class="font-bold text-lg">${esc(program.offer || "-")}</div>
+              <div class="text-xs muted">Offer</div>
             </div>
-            <div class="surface-2 p-4 rounded-lg">
-              <div class="text-sm">${program.startDate ? new Date(program.startDate).toLocaleDateString() : "-"}</div>
-              <div class="text-sm">${program.endDate ? new Date(program.endDate).toLocaleDateString() : "-"}</div>
+
+            <div class="surface-2 p-4 rounded-xl">
+              <div class="text-sm">
+                ${program.startDate ? new Date(program.startDate).toLocaleDateString() : "-"}
+              </div>
+              <div class="text-sm">
+                ${program.endDate ? new Date(program.endDate).toLocaleDateString() : "-"}
+              </div>
             </div>
+
           </div>
 
           <!-- DESCRIPTION -->
-          <div class="text-sm whitespace-pre-wrap">${esc(program.description || "No description")}</div>
+          <div class="text-sm whitespace-pre-wrap">
+            ${esc(program.description || "No description")}
+          </div>
+
         </div>
-      `;
+      </div>
+    `;
 
-      showModal(html);
-    } catch (err) {
-      console.error(err);
-      toast("Error loading program details", "rgba(185,28,28,.85)");
-    }
+    document.body.appendChild(page);
+
+    // CLOSE BUTTON
+    qs("#closeDetail").addEventListener("click", () => {
+      page.remove();
+    });
+
+  } catch (err) {
+    console.error(err);
+    toast("Error loading program details", "rgba(185,28,28,.85)");
   }
+}
 
-// Bind click events from your course cards
-document.addEventListener("click", (e) => {
-  const card = e.target.closest(".course-card");
-  if (!card) return;
-  const id = card.dataset.id;
-  if (id) openProgramDetail(id);
-});
+  // Bind click events from your course cards
+  document.addEventListener("click", (e) => {
+    const card = e.target.closest(".course-card");
+    if (!card) return;
+    const id = card.dataset.id;
+    if (id) openProgramDetail(id);
+  });
 
 
   function openCreateProjectModal() {
