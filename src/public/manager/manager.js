@@ -1245,11 +1245,10 @@ async function openProgramDetail(id) {
 
     const page = document.createElement("div");
     page.id = "programDetailPage";
-    page.className = "fixed inset-0 bg-black/60 backdrop-blur-md z-[9999] flex justify-center items-start overflow-y-auto";
-
+    page.className = "fixed inset-0 bg-black/40 backdrop-blur-lg z-[9999] flex justify-center items-start overflow-y-auto";
     page.innerHTML = `
-    <div class="min-h-screen flex justify-center">
-      <div class="w-[95%] max-w-5xl bg-[var(--surface-1)] rounded-[24px] overflow-hidden shadow-2xl">
+    <div class="min-h-screen flex justify-center pt-20 pb-10">
+      <div class="w-[30cm] max-w-full bg-white rounded-[24px] overflow-hidden shadow-2xl">
 
       <div class="relative w-full h-[300px] bg-gray-200">
 
