@@ -1292,36 +1292,35 @@ async function openProgramDetail(id) {
             }
             <div class="font-semibold">${esc(publisherName)}</div>
           </div>
-
-          <!-- DATA BLOCKS (6 COL SAME ROW) -->
+       <!-- DATA BLOCKS (6 COL SAME ROW) -->
           <div class="grid grid-cols-6 gap-4 text-center">
 
-            <div class="p-4 rounded-xl bg-emerald-700/70 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-emerald-/60 hover:scale-[1.02] transition-all duration-200">
+            <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-emerald-700/60 hover:scale-[1.02] transition-all duration-200">
               <div class="font-bold text-lg">${esc(program.programType || "-")}</div>
               <div class="text-xs muted">Type</div>
             </div> 
 
-            <div class="p-4 rounded-xl bg-emerald-700/70 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-emerald-/60 hover:scale-[1.02] transition-all duration-200">
+            <div class="p-4 rounded-xl bg-green-700/70 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-emerald-700/60 hover:scale-[1.02] transition-all duration-200">
               <div class="font-bold text-lg">${esc(program.durationValue || "-")}</div>
               <div class="text-xs muted">${esc(program.durationUnit || "")}</div>
             </div>
 
-            <div class="p-4 rounded-xl bg-emerald-700/70 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-emerald-/60 hover:scale-[1.02] transition-all duration-200">
+            <div class="p-4 rounded-xl bg-emerald-700/70 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-emerald-700/60 hover:scale-[1.02] transition-all duration-200">
               <div class="font-bold text-lg">${esc(program.sessionsValue || "-")}</div>
               <div class="text-xs muted">${esc(program.sessionsUnit || "")}</div>
             </div>
 
-            <div class="p-4 rounded-xl bg-emerald-700/70 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-emerald-/60 hover:scale-[1.02] transition-all duration-200">
+            <div class="p-4 rounded-xl bg-emerald-700/70 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-emerald-700/60 hover:scale-[1.02] transition-all duration-200">
               <div class="font-bold text-lg">${esc(program.theme || "-")}</div>
               <div class="text-xs muted">Theme</div>
             </div>
 
-            <div class="p-4 rounded-xl bg-emerald-700/70 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-emerald-/60 hover:scale-[1.02] transition-all duration-200">
+            <div class="p-4 rounded-xl bg-emerald-700/70 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-emerald-700/60 hover:scale-[1.02] transition-all duration-200">
               <div class="font-bold text-lg">${esc(program.offer || "-")}</div>
               <div class="text-xs muted">Offer</div>
             </div>
 
-            <div class="p-4 rounded-xl bg-emerald-700/70 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-emerald-/60 hover:scale-[1.02] transition-all duration-200">
+            <div class="p-4 rounded-xl bg-emerald-700/70 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-emerald-700/60 hover:scale-[1.02] transition-all duration-200">
               <div class="text-sm">
                 ${program.startDate ? new Date(program.startDate).toLocaleDateString() : "-"}
               </div>
