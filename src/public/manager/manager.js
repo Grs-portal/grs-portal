@@ -1231,6 +1231,88 @@ function setupCourseForm() {
   }
 
 
+  async function openProgramDetail(id) {
+    try {
+      const program = await fetchJSON(`/courses/${id}`);
+      if (!program) return toast("Program not found", "rgba(185,28,28,.85)");
+
+      const publisherName = localStorage.getItem("publisherName") || "Your Company";
+      const publisherImg = localStorage.getItem("publisherImg") || ""; // optional
+
+      const html = `
+        <div class="max-w-4xl mx-auto p-6 space-y-6">
+
+          <!-- COVER IMAGE -->
+          <div class="w-full h-60 bg-gray-200 rounded-lg overflow-hidden">
+            ${
+              program.cover
+                ? `<img src="${program.cover}" class="w-full h-full object-cover"/>`
+                : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
+            }
+          </div>
+
+          <!-- TITLE -->
+          <div class="text-3xl font-extrabold">${esc(program.title)}</div>
+
+          <!-- PUBLISHER -->
+          <div class="flex items-center gap-3 text-sm muted">
+            ${
+              publisherImg
+                ? `<img src="${publisherImg}" class="w-8 h-8 rounded-full object-cover"/>`
+                : `<div class="w-8 h-8 rounded-full bg-indigo-400 flex items-center justify-center text-white font-bold">${initials(publisherName)}</div>`
+            }
+            <div>${esc(publisherName)}</div>
+          </div>
+
+          <!-- DATA BLOCKS -->
+          <div class="grid grid-cols-3 gap-4 text-center">
+            <div class="surface-2 p-4 rounded-lg">
+              <div class="text-xl font-bold">${esc(program.programType || "-")}</div>
+              <div class="text-xs text-muted">Type</div>
+            </div>
+            <div class="surface-2 p-4 rounded-lg">
+              <div class="text-xl font-bold">${esc(program.durationValue || "-")}</div>
+              <div class="text-xs text-muted">${esc(program.durationUnit || "days")}</div>
+            </div>
+            <div class="surface-2 p-4 rounded-lg">
+              <div class="text-xl font-bold">${esc(program.sessionsValue || "-")}</div>
+              <div class="text-xs text-muted">${esc(program.sessionsUnit || "sessions")}</div>
+            </div>
+            <div class="surface-2 p-4 rounded-lg">
+              <div class="text-xl font-bold">${esc(program.theme || "-")}</div>
+              <div class="text-xs text-muted">Theme</div>
+            </div>
+            <div class="surface-2 p-4 rounded-lg">
+              <div class="text-xl font-bold">${esc(program.offering || "-")}</div>
+              <div class="text-xs text-muted">Offering</div>
+            </div>
+            <div class="surface-2 p-4 rounded-lg">
+              <div class="text-sm">${program.startDate ? new Date(program.startDate).toLocaleDateString() : "-"}</div>
+              <div class="text-sm">${program.endDate ? new Date(program.endDate).toLocaleDateString() : "-"}</div>
+            </div>
+          </div>
+
+          <!-- DESCRIPTION -->
+          <div class="text-sm whitespace-pre-wrap">${esc(program.description || "No description")}</div>
+        </div>
+      `;
+
+      showModal(html);
+    } catch (err) {
+      console.error(err);
+      toast("Error loading program details", "rgba(185,28,28,.85)");
+    }
+  }
+
+// Bind click events from your course cards
+document.addEventListener("click", (e) => {
+  const card = e.target.closest(".course-card");
+  if (!card) return;
+  const id = card.dataset.id;
+  if (id) openProgramDetail(id);
+});
+
+
   function openCreateProjectModal() {
   showModal(`
 
@@ -1309,7 +1391,7 @@ async function createProject() {
     closeModal();
     toast("Project created", "rgba(34,197,94,.7)");
 
-    loadProjects(); // you'll add this next
+    loadProjects(); 
   } catch {
     toast("Failed to create project", "rgba(185,28,28,.85)");
   }
