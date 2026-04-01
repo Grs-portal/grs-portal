@@ -1245,29 +1245,39 @@ async function openProgramDetail(id) {
 
     const page = document.createElement("div");
     page.id = "programDetailPage";
-    page.className = "fixed inset-0 bg-black/60 backdrop-blur-md z-[9999] overflow-y-auto";
+    page.className = "fixed inset-0 bg-black/60 backdrop-blur-md z-[9999] flex justify-center items-start overflow-y-auto";
 
     page.innerHTML = `
-      <div class="w-full min-h-screen bg-[var(--surface-1)]">
+    <div class="min-h-screen flex justify-center">
+      <div class="w-[95%] max-w-5xl bg-[var(--surface-1)] rounded-[24px] overflow-hidden shadow-2xl">
 
-        <!-- TOP BAR -->
-        <div class="flex justify-end p-4">
-          <button id="closeDetail" class="px-4 py-2 bg-black/60 text-white rounded-lg">
-            ✕ Close
-          </button>
-        </div>
+      <div class="relative w-full h-[300px] bg-gray-200">
 
-        <!-- COVER IMAGE (FULL WIDTH) -->
-        <div class="w-full h-[300px] bg-gray-200">
-          ${
-            program.cover
-              ? `<img src="${program.cover}" class="w-full h-full object-cover"/>`
-              : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
-          }
-        </div>
+        ${
+          program.cover
+            ? `<img src="${program.cover}" class="w-full h-full object-cover"/>`
+            : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
+        }
+
+        <!-- DARK OVERLAY (optional, looks better) -->
+        <div class="absolute inset-0 bg-black/30"></div>
+
+        <!-- MENU BUTTON (LEFT) -->
+        <button id="detailMenuBtn"
+          class="absolute top-4 left-4 px-3 py-2 rounded-lg bg-black/50 text-white backdrop-blur">
+          ☰
+        </button>
+
+        <!-- CLOSE BUTTON (RIGHT) -->
+        <button id="closeDetail"
+          class="absolute top-4 right-4 px-3 py-2 rounded-lg bg-black/50 text-white backdrop-blur">
+          ✕
+        </button>
+
+      </div>
 
         <!-- CONTENT -->
-        <div class="max-w-6xl mx-auto p-6 space-y-6">
+        <div class="p-6 space-y-6">
 
           <!-- TITLE -->
           <div class="text-4xl font-extrabold">${esc(program.title)}</div>
@@ -1333,11 +1343,14 @@ async function openProgramDetail(id) {
     `;
 
     document.body.appendChild(page);
+    document.body.style.overflow = "hidden";
 
     // CLOSE BUTTON
     qs("#closeDetail").addEventListener("click", () => {
       page.remove();
+      document.body.style.overflow = "";
     });
+
 
   } catch (err) {
     console.error(err);
