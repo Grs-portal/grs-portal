@@ -1247,78 +1247,98 @@ async function openProgramDetail(id) {
     page.id = "programDetailPage";
     page.className = "fixed inset-0 bg-black/40 backdrop-blur-lg z-[9999] flex justify-center items-start overflow-y-auto";
     page.innerHTML = `
-    <div id="detailContainer" class="min-h-screen flex justify-center pt-20 pb-10">
-      <div class="w-[30cm] max-w-full bg-white rounded-[24px] overflow-hidden shadow-2xl relative">
+    <div class="min-h-screen flex justify-center pt-20 pb-10">
+      <div class="w-[30cm] max-w-full bg-white rounded-[24px] overflow-hidden shadow-2xl">
 
-        <!-- COVER IMAGE -->
-        <div class="relative w-full h-[300px] bg-gray-200">
-          ${
-            program.cover
-              ? `<img src="${program.cover}" class="w-full h-full object-cover"/>`
-              : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
-          }
+      <div class="relative w-full h-[300px] bg-gray-200">
 
-          <!-- DARK OVERLAY -->
-          <div class="absolute inset-0 bg-black/30"></div>
+        ${
+          program.cover
+            ? `<img src="${program.cover}" class="w-full h-full object-cover"/>`
+            : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
+        }
 
-          <!-- CLOSE BUTTON -->
-          <button id="closeDetail"
-            class="absolute top-4 right-4 px-3 py-2 rounded-lg bg-black/50 text-white backdrop-blur">
-            ✕
-          </button>
-        </div>
+        <!-- DARK OVERLAY (optional, looks better) -->
+        <div class="absolute inset-0 bg-black/30"></div>
 
-        <!-- TITLE -->
-        <div class="p-6">
-          <div class="text-4xl font-extrabold mt-4 mb-6">${esc(program.title)}</div>
+        <!-- MENU BUTTON (LEFT) -->
+        <button id="detailMenuBtn"
+          class="absolute top-4 left-4 px-3 py-2 rounded-lg bg-black/50 text-white backdrop-blur">
+          ☰
+        </button>
 
-          <!-- PUBLISHER -->
-          <div class="flex items-center gap-4 mb-6">
+        <!-- CLOSE BUTTON (RIGHT) -->
+        <button id="closeDetail"
+          class="absolute top-4 right-4 px-3 py-2 rounded-lg bg-black/50 text-white backdrop-blur">
+          ✕
+        </button>
+
+      </div>
+
+        <!-- CONTENT -->
+        <div class="p-6 space-y-6">
+
+          <!-- TITLE -->
+          <div class="text-4xl font-extrabold">${esc(program.title)}</div>
+
+          <!-- PUBLISHER (FROM SYSTEM) -->
+          <div class="flex items-center gap-3">
             ${
               publisherImg
-                ? `<img src="${publisherImg}" class="w-16 h-16 rounded-full object-cover"/>`
-                : `<div class="w-16 h-16 rounded-full bg-indigo-400 flex items-center justify-center text-white font-bold text-xl">
+                ? `<img src="${publisherImg}" class="w-10 h-10 rounded-full object-cover"/>`
+                : `<div class="w-10 h-10 rounded-full bg-indigo-400 flex items-center justify-center text-black font-bold">
                     ${initials(publisherName)}
                   </div>`
             }
-            <div class="font-semibold text-black text-xl">${esc(publisherName)}</div>
+            <div class="font-semibold">${esc(publisherName)}</div>
           </div>
 
-          <!-- DATA BLOCKS -->
-          <div class="grid grid-cols-6 gap-4 text-center mb-6">
+          <!-- DATA BLOCKS (6 COL SAME ROW) -->
+          <div class="grid grid-cols-6 gap-4 text-center">
+
             <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
               <div class="font-bold text-lg">${esc(program.programType || "-")}</div>
               <div class="text-xs muted">Type</div>
-            </div>
+            </div> 
+
             <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
               <div class="font-bold text-lg">${esc(program.durationValue || "-")}</div>
               <div class="text-xs muted">${esc(program.durationUnit || "")}</div>
             </div>
+
             <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
               <div class="font-bold text-lg">${esc(program.sessionsValue || "-")}</div>
               <div class="text-xs muted">${esc(program.sessionsUnit || "")}</div>
             </div>
+
             <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
               <div class="font-bold text-lg">${esc(program.theme || "-")}</div>
               <div class="text-xs muted">Theme</div>
             </div>
+
             <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
               <div class="font-bold text-lg">${esc(program.offer || "-")}</div>
               <div class="text-xs muted">Offer</div>
             </div>
+
             <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
-              <div class="text-sm">${program.startDate ? new Date(program.startDate).toLocaleDateString() : "-"}</div>
-              <div class="text-sm">${program.endDate ? new Date(program.endDate).toLocaleDateString() : "-"}</div>
+              <div class="text-sm">
+                ${program.startDate ? new Date(program.startDate).toLocaleDateString() : "-"}
+              </div>
+              <div class="text-sm">
+                ${program.endDate ? new Date(program.endDate).toLocaleDateString() : "-"}
+              </div>
             </div>
+
           </div>
 
           <!-- DESCRIPTION -->
           <div class="text-sm whitespace-pre-wrap">
             ${esc(program.description || "No description")}
           </div>
+
         </div>
       </div>
-    </div>
     `;
 
     document.body.appendChild(page);
@@ -1330,13 +1350,6 @@ async function openProgramDetail(id) {
       document.body.style.overflow = "";
     });
 
-    // CLOSE BY CLICKING OUTSIDE
-    page.addEventListener("click", (e) => {
-      if (e.target.id === "programDetailPage") {
-        page.remove();
-        document.body.style.overflow = "";
-      }
-    });
 
   } catch (err) {
     console.error(err);
