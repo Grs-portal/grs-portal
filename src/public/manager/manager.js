@@ -1296,7 +1296,7 @@ async function openProgramDetail(id) {
           <!-- DATA BLOCKS (6 COL SAME ROW) -->
           <div class="grid grid-cols-6 gap-4 text-center">
 
-            <div class="p-4 rounded-xl bg-gray-100/70 backdrop-blur-sm border border-gray-200">
+            <div class="p-4 rounded-xl bg-emerald-900/70 backdrop-blur-sm border border-gray-200">
               <div class="font-bold text-lg">${esc(program.programType || "-")}</div>
               <div class="text-xs muted">Type</div>
             </div>
