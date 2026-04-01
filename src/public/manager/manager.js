@@ -416,7 +416,7 @@
 
     box.innerHTML = courses
       .map((c) => `
-        <div class="surface-2 rounded-[18px] overflow-hidden relative group">
+        <div class="course-card surface-2 rounded-[18px] overflow-hidden relative group cursor-pointer" data-id="${c.id}"
 
           <!-- STATUS TAG -->
           <div class="absolute top-3 left-3 px-3 py-1 text-xs font-bold rounded-full ${getStatusColor(c.status)}">
@@ -489,8 +489,9 @@
       });
     });
 
-    box.querySelectorAll(".del-course").forEach((btn) => {
-      btn.addEventListener("click", async () => {
+    list.querySelectorAll(".del-course").forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        e.stopPropagation();
         const id = btn.dataset.id;
         if (!confirm("Delete course?")) return;
         const r = await fetch(`${API}/courses/${id}`, { method: "DELETE", headers: actorHeaders() });
@@ -500,8 +501,9 @@
       });
     });
 
-    box.querySelectorAll(".edit-course").forEach((btn) => {
-      btn.addEventListener("click", async () => {
+    list.querySelectorAll(".edit-course").forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        e.stopPropagation();
         const id = btn.dataset.id;
         const coursesNow = await fetchJSON("/courses");
         const found = coursesNow.find((x) => String(x.id) === String(id));
@@ -525,7 +527,7 @@
 
     list.innerHTML = courses
       .map((c) => `
-        <div class="surface-2 rounded-[18px] overflow-hidden relative group">
+        <div class="course-card surface-2 rounded-[18px] overflow-hidden relative group cursor-pointer" data-id="${c.id}"
 
           <!-- STATUS TAG -->
           <div class="absolute top-3 left-3 px-3 py-1 text-xs font-bold rounded-full ${getStatusColor(c.status)}">
@@ -603,7 +605,8 @@
     });
 
     list.querySelectorAll(".del-course").forEach((btn) => {
-      btn.addEventListener("click", async () => {
+      btn.addEventListener("click", async (e) => {
+        e.stopPropagation();
         const id = btn.dataset.id;
         if (!confirm("Delete course?")) return;
         const r = await fetch(`${API}/courses/${id}`, { method: "DELETE", headers: actorHeaders() });
@@ -615,7 +618,8 @@
     });
 
     list.querySelectorAll(".edit-course").forEach((btn) => {
-      btn.addEventListener("click", async () => {
+      btn.addEventListener("click", async (e) => {
+        e.stopPropagation();
         const id = btn.dataset.id;
         const found = courses.find((x) => String(x.id) === String(id));
         if (found) openEditCourseModal(found);
