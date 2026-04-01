@@ -1344,6 +1344,14 @@ async function openProgramDetail(id) {
   }
 }
 
+    // Bind click events from your course cards
+  document.addEventListener("click", (e) => {
+    const card = e.target.closest(".course-card");
+    if (!card) return;
+    const id = card.dataset.id;
+    if (id) openProgramDetail(id);
+  });
+
 
   function openCreateProjectModal() {
   showModal(`
