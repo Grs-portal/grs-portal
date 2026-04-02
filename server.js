@@ -786,10 +786,11 @@ app.post("/api/courses", (req, res) => {
     status,
 
     createdBy: a.byName || a.byUsername || "Unknown",
-    createdByUsername: a.byUsername || "",
-    createdAt: new Date().toISOString()
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   };
 
+  db.courses = Array.isArray(db.courses) ? db.courses : [];
   db.courses.push(newCourse);
   saveData();
 
@@ -803,23 +804,23 @@ app.post("/api/courses", (req, res) => {
     audienceRole: "all"
   });
 
-  res.json(newCourse);
+  res.json({ success: true, item: newCourse });
 });
 
+// Update course
 app.put("/api/courses/:id", (req, res) => {
   const id = String(req.params.id);
   const idx = db.courses.findIndex(c => String(c.id) === id);
   if (idx === -1) return res.status(404).json({ success: false, message: "Course not found" });
 
   const a = actorFromReq(req);
+  const patch = req.body;
 
   db.courses[idx] = {
     ...db.courses[idx],
-    ...req.body,
+    ...patch,
+    updatedAt: new Date().toISOString(),
     updatedBy: a.byName || a.byUsername || "Unknown",
-    updatedByUsername: a.byUsername || "",
-    updatedByRole: a.byRole || "",
-    updatedAt: new Date().toISOString()
   };
 
   saveData();
@@ -834,27 +835,28 @@ app.put("/api/courses/:id", (req, res) => {
     audienceRole: "all"
   });
 
-  res.json(db.courses[idx]);
+  res.json({ success: true, item: db.courses[idx] });
 });
 
+// Delete course
 app.delete("/api/courses/:id", (req, res) => {
   const id = String(req.params.id);
-  const before = db.courses.length;
-  db.courses = db.courses.filter(c => String(c.id) !== id);
-  saveData();
+  const idx = db.courses.findIndex(c => String(c.id) === id);
+  if (idx === -1) return res.status(404).json({ success: false, message: "Course not found" });
 
   const a = actorFromReq(req);
-  if (db.courses.length !== before) {
-    addNotification({
-      type: "course",
-      action: "deleted",
-      message: `Course deleted (id: ${id})`,
-      ...a,
-      targetType: "course",
-      targetId: id,
-      audienceRole: "all"
-    });
-  }
+  const removed = db.courses.splice(idx, 1)[0];
+  saveData();
+
+  addNotification({
+    type: "course",
+    action: "deleted",
+    message: `Course deleted: "${removed.title}"`,
+    ...a,
+    targetType: "course",
+    targetId: id,
+    audienceRole: "all"
+  });
 
   res.json({ success: true });
 });
