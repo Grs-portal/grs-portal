@@ -1235,123 +1235,116 @@ function setupCourseForm() {
   }
 
 
-  async function openProgramDetail(id) {
-    try {
-      const program = await fetchJSON(`/courses/${id}`);
-      if (!program) return toast("Program not found", "rgba(185,28,28,.85)");
-  
-      const publisherName = program.createdByUsername || "Unknown";
-      const publisherImg = program.createdByAvatar || "";
-  
-      const page = document.createElement("div");
-      page.id = "programDetailPage";
-      page.className = "fixed inset-0 bg-black/40 backdrop-blur-lg z-[9999] flex justify-center items-start overflow-y-auto";
-      page.innerHTML = `
-        <div id="detailContainer" class="min-h-screen flex justify-center pt-20 pb-10">
-          <div class="w-[30cm] max-w-full bg-white rounded-[24px] overflow-hidden shadow-2xl relative">
-  
-            <!-- COVER IMAGE -->
-            <div class="relative w-full h-[300px] bg-gray-200 flex flex-col justify-end">
-              ${
-                program.cover
-                  ? `<img src="${program.cover}" class="w-full h-full object-cover absolute inset-0"/>`
-                  : `<div class="w-full h-full flex items-center justify-center text-sm muted absolute inset-0">No Image</div>`
-              }
-  
-              <!-- DARK OVERLAY -->
-              <div class="absolute inset-0 bg-black/30"></div>
-  
-              <!-- TITLE ON COVER -->
-              <div class="relative z-10 p-6">
-                <div class="text-4xl font-extrabold text-white drop-shadow-lg">
-                  ${esc(program.title)}
-                </div>
-              </div>
-  
-              <!-- CLOSE BUTTON -->
-              <button id="closeDetail"
-                class="absolute top-4 right-4 px-3 py-2 rounded-lg bg-black/50 text-white backdrop-blur">
-                ✕
-              </button>
+async function openProgramDetail(id) {
+  try {
+    const program = await fetchJSON(`/courses/${id}`);
+    if (!program) return toast("Program not found", "rgba(185,28,28,.85)");
+
+    const publisherName = program.createdByUsername || "Unknown";
+    const publisherImg = program.createdByAvatar || "";
+
+    const page = document.createElement("div");
+    page.id = "programDetailPage";
+    page.className = "fixed inset-0 bg-black/40 backdrop-blur-lg z-[9999] flex justify-center items-start overflow-y-auto";
+    page.innerHTML = `
+      <div id="detailContainer" class="min-h-screen flex justify-center pt-20 pb-10">
+        <div class="w-[30cm] max-w-full bg-white rounded-[24px] overflow-hidden shadow-2xl relative">
+
+          <!-- COVER IMAGE -->
+          <div class="relative w-full h-[300px] bg-gray-200">
+            ${
+              program.cover
+                ? `<img src="${program.cover}" class="w-full h-full object-cover"/>`
+                : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
+            }
+          </div>
+
+          <!-- TITLE BELOW COVER -->
+          <div class="p-6 border-b">
+            <div class="text-4xl font-extrabold text-black mb-4">
+              ${esc(program.title)}
             </div>
-  
-            <!-- CONTENT BELOW COVER -->
-            <div class="p-6">
-  
-              <!-- PUBLISHER -->
-              <div class="flex items-center gap-4 mb-6">
-                ${
-                  publisherImg
-                    ? `<img src="${publisherImg}" class="w-16 h-16 rounded-full object-cover"/>`
-                    : `<div class="w-16 h-16 rounded-full bg-indigo-400 flex items-center justify-center text-white font-bold text-xl">
-                        ${initials(publisherName)}
-                      </div>`
-                }
-                <div class="font-semibold text-black text-xl">${esc(publisherName)}</div>
-              </div>
-  
-              <!-- DATA BLOCKS -->
-              <div class="grid grid-cols-6 gap-4 text-center mb-6">
-                <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
-                  <div class="font-bold text-lg">${esc(program.programType || "-")}</div>
-                  <div class="text-xs muted">Type</div>
-                </div>
-                <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
-                  <div class="font-bold text-lg">${esc(program.durationValue || "-")}</div>
-                  <div class="text-xs muted">${esc(program.durationUnit || "")}</div>
-                </div>
-                <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
-                  <div class="font-bold text-lg">${esc(program.sessionsValue || "-")}</div>
-                  <div class="text-xs muted">${esc(program.sessionsUnit || "")}</div>
-                </div>
-                <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
-                  <div class="font-bold text-lg">${esc(program.theme || "-")}</div>
-                  <div class="text-xs muted">Theme</div>
-                </div>
-                <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
-                  <div class="font-bold text-lg">${esc(program.offer || "-")}</div>
-                  <div class="text-xs muted">Offer</div>
-                </div>
-                <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
-                  <div class="text-sm">${program.startDate ? new Date(program.startDate).toLocaleDateString() : "-"}</div>
-                  <div class="text-sm">${program.endDate ? new Date(program.endDate).toLocaleDateString() : "-"}</div>
-                </div>
-              </div>
-  
-              <!-- DESCRIPTION -->
-              <div class="text-black text-sm whitespace-pre-wrap">
-                ${esc(program.description || "No description")}
-              </div>
-  
+
+            <!-- PUBLISHER -->
+            <div class="flex items-center gap-4 mb-6">
+              ${
+                publisherImg
+                  ? `<img src="${publisherImg}" class="w-16 h-16 rounded-full object-cover"/>`
+                  : `<div class="w-16 h-16 rounded-full bg-indigo-400 flex items-center justify-center text-white font-bold text-xl">
+                      ${initials(publisherName)}
+                    </div>`
+              }
+              <div class="font-semibold text-black text-xl">${esc(publisherName)}</div>
             </div>
           </div>
+
+          <!-- DATA BLOCKS -->
+          <div class="grid grid-cols-6 gap-4 text-center p-6">
+            <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
+              <div class="font-bold text-lg">${esc(program.programType || "-")}</div>
+              <div class="text-xs muted">Type</div>
+            </div>
+            <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
+              <div class="font-bold text-lg">${esc(program.durationValue || "-")}</div>
+              <div class="text-xs muted">${esc(program.durationUnit || "")}</div>
+            </div>
+            <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
+              <div class="font-bold text-lg">${esc(program.sessionsValue || "-")}</div>
+              <div class="text-xs muted">${esc(program.sessionsUnit || "")}</div>
+            </div>
+            <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
+              <div class="font-bold text-lg">${esc(program.theme || "-")}</div>
+              <div class="text-xs muted">Theme</div>
+            </div>
+            <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
+              <div class="font-bold text-lg">${esc(program.offer || "-")}</div>
+              <div class="text-xs muted">Offer</div>
+            </div>
+            <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
+              <div class="text-sm">${program.startDate ? new Date(program.startDate).toLocaleDateString() : "-"}</div>
+              <div class="text-sm">${program.endDate ? new Date(program.endDate).toLocaleDateString() : "-"}</div>
+            </div>
+          </div>
+
+          <!-- DESCRIPTION -->
+          <div class="p-6 text-black text-sm whitespace-pre-wrap">
+            ${esc(program.description || "No description")}
+          </div>
+
+          <!-- CLOSE BUTTON -->
+          <button id="closeDetail"
+            class="absolute top-4 right-4 px-3 py-2 rounded-lg bg-black/50 text-white backdrop-blur">
+            ✕
+          </button>
+
         </div>
-      `;
-  
-      document.body.appendChild(page);
-      document.body.style.overflow = "hidden";
-  
-      // CLOSE BUTTON
-      qs("#closeDetail").addEventListener("click", () => {
+      </div>
+    `;
+
+    document.body.appendChild(page);
+    document.body.style.overflow = "hidden";
+
+    // CLOSE BUTTON
+    qs("#closeDetail").addEventListener("click", () => {
+      page.remove();
+      document.body.style.overflow = "";
+    });
+
+    // CLOSE BY CLICKING OUTSIDE
+    page.addEventListener("click", (e) => {
+      if (e.target.id === "programDetailPage") {
         page.remove();
         document.body.style.overflow = "";
-      });
-  
-      // CLOSE BY CLICKING OUTSIDE
-      page.addEventListener("click", (e) => {
-        if (e.target.id === "programDetailPage") {
-          page.remove();
-          document.body.style.overflow = "";
-        }
-      });
-  
-    } catch (err) {
-      console.error(err);
-      toast("Error loading program details", "rgba(185,28,28,.85)");
-    }
-  }
+      }
+    });
 
-    // Bind click events from your course cards
+  } catch (err) {
+    console.error(err);
+    toast("Error loading program details", "rgba(185,28,28,.85)");
+  }
+}
+
+  // Bind click events from your course cards
   document.addEventListener("click", (e) => {
     const card = e.target.closest(".course-card");
     if (!card) return;
