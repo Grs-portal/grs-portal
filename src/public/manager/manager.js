@@ -1237,13 +1237,11 @@ function setupCourseForm() {
 
 async function openProgramDetail(id) {
   try {
-    const program = await fetchJSON(`/api/courses/${id}`); // ✅ add /api
-    if (!program || !program.success) return toast("Program not found", "rgba(185,28,28,.85)");
+    const program = await fetchJSON(`/courses/${id}`);
+    if (!program) return toast("Program not found", "rgba(185,28,28,.85)");
 
-    const data = program.course; // server sends { success: true, course }
-
-    const publisherName = data.createdByUsername || "Unknown";
-    const publisherImg = data.createdByAvatar || "";
+    const publisherName = program.createdByUsername || "Unknown";
+    const publisherImg = program.createdByAvatar || "";
 
     const page = document.createElement("div");
     page.id = "programDetailPage";
@@ -1255,8 +1253,8 @@ async function openProgramDetail(id) {
           <!-- COVER IMAGE -->
           <div class="relative w-full h-[300px] bg-gray-200">
             ${
-              data.cover
-                ? `<img src="${data.cover}" class="w-full h-full object-cover"/>`
+              program.cover
+                ? `<img src="${program.cover}" class="w-full h-full object-cover"/>`
                 : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
             }
           </div>
@@ -1264,7 +1262,7 @@ async function openProgramDetail(id) {
           <!-- TITLE BELOW COVER -->
           <div class="p-6 border-b">
             <div class="text-4xl font-extrabold text-black mb-4">
-              ${esc(data.title)}
+              ${esc(program.title)}
             </div>
 
             <!-- PUBLISHER -->
@@ -1283,34 +1281,34 @@ async function openProgramDetail(id) {
           <!-- DATA BLOCKS -->
           <div class="grid grid-cols-6 gap-4 text-center p-6">
             <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
-              <div class="font-bold text-lg">${esc(data.programType || "-")}</div>
+              <div class="font-bold text-lg">${esc(program.programType || "-")}</div>
               <div class="text-xs muted">Type</div>
             </div>
             <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
-              <div class="font-bold text-lg">${esc(data.durationValue || "-")}</div>
-              <div class="text-xs muted">${esc(data.durationUnit || "")}</div>
+              <div class="font-bold text-lg">${esc(program.durationValue || "-")}</div>
+              <div class="text-xs muted">${esc(program.durationUnit || "")}</div>
             </div>
             <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
-              <div class="font-bold text-lg">${esc(data.sessionsValue || "-")}</div>
-              <div class="text-xs muted">${esc(data.sessionsUnit || "")}</div>
+              <div class="font-bold text-lg">${esc(program.sessionsValue || "-")}</div>
+              <div class="text-xs muted">${esc(program.sessionsUnit || "")}</div>
             </div>
             <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
-              <div class="font-bold text-lg">${esc(data.theme || "-")}</div>
+              <div class="font-bold text-lg">${esc(program.theme || "-")}</div>
               <div class="text-xs muted">Theme</div>
             </div>
             <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
-              <div class="font-bold text-lg">${esc(data.offer || "-")}</div>
+              <div class="font-bold text-lg">${esc(program.offer || "-")}</div>
               <div class="text-xs muted">Offer</div>
             </div>
             <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
-              <div class="text-sm">${data.startDate ? new Date(data.startDate).toLocaleDateString() : "-"}</div>
-              <div class="text-sm">${data.endDate ? new Date(data.endDate).toLocaleDateString() : "-"}</div>
+              <div class="text-sm">${program.startDate ? new Date(program.startDate).toLocaleDateString() : "-"}</div>
+              <div class="text-sm">${program.endDate ? new Date(program.endDate).toLocaleDateString() : "-"}</div>
             </div>
           </div>
 
           <!-- DESCRIPTION -->
           <div class="p-6 text-black text-sm whitespace-pre-wrap">
-            ${esc(data.description || "No description")}
+            ${esc(program.description || "No description")}
           </div>
 
           <!-- CLOSE BUTTON -->
