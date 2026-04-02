@@ -740,6 +740,16 @@ app.delete("/api/schedule/:id", (req, res) => {
 
 // ---------- COURSES ----------
 app.get("/api/courses", (req, res) => res.json(db.courses));
+app.get("/api/courses/:id", (req, res) => {
+  const id = String(req.params.id);
+  const course = db.courses.find(c => String(c.id) === id);
+
+  if (!course) {
+    return res.status(404).json({ success: false, message: "Course not found" });
+  }
+
+  res.json({ success: true, course });
+});
 
 app.post("/api/courses", (req, res) => {
   const a = actorFromReq(req);
@@ -785,7 +795,8 @@ app.post("/api/courses", (req, res) => {
     endDate,
     status,
 
-    createdBy: a.byName || a.byUsername || "Unknown",
+    createdByUsername: a.byUsername || "",
+    createdByAvatar: req.body.createdByAvatar || "",
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
