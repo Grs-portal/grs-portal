@@ -1453,8 +1453,7 @@ async function loadProjects() {
   if (!box) return;
 
   box.innerHTML = projects.map(p => `
-    <div class="surface-2 rounded-[18px] overflow-hidden">
-
+  <div class="project-card surface-2 rounded-[18px] overflow-hidden cursor-pointer" data-id="${p.id}">
       <div class="h-40 w-full bg-gray-200">
         ${
           p.cover
@@ -1473,73 +1472,73 @@ async function loadProjects() {
 
 
   async function openProjectDetail(id) {
-    try {
-      const project = await fetchJSON(`/projects`);
-      const data = project.find(p => String(p.id) === String(id));
+  try {
+    const project = await fetchJSON(`/projects`);
+    const data = project.find(p => String(p.id) === String(id));
 
-      if (!data) return toast("Project not found", "rgba(185,28,28,.85)");
+    if (!data) return toast("Project not found", "rgba(185,28,28,.85)");
 
-      const page = document.createElement("div");
-      page.id = "projectDetailPage";
-      page.className = "fixed inset-0 bg-black/40 backdrop-blur-lg z-[9999] flex justify-center items-start overflow-y-auto";
+    const page = document.createElement("div");
+    page.id = "projectDetailPage";
+    page.className = "fixed inset-0 bg-black/40 backdrop-blur-lg z-[9999] flex justify-center items-start overflow-y-auto";
 
-      page.innerHTML = `
-        <div class="min-h-screen flex justify-center pt-20 pb-10">
-          <div class="w-[30cm] max-w-full bg-white rounded-[24px] overflow-hidden shadow-2xl relative">
+    page.innerHTML = `
+      <div class="min-h-screen flex justify-center pt-20 pb-10">
+        <div class="w-[30cm] max-w-full bg-white rounded-[24px] overflow-hidden shadow-2xl relative">
 
-            <!-- COVER -->
-            <div class="relative w-full h-[300px] bg-gray-200">
-              ${
-                data.cover
-                  ? `<img src="${data.cover}" class="w-full h-full object-cover"/>`
-                  : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
-              }
-            </div>
-
-            <!-- TITLE -->
-            <div class="p-6 border-b">
-              <div class="text-4xl font-extrabold text-black">
-                ${esc(data.title)}
-              </div>
-            </div>
-
-            <!-- DESCRIPTION -->
-            <div class="p-6 text-black text-sm whitespace-pre-wrap">
-              ${data.content || "No content"}
-            </div>
-
-            <!-- CLOSE -->
-            <button id="closeProjectDetail"
-              class="absolute top-4 right-4 px-3 py-2 rounded-lg bg-black/50 text-white backdrop-blur">
-              ✕
-            </button>
-
+          <!-- COVER -->
+          <div class="relative w-full h-[300px] bg-gray-200">
+            ${
+              data.cover
+                ? `<img src="${data.cover}" class="w-full h-full object-cover"/>`
+                : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
+            }
           </div>
+
+          <!-- TITLE -->
+          <div class="p-6 border-b">
+            <div class="text-4xl font-extrabold text-black">
+              ${esc(data.title)}
+            </div>
+          </div>
+
+          <!-- DESCRIPTION -->
+          <div class="p-6 text-black text-sm whitespace-pre-wrap">
+            ${data.content || "No content"}
+          </div>
+
+          <!-- CLOSE -->
+          <button id="closeProjectDetail"
+            class="absolute top-4 right-4 px-3 py-2 rounded-lg bg-black/50 text-white backdrop-blur">
+            ✕
+          </button>
+
         </div>
-      `;
+      </div>
+    `;
 
-      document.body.appendChild(page);
-      document.body.style.overflow = "hidden";
+    document.body.appendChild(page);
+    document.body.style.overflow = "hidden";
 
-      // close button
-      qs("#closeProjectDetail").addEventListener("click", () => {
+    // close button
+    qs("#closeProjectDetail").addEventListener("click", () => {
+      page.remove();
+      document.body.style.overflow = "";
+    });
+
+    // click outside
+    page.addEventListener("click", (e) => {
+      if (e.target.id === "projectDetailPage") {
         page.remove();
         document.body.style.overflow = "";
-      });
+      }
+    });
 
-      // click outside
-      page.addEventListener("click", (e) => {
-        if (e.target.id === "projectDetailPage") {
-          page.remove();
-          document.body.style.overflow = "";
-        }
-      });
-
-    } catch (err) {
-      console.error(err);
-      toast("Error loading project", "rgba(185,28,28,.85)");
-    }
+  } catch (err) {
+    console.error(err);
+    toast("Error loading project", "rgba(185,28,28,.85)");
   }
+}
   
   function openCreateHomeworkModal() {
     showModal(`
