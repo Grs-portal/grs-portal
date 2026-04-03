@@ -277,6 +277,7 @@
 
         if (page === "dashboard") await loadDashboard();
         if (page === "students") await loadStudents();
+        if (page === "projects") await loadProjects();
         if (page === "submitted-homework") await loadHomework();
         if (page === "submitted-courses") await loadCourses();
         if (page === "users") await loadUsers();
@@ -410,6 +411,8 @@
 
     qs("#activeCoursesCount").textContent = courses.length;
     qs("#toGradeCount").textContent = hw.length;
+
+    await loadProjects();
 
     const box = qs("#courses");
     if (!box) return;
@@ -1453,7 +1456,9 @@ async function loadProjects() {
   if (!box) return;
 
   box.innerHTML = projects.map(p => `
-  <div class="project-card surface-2 rounded-[18px] overflow-hidden cursor-pointer" data-id="${p.id}">
+    <div class="project-card surface-2 rounded-[18px] overflow-hidden relative group cursor-pointer" data-id="${p.id}">
+
+      <!-- COVER -->
       <div class="h-40 w-full bg-gray-200">
         ${
           p.cover
@@ -1462,7 +1467,8 @@ async function loadProjects() {
         }
       </div>
 
-      <div class="p-4">
+      <!-- CONTENT -->
+      <div class="p-4 space-y-2">
         <div class="font-extrabold text-lg">${esc(p.title)}</div>
       </div>
 
@@ -1473,10 +1479,10 @@ async function loadProjects() {
 
   async function openProjectDetail(id) {
   try {
-    const project = await fetchJSON(`/projects`);
-    const data = project.find(p => String(p.id) === String(id));
+    const project = await fetchJSON(`/projects/${id}`);
+    if (!project || !project.success) return toast("Project not found", "rgba(185,28,28,.85)");
 
-    if (!data) return toast("Project not found", "rgba(185,28,28,.85)");
+    const data = project.course; // server sends { success: true, project }
 
     const page = document.createElement("div");
     page.id = "projectDetailPage";
