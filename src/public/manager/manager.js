@@ -406,8 +406,11 @@
   }
     
 
-  async function loadDashboard() {
-    const [courses, hw] = await Promise.all([fetchJSON("/courses"), fetchJSON("/homework")]);
+  async function Dashboard() {
+    const [courses, projects, hw] = await Promise.all([
+      fetchJSON("/courses"), 
+      fetchJSON("/projects"), 
+      fetchJSON("/homework")]);
 
     qs("#activeCoursesCount").textContent = courses.length;
     qs("#toGradeCount").textContent = hw.length;
@@ -1474,6 +1477,13 @@ async function loadProjects() {
 
     </div>
   `).join("");
+
+  box.querySelectorAll(".project-card").forEach(card => {
+    card.addEventListener("click", () => {
+      const id = card.dataset.id;
+      if (id) openProjectDetail(id);
+    });
+  });
 }
 
 
@@ -1482,7 +1492,7 @@ async function loadProjects() {
     const project = await fetchJSON(`/projects/${id}`);
     if (!project || !project.success) return toast("Project not found", "rgba(185,28,28,.85)");
 
-    const data = project.course; // server sends { success: true, project }
+    const data = project.project; // server sends { success: true, project }
 
     const page = document.createElement("div");
     page.id = "projectDetailPage";
