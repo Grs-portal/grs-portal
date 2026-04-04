@@ -406,7 +406,7 @@
   }
     
 
-  async function Dashboard() {
+  async function loadDashboard() {
     const [courses, projects, hw] = await Promise.all([
       fetchJSON("/courses"), 
       fetchJSON("/projects"), 
@@ -422,7 +422,7 @@
 
     box.innerHTML = courses
       .map((c) => `
-        <div class="course-card surface-2 rounded-[18px] overflow-hidden relative group cursor-pointer" data-id="${c.id}"
+        <div class="course-card surface-2 rounded-[18px] overflow-hidden relative group cursor-pointer" data-id="${c.id}">
 
           <!-- STATUS TAG -->
           <div class="absolute top-3 left-3 px-3 py-1 text-xs font-bold rounded-full ${getStatusColor(c.status)}">
@@ -495,7 +495,7 @@
       });
     });
 
-    list.querySelectorAll(".del-course").forEach((btn) => {
+    box.querySelectorAll(".del-course").forEach((btn) => {
       btn.addEventListener("click", async (e) => {
         e.stopPropagation();
         const id = btn.dataset.id;
@@ -533,7 +533,7 @@
 
     list.innerHTML = courses
       .map((c) => `
-        <div class="course-card surface-2 rounded-[18px] overflow-hidden relative group cursor-pointer" data-id="${c.id}"
+        <div class="course-card surface-2 rounded-[18px] overflow-hidden relative group cursor-pointer" data-id="${c.id}">
 
           <!-- STATUS TAG -->
           <div class="absolute top-3 left-3 px-3 py-1 text-xs font-bold rounded-full ${getStatusColor(c.status)}">
@@ -610,7 +610,7 @@
       });
     });
 
-    list.querySelectorAll(".del-course").forEach((btn) => {
+    box.querySelectorAll(".del-course").forEach((btn) => {
       btn.addEventListener("click", async (e) => {
         e.stopPropagation();
         const id = btn.dataset.id;
@@ -687,7 +687,7 @@
       )
       .join("");
 
-    list.querySelectorAll(".del-hw").forEach((btn) => {
+    box.querySelectorAll(".del-hw").forEach((btn) => {
       btn.addEventListener("click", async () => {
         const id = btn.dataset.id;
         if (!confirm("Delete homework?")) return;
@@ -748,7 +748,7 @@
       });
     });
 
-    list.querySelectorAll(".del-news").forEach(btn => {
+    box.querySelectorAll(".del-news").forEach(btn => {
       btn.addEventListener("click", async () => {
         const id = btn.dataset.id;
         if (!confirm("Delete this news item?")) return;
@@ -1049,6 +1049,7 @@ function setupCourseForm() {
       offer: qs("#courseOffer")?.value,
 
       startDate: qs("#courseStartDate")?.value || null,
+      endDate: qs("#courseEndDate")?.value || null,
       status: forceDraft ? "draft" : selectedStatus || "published",
 
       createdByUsername: username,      
@@ -1206,38 +1207,7 @@ function setupCourseForm() {
     </form>
   `);
 
-    qs("#saveCourse").addEventListener("click", async () => {
-      const title = qs("#courseTitle").value.trim();
-      const description = qs("#courseDesc").value.trim();
-      const locationType = qs("#courseType").value;
-
-      if (!title) return toast("Title required", "rgba(185,28,28,.85)");
-
-      let pdfUrl = course.pdfUrl || "", pdfName = course.pdfName || "";
-      const file = qs("#coursePdf")?.files?.[0];
-      try {
-        if (file) {
-          const up = await uploadPdf(file);
-          pdfUrl = up.url; pdfName = up.originalName;
-        }
-      } catch (e) {
-        return toast(e.message, "rgba(185,28,28,.85)");
-      }
-
-      const res = await fetch(`${API}/courses/${encodeURIComponent(course.id)}`, {
-        method: "PUT",
-        headers: jsonHeaders(),
-        body: JSON.stringify({ title, description, locationType, pdfUrl, pdfName }),
-      });
-
-      if (!res.ok) return toast("Update failed", "rgba(185,28,28,.85)");
-
-      closeModal();
-      toast("Course updated", "rgba(34,197,94,.70)");
-      loadCourses();
-      loadDashboard();
-      loadNotifications();
-    });
+    
   }
 
 
@@ -1355,6 +1325,7 @@ async function openProgramDetail(id) {
   // Bind click events from your course cards
   document.addEventListener("click", (e) => {
     const courseCard = e.target.closest(".course-card");
+    if (e.target.closest(".menu-btn") || e.target.closest(".menu")) return;
     if (courseCard) {
       const id = courseCard.dataset.id;
       if (id) openProgramDetail(id);
