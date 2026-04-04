@@ -1340,39 +1340,40 @@ async function openProgramDetail(id) {
   });
 
 
-function openCreateProjectModal() {
-    showModal(`
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-extrabold">Create Project</h2>
-        <button id="cancelModal" class="btn-theme text-sm">Cancel</button>
+function openProjectDetail(project) {
+    qs("#projectDetailBg")?.remove();
+
+    const bg = document.createElement("div");
+    bg.id = "projectDetailBg";
+    bg.className = "fixed inset-0 bg-black/60 flex items-center justify-center z-[9999] backdrop-blur-md p-4 md:p-8";
+
+    bg.innerHTML = `
+      <div class="surface-2 w-full max-w-3xl max-h-full flex flex-col rounded-[24px] overflow-hidden relative shadow-2xl">
+        
+        <button id="closeDetailBtn" class="absolute top-4 right-4 z-10 w-10 h-10 bg-black/50 hover:bg-black/80 backdrop-blur text-white rounded-full flex items-center justify-center transition-colors text-lg">
+          ✕
+        </button>
+
+        <div class="w-full h-48 md:h-72 bg-gray-800 relative shrink-0">
+          ${
+            project.cover
+              ? `<img src="${project.cover}" class="w-full h-full object-cover"/>`
+              : `<div class="w-full h-full flex items-center justify-center text-gray-400">No Cover Image</div>`
+          }
+        </div>
+
+        <div class="p-6 md:p-8 overflow-y-auto flex-1">
+          <h1 class="text-2xl md:text-3xl font-extrabold mb-4">${esc(project.title)}</h1>
+          
+          <div class="text-base muted whitespace-pre-wrap leading-relaxed prose prose-invert max-w-none">
+            ${project.content || "No content available for this project."}
+          </div>
+        </div>
       </div>
+    `;
 
-      <label class="text-sm font-bold muted">Title</label>
-      <input id="projectTitle" class="input-theme mt-1 mb-3" />
-
-      <label class="text-sm font-bold muted">Cover</label>
-      <input id="projectCover" type="file" accept="image/*" class="mb-3"/>
-
-      <label class="text-sm font-bold muted">Content</label>
-
-      <div class="flex gap-2 mb-2">
-        <button class="btn-theme text-sm" onclick="document.execCommand('bold')">Bold</button>
-        <button class="btn-theme text-sm" onclick="document.execCommand('italic')">Italic</button>
-        <button class="btn-theme text-sm" onclick="document.execCommand('insertUnorderedList')">• List</button>
-        <button class="btn-theme text-sm" onclick="addImage()">Insert Image</button>
-        <button class="btn-theme text-sm" onclick="addLink()">Insert Link</button>
-      </div>
-
-      <div id="projectContent"
-        contenteditable="true"
-        class="input-theme min-h-[200px] mb-4 overflow-y-auto">
-      </div>
-
-      <div class="flex justify-end gap-3 mt-4">
-        <button id="saveDraftProjectBtn" class="btn-theme">Save Draft</button>
-        <button id="publishProjectBtn" class="btn-theme">Publish</button>
-      </div>
-    `);
+    document.body.appendChild(bg);
+    document.body.style.overflow = "hidden";
 
     // Pass the specific status string depending on which button is clicked
     qs("#saveDraftProjectBtn")?.addEventListener("click", () => createProject("draft"));
