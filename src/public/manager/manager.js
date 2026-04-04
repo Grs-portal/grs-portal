@@ -1340,7 +1340,7 @@ async function openProgramDetail(id) {
   });
 
 
-function openProjectDetail(project) {
+  function openProjectDetail(project) {
     qs("#projectDetailBg")?.remove();
 
     const bg = document.createElement("div");
@@ -1365,7 +1365,7 @@ function openProjectDetail(project) {
         <div class="p-6 md:p-8 overflow-y-auto flex-1">
           <h1 class="text-2xl md:text-3xl font-extrabold mb-4">${esc(project.title)}</h1>
           
-          <div class="text-base muted whitespace-pre-wrap leading-relaxed prose prose-invert max-w-none">
+          <div class="text-base muted leading-relaxed prose prose-invert max-w-none">
             ${project.content || "No content available for this project."}
           </div>
         </div>
@@ -1375,9 +1375,14 @@ function openProjectDetail(project) {
     document.body.appendChild(bg);
     document.body.style.overflow = "hidden";
 
-    // Pass the specific status string depending on which button is clicked
-    qs("#saveDraftProjectBtn")?.addEventListener("click", () => createProject("draft"));
-    qs("#publishProjectBtn")?.addEventListener("click", () => createProject("published"));
+    // Setup Close Logic
+    const closeDetail = () => {
+      bg.remove();
+      document.body.style.overflow = "";
+    };
+
+    bg.querySelector("#closeDetailBtn").onclick = closeDetail;
+    bg.onclick = (e) => { if (e.target === bg) closeDetail(); };
   }
 
   window.addImage = function () {
