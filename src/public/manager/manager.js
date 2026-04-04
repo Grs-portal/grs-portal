@@ -1396,7 +1396,7 @@ window.addLink = function () {
 async function createProject(status) {
   const title = qs("#projectTitle")?.value.trim();
   const file = qs("#projectCover")?.files?.[0];
-  const content = qs("#projectContent")?.innerHTML;
+  const description = qs("#projectDescription")?.innerHTML;
 
   if (!title) return toast("Title required", "rgba(185,28,28,.85)");
 
@@ -1405,7 +1405,7 @@ async function createProject(status) {
   const newProject = {
     title,
     cover,
-    content,
+    description,
     status: status
   };
 
@@ -1445,6 +1445,9 @@ async function loadProjects() {
               ? `<img src="${p.cover}" class="w-full h-full object-cover"/>`
               : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
           }
+        </div>
+        <div class="p-3">
+          <h3 class="font-bold text-sm truncate">${esc(p.title)}</h3>
         </div>
       </div>
     `
@@ -1486,7 +1489,7 @@ function openProjectDetail(project) {
         <h1 class="text-2xl md:text-3xl font-extrabold mb-4">${esc(project.title)}</h1>
         
         <div class="text-base muted leading-relaxed prose prose-invert max-w-none">
-          ${project.content || "No content available for this project."}
+          ${project.description || "No description available for this project."}
         </div>
       </div>
     </div>
