@@ -1452,11 +1452,6 @@ async function createProject(status) {
                 : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
             }
           </div>
-          
-          <div class="p-4 space-y-2">
-            <div class="font-extrabold text-lg">${esc(p.title)}</div>
-            <div class="text-sm muted line-clamp-2">${esc(p.description || "No description provided.")}</div>
-          </div>
         </div>
       `
       )
