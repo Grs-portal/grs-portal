@@ -1340,199 +1340,179 @@ async function openProgramDetail(id) {
   });
 
 
-  function openProjectDetail(project) {
-    qs("#projectDetailBg")?.remove();
 
-    const bg = document.createElement("div");
-    bg.id = "projectDetailBg";
-    bg.className = "fixed inset-0 bg-black/60 flex items-center justify-center z-[9999] backdrop-blur-md p-4 md:p-8";
+/* ==========================================
+   PROJECTS SECTION (CREATE & DETAIL)
+========================================== */
 
-    bg.innerHTML = `
-      <div class="surface-2 w-full max-w-3xl max-h-full flex flex-col rounded-[24px] overflow-hidden relative shadow-2xl">
-        
-        <button id="closeDetailBtn" class="absolute top-4 right-4 z-10 w-10 h-10 bg-black/50 hover:bg-black/80 backdrop-blur text-white rounded-full flex items-center justify-center transition-colors text-lg">
-          ✕
-        </button>
+function openCreateProjectModal() {
+  showModal(`
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-extrabold">Create Project</h2>
+      <button id="cancelModal" class="btn-theme text-sm">Cancel</button>
+    </div>
 
-        <div class="w-full h-48 md:h-72 bg-gray-800 relative shrink-0">
-          ${
-            project.cover
-              ? `<img src="${project.cover}" class="w-full h-full object-cover"/>`
-              : `<div class="w-full h-full flex items-center justify-center text-gray-400">No Cover Image</div>`
-          }
-        </div>
+    <label class="text-sm font-bold muted">Title</label>
+    <input id="projectTitle" class="input-theme mt-1 mb-3" />
 
-        <div class="p-6 md:p-8 overflow-y-auto flex-1">
-          <h1 class="text-2xl md:text-3xl font-extrabold mb-4">${esc(project.title)}</h1>
-          
-          <div class="text-base muted leading-relaxed prose prose-invert max-w-none">
-            ${project.content || "No content available for this project."}
-          </div>
-        </div>
-      </div>
-    `;
+    <label class="text-sm font-bold muted">Cover</label>
+    <input id="projectCover" type="file" accept="image/*" class="mb-3"/>
 
-    document.body.appendChild(bg);
-    document.body.style.overflow = "hidden";
+    <label class="text-sm font-bold muted">Content</label>
 
-    // Setup Close Logic
-    const closeDetail = () => {
-      bg.remove();
-      document.body.style.overflow = "";
-    };
+    <div class="flex gap-2 mb-2">
+      <button class="btn-theme text-sm" onclick="document.execCommand('bold')">Bold</button>
+      <button class="btn-theme text-sm" onclick="document.execCommand('italic')">Italic</button>
+      <button class="btn-theme text-sm" onclick="document.execCommand('insertUnorderedList')">• List</button>
+      <button class="btn-theme text-sm" onclick="addImage()">Insert Image</button>
+      <button class="btn-theme text-sm" onclick="addLink()">Insert Link</button>
+    </div>
 
-    bg.querySelector("#closeDetailBtn").onclick = closeDetail;
-    bg.onclick = (e) => { if (e.target === bg) closeDetail(); };
-  }
+    <div id="projectContent"
+      contenteditable="true"
+      class="input-theme min-h-[200px] mb-4 overflow-y-auto">
+    </div>
 
-  window.addImage = function () {
-    const url = prompt("Enter image URL:");
-    if (url) document.execCommand("insertImage", false, url);
-  };
+    <div class="flex justify-end gap-3 mt-4">
+      <button id="saveDraftProjectBtn" class="btn-theme">Save Draft</button>
+      <button id="publishProjectBtn" class="btn-theme">Publish</button>
+    </div>
+  `);
 
-  window.addLink = function () {
-    const url = prompt("Enter link URL:");
-    if (url) document.execCommand("createLink", false, url);
-  };
+  qs("#saveDraftProjectBtn")?.addEventListener("click", () => createProject("draft"));
+  qs("#publishProjectBtn")?.addEventListener("click", () => createProject("published"));
+}
 
+window.addImage = function () {
+  const url = prompt("Enter image URL:");
+  if (url) document.execCommand("insertImage", false, url);
+};
+
+window.addLink = function () {
+  const url = prompt("Enter link URL:");
+  if (url) document.execCommand("createLink", false, url);
+};
 
 async function createProject(status) {
-    const title = qs("#projectTitle")?.value.trim();
-    const file = qs("#projectCover")?.files?.[0];
-    const content = qs("#projectContent")?.innerHTML;
+  const title = qs("#projectTitle")?.value.trim();
+  const file = qs("#projectCover")?.files?.[0];
+  const content = qs("#projectContent")?.innerHTML;
 
-    if (!title) return toast("Title required", "rgba(185,28,28,.85)");
+  if (!title) return toast("Title required", "rgba(185,28,28,.85)");
 
-    const cover = file ? await toBase64(file) : "";
+  const cover = file ? await toBase64(file) : "";
 
-    const newProject = {
-      title,
-      cover,
-      content,
-      status: status // "draft" or "published"
-    };
+  const newProject = {
+    title,
+    cover,
+    content,
+    status: status
+  };
 
-    try {
-      const res = await fetch(`${API}/projects`, {
-        method: "POST",
-        headers: jsonHeaders(),
-        body: JSON.stringify(newProject)
-      });
-
-      if (!res.ok) throw new Error();
-
-      closeModal();
-      
-      // Update the toast to reflect the status
-      toast(`Project ${status === "draft" ? "saved as draft" : "published"}`, "rgba(34,197,94,.7)");
-
-      loadProjects(); 
-    } catch {
-      toast("Failed to create project", "rgba(185,28,28,.85)");
-    }
-  }
-
-
-// ==========================================
-  // PROJECTS SECTION & DETAIL PAGE
-  // ==========================================
-
-  async function loadProjects() {
-    // Assuming you have an API route /projects and a container with id="projectsList"
-    const projects = await fetchJSON("/projects");
-    const list = qs("#projects"); // Update this selector if your HTML uses a different ID for the projects tab
-    if (!list) return;
-
-    list.innerHTML = projects
-      .map(
-        (p) => `
-        <div class="project-card surface-2 rounded-[18px] overflow-hidden relative group cursor-pointer transition-transform hover:-translate-y-1" data-id="${p.id}">
-          <div class="absolute top-3 left-3 px-3 py-1 text-xs font-bold rounded-full ${getStatusColor(p.status)}">
-            ${esc(p.status || "unknown")}
-          </div>
-          
-          <div class="h-40 w-full bg-gray-200">
-            ${
-              p.cover
-                ? `<img src="${p.cover}" class="w-full h-full object-cover"/>`
-                : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
-            }
-          </div>
-        </div>
-      `
-      )
-      .join("");
-
-    // Bind click events to open the detail page overlay
-    list.querySelectorAll(".project-card").forEach((card) => {
-      card.addEventListener("click", () => {
-        const id = card.dataset.id;
-        const found = projects.find((x) => String(x.id) === String(id));
-        if (found) openProjectDetail(found);
-      });
+  try {
+    const res = await fetch(`${API}/projects`, {
+      method: "POST",
+      headers: jsonHeaders(),
+      body: JSON.stringify(newProject)
     });
+
+    if (!res.ok) throw new Error();
+
+    closeModal();
+    toast(`Project ${status === "draft" ? "saved as draft" : "published"}`, "rgba(34,197,94,.7)");
+    loadProjects(); 
+  } catch {
+    toast("Failed to create project", "rgba(185,28,28,.85)");
   }
+}
 
-  function openProjectDetail(project) {
-    qs("#projectDetailBg")?.remove();
+async function loadProjects() {
+  const projects = await fetchJSON("/projects");
+  const list = qs("#projects");
+  if (!list) return;
 
-    const bg = document.createElement("div");
-    bg.id = "projectDetailBg";
-    bg.className = "fixed inset-0 bg-black/60 flex items-center justify-center z-[9999] backdrop-blur-md p-4 md:p-8";
-
-    bg.innerHTML = `
-      <div class="surface-2 w-full max-w-3xl max-h-full flex flex-col rounded-[24px] overflow-hidden relative shadow-2xl">
+  list.innerHTML = projects
+    .map(
+      (p) => `
+      <div class="project-card surface-2 rounded-[18px] overflow-hidden relative group cursor-pointer transition-transform hover:-translate-y-1" data-id="${p.id}">
+        <div class="absolute top-3 left-3 px-3 py-1 text-xs font-bold rounded-full ${getStatusColor(p.status)}">
+          ${esc(p.status || "unknown")}
+        </div>
         
-        <button id="closeDetailBtn" class="absolute top-4 right-4 z-10 w-10 h-10 bg-black/50 hover:bg-black/80 backdrop-blur text-white rounded-full flex items-center justify-center transition-colors text-lg">
-          ✕
-        </button>
-
-        <div class="w-full h-48 md:h-72 bg-gray-800 relative shrink-0">
+        <div class="h-40 w-full bg-gray-200">
           ${
-            project.cover
-              ? `<img src="${project.cover}" class="w-full h-full object-cover"/>`
-              : `<div class="w-full h-full flex items-center justify-center text-gray-400">No Cover Image</div>`
+            p.cover
+              ? `<img src="${p.cover}" class="w-full h-full object-cover"/>`
+              : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
           }
         </div>
+      </div>
+    `
+    )
+    .join("");
 
-        <div class="p-6 md:p-8 overflow-y-auto flex-1">
-          <h1 class="text-2xl md:text-3xl font-extrabold mb-4">${esc(project.title)}</h1>
-          
-          <div class="text-base muted whitespace-pre-wrap leading-relaxed">
-            ${esc(project.description || "No description available for this project.")}
-          </div>
+  list.querySelectorAll(".project-card").forEach((card) => {
+    card.addEventListener("click", () => {
+      const id = card.dataset.id;
+      const found = projects.find((x) => String(x.id) === String(id));
+      if (found) openProjectDetail(found);
+    });
+  });
+}
+
+function openProjectDetail(project) {
+  qs("#projectDetailBg")?.remove();
+
+  const bg = document.createElement("div");
+  bg.id = "projectDetailBg";
+  bg.className = "fixed inset-0 bg-black/60 flex items-center justify-center z-[9999] backdrop-blur-md p-4 md:p-8";
+
+  bg.innerHTML = `
+    <div class="surface-2 w-full max-w-3xl max-h-full flex flex-col rounded-[24px] overflow-hidden relative shadow-2xl">
+      
+      <button id="closeDetailBtn" class="absolute top-4 right-4 z-10 w-10 h-10 bg-black/50 hover:bg-black/80 backdrop-blur text-white rounded-full flex items-center justify-center transition-colors text-lg">
+        ✕
+      </button>
+
+      <div class="w-full h-48 md:h-72 bg-gray-800 relative shrink-0">
+        ${
+          project.cover
+            ? `<img src="${project.cover}" class="w-full h-full object-cover"/>`
+            : `<div class="w-full h-full flex items-center justify-center text-gray-400">No Cover Image</div>`
+        }
+      </div>
+
+      <div class="p-6 md:p-8 overflow-y-auto flex-1">
+        <h1 class="text-2xl md:text-3xl font-extrabold mb-4">${esc(project.title)}</h1>
+        
+        <div class="text-base muted leading-relaxed prose prose-invert max-w-none">
+          ${project.content || "No content available for this project."}
         </div>
       </div>
-    `;
+    </div>
+  `;
 
-    document.body.appendChild(bg);
-    
-    // Lock background scrolling
-    document.body.style.overflow = "hidden";
+  document.body.appendChild(bg);
+  document.body.style.overflow = "hidden";
 
-    // Close Logic
-    const closeOverlay = () => {
-      bg.remove();
-      document.body.style.overflow = ""; // Restore scrolling
-    };
+  const closeOverlay = () => {
+    bg.remove();
+    document.body.style.overflow = "";
+  };
 
-    // Close on button click
-    bg.querySelector("#closeDetailBtn").addEventListener("click", closeOverlay);
-    
-    // Close on clicking outside the modal
-    bg.addEventListener("click", (e) => {
-      if (e.target === bg) closeOverlay();
-    });
+  bg.querySelector("#closeDetailBtn").addEventListener("click", closeOverlay);
+  bg.addEventListener("click", (e) => { if (e.target === bg) closeOverlay(); });
 
-    // Close on Escape key
-    const escHandler = (e) => {
-      if (e.key === "Escape") {
-        closeOverlay();
-        window.removeEventListener("keydown", escHandler);
-      }
-    };
-    window.addEventListener("keydown", escHandler);
-  }
+  const escHandler = (e) => {
+    if (e.key === "Escape") {
+      closeOverlay();
+      window.removeEventListener("keydown", escHandler);
+    }
+  };
+  window.addEventListener("keydown", escHandler);
+}
+
+
   
   function openCreateHomeworkModal() {
     showModal(`
