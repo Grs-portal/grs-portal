@@ -1426,7 +1426,7 @@ async function createProject(status) {
     }
   }
 
-  
+
 // ==========================================
   // PROJECTS SECTION & DETAIL PAGE
   // ==========================================
@@ -1473,15 +1473,12 @@ async function createProject(status) {
   }
 
   function openProjectDetail(project) {
-    // 1. Remove any existing overlay to prevent duplicates
     qs("#projectDetailBg")?.remove();
 
-    // 2. Create the full-screen overlay background
     const bg = document.createElement("div");
     bg.id = "projectDetailBg";
     bg.className = "fixed inset-0 bg-black/60 flex items-center justify-center z-[9999] backdrop-blur-md p-4 md:p-8";
 
-    // 3. Build the detail page modal matching the program structure
     bg.innerHTML = `
       <div class="surface-2 w-full max-w-3xl max-h-full flex flex-col rounded-[24px] overflow-hidden relative shadow-2xl">
         
@@ -1512,7 +1509,7 @@ async function createProject(status) {
     // Lock background scrolling
     document.body.style.overflow = "hidden";
 
-    // 4. Setup Close Logic
+    // Close Logic
     const closeOverlay = () => {
       bg.remove();
       document.body.style.overflow = ""; // Restore scrolling
