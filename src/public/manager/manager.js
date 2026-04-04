@@ -1340,90 +1340,93 @@ async function openProgramDetail(id) {
   });
 
 
-  function openCreateProjectModal() {
-  showModal(`
+function openCreateProjectModal() {
+    showModal(`
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-extrabold">Create Project</h2>
+        <button id="cancelModal" class="btn-theme text-sm">Cancel</button>
+      </div>
 
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-extrabold">Create Project</h2>
-      <button id="cancelModal" class="btn-theme text-sm">Cancel</button>
-    </div>
+      <label class="text-sm font-bold muted">Title</label>
+      <input id="projectTitle" class="input-theme mt-1 mb-3" />
 
-    <label class="text-sm font-bold muted">Title</label>
-    <input id="projectTitle" class="input-theme mt-1 mb-3" />
+      <label class="text-sm font-bold muted">Cover</label>
+      <input id="projectCover" type="file" accept="image/*" class="mb-3"/>
 
-    <label class="text-sm font-bold muted">Cover</label>
-    <input id="projectCover" type="file" accept="image/*" class="mb-3"/>
+      <label class="text-sm font-bold muted">Content</label>
 
-    <label class="text-sm font-bold muted">Content</label>
+      <div class="flex gap-2 mb-2">
+        <button class="btn-theme text-sm" onclick="document.execCommand('bold')">Bold</button>
+        <button class="btn-theme text-sm" onclick="document.execCommand('italic')">Italic</button>
+        <button class="btn-theme text-sm" onclick="document.execCommand('insertUnorderedList')">• List</button>
+        <button class="btn-theme text-sm" onclick="addImage()">Insert Image</button>
+        <button class="btn-theme text-sm" onclick="addLink()">Insert Link</button>
+      </div>
 
-    <!-- TOOLBAR -->
-    <div class="flex gap-2 mb-2">
-      <button class="btn-theme text-sm" onclick="document.execCommand('bold')">B</button>
-      <button class="btn-theme text-sm" onclick="document.execCommand('italic')">I</button>
-      <button class="btn-theme text-sm" onclick="document.execCommand('insertUnorderedList')">• List</button>
-      <button class="btn-theme text-sm" onclick="addImage()">Img</button>
-      <button class="btn-theme text-sm" onclick="addLink()">Link</button>
-    </div>
+      <div id="projectContent"
+        contenteditable="true"
+        class="input-theme min-h-[200px] mb-4 overflow-y-auto">
+      </div>
 
-    <!-- EDITOR -->
-    <div id="projectContent"
-      contenteditable="true"
-      class="input-theme min-h-[200px] mb-4 overflow-y-auto">
-    </div>
+      <div class="flex justify-end gap-3 mt-4">
+        <button id="saveDraftProjectBtn" class="btn-theme">Save Draft</button>
+        <button id="publishProjectBtn" class="btn-theme">Publish</button>
+      </div>
+    `);
 
-    <div class="flex justify-end gap-3">
-      <button id="saveProjectBtn" class="btn-theme">Save</button>
-    </div>
+    // Pass the specific status string depending on which button is clicked
+    qs("#saveDraftProjectBtn")?.addEventListener("click", () => createProject("draft"));
+    qs("#publishProjectBtn")?.addEventListener("click", () => createProject("published"));
+  }
 
-  `);
-
-  qs("#saveProjectBtn")?.addEventListener("click", createProject);
-}
-
-window.addImage = function () {
-  const url = prompt("Enter image URL:");
-  if (url) document.execCommand("insertImage", false, url);
-};
-
-window.addLink = function () {
-  const url = prompt("Enter link URL:");
-  if (url) document.execCommand("createLink", false, url);
-};
-
-
-async function createProject() {
-  const title = qs("#projectTitle")?.value.trim();
-  const file = qs("#projectCover")?.files?.[0];
-  const content = qs("#projectContent")?.innerHTML;
-
-  if (!title) return toast("Title required", "rgba(185,28,28,.85)");
-
-  const cover = file ? await toBase64(file) : "";
-
-  const newProject = {
-    title,
-    cover,
-    content
+  window.addImage = function () {
+    const url = prompt("Enter image URL:");
+    if (url) document.execCommand("insertImage", false, url);
   };
 
-  try {
-    const res = await fetch(`${API}/projects`, {
-      method: "POST",
-      headers: jsonHeaders(),
-      body: JSON.stringify(newProject)
-    });
+  window.addLink = function () {
+    const url = prompt("Enter link URL:");
+    if (url) document.execCommand("createLink", false, url);
+  };
 
-    if (!res.ok) throw new Error();
 
-    closeModal();
-    toast("Project created", "rgba(34,197,94,.7)");
+async function createProject(status) {
+    const title = qs("#projectTitle")?.value.trim();
+    const file = qs("#projectCover")?.files?.[0];
+    const content = qs("#projectContent")?.innerHTML;
 
-    loadProjects(); 
-  } catch {
-    toast("Failed to create project", "rgba(185,28,28,.85)");
+    if (!title) return toast("Title required", "rgba(185,28,28,.85)");
+
+    const cover = file ? await toBase64(file) : "";
+
+    const newProject = {
+      title,
+      cover,
+      content,
+      status: status // "draft" or "published"
+    };
+
+    try {
+      const res = await fetch(`${API}/projects`, {
+        method: "POST",
+        headers: jsonHeaders(),
+        body: JSON.stringify(newProject)
+      });
+
+      if (!res.ok) throw new Error();
+
+      closeModal();
+      
+      // Update the toast to reflect the status
+      toast(`Project ${status === "draft" ? "saved as draft" : "published"}`, "rgba(34,197,94,.7)");
+
+      loadProjects(); 
+    } catch {
+      toast("Failed to create project", "rgba(185,28,28,.85)");
+    }
   }
-}
 
+  
 // ==========================================
   // PROJECTS SECTION & DETAIL PAGE
   // ==========================================
