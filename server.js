@@ -879,7 +879,7 @@ app.get("/api/projects", (req, res) => {
 });
 
 app.post("/api/projects", (req, res) => {
-  const { title, cover = "", content = "", status = "draft" } = req.body || {};
+  const { title, cover = "", description = "", status = "draft" } = req.body || {};
 
   if (!title) {
     return res.status(400).json({ success: false, message: "Title required" });
@@ -889,8 +889,8 @@ app.post("/api/projects", (req, res) => {
     id: Date.now(),
     title,
     cover,
-    content,
-    status, 
+    description, // ✅ use description
+    status,
     createdAt: new Date().toISOString()
   };
 
