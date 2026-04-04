@@ -889,7 +889,7 @@ app.post("/api/projects", (req, res) => {
     id: Date.now(),
     title,
     cover,
-    description, // ✅ use description
+    description,
     status,
     createdAt: new Date().toISOString()
   };
