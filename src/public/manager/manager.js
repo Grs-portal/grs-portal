@@ -1477,13 +1477,6 @@ async function loadProjects() {
 
     </div>
   `).join("");
-
-  box.querySelectorAll(".project-card").forEach(card => {
-    card.addEventListener("click", () => {
-      const id = card.dataset.id;
-      if (id) openProjectDetail(id);
-    });
-  });
 }
 
 
