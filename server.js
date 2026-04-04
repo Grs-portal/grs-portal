@@ -97,7 +97,7 @@ function defaultData() {
     notifications: [],
     schedule: [],
     news: [],
-    Projects: []
+    projects: []
   };
 }
 
