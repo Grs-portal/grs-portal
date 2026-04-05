@@ -428,140 +428,75 @@
   `;
 }
 
-  async function loadDashboard() {
-    const [courses, projects, hw] = await Promise.all([
-      fetchJSON("/courses"), 
-      fetchJSON("/projects"), 
-      fetchJSON("/homework")]);
+async function loadDashboard() {
+  const [courses, projects, hw] = await Promise.all([
+    fetchJSON("/courses"),
+    fetchJSON("/projects"),
+    fetchJSON("/homework")
+  ]);
 
-    const safeCourses = courses || [];
-    const safeProjects = projects || [];
-    const safeHw = hw || [];
+  const safeCourses = courses || [];
+  const safeProjects = projects || [];
+  const safeHw = hw || [];
 
-    qs("#activeCoursesCount").textContent = safeCourses.length;
-    qs("#projectsCount").textContent = safeProjects.length;
-    qs("#toGradeCount").textContent = safeHw.length;
+  // ===== COUNTS =====
+  qs("#activeCoursesCount").textContent = safeCourses.length;
+  qs("#projectsCount").textContent = safeProjects.length;
+  qs("#toGradeCount").textContent = safeHw.length;
 
-    const projectBox = qs("#dashboardProjects");
-    if (projectBox) {
-      projectBox.innerHTML = safeProjects.map(p => renderProjectCard(p)).join("");      
-      projectBox.querySelectorAll(".project-card").forEach(card => {
-        card.onclick = () => {
-          const id = card.dataset.id;
-          const found = safeProjects.find(x => String(x.id) === String(id));
-          if (found) openProjectDetail(found);
-        };
-      });
-    }
+  // ===== COURSES (DASHBOARD) =====
+  const coursesBox = qs("#dashboardCourses");
+  if (coursesBox) {
+    coursesBox.innerHTML = safeCourses.map((c) => `
+      <div class="course-card surface-2 rounded-[18px] overflow-hidden relative group cursor-pointer" data-id="${c.id}">
 
-    const box = qs("#courses");
-    if (!box) return;
+        <div class="absolute top-3 left-3 px-3 py-1 text-xs font-bold rounded-full ${getStatusColor(c.status)}">
+          ${esc(c.status || "unknown")}
+        </div>
 
-    box.innerHTML = courses
-      .map((c) => `
-        <div class="course-card surface-2 rounded-[18px] overflow-hidden relative group cursor-pointer" data-id="${c.id}">
+        <div class="h-40 w-full bg-gray-200">
+          ${
+            c.cover
+              ? `<img src="${c.cover}" class="w-full h-full object-cover"/>`
+              : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
+          }
+        </div>
 
-          <!-- STATUS TAG -->
-          <div class="absolute top-3 left-3 px-3 py-1 text-xs font-bold rounded-full ${getStatusColor(c.status)}">
-            ${esc(c.status || "unknown")}
+        <div class="p-4 space-y-2">
+          <div class="font-extrabold text-lg">${esc(c.title)}</div>
+
+          <div class="text-xs font-semibold text-indigo-400">
+            ${esc(c.programType || "—")}
           </div>
 
-          <!-- COVER IMAGE -->
-          <div class="h-40 w-full bg-gray-200">
-            ${
-              c.cover
-                ? `<img src="${c.cover}" class="w-full h-full object-cover"/>`
-                : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
-            }
+          <div class="text-sm muted">
+            ${esc(c.durationValue || "-")} ${esc(c.durationUnit || "")}
           </div>
 
-          <!-- 3 DOT MENU -->
-          <div class="absolute top-3 right-3">
-            <button class="menu-btn text-xl px-2 py-1 rounded-lg bg-black/40 text-white" data-id="${c.id}">
-              ⋮
-            </button>
-
-            <div class="menu hidden absolute right-0 mt-2 w-32 surface-2 rounded-xl shadow-lg p-2 z-50">
-              <button class="edit-course block w-full text-left px-3 py-2 hover:bg-white/10 rounded" data-id="${c.id}">
-                Edit
-              </button>
-              <button class="del-course block w-full text-left px-3 py-2 hover:bg-white/10 rounded text-red-400" data-id="${c.id}">
-                Delete
-              </button>
-            </div>
+          <div class="text-sm muted">
+            ${esc(c.sessionsValue || "-")} ${esc(c.sessionsUnit || "")}
           </div>
 
-          <!-- CONTENT -->
-          <div class="p-4 space-y-2">
-
-            <!-- TITLE -->
-            <div class="font-extrabold text-lg">${esc(c.title)}</div>
-
-            <!-- PROGRAM TYPE -->
-            <div class="text-xs font-semibold text-indigo-400">
-              ${esc(c.programType || "—")}
-            </div>
-
-            <!-- DURATION -->
-            <div class="text-sm muted">
-              ${esc(c.durationValue || "-")} ${esc(c.durationUnit || "")}
-            </div>
-
-            <!-- SESSIONS -->
-            <div class="text-sm muted">
-              ${esc(c.sessionsValue || "-")} ${esc(c.sessionsUnit || "")}
-            </div>
-
-            <!-- DATES -->
-            <div class="text-xs muted">
-              ${c.startDate ? new Date(c.startDate).toLocaleDateString() : "-"} 
-              → 
-              ${c.endDate ? new Date(c.endDate).toLocaleDateString() : "-"}
-            </div>
-
+          <div class="text-xs muted">
+            ${c.startDate ? new Date(c.startDate).toLocaleDateString() : "-"} 
+            → 
+            ${c.endDate ? new Date(c.endDate).toLocaleDateString() : "-"}
           </div>
         </div>
-      `)
-      .join("");
-
-    box.querySelectorAll(".menu-btn").forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        document.querySelectorAll(".menu").forEach(m => m.classList.add("hidden"));
-        btn.nextElementSibling.classList.toggle("hidden");
-      });
-    });
-
-    box.querySelectorAll(".del-course").forEach((btn) => {
-      btn.addEventListener("click", async (e) => {
-        e.stopPropagation();
-        const id = btn.dataset.id;
-        if (!confirm("Delete course?")) return;
-        const r = await fetch(`${API}/courses/${id}`, { method: "DELETE", headers: actorHeaders() });
-        if (!r.ok) return toast("Delete failed", "rgba(185,28,28,.85)");
-        toast("Deleted", "rgba(185,28,28,.85)");
-        await loadDashboard();
-      });
-    });
-
-    box.querySelectorAll(".edit-course").forEach((btn) => {
-      btn.addEventListener("click", async (e) => {
-        e.stopPropagation();
-        const id = btn.dataset.id;
-        const coursesNow = await fetchJSON("/courses");
-        const found = coursesNow.find((x) => String(x.id) === String(id));
-        if (found) openEditCourseModal(found);
-      });
-    });
-  
-    if (!window.menuListenerAdded) {
-      window.menuListenerAdded = true;
-      document.addEventListener("click", () => {
-        document.querySelectorAll(".menu").forEach((m) => m.classList.add("hidden"));
-      });
-    }
+      </div>
+    `).join("");
   }
 
+  // ===== PROJECTS (DASHBOARD) =====
+  const projectsBox = qs("#dashboardProjects");
+  if (projectsBox) {
+    projectsBox.innerHTML = safeProjects
+      .map(renderProjectCard)
+      .join("");
+  }
+}
+
+    
   async function loadCourses() {
     const courses = await fetchJSON("/courses");
     const list = qs("#submitted-courses-list");
