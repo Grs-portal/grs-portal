@@ -507,7 +507,7 @@
       });
     });
 
-    list.querySelectorAll(".edit-course").forEach((btn) => {
+    box.querySelectorAll(".edit-course").forEach((btn) => {
       btn.addEventListener("click", async (e) => {
         e.stopPropagation();
         const id = btn.dataset.id;
@@ -623,7 +623,7 @@
       });
     });
 
-    list.querySelectorAll(".edit-course").forEach((btn) => {
+    box.querySelectorAll(".edit-course").forEach((btn) => {
       btn.addEventListener("click", async (e) => {
         e.stopPropagation();
         const id = btn.dataset.id;
@@ -1335,9 +1335,8 @@ async function openProgramDetail(id) {
     const projectCard = e.target.closest(".project-card");
     if (projectCard) {
       const id = projectCard.dataset.id;
-      const projects = await fetchJSON("/projects");
-      const found = projects.find(x => String(x.id) === String(id));
-      if (found) openProjectDetail(found);    }
+      if (id) openProjectDetail(id);
+    }
   });
 
 
