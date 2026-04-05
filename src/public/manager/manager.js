@@ -1428,7 +1428,7 @@ async function createProject(status) {
 
 async function loadProjects() {
   const projects = await fetchJSON("/projects");
-  const list = qs("#projects");
+  const list = qs("#projectsFullList");
   if (!list) return;
 
   list.innerHTML = projects
