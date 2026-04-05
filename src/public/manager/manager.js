@@ -1458,7 +1458,20 @@ async function loadProjects() {
     card.addEventListener("click", () => {
       const id = card.dataset.id;
       const found = projects.find((x) => String(x.id) === String(id));
-      if (found) openProjectDetail(found);
+      card.addEventListener("click", async () => {
+      const id = card.dataset.id;
+
+      try {
+        const res = await fetchJSON(`/projects/${id}`);
+        if (!res || !res.success) {
+          return toast("Project not found", "rgba(185,28,28,.85)");
+        }
+
+        openProjectDetail(res.project);
+      } catch {
+        toast("Failed to load project", "rgba(185,28,28,.85)");
+      }
+    });
     });
   });
 }
