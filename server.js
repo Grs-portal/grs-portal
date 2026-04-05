@@ -874,31 +874,39 @@ app.delete("/api/courses/:id", (req, res) => {
 
 
 // ---------- PROJECTS ----------
-app.get("/api/projects", (req, res) => {
-  res.json(db.projects || []);
-});
+app.put("/api/projects/:id", (req, res) => {
+  const id = String(req.params.id);
+  const idx = (db.projects || []).findIndex(p => String(p.id) === id);
 
-app.post("/api/projects", (req, res) => {
-  const { title, cover = "", description = "", status = "draft" } = req.body || {};
-
-  if (!title) {
-    return res.status(400).json({ success: false, message: "Title required" });
+  if (idx === -1) {
+    return res.status(404).json({ success: false, message: "Project not found" });
   }
 
-  const newProject = {
-    id: Date.now(),
-    title,
-    cover,
-    description,
-    status,
-    createdAt: new Date().toISOString()
+  db.projects[idx] = {
+    ...db.projects[idx],
+    ...req.body,
+    updatedAt: new Date().toISOString()
   };
 
-  db.projects = db.projects || [];
-  db.projects.push(newProject);
   saveData();
 
-  res.json(newProject);
+  res.json({ success: true, item: db.projects[idx] });
+});
+
+// DELETE project
+app.delete("/api/projects/:id", (req, res) => {
+  const id = String(req.params.id);
+  const before = db.projects.length;
+
+  db.projects = (db.projects || []).filter(p => String(p.id) !== id);
+
+  if (db.projects.length === before) {
+    return res.status(404).json({ success: false, message: "Project not found" });
+  }
+
+  saveData();
+
+  res.json({ success: true });
 });
 
 
