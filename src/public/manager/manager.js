@@ -1464,14 +1464,11 @@ async function createProject(status) {
 }
 
 async function loadProjects() {
-  const res = await fetchJSON("/projects");
-
-  const projects = res?.projects || []; // ✅ FIX HERE
-
+  const projects = await fetchJSON("/projects");
   const list = qs("#projectsFullList");
   if (!list) return;
 
-  list.innerHTML = projects.map(renderProjectCard).join("");
+list.innerHTML = (projects || []).map(renderProjectCard).join("");
 
   list.querySelectorAll(".project-card").forEach((card) => {
     card.onclick = async () => {
