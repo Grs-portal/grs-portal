@@ -893,6 +893,18 @@ app.put("/api/projects/:id", (req, res) => {
   res.json({ success: true, item: db.projects[idx] });
 });
 
+// Get single project (LIKE COURSES DETAIL)
+app.get("/api/projects/:id", (req, res) => {
+  const id = String(req.params.id);
+  const project = (db.projects || []).find(p => String(p.id) === id);
+
+  if (!project) {
+    return res.status(404).json({ success: false, message: "Project not found" });
+  }
+
+  res.json({ success: true, project });
+});
+
 // DELETE project
 app.delete("/api/projects/:id", (req, res) => {
   const id = String(req.params.id);
