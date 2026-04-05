@@ -413,9 +413,21 @@
       fetchJSON("/homework")]);
 
     qs("#activeCoursesCount").textContent = courses.length;
+    qs("#projectsCount").textContent = projects.length;
     qs("#toGradeCount").textContent = hw.length;
 
-    await loadProjects();
+    const projectBox = qs("#dashboardProjects");
+    if (projectBox) {
+      projectBox.innerHTML = projects.map(p => renderProjectCard(p)).join("");
+      
+      projectBox.querySelectorAll(".project-card").forEach(card => {
+        card.onclick = () => {
+          const id = card.dataset.id;
+          const found = projects.find(x => String(x.id) === String(id));
+          if (found) openProjectDetail(found);
+        };
+      });
+    }
 
     const box = qs("#courses");
     if (!box) return;
@@ -1432,8 +1444,7 @@ async function loadProjects() {
   if (!list) return;
 
   list.innerHTML = projects
-    .map(
-      (p) => `
+    .map((p) => `
       <div class="project-card surface-2 rounded-[18px] overflow-hidden relative group cursor-pointer transition-transform hover:-translate-y-1" data-id="${p.id}">
         <div class="absolute top-3 left-3 px-3 py-1 text-xs font-bold rounded-full ${getStatusColor(p.status)}">
           ${esc(p.status || "unknown")}
@@ -1450,29 +1461,26 @@ async function loadProjects() {
           <h3 class="font-bold text-sm truncate">${esc(p.title)}</h3>
         </div>
       </div>
-    `
-    )
+    `)
     .join("");
 
   list.querySelectorAll(".project-card").forEach((card) => {
-    card.addEventListener("click", () => {
-      const id = card.dataset.id;
-      const found = projects.find((x) => String(x.id) === String(id));
-      card.addEventListener("click", async () => {
+    card.onclick = async () => {
       const id = card.dataset.id;
 
       try {
         const res = await fetchJSON(`/projects/${id}`);
+        
         if (!res || !res.success) {
           return toast("Project not found", "rgba(185,28,28,.85)");
         }
 
         openProjectDetail(res.project);
-      } catch {
+      } catch (err) {
+        console.error("Fetch error:", err);
         toast("Failed to load project", "rgba(185,28,28,.85)");
       }
-    });
-    });
+    };
   });
 }
 
