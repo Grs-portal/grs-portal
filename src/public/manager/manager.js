@@ -405,6 +405,28 @@
     }
   }
     
+  function renderProjectCard(p) {
+  return `
+    <div class="project-card surface-2 rounded-[18px] overflow-hidden relative group cursor-pointer transition-transform hover:-translate-y-1" data-id="${p.id}">
+      
+      <div class="absolute top-3 left-3 px-3 py-1 text-xs font-bold rounded-full ${getStatusColor(p.status)}">
+        ${esc(p.status || "unknown")}
+      </div>
+
+      <div class="h-40 w-full bg-gray-200">
+        ${
+          p.cover
+            ? `<img src="${p.cover}" class="w-full h-full object-cover"/>`
+            : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
+        }
+      </div>
+
+      <div class="p-3">
+        <h3 class="font-bold text-sm truncate">${esc(p.title)}</h3>
+      </div>
+    </div>
+  `;
+}
 
   async function loadDashboard() {
     const [courses, projects, hw] = await Promise.all([
@@ -412,18 +434,21 @@
       fetchJSON("/projects"), 
       fetchJSON("/homework")]);
 
-    qs("#activeCoursesCount").textContent = courses.length;
-    qs("#projectsCount").textContent = projects.length;
-    qs("#toGradeCount").textContent = hw.length;
+    const safeCourses = courses || [];
+    const safeProjects = projects || [];
+    const safeHw = hw || [];
+
+    qs("#activeCoursesCount").textContent = safeCourses.length;
+    qs("#projectsCount").textContent = safeProjects.length;
+    qs("#toGradeCount").textContent = safeHw.length;
 
     const projectBox = qs("#dashboardProjects");
     if (projectBox) {
-      projectBox.innerHTML = projects.map(p => renderProjectCard(p)).join("");
-      
+      projectBox.innerHTML = safeProjects.map(p => renderProjectCard(p)).join("");      
       projectBox.querySelectorAll(".project-card").forEach(card => {
         card.onclick = () => {
           const id = card.dataset.id;
-          const found = projects.find(x => String(x.id) === String(id));
+          const found = safeProjects.find(x => String(x.id) === String(id));
           if (found) openProjectDetail(found);
         };
       });
@@ -622,7 +647,7 @@
       });
     });
 
-    box.querySelectorAll(".del-course").forEach((btn) => {
+    container.querySelectorAll(".del-course").forEach((btn) => {
       btn.addEventListener("click", async (e) => {
         e.stopPropagation();
         const id = btn.dataset.id;
@@ -635,7 +660,7 @@
       });
     });
 
-    box.querySelectorAll(".edit-course").forEach((btn) => {
+    container.querySelectorAll(".edit-course").forEach((btn) => {
       btn.addEventListener("click", async (e) => {
         e.stopPropagation();
         const id = btn.dataset.id;
@@ -1443,26 +1468,7 @@ async function loadProjects() {
   const list = qs("#projectsFullList");
   if (!list) return;
 
-  list.innerHTML = projects
-    .map((p) => `
-      <div class="project-card surface-2 rounded-[18px] overflow-hidden relative group cursor-pointer transition-transform hover:-translate-y-1" data-id="${p.id}">
-        <div class="absolute top-3 left-3 px-3 py-1 text-xs font-bold rounded-full ${getStatusColor(p.status)}">
-          ${esc(p.status || "unknown")}
-        </div>
-        
-        <div class="h-40 w-full bg-gray-200">
-          ${
-            p.cover
-              ? `<img src="${p.cover}" class="w-full h-full object-cover"/>`
-              : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
-          }
-        </div>
-        <div class="p-3">
-          <h3 class="font-bold text-sm truncate">${esc(p.title)}</h3>
-        </div>
-      </div>
-    `)
-    .join("");
+list.innerHTML = (projects || []).map(renderProjectCard).join("");
 
   list.querySelectorAll(".project-card").forEach((card) => {
     card.onclick = async () => {
