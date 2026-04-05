@@ -1335,8 +1335,9 @@ async function openProgramDetail(id) {
     const projectCard = e.target.closest(".project-card");
     if (projectCard) {
       const id = projectCard.dataset.id;
-      if (id) openProjectDetail(id);
-    }
+      const projects = await fetchJSON("/projects");
+      const found = projects.find(x => String(x.id) === String(id));
+      if (found) openProjectDetail(found);    }
   });
 
 
@@ -1368,7 +1369,7 @@ function openCreateProjectModal() {
       <button class="btn-theme text-sm" onclick="addLink()">Insert Link</button>
     </div>
 
-    <div id="projectContent"
+    <div id="projectDescription"
       contenteditable="true"
       class="input-theme min-h-[200px] mb-4 overflow-y-auto">
     </div>
