@@ -311,6 +311,7 @@ if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 app.use("/uploads", express.static(uploadsDir));
 
 let upload = null;
+
 if (multer) {
   const storage = multer.diskStorage({
     destination: (req, file, cb) => cb(null, uploadsDir),
@@ -322,30 +323,105 @@ if (multer) {
 
   upload = multer({
     storage,
-    limits: { fileSize: 15 * 1024 * 1024 },
+    limits: { fileSize: 15 * 1024 * 1024 }, // 15MB
   });
 }
 
+// ---------- UPLOAD FILE (IMAGES + PDF/DOCS) ----------
 app.post("/api/upload", (req, res) => {
-  if (!upload) return res.status(500).json({ success: false, message: "Uploads not enabled (multer missing)" });
+  if (!upload) {
+    return res.status(500).json({
+      success: false,
+      message: "Multer not installed"
+    });
+  }
 
   upload.single("file")(req, res, (err) => {
-    if (err) return res.status(400).json({ success: false, message: err.message });
-    if (!req.file) return res.status(400).json({ success: false, message: "No file uploaded" });
+    if (err) {
+      return res.status(400).json({ success: false, message: err.message });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: "No file uploaded" });
+    }
 
     const ext = path.extname(req.file.originalname).toLowerCase();
-    if (ext !== ".pdf") {
+
+    const allowedImages = [".png", ".jpg", ".jpeg", ".webp", ".gif"];
+    const allowedDocs = [".pdf", ".doc", ".docx", ".txt"];
+
+    if (![...allowedImages, ...allowedDocs].includes(ext)) {
       try { fs.unlinkSync(req.file.path); } catch {}
-      return res.status(400).json({ success: false, message: "Only PDF allowed" });
+      return res.status(400).json({
+        success: false,
+        message: "Invalid file type. Allowed: images + pdf/doc/txt"
+      });
     }
+
+    const type = allowedImages.includes(ext) ? "image" : "document";
 
     return res.json({
       success: true,
+      type,
       url: `/uploads/${req.file.filename}`,
       originalName: req.file.originalname
     });
   });
 });
+
+// ---------- UPLOAD VIA IMAGE LINK ----------
+app.post("/api/upload-by-url", async (req, res) => {
+  try {
+    const { url } = req.body;
+
+    if (!url || !url.startsWith("http")) {
+      return res.status(400).json({
+        success: false,
+        message: "Valid URL required"
+      });
+    }
+
+    const ext = path.extname(url.split("?")[0]).toLowerCase();
+    const allowedImages = [".png", ".jpg", ".jpeg", ".webp", ".gif"];
+
+    if (!allowedImages.includes(ext)) {
+      return res.status(400).json({
+        success: false,
+        message: "Only image URLs allowed"
+      });
+    }
+
+    const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}${ext}`;
+    const filePath = path.join(uploadsDir, fileName);
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      return res.status(400).json({
+        success: false,
+        message: "Failed to fetch image"
+      });
+    }
+
+    const buffer = await response.arrayBuffer();
+    fs.writeFileSync(filePath, Buffer.from(buffer));
+
+    return res.json({
+      success: true,
+      type: "image",
+      url: `/uploads/${fileName}`
+    });
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      success: false,
+      message: "Upload via URL failed"
+    });
+  }
+});
+
+
 
 // ---------------- API ROUTES ----------------
 
