@@ -1366,11 +1366,7 @@ async function openProgramDetail(id) {
       return;
     }
 
-    const projectCard = e.target.closest(".project-card");
-    if (projectCard) {
-      const id = projectCard.dataset.id;
-      if (id) openProjectDetail(id);
-    }
+    
   });
 
 
