@@ -286,49 +286,13 @@
     });
   }
 
-  function goToPage(page) {
-    const pages = qsa(".page-section");
-    const links = qsa(".nav-item");
-
-    pages.forEach(p => p.classList.add("hidden"));
-    qs(`#${page}`)?.classList.remove("hidden");
-
-    links.forEach(l => l.classList.remove("active"));
-    qs(`.nav-item[data-page="${page}"]`)?.classList.add("active");
-  }
-
   function bindButtons() {
-    qs("#openCreateHw")?.addEventListener("click", async () => {
-      goToPage("submitted-homework");
-      await loadHomework();
-      openCreateHomeworkModal();
-    });
-
-    qs("#openCreateCourse")?.addEventListener("click", async () => {
-      goToPage("submitted-courses");
-      await loadCourses();
-      openCreateCourseModal();
-    });
-
-    qs("#openCreateProject")?.addEventListener("click", async () => {
-      goToPage("projects");
-      await loadProjects();
-      openCreateProjectModal();
-    });
-
-    qs("#createUserBtn")?.addEventListener("click", async () => {
-      goToPage("users");
-      await loadUsers();
-      openCreateUserModal();
-    });
-
-    qs("#createNewsBtn")?.addEventListener("click", async () => {
-      goToPage("news");
-      await loadNews();
-      openCreateNewsModal();
-    });
-
+    qs("#openCreateHw")?.addEventListener("click", openCreateHomeworkModal);
+    qs("#openCreateCourse")?.addEventListener("click", openCreateCourseModal);
     qs("#refreshUsersBtn")?.addEventListener("click", loadUsers);
+    qs("#createUserBtn")?.addEventListener("click", openCreateUserModal);
+    qs("#createNewsBtn")?.addEventListener("click", openCreateNewsModal);
+    qs("#openCreateProject")?.addEventListener("click", openCreateProjectModal);
   }
 
   function showModal(html) {
@@ -539,19 +503,6 @@ async function loadDashboard() {
     const container = list;
     if (!list) return;
 
-    if (!courses || courses.length === 0) {
-    list.innerHTML = `
-        <div class="surface-2 rounded-[24px] p-10 text-center flex flex-col items-center gap-4">
-          <div class="text-xl font-extrabold">No Programs Yet</div>
-          <div class="text-sm muted">Create your first program</div>
-          <button id="emptyCreateCourse" class="btn-theme">Create Program</button>
-        </div>
-      `;
-
-      qs("#emptyCreateCourse")?.addEventListener("click", openCreateCourseModal);
-      return;
-    }
-
     list.innerHTML = courses
       .map((c) => `
         <div class="course-card surface-2 rounded-[18px] overflow-hidden relative group cursor-pointer" data-id="${c.id}">
@@ -685,19 +636,6 @@ async function loadDashboard() {
     const list = qs("#homework-list");
     if (!list) return;
 
-    if (!hw || hw.length === 0) {
-      list.innerHTML = `
-        <div class="surface-2 rounded-[24px] p-10 text-center flex flex-col items-center gap-4">
-          <div class="text-xl font-extrabold">No Homework Yet</div>
-          <div class="text-sm muted">Create your first homework</div>
-          <button id="emptyCreateHw" class="btn-theme">Create Homework</button>
-        </div>
-      `;
-
-      qs("#emptyCreateHw")?.addEventListener("click", openCreateHomeworkModal);
-      return;
-    }
-
     list.innerHTML = hw
       .map(
         (h) => `
@@ -721,7 +659,7 @@ async function loadDashboard() {
       )
       .join("");
 
-    list.querySelectorAll(".del-hw").forEach((btn) => {
+    box.querySelectorAll(".del-hw").forEach((btn) => {
       btn.addEventListener("click", async () => {
         const id = btn.dataset.id;
         if (!confirm("Delete homework?")) return;
@@ -1366,7 +1304,11 @@ async function openProgramDetail(id) {
       return;
     }
 
-    
+    const projectCard = e.target.closest(".project-card");
+    if (projectCard) {
+      const id = projectCard.dataset.id;
+      if (id) openProjectDetail(id);
+    }
   });
 
 
@@ -1450,9 +1392,7 @@ async function createProject(status) {
 
     closeModal();
     toast(`Project ${status === "draft" ? "saved as draft" : "published"}`, "rgba(34,197,94,.7)");
-    loadProjects();
-    loadDashboard();
-    loadNotifications(); 
+    loadProjects(); 
   } catch {
     toast("Failed to create project", "rgba(185,28,28,.85)");
   }
@@ -1463,20 +1403,8 @@ async function loadProjects() {
   const list = qs("#projectsFullList");
   if (!list) return;
 
-if (!projects || projects.length === 0) {
-  list.innerHTML = `
-    <div class="surface-2 rounded-[24px] p-10 text-center flex flex-col items-center justify-center gap-4">
-      <div class="text-xl font-extrabold">No Projects Yet</div>
-      <div class="text-sm muted">Start by creating your first project</div>
-      <button id="emptyCreateProject" class="btn-theme mt-2">Create Project</button>
-    </div>
-  `;
+list.innerHTML = (projects || []).map(renderProjectCard).join("");
 
-  qs("#emptyCreateProject")?.addEventListener("click", openCreateProjectModal);
-  return;
-}
-
-list.innerHTML = projects.map(renderProjectCard).join("");
   list.querySelectorAll(".project-card").forEach((card) => {
     card.onclick = async () => {
       const id = card.dataset.id;
