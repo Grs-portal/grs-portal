@@ -929,16 +929,6 @@ async function loadDashboard() {
         </select>
       </div>
 
-      <div>
-        <label class="text-sm font-bold muted">What You Offer</label>
-        <select id="courseOffer" class="select-theme mt-1">
-          <option value="">All</option>
-          <option>Activities</option>
-          <option>Learning & deepening recovery knowledge</option>
-          <option>Regular offerings</option>
-          <option>Lived-experience training</option>
-        </select>
-      </div>
 
       <div>
           <label class="text-sm font-bold muted">Status</label>
@@ -1049,7 +1039,6 @@ function setupCourseForm() {
 
       programType: qs("#courseProgramType")?.value,
       theme: qs("#courseTheme")?.value,
-      offer: qs("#courseOffer")?.value,
 
       startDate: qs("#courseStartDate")?.value || null,
       endDate: qs("#courseEndDate")?.value || null,
@@ -1161,17 +1150,6 @@ function setupCourseForm() {
       </div>
 
       <div>
-        <label class="text-sm font-bold muted">What You Offer</label>
-        <select id="courseOffer" class="select-theme mt-1">
-          <option value="">All</option>
-          <option>Activities</option>
-          <option>Learning & deepening recovery knowledge</option>
-          <option>Regular offerings</option>
-          <option>Lived-experience training</option>
-        </select>
-      </div>
-
-      <div>
           <label class="text-sm font-bold muted">Status</label>
           <select id="courseStatus" class="select-theme mt-1">
             <option value="">All</option>
@@ -1222,7 +1200,6 @@ function setupCourseForm() {
 
   qs("#courseProgramType").value = course.programType || "";
   qs("#courseTheme").value = course.theme || "";
-  qs("#courseOffer").value = course.offer || "";
 
   qs("#courseStatus").value = course.status || "draft";
 
@@ -1243,7 +1220,6 @@ function setupCourseForm() {
 
     programType: qs("#courseProgramType").value,
     theme: qs("#courseTheme").value,
-    offer: qs("#courseOffer").value,
 
     startDate: qs("#courseStartDate").value || null,
     endDate: qs("#courseEndDate").value || null,
@@ -1338,10 +1314,6 @@ async function openProgramDetail(id) {
             <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
               <div class="font-bold text-lg">${esc(data.theme || "-")}</div>
               <div class="text-xs muted">Theme</div>
-            </div>
-            <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
-              <div class="font-bold text-lg">${esc(data.offer || "-")}</div>
-              <div class="text-xs muted">Offer</div>
             </div>
             <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
               <div class="text-sm">${data.startDate ? new Date(data.startDate).toLocaleDateString() : "-"}</div>
