@@ -73,7 +73,6 @@ function defaultData() {
     
         programType: "ALL",
         theme: "ALL",
-        offer: "ALL",
     
         startDate: null,
         endDate: null,
@@ -840,7 +839,6 @@ app.post("/api/courses", (req, res) => {
     sessionsUnit = "",
     programType = "",
     theme = "",
-    offer = "",
     startDate = null,
     endDate = null,
     status = "draft"
@@ -865,7 +863,6 @@ app.post("/api/courses", (req, res) => {
 
     programType,
     theme,
-    offer,
 
     startDate,
     endDate,
