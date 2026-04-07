@@ -405,14 +405,33 @@
     }
   }
     
-  function renderProjectCard(p) {
+
+function renderProjectCard(p) {
   return `
-    <div class="project-card surface-2 rounded-[18px] overflow-hidden relative group cursor-pointer transition-transform hover:-translate-y-1" data-id="${p.id}">
-      
+    <div class="project-card surface-2 rounded-[18px] overflow-hidden relative group cursor-pointer" data-id="${p.id}">
+
+      <!-- STATUS -->
       <div class="absolute top-3 left-3 px-3 py-1 text-xs font-bold rounded-full ${getStatusColor(p.status)}">
         ${esc(p.status || "unknown")}
       </div>
 
+      <!-- MENU -->
+      <div class="absolute top-3 right-3">
+        <button class="menu-btn text-xl px-2 py-1 rounded-lg bg-black/40 text-white" data-id="${p.id}">
+          ⋮
+        </button>
+
+        <div class="menu hidden absolute right-0 mt-2 w-32 surface-2 rounded-xl shadow-lg p-2 z-50">
+          <button class="edit-project block w-full text-left px-3 py-2 hover:bg-white/10 rounded" data-id="${p.id}">
+            Edit
+          </button>
+          <button class="del-project block w-full text-left px-3 py-2 hover:bg-white/10 rounded text-red-400" data-id="${p.id}">
+            Delete
+          </button>
+        </div>
+      </div>
+
+      <!-- COVER -->
       <div class="h-40 w-full bg-gray-200">
         ${
           p.cover
@@ -421,9 +440,11 @@
         }
       </div>
 
+      <!-- TITLE -->
       <div class="p-3">
         <h3 class="font-bold text-sm truncate">${esc(p.title)}</h3>
       </div>
+
     </div>
   `;
 }
@@ -1189,7 +1210,69 @@ function setupCourseForm() {
     </form>
   `);
 
-    
+  // PREFILL VALUES
+  qs("#courseTitle").value = course.title || "";
+  qs("#courseDescription").value = course.description || "";
+
+  qs("#courseDurationValue").value = course.durationValue || "";
+  qs("#courseDurationUnit").value = course.durationUnit || "minutes";
+
+  qs("#courseSessionsValue").value = course.sessionsValue || "";
+  qs("#courseSessionsUnit").value = course.sessionsUnit || "daily";
+
+  qs("#courseProgramType").value = course.programType || "";
+  qs("#courseTheme").value = course.theme || "";
+  qs("#courseOffer").value = course.offer || "";
+
+  qs("#courseStatus").value = course.status || "draft";
+
+  qs("#courseStartDate").value = course.startDate || "";
+  qs("#courseEndDate").value = course.endDate || "";
+
+
+  qs("#publishCourseBtn")?.addEventListener("click", async () => {
+  const updated = {
+    title: qs("#courseTitle").value.trim(),
+    description: qs("#courseDescription").value.trim(),
+
+    durationValue: qs("#courseDurationValue").value,
+    durationUnit: qs("#courseDurationUnit").value,
+
+    sessionsValue: qs("#courseSessionsValue").value,
+    sessionsUnit: qs("#courseSessionsUnit").value,
+
+    programType: qs("#courseProgramType").value,
+    theme: qs("#courseTheme").value,
+    offer: qs("#courseOffer").value,
+
+    startDate: qs("#courseStartDate").value || null,
+    endDate: qs("#courseEndDate").value || null,
+
+    status: qs("#courseStatus").value || "draft"
+  };
+
+  try {
+        const res = await fetch(`${API}/courses/${course.id}`, {
+          method: "PUT",
+          headers: jsonHeaders(),
+          body: JSON.stringify(updated)
+        });
+
+        const out = await safeJson(res);
+
+        if (!res.ok || !out?.success) {
+          return toast(out?.message || "Update failed", "rgba(185,28,28,.85)");
+        }
+
+        closeModal();
+        toast("Course updated", "rgba(34,197,94,.7)");
+
+        loadCourses();
+        loadDashboard();
+      } catch {
+        toast("Server error", "rgba(185,28,28,.85)");
+      }
+    }); 
   }
 
 
@@ -1434,6 +1517,52 @@ async function loadProjects() {
   if (!list) return;
 
 list.innerHTML = (projects || []).map(renderProjectCard).join("");
+
+  // TOGGLE MENU
+list.querySelectorAll(".menu-btn").forEach((btn) => {
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+
+    document.querySelectorAll(".menu").forEach(m => m.classList.add("hidden"));
+
+    btn.nextElementSibling.classList.toggle("hidden");
+  });
+});
+
+// DELETE
+list.querySelectorAll(".del-project").forEach((btn) => {
+  btn.addEventListener("click", async (e) => {
+    e.stopPropagation();
+
+    const id = btn.dataset.id;
+    if (!confirm("Delete project?")) return;
+
+    const res = await fetch(`${API}/projects/${id}`, {
+      method: "DELETE",
+      headers: actorHeaders()
+    });
+
+    if (!res.ok) return toast("Delete failed", "rgba(185,28,28,.85)");
+
+    toast("Deleted", "rgba(185,28,28,.85)");
+    loadProjects();
+    loadDashboard();
+  });
+});
+
+// EDIT
+list.querySelectorAll(".edit-project").forEach((btn) => {
+  btn.addEventListener("click", async (e) => {
+    e.stopPropagation();
+
+    const id = btn.dataset.id;
+
+    const res = await fetchJSON(`/projects/${id}`);
+    if (!res || !res.success) return toast("Project not found", "rgba(185,28,28,.85)");
+
+    openEditProjectModal(res.project);
+  });
+});
 
   list.querySelectorAll(".project-card").forEach((card) => {
     card.onclick = async () => {
