@@ -961,15 +961,6 @@ async function loadDashboard() {
   setupCourseForm();
 }
 
-function toBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
 
 let forceDraft = false;
 
@@ -994,7 +985,26 @@ function setupCourseForm() {
     e.preventDefault();
 
     const file = qs("#courseCover")?.files?.[0];
-    const cover = file ? await toBase64(file) : "";
+
+    let cover = "";
+
+    if (file) {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch(`${API}/upload`, {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        return toast("Image upload failed", "rgba(185,28,28,.85)");
+      }
+
+      cover = data.url; 
+    }
 
     const selectedStatus = qs("#courseStatus")?.value;
     
@@ -1368,11 +1378,31 @@ window.addLink = function () {
 async function createProject(status) {
   const title = qs("#projectTitle")?.value.trim();
   const file = qs("#projectCover")?.files?.[0];
+
+  let cover = "";
+
+  if (file) {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await fetch(`${API}/upload`,{
+      method: "POST",
+      body: formData
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      return toast("Upload failed", "rgba(185,28,28,.85)");
+    }
+
+    cover = data.url;
+  }
   const description = qs("#projectDescription")?.innerHTML;
 
   if (!title) return toast("Title required", "rgba(185,28,28,.85)");
 
-  const cover = file ? await toBase64(file) : "";
+  
 
   const newProject = {
     title,
