@@ -1230,7 +1230,7 @@ function setupCourseForm() {
   qs("#courseEndDate").value = course.endDate || "";
 
 
-  qs("#publishCourseBtn")?.addEventListener("click", async () => {
+  qs("#saveDraftBtn")?.addEventListener("click", async () => {
   const updated = {
     title: qs("#courseTitle").value.trim(),
     description: qs("#courseDescription").value.trim(),
@@ -1582,6 +1582,8 @@ list.querySelectorAll(".edit-project").forEach((btn) => {
       }
     };
   });
+
+  if (e.target.closest(".menu-btn") || e.target.closest(".menu")) return;
 }
 
 function openProjectDetail(project) {
@@ -1634,6 +1636,105 @@ function openProjectDetail(project) {
     }
   };
   window.addEventListener("keydown", escHandler);
+}
+
+function openEditProjectModal(project) {
+  showModal(`
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-extrabold">Edit Project</h2>
+      <button id="cancelModal" class="btn-theme text-sm">Cancel</button>
+    </div>
+
+    <label class="text-sm font-bold muted">Title</label>
+    <input id="projectTitle" class="input-theme mt-1 mb-3" />
+
+    <label class="text-sm font-bold muted">Cover</label>
+    <input id="projectCover" type="file" accept="image/*" class="mb-3"/>
+
+    <label class="text-sm font-bold muted">Content</label>
+
+    <div class="flex gap-2 mb-2">
+      <button class="btn-theme text-sm" onclick="document.execCommand('bold')">Bold</button>
+      <button class="btn-theme text-sm" onclick="document.execCommand('italic')">Italic</button>
+      <button class="btn-theme text-sm" onclick="document.execCommand('insertUnorderedList')">• List</button>
+      <button class="btn-theme text-sm" onclick="addImage()">Insert Image</button>
+      <button class="btn-theme text-sm" onclick="addLink()">Insert Link</button>
+    </div>
+
+    <div id="projectDescription"
+      contenteditable="true"
+      class="input-theme min-h-[200px] mb-4 overflow-y-auto">
+    </div>
+
+    <div class="flex justify-end gap-3 mt-4">
+      <button id="saveDraftProjectBtn" class="btn-theme">Save Draft</button>
+      <button id="publishProjectBtn" class="btn-theme">Publish</button>
+    </div>
+  `);
+
+  //  PREFILL
+  qs("#projectTitle").value = project.title || "";
+  qs("#projectDescription").innerHTML = project.description || "";
+
+  // SAVE (PUT)
+  qs("#saveDraftProjectBtn")?.addEventListener("click", async () => {
+    const title = qs("#projectTitle").value.trim();
+    const description = qs("#projectDescription").innerHTML;
+    const file = qs("#projectCover")?.files?.[0];
+
+    if (!title) return toast("Title required", "rgba(185,28,28,.85)");
+
+    let cover = project.cover || "";
+
+    // Upload new cover ONLY if changed
+    if (file) {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch(`${API}/upload`, {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        return toast("Image upload failed", "rgba(185,28,28,.85)");
+      }
+
+      cover = data.url;
+    }
+
+    const updatedProject = {
+      title,
+      description,
+      cover,
+      status: project.status || "draft"
+    };
+
+    try {
+      const res = await fetch(`${API}/projects/${project.id}`, {
+        method: "PUT",
+        headers: jsonHeaders(),
+        body: JSON.stringify(updatedProject)
+      });
+
+      const out = await safeJson(res);
+
+      if (!res.ok || !out?.success) {
+        return toast(out?.message || "Update failed", "rgba(185,28,28,.85)");
+      }
+
+      closeModal();
+      toast("Project updated", "rgba(34,197,94,.7)");
+
+      loadProjects();
+      loadDashboard();
+    } catch (err) {
+      console.error(err);
+      toast("Server error", "rgba(185,28,28,.85)");
+    }
+  });
 }
 
 
