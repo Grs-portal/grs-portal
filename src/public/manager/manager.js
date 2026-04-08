@@ -537,55 +537,6 @@ async function loadDashboard() {
       .join("");
   }
 
-  async function loadHomework() {
-    const hw = await fetchJSON("/homework");
-    const list = qs("#homework-list");
-    if (!list) return;
-
-    list.innerHTML = hw
-      .map(
-        (h) => `
-      <div class="surface-2 p-4 rounded-[18px] flex justify-between items-start">
-        <div>
-          <div class="font-extrabold">${esc(h.title)}</div>
-          <div class="text-sm muted">${esc(h.description || "")}</div>
-          <div class="text-xs muted mt-2">By: ${esc(h.submitted_by || "N/A")} · ${esc(h.course || "")}</div>
-          ${
-            h.pdfUrl
-              ? `<a class="text-xs underline" href="${esc(h.pdfUrl)}" target="_blank">PDF: ${esc(h.pdfName || "View")}</a>`
-              : ""
-          }
-        </div>
-        <div class="flex gap-2">
-          <button class="edit-hw icon-btn" data-id="${h.id}" title="Edit">✏️</button>
-          <button class="del-hw icon-btn" data-id="${h.id}" title="Delete">🗑</button>
-        </div>
-      </div>
-    `
-      )
-      .join("");
-
-    list.querySelectorAll(".del-hw").forEach((btn) => {
-      btn.addEventListener("click", async () => {
-        const id = btn.dataset.id;
-        if (!confirm("Delete homework?")) return;
-        const r = await fetch(`${API}/homework/${id}`, { method: "DELETE", headers: actorHeaders() });
-        if (!r.ok) return toast("Delete failed", "rgba(185,28,28,.85)");
-        toast("Deleted", "rgba(185,28,28,.85)");
-        loadHomework();
-        loadDashboard();
-      });
-    });
-
-    list.querySelectorAll(".edit-hw").forEach((btn) => {
-      btn.addEventListener("click", async () => {
-        const id = btn.dataset.id;
-        const found = hw.find((x) => String(x.id) === String(id));
-        if (found) openEditHomeworkModal(found);
-      });
-    });
-  }
-
 
 
   /* =========================
@@ -1778,6 +1729,139 @@ function openEditProjectModal(project) {
 }
 
 
+//------------- HOMEWORKS ----------------
+
+
+async function loadHomework() {
+  const data = await fetchJSON("/homework");
+  const createdList = qs("#homework-created");     // teacher assignments
+  const submittedList = qs("#homework-submitted"); // student submissions
+
+  if (!createdList || !submittedList) return;
+
+  const created = data.created || [];
+  const submitted = data.submitted || [];
+
+  // =========================
+  // TEACHER CREATED
+  // =========================
+  createdList.innerHTML = !created.length
+    ? `<div class="surface-2 p-4 rounded-[18px] text-sm muted">No assignments created.</div>`
+    : created.map(h => `
+      <div class="surface-2 p-4 rounded-[18px] flex justify-between items-start">
+        <div class="flex-1">
+          <div class="font-extrabold">${esc(h.title)}</div>
+          <div class="text-sm muted">${esc(h.description || "")}</div>
+
+          <div class="text-xs muted mt-2">
+            Program: ${esc(h.course)} · Created: ${new Date(h.createdAt).toLocaleDateString()}
+          </div>
+
+          <div class="text-xs muted">
+            Due: ${h.dueDate ? new Date(h.dueDate).toLocaleDateString() : "-"}
+          </div>
+
+          <div class="text-xs muted">
+            By: ${esc(h.createdBy || "Manager")}
+          </div>
+
+          ${h.pdfUrl ? `<a href="${h.pdfUrl}" target="_blank" class="text-xs underline">View File</a>` : ""}
+        </div>
+
+        <div class="relative">
+          <button class="menu-btn btn-theme text-sm">⋮</button>
+
+          <div class="menu hidden absolute right-0 mt-2 w-40 bg-white rounded-xl shadow-lg border z-50">
+            <button class="view-hw block w-full text-left px-4 py-2 hover:bg-gray-100" data-id="${h.id}">
+              View
+            </button>
+            <button class="edit-hw block w-full text-left px-4 py-2 hover:bg-gray-100" data-id="${h.id}">
+              Edit
+            </button>
+            <button class="del-hw block w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500" data-id="${h.id}">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    `).join("");
+
+  // =========================
+  // STUDENT SUBMISSIONS
+  // =========================
+  submittedList.innerHTML = !submitted.length
+    ? `<div class="surface-2 p-4 rounded-[18px] text-sm muted">No submissions yet.</div>`
+    : submitted.map(s => `
+      <div class="surface-2 p-4 rounded-[18px] flex justify-between items-start">
+        <div>
+          <div class="font-extrabold">${esc(s.title)}</div>
+          <div class="text-sm muted">
+            ${esc(s.studentName)} · ${esc(s.course)}
+          </div>
+        </div>
+
+        <div class="relative">
+          <button class="menu-btn btn-theme text-sm">⋮</button>
+
+          <div class="menu hidden absolute right-0 mt-2 w-40 bg-white rounded-xl shadow-lg border z-50">
+            <button class="view-sub block w-full text-left px-4 py-2 hover:bg-gray-100" data-id="${s.id}">
+              View
+            </button>
+            <button class="grade-sub block w-full text-left px-4 py-2 hover:bg-gray-100">
+              Grade
+            </button>
+          </div>
+        </div>
+      </div>
+    `).join("");
+
+  // =========================
+  // MENU TOGGLE
+  // =========================
+  document.querySelectorAll(".menu-btn").forEach(btn => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      document.querySelectorAll(".menu").forEach(m => m.classList.add("hidden"));
+      btn.nextElementSibling.classList.toggle("hidden");
+    };
+  });
+
+  // =========================
+  // EVENTS
+  // =========================
+  createdList.querySelectorAll(".view-hw").forEach(btn => {
+    btn.onclick = () => openHomeworkDetail(btn.dataset.id);
+  });
+
+  createdList.querySelectorAll(".edit-hw").forEach(btn => {
+    const found = created.find(x => String(x.id) === btn.dataset.id);
+    if (found) btn.onclick = () => openEditHomeworkModal(found);
+  });
+
+  createdList.querySelectorAll(".del-hw").forEach(btn => {
+    btn.onclick = async () => {
+      if (!confirm("Delete assignment?")) return;
+
+      await fetch(`${API}/homework/${btn.dataset.id}`, {
+        method: "DELETE",
+        headers: actorHeaders()
+      });
+
+      toast("Deleted", "rgba(185,28,28,.85)");
+      loadHomework();
+    };
+  });
+
+  submittedList.querySelectorAll(".view-sub").forEach(btn => {
+    btn.onclick = () => openSubmissionDetail(btn.dataset.id);
+  });
+
+  submittedList.querySelectorAll(".grade-sub").forEach(btn => {
+    btn.onclick = () => openGradeModal(btn.dataset.id);
+  });
+}
+
+
   
   function openCreateHomeworkModal() {
     showModal(`
@@ -1878,6 +1962,119 @@ function openEditProjectModal(project) {
       loadNotifications();
     });
   }
+
+  async function openHomeworkDetail(id) {
+  const res = await fetchJSON(`/homework/${id}`);
+    if (!res?.success) return toast("Not found", "rgba(185,28,28,.85)");
+
+    const h = res.homework;
+
+    const bg = document.createElement("div");
+    bg.className = "fixed inset-0 bg-black/60 flex items-center justify-center z-[9999] backdrop-blur-md";
+
+    bg.innerHTML = `
+      <div class="surface-2 w-full max-w-2xl p-6 rounded-[24px] relative">
+
+        <button id="closeDetail" class="absolute top-4 right-4">✕</button>
+
+        <h1 class="text-2xl font-extrabold mb-2">${esc(h.title)}</h1>
+
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-full bg-indigo-400 flex items-center justify-center text-white">
+            ${initials(h.createdBy || "U")}
+          </div>
+          <div>${esc(h.createdBy || "Unknown")}</div>
+        </div>
+
+        <div class="text-sm muted mb-2">Program: ${esc(h.course)}</div>
+        <div class="text-sm muted mb-2">Created: ${new Date(h.createdAt).toLocaleDateString()}</div>
+        <div class="text-sm muted mb-4">Due: ${h.dueDate ? new Date(h.dueDate).toLocaleDateString() : "-"}</div>
+
+        <div class="text-sm mb-4">${esc(h.description || "")}</div>
+
+        ${h.pdfUrl ? `<a href="${h.pdfUrl}" target="_blank" class="underline text-sm">View File</a>` : ""}
+
+      </div>
+    `;
+
+    document.body.appendChild(bg);
+    bg.onclick = (e) => { if (e.target === bg) bg.remove(); };
+    bg.querySelector("#closeDetail").onclick = () => bg.remove();
+  }
+
+
+  async function openSubmissionDetail(id) {
+  const res = await fetchJSON(`/submissions/${id}`);
+  if (!res?.success) return;
+
+  const s = res.submission;
+
+  const bg = document.createElement("div");
+  bg.className = "fixed inset-0 bg-black/60 flex items-center justify-center z-[9999]";
+
+  bg.innerHTML = `
+    <div class="surface-2 w-full max-w-2xl p-6 rounded-[24px] relative">
+
+      <button id="closeDetail">✕</button>
+
+      <h1 class="text-xl font-extrabold">${esc(s.title)}</h1>
+
+      <div class="flex items-center gap-3 my-4">
+        <div class="w-10 h-10 rounded-full bg-indigo-400 flex items-center justify-center text-white">
+          ${initials(s.studentName)}
+        </div>
+        <div>${esc(s.studentName)}</div>
+      </div>
+
+      <div class="text-xs muted mb-2">
+        Submitted: ${new Date(s.createdAt).toLocaleDateString()}
+      </div>
+
+      <div class="mb-4">${esc(s.comment || "")}</div>
+
+      ${s.pdfUrl ? `<a href="${s.pdfUrl}" target="_blank" class="underline">View File</a>` : ""}
+
+      <button id="gradeBtn" class="btn-theme mt-4">Grade</button>
+    </div>
+  `;
+
+  document.body.appendChild(bg);
+
+  qs("#gradeBtn").onclick = () => openGradeModal(id);
+}
+
+function openGradeModal(id) {
+  showModal(`
+    <h2 class="text-xl font-extrabold mb-4">Grade Submission</h2>
+
+    <label class="text-sm font-bold muted">Grade</label>
+    <input id="gradeValue" class="input-theme mt-1 mb-3" placeholder="e.g. 8/10" />
+
+    <label class="text-sm font-bold muted">Comment</label>
+    <textarea id="gradeComment" class="input-theme mt-1 mb-4"></textarea>
+
+    <div class="flex justify-end gap-2">
+      <button id="submitGrade" class="btn-theme">Submit</button>
+    </div>
+  `);
+
+  qs("#submitGrade").onclick = async () => {
+    const grade = qs("#gradeValue").value;
+    const comment = qs("#gradeComment").value;
+
+    await fetch(`${API}/submissions/${id}/grade`, {
+      method: "POST",
+      headers: jsonHeaders(),
+      body: JSON.stringify({ grade, comment })
+    });
+
+    closeModal();
+    toast("Graded successfully", "rgba(34,197,94,.7)");
+  };
+}
+
+
+  
 
   function openCreateUserModal() {
     showModal(`
