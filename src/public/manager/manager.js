@@ -1,1332 +1,2204 @@
-/* server.js */
-const express = require("express");
-const cors = require("cors");
-const path = require("path");
-const fs = require("fs");
-const { Resend } = require("resend");
+// manager.js
+(() => {
+  const API = "/api";
+  const LOGIN = "/homepage/login-manager.html";
 
-// Multer (uploads)
-let multer = null;
-try {
-  multer = require("multer");
-} catch (e) {
-  console.warn("⚠️ multer not installed. Uploads will be disabled until you install it.");
-}
+  const qs = (s) => document.querySelector(s);
+  const qsa = (s) => [...document.querySelectorAll(s)];
 
-const app = express();
-const PORT = process.env.PORT || 3000;
-
-// ---------------- EMAIL SETUP (RESEND API) ----------------
-const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
-const RESEND_FROM = process.env.RESEND_FROM || "Hofi Korsou <onboarding@resend.dev>";
-
-let resend = null;
-if (RESEND_API_KEY) {
-  resend = new Resend(RESEND_API_KEY);
-  console.log("✅ Resend email API ready");
-} else {
-  console.warn("⚠️ RESEND_API_KEY missing. News emails will be disabled.");
-}
-
-// ---------------- MIDDLEWARES ----------------
-app.use(cors());
-app.use(express.json());
-
-// ---------------- DETERMINE PUBLIC ROOT ----------------
-let rootDir = __dirname;
-
-if (!fs.existsSync(path.join(rootDir, "public"))) {
-  if (fs.existsSync(path.join(__dirname, "src", "public"))) {
-    rootDir = path.join(__dirname, "src");
-  } else {
-    console.error("❌ Could not find public/ folder (root/public or root/src/public).");
-    process.exit(1);
-  }
-}
-
-const publicDir = path.join(rootDir, "public");
-console.log("✅ Serving static files from:", publicDir);
-app.use(express.static(publicDir));
-
-// ---------------- SIMPLE FILE DB ----------------
-const DATA_FILE = path.join(__dirname, "data.json");
-
-function defaultData() {
-  return {
-    accounts: [
-      { username: "root", password: "1234", role: "instructor", name: "Instructor Root", email: "", avatarUrl: "" },
-      { username: "manager", password: "9999", role: "manager", name: "Project Manager", email: "", avatarUrl: "" },
-      { username: "student", password: "1234", role: "student", name: "Student", email: "", avatarUrl: "" },
-    ],
-    courses: [
-      {
-        id: 1,
-        title: "Intro to Programming",
-        description: "Learn JS basics",
-        cover: "",
-    
-        durationValue: "2",
-        durationUnit: "hours",
-    
-        sessionsValue: "8",
-        sessionsUnit: "weekly",
-    
-        programType: "ALL",
-        theme: "ALL",
-        offer: "ALL",
-    
-        startDate: null,
-        endDate: null,
-        status: "draft"
-      }
-    ],
-    homework: [
-      {
-        id: 1,
-        title: "Week 1 Assignment",
-        description: "Intro tasks",
-        submitted_by: "John Doe",
-        course: "Intro to Programming",
-        pdfUrl: "",
-        pdfName: ""
-      },
-    ],
-    students: [
-      { enrollment_id: 1, name: "John Doe", course: "Intro to Programming", grade: 9, username: "student" }
-    ],
-    notifications: [],
-    schedule: [],
-    news: [],
-    projects: []
+  const toast = (msg, color = "rgba(0,0,0,.75)") => {
+    const t = document.createElement("div");
+    t.className =
+      "fixed bottom-4 right-4 px-4 py-2 rounded-xl text-white shadow z-[9999] backdrop-blur-md border border-white/15";
+    t.style.background = color;
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2500);
   };
-}
 
-function loadData() {
-  try {
-    if (!fs.existsSync(DATA_FILE)) {
-      fs.writeFileSync(DATA_FILE, JSON.stringify(defaultData(), null, 2));
+  const esc = (s) =>
+    String(s || "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;");
+
+  function initials(name) {
+    const parts = String(name || "").trim().split(/\s+/).filter(Boolean);
+    const a = parts[0]?.[0] || "M";
+    const b = parts[1]?.[0] || "";
+    return (a + b).toUpperCase();
+  }
+
+  const actorHeaders = () => ({
+    "x-role": localStorage.getItem("role") || "",
+    "x-username": localStorage.getItem("username") || "",
+    "x-name": localStorage.getItem("userName") || "",
+  });
+
+  const jsonHeaders = () => ({
+    ...actorHeaders(),
+    "Content-Type": "application/json",
+  });
+
+  document.addEventListener("DOMContentLoaded", init);
+
+  async function init() {
+    if (localStorage.getItem("isLoggedIn") !== "true") return (location.href = LOGIN);
+    if (localStorage.getItem("role") !== "manager") return (location.href = LOGIN);
+
+    qs("#y").textContent = new Date().getFullYear();
+
+    setupThemeUI(true);
+    setupProfileDropdown();
+    renderTopbarIdentity();
+    setupPersonalizeModal();
+    setupMobileSidebar();
+    setupNav();
+    bindButtons();
+
+    setupNotificationsUI();
+    loadNotifications();
+    setInterval(loadNotifications, 15000);
+
+    await loadMeIntoUI();
+    await loadDashboard();
+  }
+
+  function applyTheme(theme) {
+    const t = theme || "light";
+    document.documentElement.dataset.theme = t;
+    localStorage.setItem("theme", t);
+  }
+
+  function setupThemeUI(forceDefaultLight = false) {
+    const saved = localStorage.getItem("theme");
+    if (forceDefaultLight && !saved) applyTheme("light");
+    else applyTheme(saved || "light");
+
+    qsa(".themePick").forEach((b) => {
+      b.addEventListener("click", (e) => {
+        e.preventDefault();
+        applyTheme(b.dataset.theme);
+      });
+    });
+  }
+
+  function logout() {
+    localStorage.clear();
+    location.href = LOGIN;
+  }
+
+  function renderTopbarIdentity() {
+    const name = localStorage.getItem("userName") || "Manager";
+    qs("#userName").textContent = name;
+
+    const avatarEl = qs("#userAvatar");
+    const avatarData = localStorage.getItem("userAvatar") || "";
+
+    if (!avatarEl) return;
+
+    if (avatarData) {
+      avatarEl.style.backgroundImage = `url(${avatarData})`;
+      avatarEl.style.backgroundSize = "cover";
+      avatarEl.style.backgroundPosition = "center";
+      avatarEl.textContent = "";
+    } else {
+      avatarEl.style.backgroundImage = "";
+      avatarEl.textContent = initials(name);
+    }
+  }
+
+  function setupProfileDropdown() {
+    qs("#userAvatar")?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      qs("#profileMenu")?.classList.toggle("hidden");
+    });
+
+    qs("#logoutBtn")?.addEventListener("click", logout);
+    qs("#sidebarLogout")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      logout();
+    });
+
+    document.addEventListener("click", (e) => {
+      const wrap = qs("#topAvatarWrap");
+      if (wrap && !wrap.contains(e.target)) qs("#profileMenu")?.classList.add("hidden");
+    });
+  }
+
+  function openPersonalize() {
+    qs("#personalizeBg")?.classList.remove("hidden");
+    qs("#personalizeBg")?.classList.add("flex");
+    document.body.style.overflow = "hidden";
+    loadPersonalizeFields();
+  }
+
+  function closePersonalize() {
+    qs("#personalizeBg")?.classList.add("hidden");
+    qs("#personalizeBg")?.classList.remove("flex");
+    document.body.style.overflow = "";
+  }
+
+  function loadPersonalizeFields() {
+    const name = localStorage.getItem("userName") || "Manager";
+    const avatarData = localStorage.getItem("userAvatar") || "";
+    const email = localStorage.getItem("userEmail") || "";
+
+    const nameInput = qs("#profileNameInput");
+    const emailInput = qs("#profileEmailInput");
+    const preview = qs("#profileAvatarPreview");
+
+    if (nameInput) nameInput.value = name;
+    if (emailInput) emailInput.value = email;
+
+    if (preview) {
+      if (avatarData) {
+        preview.style.backgroundImage = `url(${avatarData})`;
+        preview.style.backgroundSize = "cover";
+        preview.style.backgroundPosition = "center";
+        preview.textContent = "";
+      } else {
+        preview.style.backgroundImage = "";
+        preview.textContent = initials(name);
+      }
+    }
+  }
+
+  function setupPersonalizeModal() {
+    qs("#openPersonalize")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      qs("#profileMenu")?.classList.add("hidden");
+      openPersonalize();
+    });
+
+    qs("#closePersonalize")?.addEventListener("click", closePersonalize);
+
+    qs("#personalizeBg")?.addEventListener("click", (e) => {
+      if (e.target === qs("#personalizeBg")) closePersonalize();
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closePersonalize();
+    });
+
+    qs("#profilePhotoInput")?.addEventListener("change", (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        localStorage.setItem("userAvatar", ev.target.result);
+        loadPersonalizeFields();
+        renderTopbarIdentity();
+      };
+      reader.readAsDataURL(file);
+    });
+
+    qs("#removeAvatarBtn")?.addEventListener("click", () => {
+      localStorage.removeItem("userAvatar");
+      loadPersonalizeFields();
+      renderTopbarIdentity();
+    });
+
+    qs("#savePersonalize")?.addEventListener("click", async () => {
+      const newName = (qs("#profileNameInput")?.value || "").trim() || "Manager";
+      const newEmail = (qs("#profileEmailInput")?.value || "").trim();
+
+      localStorage.setItem("userName", newName);
+      localStorage.setItem("userEmail", newEmail);
+
+      try {
+        const res = await fetch(`${API}/me`, {
+          method: "PUT",
+          headers: jsonHeaders(),
+          body: JSON.stringify({ name: newName, email: newEmail }),
+        });
+        const out = await safeJson(res);
+        if (!res.ok || !out?.success) {
+          toast(out?.message || "Could not save email to server", "rgba(185,28,28,.85)");
+        } else {
+          toast("Saved", "rgba(34,197,94,.70)");
+        }
+      } catch {
+        toast("Server error saving profile", "rgba(185,28,28,.85)");
+      }
+
+      renderTopbarIdentity();
+      await loadMeIntoUI();
+      closePersonalize();
+    });
+  }
+
+  async function loadMeIntoUI() {
+    const topEmail = qs("#topEmail");
+    try {
+      const res = await fetch(`${API}/me`, { headers: actorHeaders() });
+      const out = await safeJson(res);
+      const email = out?.user?.email || localStorage.getItem("userEmail") || "";
+      if (email) localStorage.setItem("userEmail", email);
+      if (topEmail) topEmail.textContent = email || "—";
+    } catch {
+      if (topEmail) topEmail.textContent = localStorage.getItem("userEmail") || "—";
+    }
+  }
+
+  function setupMobileSidebar() {
+    const menuBtn = qs("#menuBtn");
+    const sidebar = qs("#sidebar");
+    const overlay = qs("#overlay");
+    if (!menuBtn || !sidebar || !overlay) return;
+
+    menuBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("-translate-x-full");
+      overlay.classList.toggle("hidden");
+    });
+
+    overlay.addEventListener("click", () => {
+      sidebar.classList.add("-translate-x-full");
+      overlay.classList.add("hidden");
+    });
+  }
+
+  function setupNav() {
+    const pages = qsa(".page-section");
+    const links = qsa(".nav-item");
+
+    links.forEach((link) => {
+      link.addEventListener("click", async (e) => {
+        e.preventDefault();
+        const page = link.dataset.page;
+        if (!page) return;
+
+        pages.forEach((p) => p.classList.add("hidden"));
+        qs(`#${page}`)?.classList.remove("hidden");
+
+        links.forEach((l) => l.classList.remove("active"));
+        link.classList.add("active");
+
+        if (page === "dashboard") await loadDashboard();
+        if (page === "students") await loadStudents();
+        if (page === "projects") await loadProjects();
+        if (page === "submitted-homework") await loadHomework();
+        if (page === "submitted-courses") await loadCourses();
+        if (page === "users") await loadUsers();
+        if (page === "news") await loadNews();
+      });
+    });
+  }
+
+  function bindButtons() {
+    qs("#openCreateHw")?.addEventListener("click", openCreateHomeworkModal);
+    qs("#openCreateCourse")?.addEventListener("click", openCreateCourseModal);
+    qs("#refreshUsersBtn")?.addEventListener("click", loadUsers);
+    qs("#createUserBtn")?.addEventListener("click", openCreateUserModal);
+    qs("#createNewsBtn")?.addEventListener("click", openCreateNewsModal);
+    qs("#openCreateProject")?.addEventListener("click", openCreateProjectModal);
+  }
+
+  function showModal(html) {
+    closeModal();
+    const bg = document.createElement("div");
+    bg.id = "modalBg";
+    bg.className = "fixed inset-0 bg-black/45 flex items-center justify-center z-50 backdrop-blur-sm";
+    bg.innerHTML = `
+      <div class="surface-2 p-6 w-[92%] max-w-md max-h-[90vh] overflow-y-auto">
+        ${html}
+      </div>
+    `;
+    document.body.appendChild(bg);
+
+    bg.addEventListener("click", (e) => {
+      if (e.target === bg) closeModal();
+    });
+    bg.querySelector("#cancelModal")?.addEventListener("click", closeModal);
+  }
+
+  function closeModal() {
+    qs("#modalBg")?.remove();
+  }
+
+  async function confirmDeleteUser(username) {
+    const typed = prompt(`Type the username "${username}" to confirm delete:`);
+    return typed === username;
+  }
+
+  function setupNotificationsUI() {
+    const btn = qs("#notifBtn");
+    const menu = qs("#notifMenu");
+    const wrap = qs("#notifWrap");
+    const readAll = qs("#notifReadAll");
+
+    btn?.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      menu?.classList.toggle("hidden");
+      if (menu && !menu.classList.contains("hidden")) await loadNotifications();
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!wrap || !menu) return;
+      if (!wrap.contains(e.target)) menu.classList.add("hidden");
+    });
+
+    readAll?.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      const role = localStorage.getItem("role") || "";
+      const username = localStorage.getItem("username") || "";
+      await fetch(`${API}/notifications/read-all`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role, username }),
+      });
+      await loadNotifications();
+    });
+  }
+
+  async function loadNotifications() {
+    const role = localStorage.getItem("role") || "";
+    const username = localStorage.getItem("username") || "";
+    if (!username || !["manager", "instructor", "student"].includes(role)) return;
+
+    const res = await fetch(
+      `${API}/notifications?role=${encodeURIComponent(role)}&username=${encodeURIComponent(username)}`
+    );
+    const out = await safeJson(res);
+    if (!out?.success) return;
+
+    const items = out.items || [];
+    const unreadCount = items.filter((x) => x.unread).length;
+
+    const badge = qs("#notifBadge");
+    if (badge) {
+      badge.textContent = String(unreadCount);
+      badge.classList.toggle("hidden", unreadCount === 0);
     }
 
-    const raw = JSON.parse(fs.readFileSync(DATA_FILE, "utf-8"));
-    const defs = defaultData();
+    const list = qs("#notifList");
+    if (!list) return;
 
-    raw.accounts = Array.isArray(raw.accounts) ? raw.accounts : defs.accounts;
-    raw.courses = Array.isArray(raw.courses) ? raw.courses : defs.courses;
-    raw.homework = Array.isArray(raw.homework) ? raw.homework : defs.homework;
-    raw.students = Array.isArray(raw.students) ? raw.students : defs.students;
-    raw.notifications = Array.isArray(raw.notifications) ? raw.notifications : [];
-    raw.schedule = Array.isArray(raw.schedule) ? raw.schedule : [];
-    raw.news = Array.isArray(raw.news) ? raw.news : [];
-    raw.projects = Array.isArray(raw.projects) ? raw.projects : [];
-
-    raw.accounts = raw.accounts.map((a) => ({
-      email: "",
-      avatarUrl: "",
-      ...a,
-    }));
-
-    return raw;
-  } catch (e) {
-    console.error("❌ Failed to load data.json, using defaults:", e);
-    return defaultData();
-  }
-}
-
-let db = loadData();
-
-function saveData() {
-  fs.writeFileSync(DATA_FILE, JSON.stringify(db, null, 2));
-}
-
-// ---------------- HELPERS ----------------
-function actorFromReq(req) {
-  return {
-    byUsername: String(req.headers["x-username"] || "").trim(),
-    byRole: String(req.headers["x-role"] || "").trim(),
-    byName: String(req.headers["x-name"] || "").trim(),
-  };
-}
-
-function addNotification({
-  type,
-  action,
-  message,
-  byRole,
-  byName,
-  byUsername,
-  targetType,
-  targetId,
-  audienceRole = "all",
-  audienceUsername = ""
-}) {
-  const n = {
-    id: Date.now() + Math.floor(Math.random() * 1000),
-    ts: new Date().toISOString(),
-    type,
-    action,
-    message,
-    byRole,
-    byName,
-    byUsername,
-    targetType,
-    targetId,
-    audienceRole,
-    audienceUsername,
-    readBy: []
-  };
-  db.notifications.unshift(n);
-  db.notifications = db.notifications.slice(0, 300);
-  saveData();
-  return n;
-}
-
-function requireRole(req, res, allowedRoles = []) {
-  const role = String(req.headers["x-role"] || req.query.role || "").trim();
-  if (!allowedRoles.includes(role)) {
-    return res.status(403).json({ success: false, message: "Forbidden" });
-  }
-  return role;
-}
-
-function safeNoPassword(a) {
-  const { password, ...rest } = a;
-  return rest;
-}
-
-function isISODate(s) {
-  const d = new Date(s);
-  return !isNaN(d.getTime());
-}
-
-function validEmail(email) {
-  if (!email) return true;
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).trim());
-}
-
-function escapeHtml(str) {
-  return String(str ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-async function sendNewsEmails(newsItem) {
-  if (!resend) {
-    console.warn("⚠️ Email skipped: Resend not configured");
-    return;
+    list.innerHTML = items
+      .map(
+        (n) => `
+      <div class="px-4 py-3 border-b border-white/10 ${n.unread ? "bg-white/10" : ""}">
+        <div class="text-sm font-extrabold">${esc(n.message || "")}</div>
+        <div class="text-xs muted mt-1">
+          ${esc(n.byName || n.byUsername || "Someone")} · ${esc(n.byRole || "")} ·
+          ${new Date(n.ts).toLocaleString()}
+        </div>
+      </div>
+    `
+      )
+      .join("");
   }
 
-  const recipients = db.accounts
-    .map((a) => String(a.email || "").trim())
-    .filter((email) => email && validEmail(email));
-
-  if (!recipients.length) {
-    console.warn("⚠️ No valid email recipients found for news");
-    return;
+  function getStatusColor(status) {
+    switch (status) {
+      case "draft":
+        return "bg-gray-400 text-black";
+      case "not-started":
+        return "bg-blue-500 text-white";
+      case "ongoing":
+        return "bg-green-500 text-white";
+      case "finished":
+        return "bg-purple-500 text-white";
+      default:
+        return "bg-gray-300 text-black";
+    }
   }
+    
 
-  const html = `
-  <div style="font-family: Inter, Arial, sans-serif; background:#f4f7f5; padding:40px 0;">
-    <div style="max-width:700px;margin:auto;background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e5e7eb">
+function renderProjectCard(p) {
+  return `
+    <div class="project-card surface-2 rounded-[18px] overflow-hidden relative group cursor-pointer" data-id="${p.id}">
 
-      <div style="background:#22c55e;padding:20px 30px;color:white">
-        <h2 style="margin:0;font-size:22px;">🌿 Hofi Korsou Portal</h2>
-        <p style="margin:4px 0 0 0;font-size:13px;opacity:.9">Official portal notification</p>
+      <!-- STATUS -->
+      <div class="absolute top-3 left-3 px-3 py-1 text-xs font-bold rounded-full ${getStatusColor(p.status)}">
+        ${esc(p.status || "unknown")}
       </div>
 
-      <div style="padding:30px">
-        <h1 style="margin-top:0;font-size:26px;color:#111827">
-          ${escapeHtml(newsItem.title)}
-        </h1>
+      <!-- MENU -->
+      <div class="absolute top-3 right-3">
+        <button class="menu-btn text-xl px-2 py-1 rounded-lg bg-black/40 text-white" data-id="${p.id}">
+          ⋮
+        </button>
 
-        ${
-          newsItem.summary
-            ? `<p style="color:#4b5563;font-size:16px;margin-top:10px">
-                ${escapeHtml(newsItem.summary)}
-              </p>`
-            : ""
-        }
-
-        ${
-          newsItem.content
-            ? `<div style="margin-top:20px;font-size:15px;color:#111827;line-height:1.6;white-space:pre-wrap">
-                ${escapeHtml(newsItem.content)}
-              </div>`
-            : ""
-        }
-
-        <div style="margin-top:30px;padding:15px;border-radius:8px;background:#f0fdf4;border:1px solid #bbf7d0">
-          <strong>Posted by:</strong> ${escapeHtml(newsItem.createdBy || "Manager")} <br>
-          <strong>Date:</strong> ${new Date(newsItem.createdAt).toLocaleString()}
+        <div class="menu hidden absolute right-0 mt-2 w-32 surface-2 rounded-xl shadow-lg p-2 z-50">
+          <button class="edit-project block w-full text-left px-3 py-2 hover:bg-white/10 rounded" data-id="${p.id}">
+            Edit
+          </button>
+          <button class="del-project block w-full text-left px-3 py-2 hover:bg-white/10 rounded text-red-400" data-id="${p.id}">
+            Delete
+          </button>
         </div>
-
-        <div style="margin-top:30px;text-align:center">
-          <a href="https://www.greenrecoveryspace.com"
-             style="display:inline-block;background:#22c55e;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold">
-             Open Portal
-          </a>
-        </div>
-
-        <p style="margin-top:15px;font-size:13px;color:#6b7280;text-align:center">
-          Need help?
-          <a href="https://wa.me/59990000001" style="color:#16a34a;">Contact us on WhatsApp</a>
-        </p>
       </div>
 
-      <div style="padding:18px 30px;background:#f9fafb;font-size:12px;color:#6b7280">
-        This message was sent automatically from the Hofi Korsou Portal.<br>
-        If you were not expecting this email, you can ignore it.
+      <!-- COVER -->
+      <div class="h-40 w-full bg-gray-200">
+        ${
+          p.cover
+            ? `<img src="${p.cover}" class="w-full h-full object-cover"/>`
+            : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
+        }
+      </div>
+
+      <!-- TITLE -->
+      <div class="p-3">
+        <h3 class="font-bold text-sm truncate">${esc(p.title)}</h3>
       </div>
 
     </div>
-  </div>
   `;
+}
 
-  try {
-    const { error } = await resend.emails.send({
-      from: RESEND_FROM,
-      to: [RESEND_FROM],
-      bcc: recipients,
-      subject: `Hofi Korsou News: ${newsItem.title}`,
-      html,
-    });
+async function loadDashboard() {
+  const [courses, projects, hw] = await Promise.all([
+    fetchJSON("/courses"),
+    fetchJSON("/projects"),
+    fetchJSON("/homework")
+  ]);
 
-    if (error) {
-      console.error("❌ Failed to send news email via Resend:", error);
+  const safeCourses = courses || [];
+  const safeProjects = projects || [];
+  const safeHw = hw || [];
+
+  // ===== COUNTS =====
+  qs("#activeCoursesCount").textContent = safeCourses.length;
+  qs("#projectsCount").textContent = safeProjects.length;
+  qs("#toGradeCount").textContent = safeHw.length;
+
+  // ===== COURSES (DASHBOARD) =====
+  const coursesBox = qs("#dashboardCourses");
+  if (coursesBox) {
+    coursesBox.innerHTML = safeCourses.map((c) => `
+      <div class="course-card surface-2 rounded-[18px] overflow-hidden relative group cursor-pointer" data-id="${c.id}">
+
+        <div class="absolute top-3 left-3 px-3 py-1 text-xs font-bold rounded-full ${getStatusColor(c.status)}">
+          ${esc(c.status || "unknown")}
+        </div>
+
+        <div class="h-40 w-full bg-gray-200">
+          ${
+            c.cover
+              ? `<img src="${c.cover}" class="w-full h-full object-cover"/>`
+              : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
+          }
+        </div>
+
+        <div class="p-4 space-y-2">
+          <div class="font-extrabold text-lg">${esc(c.title)}</div>
+
+          <div class="text-xs font-semibold text-indigo-400">
+            ${esc(c.programType || "—")}
+          </div>
+
+          <div class="text-sm muted">
+            ${esc(c.durationValue || "-")} ${esc(c.durationUnit || "")}
+          </div>
+
+          <div class="text-sm muted">
+            ${esc(c.sessionsValue || "-")} ${esc(c.sessionsUnit || "")}
+          </div>
+
+          <div class="text-xs muted">
+            ${c.startDate ? new Date(c.startDate).toLocaleDateString() : "-"} 
+            → 
+            ${c.endDate ? new Date(c.endDate).toLocaleDateString() : "-"}
+          </div>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  // ===== PROJECTS (DASHBOARD) =====
+  const projectsBox = qs("#dashboardProjects");
+  if (projectsBox) {
+    projectsBox.innerHTML = safeProjects
+      .map(renderProjectCard)
+      .join("");
+  }
+}
+
+
+  async function loadStudents() {
+    const students = await fetchJSON("/students");
+    const table = qs("#studentTable");
+    if (!table) return;
+
+    table.innerHTML = students
+      .map(
+        (s) => `
+      <tr class="border-t border-white/10">
+        <td class="px-6 py-3 font-bold">${esc(s.name)}</td>
+        <td class="px-6 py-3">${esc(s.course)}</td>
+        <td class="px-6 py-3">${s.grade ?? "-"}</td>
+        <td class="px-6 py-3 text-right muted">—</td>
+      </tr>
+    `
+      )
+      .join("");
+  }
+
+
+
+  /* =========================
+    LOAD NEWS
+  ========================= */
+  async function loadNews() {
+    const list = qs("#newsList");
+    if (!list) return;
+
+    const res = await fetch(`${API}/news`);
+    const out = await safeJson(res);
+    const items = out?.items || [];
+
+    if (!items.length) {
+      list.innerHTML = `<div class="surface-2 p-4 rounded-[18px] text-sm muted">No news posted yet.</div>`;
       return;
     }
 
-    console.log(`✅ News email sent to ${recipients.length} recipient(s)`);
-  } catch (err) {
-    console.error("❌ Failed to send news email via Resend:", err);
-  }
-}
+    list.innerHTML = items.map(n => `
+      <div class="surface-2 p-4 rounded-[18px]">
+        <div class="flex items-start justify-between gap-4">
+          <div class="flex-1">
+            <div class="font-extrabold text-lg">${esc(n.title)}</div>
+            ${n.summary ? `<div class="text-sm muted mt-1">${esc(n.summary)}</div>` : ""}
+            
+            ${n.content ? `<div class="text-sm mt-3 prose max-w-none">${n.content}</div>` : ""}
 
-// ---------------- UPLOADS ----------------
-const uploadsDir = path.join(__dirname, "uploads");
-if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+            <div class="text-xs muted mt-3">
+              By ${esc(n.createdBy || "Manager")} · ${new Date(n.createdAt).toLocaleString()}
+            </div>
+          </div>
 
-app.use("/uploads", express.static(uploadsDir));
+          <div class="relative">
+            <button class="menu-btn btn-theme text-sm">⋮</button>
+            <div class="menu hidden absolute right-0 mt-2 w-32 bg-white rounded-xl shadow-lg border z-50">
+              <button class="edit-news block w-full text-left px-4 py-2 hover:bg-gray-100" data-id="${n.id}">
+                Edit
+              </button>
+              <button class="del-news block w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500" data-id="${n.id}">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `).join("");
 
-let upload = null;
+    // MENU TOGGLE
+    list.querySelectorAll(".menu-btn").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        document.querySelectorAll(".menu").forEach(m => m.classList.add("hidden"));
+        btn.nextElementSibling.classList.toggle("hidden");
+      });
+    });
 
-if (multer) {
-  const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, uploadsDir),
-    filename: (req, file, cb) => {
-      const safe = file.originalname.replace(/[^\w.\-]+/g, "_");
-      cb(null, `${Date.now()}_${safe}`);
-    }
-  });
+    // EDIT
+    list.querySelectorAll(".edit-news").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const id = btn.dataset.id;
+        const found = items.find(x => String(x.id) === String(id));
+        if (found) openEditNewsModal(found);
+      });
+    });
 
-  upload = multer({
-    storage,
-    limits: { fileSize: 15 * 1024 * 1024 }, // 15MB
-  });
-}
+    // DELETE
+    list.querySelectorAll(".del-news").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const id = btn.dataset.id;
+        if (!confirm("Delete this news item?")) return;
 
-// ---------- UPLOAD FILE (IMAGES + PDF/DOCS) ----------
-app.post("/api/upload", (req, res) => {
-  if (!upload) {
-    return res.status(500).json({
-      success: false,
-      message: "Multer not installed"
+        const res = await fetch(`${API}/news/${id}`, {
+          method: "DELETE",
+          headers: actorHeaders()
+        });
+
+        const out = await safeJson(res);
+        if (!res.ok || !out?.success) {
+          return toast(out?.message || "Delete failed", "rgba(185,28,28,.85)");
+        }
+
+        toast("News deleted", "rgba(185,28,28,.85)");
+        loadNews();
+        loadNotifications();
+      });
     });
   }
 
-  upload.single("file")(req, res, (err) => {
-    if (err) {
-      return res.status(400).json({ success: false, message: err.message });
+  function openCreateNewsModal() {
+    showModal(`
+      <h2 class="text-xl font-extrabold mb-4">Create News</h2>
+
+      <label class="text-sm font-bold muted">Title</label>
+      <input id="newsTitle" class="input-theme mt-1 mb-3" />
+
+      <label class="text-sm font-bold muted">Summary</label>
+      <input id="newsSummary" class="input-theme mt-1 mb-3" />
+
+      <label class="text-sm font-bold muted">Content</label>
+
+      <div class="flex gap-2 mb-2">
+        <button class="btn-theme text-sm" onclick="document.execCommand('bold')">Bold</button>
+        <button class="btn-theme text-sm" onclick="document.execCommand('italic')">Italic</button>
+        <button class="btn-theme text-sm" onclick="document.execCommand('insertUnorderedList')">• List</button>
+        <button class="btn-theme text-sm" onclick="addImage()">Insert Image</button>
+        <button class="btn-theme text-sm" onclick="addLink()">Insert Link</button>
+      </div>
+
+      <div id="newsContent" contenteditable="true"
+        class="input-theme min-h-[200px] mb-4 overflow-y-auto"></div>
+
+      <div class="flex justify-end gap-3 mt-4">
+        <button id="saveDraftNewsBtn" class="btn-theme">Save Draft</button>
+        <button id="publishNewsBtn" class="btn-theme">Publish</button>
+      </div>
+    `);
+
+    qs("#saveDraftNewsBtn").addEventListener("click", () => createNews("draft"));
+    qs("#publishNewsBtn").addEventListener("click", () => createNews("published"));
+  }
+
+
+  function openEditNewsModal(item) {
+    showModal(`
+      <h2 class="text-xl font-extrabold mb-4">Edit News</h2>
+
+      <label class="text-sm font-bold muted">Title</label>
+      <input id="newsTitle" class="input-theme mt-1 mb-3" value="${esc(item.title)}" />
+
+      <label class="text-sm font-bold muted">Summary</label>
+      <input id="newsSummary" class="input-theme mt-1 mb-3" value="${esc(item.summary || "")}" />
+
+      <label class="text-sm font-bold muted">Content</label>
+
+      <div class="flex gap-2 mb-2">
+        <button class="btn-theme text-sm" onclick="document.execCommand('bold')">Bold</button>
+        <button class="btn-theme text-sm" onclick="document.execCommand('italic')">Italic</button>
+        <button class="btn-theme text-sm" onclick="document.execCommand('insertUnorderedList')">• List</button>
+        <button class="btn-theme text-sm" onclick="addImage()">Insert Image</button>
+        <button class="btn-theme text-sm" onclick="addLink()">Insert Link</button>
+      </div>
+
+      <div id="newsContent" contenteditable="true"
+        class="input-theme min-h-[200px] mb-4 overflow-y-auto"></div>
+
+      <div class="flex justify-end gap-3 mt-4">
+        <button id="saveDraftNewsBtn" class="btn-theme">Save Draft</button>
+        <button id="publishNewsBtn" class="btn-theme">Publish</button>
+      </div>
+    `);
+
+    // PREFILL CONTENT (IMPORTANT)
+    qs("#newsContent").innerHTML = item.content || "";
+
+    qs("#saveDraftNewsBtn").addEventListener("click", () => updateNews(item.id, "draft"));
+    qs("#publishNewsBtn").addEventListener("click", () => updateNews(item.id, "published"));
+  }
+
+
+  async function createNews(status) {
+    const title = qs("#newsTitle").value.trim();
+    const summary = qs("#newsSummary").value.trim();
+    const content = qs("#newsContent").innerHTML;
+
+    if (!title) return toast("Title required", "rgba(185,28,28,.85)");
+
+    const res = await fetch(`${API}/news`, {
+      method: "POST",
+      headers: jsonHeaders(),
+      body: JSON.stringify({ title, summary, content, status })
+    });
+
+    const out = await safeJson(res);
+    if (!res.ok || !out?.success) {
+      return toast(out?.message || "Create failed", "rgba(185,28,28,.85)");
     }
 
-    if (!req.file) {
-      return res.status(400).json({ success: false, message: "No file uploaded" });
+    closeModal();
+    toast(`News ${status === "draft" ? "saved as draft" : "published"}`, "rgba(34,197,94,.70)");
+
+    loadNews();
+    loadNotifications();
+  }
+
+  async function updateNews(id, status) {
+    const title = qs("#newsTitle").value.trim();
+    const summary = qs("#newsSummary").value.trim();
+    const content = qs("#newsContent").innerHTML;
+
+    if (!title) return toast("Title required", "rgba(185,28,28,.85)");
+
+    const res = await fetch(`${API}/news/${id}`, {
+      method: "PUT",
+      headers: jsonHeaders(),
+      body: JSON.stringify({ title, summary, content, status })
+    });
+
+    const out = await safeJson(res);
+    if (!res.ok || !out?.success) {
+      return toast(out?.message || "Update failed", "rgba(185,28,28,.85)");
     }
 
-    const ext = path.extname(req.file.originalname).toLowerCase();
+    closeModal();
+    toast("News updated", "rgba(34,197,94,.70)");
 
-    const allowedImages = [".png", ".jpg", ".jpeg", ".webp", ".gif"];
-    const allowedDocs = [".pdf", ".doc", ".docx", ".txt"];
+    loadNews();
+    loadNotifications();
+  }
 
-    if (![...allowedImages, ...allowedDocs].includes(ext)) {
-      try { fs.unlinkSync(req.file.path); } catch {}
-      return res.status(400).json({
-        success: false,
-        message: "Invalid file type. Allowed: images + pdf/doc/txt"
+
+
+
+  async function uploadPdf(file) {
+    const fd = new FormData();
+    fd.append("file", file);
+
+    const res = await fetch(`${API}/upload`, { method: "POST", body: fd });
+    const out = await safeJson(res);
+    if (!res.ok || !out?.success) throw new Error(out?.message || "Upload failed");
+    return out;
+  }
+
+    async function loadCourses() {
+    const courses = await fetchJSON("/courses");
+    const list = qs("#submitted-courses-list");
+    const container = list;
+    if (!list) return;
+
+    list.innerHTML = courses
+      .map((c) => `
+        <div class="course-card surface-2 rounded-[18px] overflow-hidden relative group cursor-pointer" data-id="${c.id}">
+
+          <!-- STATUS TAG -->
+          <div class="absolute top-3 left-3 px-3 py-1 text-xs font-bold rounded-full ${getStatusColor(c.status)}">
+            ${esc(c.status || "unknown")}
+          </div>
+
+          <!-- COVER IMAGE -->
+          <div class="h-40 w-full bg-gray-200">
+            ${
+              c.cover
+                ? `<img src="${c.cover}" class="w-full h-full object-cover"/>`
+                : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
+            }
+          </div>
+
+          <!-- 3 DOT MENU -->
+          <div class="absolute top-3 right-3">
+            <button class="menu-btn text-xl px-2 py-1 rounded-lg bg-black/40 text-white" data-id="${c.id}">
+              ⋮
+            </button>
+
+            <div class="menu hidden absolute right-0 mt-2 w-32 surface-2 rounded-xl shadow-lg p-2 z-50">
+              <button class="edit-course block w-full text-left px-3 py-2 hover:bg-white/10 rounded" data-id="${c.id}">
+                Edit
+              </button>
+              <button class="del-course block w-full text-left px-3 py-2 hover:bg-white/10 rounded text-red-400" data-id="${c.id}">
+                Delete
+              </button>
+            </div>
+          </div>
+
+          <!-- CONTENT -->
+          <div class="p-4 space-y-2">
+
+            <!-- TITLE -->
+            <div class="font-extrabold text-lg">${esc(c.title)}</div>
+
+            <!-- PROGRAM TYPE -->
+            <div class="text-xs font-semibold text-indigo-400">
+              ${esc(c.programType || "—")}
+            </div>
+
+            <!-- DURATION -->
+            <div class="text-sm muted">
+              ${esc(c.durationValue || "-")} ${esc(c.durationUnit || "")}
+            </div>
+
+            <!-- SESSIONS -->
+            <div class="text-sm muted">
+              ${esc(c.sessionsValue || "-")} ${esc(c.sessionsUnit || "")}
+            </div>
+
+            <!-- DATES -->
+            <div class="text-xs muted">
+              ${c.startDate ? new Date(c.startDate).toLocaleDateString() : "-"} 
+              → 
+              ${c.endDate ? new Date(c.endDate).toLocaleDateString() : "-"}
+            </div>
+
+          </div>
+        </div>
+      `)
+      .join("");
+
+        // TOGGLE MENU
+    container.querySelectorAll(".menu-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+
+        document.querySelectorAll(".menu").forEach(m => m.classList.add("hidden"));
+
+        const menu = btn.nextElementSibling;
+        menu.classList.toggle("hidden");
+      });
+    });
+
+    container.querySelectorAll(".del-course").forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        const id = btn.dataset.id;
+        if (!confirm("Delete course?")) return;
+        const r = await fetch(`${API}/courses/${id}`, { method: "DELETE", headers: actorHeaders() });
+        if (!r.ok) return toast("Delete failed", "rgba(185,28,28,.85)");
+        toast("Deleted", "rgba(185,28,28,.85)");
+        loadCourses();
+        loadDashboard();
+      });
+    });
+
+    container.querySelectorAll(".edit-course").forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        const id = btn.dataset.id;
+        const found = courses.find((x) => String(x.id) === String(id));
+        if (found) openEditCourseModal(found);
+      });
+    });
+  
+    if (!window.menuListenerAdded) {
+      window.menuListenerAdded = true;
+      document.addEventListener("click", () => {
+        document.querySelectorAll(".menu").forEach((m) => m.classList.add("hidden"));
       });
     }
+  }
 
-    const type = allowedImages.includes(ext) ? "image" : "document";
 
-    return res.json({
-      success: true,
-      type,
-      url: `/uploads/${req.file.filename}`,
-      originalName: req.file.originalname
-    });
+  function openCreateCourseModal() {
+
+    showModal(`
+
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-extrabold">Create Programs</h2>
+      <button id="cancelModal" class="btn-theme text-sm">Cancel</button>
+    </div>
+
+    <form id="courseForm">
+
+      <label class="text-sm font-bold muted">Title</label>
+      <input id="courseTitle" class="input-theme mt-1 mb-3" required />
+
+      <label class="text-sm font-bold muted">Description</label>
+      <textarea id="courseDescription" class="input-theme mt-1 mb-3"></textarea>
+
+      <label class="text-sm font-bold muted">Cover</label>
+      <input id="courseCover" type="file" accept="image/*" class="mb-3"/>
+
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <div>
+          <label class="text-sm font-bold muted">Duration</label>
+          <input id="courseDurationValue" class="input-theme mt-1" placeholder="12">
+        </div>
+
+        <div>
+          <label class="text-sm font-bold muted">Unit</label>
+          <select id="courseDurationUnit" class="select-theme mt-1">
+            <option value="minutes">Minutes</option>
+            <option value="hours">Hours</option>
+            <option value="days">Days</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <div>
+          <label class="text-sm font-bold muted">Sessions</label>
+          <input id="courseSessionsValue" class="input-theme mt-1" placeholder="8">
+        </div>
+
+        <div>
+          <label class="text-sm font-bold muted">Unit</label>
+          <select id="courseSessionsUnit" class="select-theme mt-1">
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="text-sm font-bold muted">Program Type</label>
+        <select id="courseProgramType" class="select-theme mt-1">
+          <option value="">All</option>
+          <option value="course">Courses</option>
+          <option value="workshop">Workshops</option>
+          <option value="activity">Activities</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="text-sm font-bold muted">Theme</label>
+        <select id="courseTheme" class="select-theme mt-1">
+          <option value="">All</option>
+          <option value="rest">Rest & Relaxation</option>
+          <option value="recovery">Recovery & Balance</option>
+          <option value="insight">Self-insight</option>
+          <option value="connection">Connection</option>
+        </select>
+      </div>
+
+
+      <div>
+          <label class="text-sm font-bold muted">Status</label>
+          <select id="courseStatus" class="select-theme mt-1">
+            <option value="">All</option>
+            <option value="draft">Draft</option>
+            <option value="not-started">Upcoming</option>
+            <option value="ongoing">Ongoing</option>
+            <option value="finished">Completed</option>
+          </select>
+      </div>
+
+
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <div>
+          <label class="text-sm font-bold muted">Start Date</label>
+          <input id="courseStartDate" type="date" class="input-theme mt-1">
+        </div>
+      
+        <div>
+          <label class="text-sm font-bold muted">End Date</label>
+          <input id="courseEndDate" type="date" class="input-theme mt-1">
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-3 mt-4">
+
+        <button type="button" id="saveDraftBtn" class="btn-theme">
+          Save Draft
+        </button>
+
+        <button type="button" id="publishCourseBtn" class="btn-theme">
+          Publish
+        </button>
+
+      </div>
+
+    </form>
+  `);
+
+  setupCourseForm();
+}
+
+
+let forceDraft = false;
+
+function setupCourseForm() {
+
+  const form = qs("#courseForm");
+  const username = localStorage.getItem("username");
+  const profilePic = localStorage.getItem("userAvatar") || "";
+
+  qs("#saveDraftBtn")?.addEventListener("click", () => {
+    forceDraft = true;
+    form.requestSubmit();
   });
-});
 
-// ---------- UPLOAD VIA IMAGE LINK ----------
-app.post("/api/upload-by-url", async (req, res) => {
+  qs("#publishCourseBtn")?.addEventListener("click", () => {
+    forceDraft = false;
+    form.requestSubmit();
+  });
+
+  form?.addEventListener("submit", async (e) => {
+
+    e.preventDefault();
+
+    const file = qs("#courseCover")?.files?.[0];
+
+    let cover = "";
+
+    if (file) {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch(`${API}/upload`, {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        return toast("Image upload failed", "rgba(185,28,28,.85)");
+      }
+
+      cover = data.url; 
+    }
+
+    const selectedStatus = qs("#courseStatus")?.value;
+    
+    // If trying to save draft but status is not draft
+    if (forceDraft && selectedStatus && selectedStatus !== "draft") {
+      toast("Set status to 'Draft' or click Publish instead.", "rgba(185,28,28,.85)");
+      return;
+    }
+    
+    const newCourse = {
+
+      title: qs("#courseTitle")?.value.trim(),
+      description: qs("#courseDescription")?.value.trim(),
+      cover,
+
+      durationValue: qs("#courseDurationValue")?.value,
+      durationUnit: qs("#courseDurationUnit")?.value,
+
+      sessionsValue: qs("#courseSessionsValue")?.value,
+      sessionsUnit: qs("#courseSessionsUnit")?.value,
+
+      programType: qs("#courseProgramType")?.value,
+      theme: qs("#courseTheme")?.value,
+
+      startDate: qs("#courseStartDate")?.value || null,
+      endDate: qs("#courseEndDate")?.value || null,
+      status: forceDraft ? "draft" : selectedStatus || "published",
+
+      createdByUsername: username,      
+      createdByAvatar: profilePic
+    };
+
+    closeModal();
+    forceDraft = false;
+
+    try {
+
+      const res = await fetch(`${API}/courses`, {
+        method: "POST",
+        headers: jsonHeaders(),
+        body: JSON.stringify(newCourse)
+      });
+
+      if (!res.ok) throw new Error("Create failed");
+
+      toast("Course created", "rgba(34,197,94,.7)");
+
+      loadCourses();
+      loadDashboard();
+      loadNotifications();
+
+    } catch (err) {
+      console.error(err);
+      toast("Failed to create course", "rgba(185,28,28,.85)");
+    }
+
+  });
+
+}
+
+  
+  function openEditCourseModal(course) {
+    showModal(`
+
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-extrabold">Create Programs</h2>
+      <button id="cancelModal" class="btn-theme text-sm">Cancel</button>
+    </div>
+
+    <form id="courseForm">
+
+      <label class="text-sm font-bold muted">Title</label>
+      <input id="courseTitle" class="input-theme mt-1 mb-3" required />
+
+      <label class="text-sm font-bold muted">Description</label>
+      <textarea id="courseDescription" class="input-theme mt-1 mb-3"></textarea>
+
+      <label class="text-sm font-bold muted">Cover</label>
+      <input id="courseCover" type="file" accept="image/*" class="mb-3"/>
+
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <div>
+          <label class="text-sm font-bold muted">Duration</label>
+          <input id="courseDurationValue" class="input-theme mt-1" placeholder="12">
+        </div>
+
+        <div>
+          <label class="text-sm font-bold muted">Unit</label>
+          <select id="courseDurationUnit" class="select-theme mt-1">
+            <option value="minutes">Minutes</option>
+            <option value="hours">Hours</option>
+            <option value="days">Days</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <div>
+          <label class="text-sm font-bold muted">Sessions</label>
+          <input id="courseSessionsValue" class="input-theme mt-1" placeholder="8">
+        </div>
+
+        <div>
+          <label class="text-sm font-bold muted">Unit</label>
+          <select id="courseSessionsUnit" class="select-theme mt-1">
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="text-sm font-bold muted">Program Type</label>
+        <select id="courseProgramType" class="select-theme mt-1">
+          <option value="">All</option>
+          <option value="course">Courses</option>
+          <option value="workshop">Workshops</option>
+          <option value="activity">Activities</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="text-sm font-bold muted">Theme</label>
+        <select id="courseTheme" class="select-theme mt-1">
+          <option value="">All</option>
+          <option value="rest">Rest & Relaxation</option>
+          <option value="recovery">Recovery & Balance</option>
+          <option value="insight">Self-insight</option>
+          <option value="connection">Connection</option>
+        </select>
+      </div>
+
+      <div>
+          <label class="text-sm font-bold muted">Status</label>
+          <select id="courseStatus" class="select-theme mt-1">
+            <option value="">All</option>
+            <option value="draft">Draft</option>
+            <option value="not-started">Upcoming</option>
+            <option value="ongoing">Ongoing</option>
+            <option value="finished">Completed</option>
+          </select>
+      </div>
+
+
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <div>
+          <label class="text-sm font-bold muted">Start Date</label>
+          <input id="courseStartDate" type="date" class="input-theme mt-1">
+        </div>
+      
+        <div>
+          <label class="text-sm font-bold muted">End Date</label>
+          <input id="courseEndDate" type="date" class="input-theme mt-1">
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-3 mt-4">
+
+        <button type="button" id="saveDraftBtn" class="btn-theme">
+          Save Draft
+        </button>
+
+        <button type="button" id="publishCourseBtn" class="btn-theme">
+          Publish
+        </button>
+
+      </div>
+
+    </form>
+  `);
+
+  // PREFILL VALUES
+  qs("#courseTitle").value = course.title || "";
+  qs("#courseDescription").value = course.description || "";
+
+  qs("#courseDurationValue").value = course.durationValue || "";
+  qs("#courseDurationUnit").value = course.durationUnit || "minutes";
+
+  qs("#courseSessionsValue").value = course.sessionsValue || "";
+  qs("#courseSessionsUnit").value = course.sessionsUnit || "daily";
+
+  qs("#courseProgramType").value = course.programType || "";
+  qs("#courseTheme").value = course.theme || "";
+
+  qs("#courseStatus").value = course.status || "draft";
+
+  qs("#courseStartDate").value = course.startDate || "";
+  qs("#courseEndDate").value = course.endDate || "";
+
+
+  qs("#saveDraftBtn")?.addEventListener("click", async () => {
+  const updated = {
+    title: qs("#courseTitle").value.trim(),
+    description: qs("#courseDescription").value.trim(),
+
+    durationValue: qs("#courseDurationValue").value,
+    durationUnit: qs("#courseDurationUnit").value,
+
+    sessionsValue: qs("#courseSessionsValue").value,
+    sessionsUnit: qs("#courseSessionsUnit").value,
+
+    programType: qs("#courseProgramType").value,
+    theme: qs("#courseTheme").value,
+
+    startDate: qs("#courseStartDate").value || null,
+    endDate: qs("#courseEndDate").value || null,
+
+    status: qs("#courseStatus").value || "draft"
+  };
+
   try {
-    const { url } = req.body;
+        const res = await fetch(`${API}/courses/${course.id}`, {
+          method: "PUT",
+          headers: jsonHeaders(),
+          body: JSON.stringify(updated)
+        });
 
-    if (!url || !url.startsWith("http")) {
-      return res.status(400).json({
-        success: false,
-        message: "Valid URL required"
-      });
-    }
+        const out = await safeJson(res);
 
-    const ext = path.extname(url.split("?")[0]).toLowerCase();
-    const allowedImages = [".png", ".jpg", ".jpeg", ".webp", ".gif"];
+        if (!res.ok || !out?.success) {
+          return toast(out?.message || "Update failed", "rgba(185,28,28,.85)");
+        }
 
-    if (!allowedImages.includes(ext)) {
-      return res.status(400).json({
-        success: false,
-        message: "Only image URLs allowed"
-      });
-    }
+        closeModal();
+        toast("Course updated", "rgba(34,197,94,.7)");
 
-    const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}${ext}`;
-    const filePath = path.join(uploadsDir, fileName);
+        loadCourses();
+        loadDashboard();
+      } catch {
+        toast("Server error", "rgba(185,28,28,.85)");
+      }
+    }); 
+  }
 
-    const response = await fetch(url);
 
-    if (!response.ok) {
-      return res.status(400).json({
-        success: false,
-        message: "Failed to fetch image"
-      });
-    }
+async function openProgramDetail(id) {
+  try {
+    const program = await fetchJSON(`/courses/${id}`); 
+    if (!program || !program.success) return toast("Program not found", "rgba(185,28,28,.85)");
 
-    const buffer = await response.arrayBuffer();
-    fs.writeFileSync(filePath, Buffer.from(buffer));
+    const data = program.course; // server sends { success: true, course }
 
-    return res.json({
-      success: true,
-      type: "image",
-      url: `/uploads/${fileName}`
+    const publisherName = data.createdByUsername || "Unknown";
+    const publisherImg = data.createdByAvatar || "";
+
+    const page = document.createElement("div");
+    page.id = "programDetailPage";
+    page.className = "fixed inset-0 bg-black/40 backdrop-blur-lg z-[9999] flex justify-center items-start overflow-y-auto";
+    page.innerHTML = `
+      <div id="detailContainer" class="min-h-screen flex justify-center pt-20 pb-10">
+        <div class="w-[30cm] max-w-full bg-white rounded-[24px] overflow-hidden shadow-2xl relative">
+
+          <!-- COVER IMAGE -->
+          <div class="relative w-full h-[300px] bg-gray-200">
+            ${
+              data.cover
+                ? `<img src="${data.cover}" class="w-full h-full object-cover"/>`
+                : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
+            }
+          </div>
+
+          <!-- TITLE BELOW COVER -->
+          <div class="p-6 border-b">
+            <div class="text-4xl font-extrabold text-black mb-4">
+              ${esc(data.title)}
+            </div>
+
+            <!-- PUBLISHER -->
+            <div class="flex items-center gap-4 mb-6">
+              ${
+                publisherImg
+                  ? `<img src="${publisherImg}" class="w-16 h-16 rounded-full object-cover"/>`
+                  : `<div class="w-16 h-16 rounded-full bg-indigo-400 flex items-center justify-center text-white font-bold text-xl">
+                      ${initials(publisherName)}
+                    </div>`
+              }
+              <div class="font-semibold text-black text-xl">${esc(publisherName)}</div>
+            </div>
+          </div>
+
+          <!-- DATA BLOCKS -->
+          <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-center p-6 justify-center max-w-5xl mx-auto">            
+            <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
+              <div class="font-bold text-lg">${esc(data.programType || "-")}</div>
+              <div class="text-xs muted">Type</div>
+            </div>
+            <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
+              <div class="font-bold text-lg">${esc(data.durationValue || "-")}</div>
+              <div class="text-xs muted">${esc(data.durationUnit || "")}</div>
+            </div>
+            <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
+              <div class="font-bold text-lg">${esc(data.sessionsValue || "-")}</div>
+              <div class="text-xs muted">${esc(data.sessionsUnit || "")}</div>
+            </div>
+            <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
+              <div class="font-bold text-lg">${esc(data.theme || "-")}</div>
+              <div class="text-xs muted">Theme</div>
+            </div>
+            <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
+              <div class="text-sm">${data.startDate ? new Date(data.startDate).toLocaleDateString() : "-"}</div>
+              <div class="text-sm">${data.endDate ? new Date(data.endDate).toLocaleDateString() : "-"}</div>
+            </div>
+          </div>
+
+          <!-- DESCRIPTION -->
+          <div class="p-6 text-black text-sm whitespace-pre-wrap">
+            ${esc(data.description || "No description")}
+          </div>
+
+          <!-- CLOSE BUTTON -->
+          <button id="closeDetail"
+            class="absolute top-4 right-4 px-3 py-2 rounded-lg bg-black/50 text-white backdrop-blur">
+            ✕
+          </button>
+
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(page);
+    document.body.style.overflow = "hidden";
+
+    // CLOSE BUTTON
+    qs("#closeDetail").addEventListener("click", () => {
+      page.remove();
+      document.body.style.overflow = "";
+    });
+
+    // CLOSE BY CLICKING OUTSIDE
+    page.addEventListener("click", (e) => {
+      if (e.target.id === "programDetailPage") {
+        page.remove();
+        document.body.style.overflow = "";
+      }
     });
 
   } catch (err) {
     console.error(err);
-    return res.status(500).json({
-      success: false,
-      message: "Upload via URL failed"
-    });
+    toast("Error loading program details", "rgba(185,28,28,.85)");
   }
-});
-
-
-
-// ---------------- API ROUTES ----------------
-
-// ---------- NOTIFICATIONS ----------
-app.get("/api/notifications", (req, res) => {
-  const username = String(req.query.username || "").trim();
-  const role = String(req.query.role || "").trim();
-  if (!username || !role) return res.status(400).json({ success: false, message: "username+role required" });
-
-  if (!["instructor", "manager", "student"].includes(role)) {
-    return res.status(403).json({ success: false, message: "Forbidden" });
-  }
-
-  const items = db.notifications
-    .filter(n => {
-      const aRole = n.audienceRole || "all";
-      const aUser = n.audienceUsername || "";
-
-      if (aRole === "all") return true;
-      if (aRole === "all-students") return role === "student";
-      if (aRole === "student") return role === "student" && aUser === username;
-      return true;
-    })
-    .slice(0, 50)
-    .map(n => ({
-      ...n,
-      unread: !n.readBy.includes(username)
-    }));
-
-  res.json({ success: true, items });
-});
-
-app.post("/api/notifications/read-all", (req, res) => {
-  const { username, role } = req.body || {};
-  if (!username || !role) return res.status(400).json({ success: false });
-
-  if (!["instructor", "manager", "student"].includes(String(role))) {
-    return res.status(403).json({ success: false, message: "Forbidden" });
-  }
-
-  db.notifications.forEach(n => {
-    const aRole = n.audienceRole || "all";
-    const aUser = n.audienceUsername || "";
-
-    const visible =
-      aRole === "all" ||
-      (aRole === "all-students" && role === "student") ||
-      (aRole === "student" && role === "student" && aUser === username);
-
-    if (visible && !n.readBy.includes(username)) n.readBy.push(username);
-  });
-
-  saveData();
-  res.json({ success: true });
-});
-
-// ---------- ME ----------
-app.get("/api/me", (req, res) => {
-  const username = String(req.headers["x-username"] || "").trim();
-  const role = String(req.headers["x-role"] || "").trim();
-  if (!username || !role) return res.status(401).json({ success: false, message: "Not logged in" });
-
-  const user = db.accounts.find(a => a.username === username);
-  if (!user) return res.status(404).json({ success: false, message: "User not found" });
-
-  res.json({ success: true, user: safeNoPassword(user) });
-});
-
-app.put("/api/me", (req, res) => {
-  const username = String(req.headers["x-username"] || "").trim();
-  const role = String(req.headers["x-role"] || "").trim();
-  if (!username || !role) return res.status(401).json({ success: false, message: "Not logged in" });
-
-  const user = db.accounts.find(a => a.username === username);
-  if (!user) return res.status(404).json({ success: false, message: "User not found" });
-
-  const { name, email } = req.body || {};
-
-  if (typeof name === "string" && name.trim()) user.name = name.trim();
-
-  if (typeof email === "string") {
-    const cleanEmail = email.trim();
-    if (!validEmail(cleanEmail)) {
-      return res.status(400).json({ success: false, message: "Invalid email" });
-    }
-    user.email = cleanEmail;
-  }
-
-  saveData();
-  res.json({ success: true, user: safeNoPassword(user) });
-});
-
-// ---------- NEWS ----------
-app.get("/api/news", (req, res) => {
-  const items = (db.news || [])
-    .slice()
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  res.json({ success: true, items });
-});
-
-app.post("/api/news", async (req, res) => {
-  const role = requireRole(req, res, ["manager"]);
-  if (!role) return;
-
-  const a = actorFromReq(req);
-  const { title, content = "", summary = "" } = req.body || {};
-
-  if (!title || !String(title).trim()) {
-    return res.status(400).json({ success: false, message: "Title required" });
-  }
-
-  const item = {
-    id: Date.now(),
-    title: String(title).trim(),
-    summary: String(summary || "").trim(),
-    content: String(content || "").trim(),
-    createdBy: a.byName || a.byUsername || "Manager",
-    createdByUsername: a.byUsername || "",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  };
-
-  db.news = Array.isArray(db.news) ? db.news : [];
-  db.news.unshift(item);
-  saveData();
-
-  addNotification({
-    type: "news",
-    action: "created",
-    message: `News posted: "${item.title}"`,
-    ...a,
-    targetType: "news",
-    targetId: item.id,
-    audienceRole: "all"
-  });
-
-  await sendNewsEmails(item);
-
-  res.json({ success: true, item });
-});
-
-app.put("/api/news/:id", (req, res) => {
-  const role = requireRole(req, res, ["manager"]);
-  if (!role) return;
-
-  const id = String(req.params.id);
-  const idx = db.news.findIndex(n => String(n.id) === id);
-  if (idx === -1) return res.status(404).json({ success: false, message: "News not found" });
-
-  const a = actorFromReq(req);
-  const { title, summary, content } = req.body || {};
-
-  if (typeof title === "string" && !title.trim()) {
-    return res.status(400).json({ success: false, message: "Title cannot be empty" });
-  }
-
-  db.news[idx] = {
-    ...db.news[idx],
-    ...(typeof title === "string" ? { title: title.trim() } : {}),
-    ...(typeof summary === "string" ? { summary: summary.trim() } : {}),
-    ...(typeof content === "string" ? { content: content.trim() } : {}),
-    updatedAt: new Date().toISOString(),
-    updatedBy: a.byName || a.byUsername || "Manager"
-  };
-
-  saveData();
-
-  addNotification({
-    type: "news",
-    action: "updated",
-    message: `News updated: "${db.news[idx].title}"`,
-    ...a,
-    targetType: "news",
-    targetId: id,
-    audienceRole: "all"
-  });
-
-  res.json({ success: true, item: db.news[idx] });
-});
-
-app.delete("/api/news/:id", (req, res) => {
-  const role = requireRole(req, res, ["manager"]);
-  if (!role) return;
-
-  const id = String(req.params.id);
-  const idx = db.news.findIndex(n => String(n.id) === id);
-  if (idx === -1) return res.status(404).json({ success: false, message: "News not found" });
-
-  const item = db.news[idx];
-  db.news.splice(idx, 1);
-  saveData();
-
-  const a = actorFromReq(req);
-  addNotification({
-    type: "news",
-    action: "deleted",
-    message: `News deleted: "${item.title}"`,
-    ...a,
-    targetType: "news",
-    targetId: id,
-    audienceRole: "all"
-  });
-
-  res.json({ success: true });
-});
-
-// ---------- SCHEDULE ----------
-app.get("/api/schedule", (req, res) => {
-  const role = String(req.query.role || req.headers["x-role"] || "").trim();
-  const username = String(req.query.username || req.headers["x-username"] || "").trim();
-
-  if (role === "student") {
-    if (!username) return res.status(400).json({ success: false, message: "Missing username" });
-
-    const now = Date.now();
-    const items = (db.schedule || [])
-      .filter(e => e && e.start)
-      .filter(e => {
-        return (
-          e.audienceRole === "all-students" ||
-          (e.audienceRole === "student" && String(e.audienceUsername || "") === username)
-        );
-      })
-      .filter(e => {
-        const endMs = new Date(e.end || e.start).getTime();
-        return !isNaN(endMs) && endMs >= (now - 60 * 60 * 1000);
-      })
-      .sort((a, b) => new Date(a.start) - new Date(b.start))
-      .slice(0, 200);
-
-    return res.json({ success: true, items });
-  }
-
-  if (!["manager", "instructor"].includes(role)) {
-    return res.status(403).json({ success: false, message: "Forbidden" });
-  }
-
-  const items = (db.schedule || []).slice().sort((a, b) => new Date(a.start) - new Date(b.start));
-  res.json({ success: true, items });
-});
-
-app.post("/api/schedule", (req, res) => {
-  const role = requireRole(req, res, ["manager", "instructor"]);
-  if (!role) return;
-
-  const a = actorFromReq(req);
-  const {
-    title,
-    course = "",
-    start,
-    end,
-    location = "",
-    notes = "",
-    audienceRole = "all-students",
-    audienceUsername = ""
-  } = req.body || {};
-
-  if (!title) return res.status(400).json({ success: false, message: "title required" });
-  if (!start || !isISODate(start)) return res.status(400).json({ success: false, message: "start must be ISO date" });
-  if (end && !isISODate(end)) return res.status(400).json({ success: false, message: "end must be ISO date" });
-
-  if (!["all-students", "student"].includes(audienceRole)) {
-    return res.status(400).json({ success: false, message: "audienceRole must be all-students or student" });
-  }
-  if (audienceRole === "student" && !String(audienceUsername).trim()) {
-    return res.status(400).json({ success: false, message: "audienceUsername required for audienceRole=student" });
-  }
-
-  const ev = {
-    id: Date.now(),
-    title: String(title),
-    course: String(course || ""),
-    start: new Date(start).toISOString(),
-    end: end ? new Date(end).toISOString() : new Date(start).toISOString(),
-    location: String(location || ""),
-    notes: String(notes || ""),
-    audienceRole,
-    audienceUsername: audienceRole === "student" ? String(audienceUsername).trim() : "",
-    createdBy: a.byName || a.byUsername || "Unknown",
-    createdByUsername: a.byUsername || "",
-    createdByRole: a.byRole || "",
-    createdAt: new Date().toISOString()
-  };
-
-  db.schedule = Array.isArray(db.schedule) ? db.schedule : [];
-  db.schedule.push(ev);
-  saveData();
-
-  addNotification({
-    type: "schedule",
-    action: "created",
-    message: audienceRole === "student"
-      ? `New schedule: "${ev.title}" (for ${ev.audienceUsername})`
-      : `New schedule: "${ev.title}"`,
-    ...a,
-    targetType: "schedule",
-    targetId: ev.id,
-    audienceRole: audienceRole === "student" ? "student" : "all-students",
-    audienceUsername: audienceRole === "student" ? ev.audienceUsername : ""
-  });
-
-  res.json({ success: true, item: ev });
-});
-
-app.put("/api/schedule/:id", (req, res) => {
-  const role = requireRole(req, res, ["manager", "instructor"]);
-  if (!role) return;
-
-  const a = actorFromReq(req);
-  const id = String(req.params.id);
-  db.schedule = Array.isArray(db.schedule) ? db.schedule : [];
-
-  const idx = db.schedule.findIndex(e => String(e.id) === id);
-  if (idx === -1) return res.status(404).json({ success: false, message: "Schedule event not found" });
-
-  const prev = db.schedule[idx];
-  const patch = { ...req.body };
-
-  if (patch.start && !isISODate(patch.start)) return res.status(400).json({ success: false, message: "start must be ISO date" });
-  if (patch.end && !isISODate(patch.end)) return res.status(400).json({ success: false, message: "end must be ISO date" });
-
-  if (patch.audienceRole && !["all-students", "student"].includes(patch.audienceRole)) {
-    return res.status(400).json({ success: false, message: "audienceRole must be all-students or student" });
-  }
-
-  if ((patch.audienceRole || prev.audienceRole) === "student") {
-    const u = String(patch.audienceUsername ?? prev.audienceUsername ?? "").trim();
-    if (!u) return res.status(400).json({ success: false, message: "audienceUsername required for audienceRole=student" });
-    patch.audienceUsername = u;
-  }
-
-  db.schedule[idx] = {
-    ...prev,
-    ...patch,
-    start: patch.start ? new Date(patch.start).toISOString() : prev.start,
-    end: patch.end ? new Date(patch.end).toISOString() : prev.end,
-    updatedBy: a.byName || a.byUsername || "Unknown",
-    updatedByUsername: a.byUsername || "",
-    updatedByRole: a.byRole || "",
-    updatedAt: new Date().toISOString()
-  };
-
-  saveData();
-
-  const ev = db.schedule[idx];
-  addNotification({
-    type: "schedule",
-    action: "updated",
-    message: ev.audienceRole === "student"
-      ? `Schedule updated: "${ev.title}" (for ${ev.audienceUsername})`
-      : `Schedule updated: "${ev.title}"`,
-    ...a,
-    targetType: "schedule",
-    targetId: ev.id,
-    audienceRole: ev.audienceRole === "student" ? "student" : "all-students",
-    audienceUsername: ev.audienceRole === "student" ? String(ev.audienceUsername || "") : ""
-  });
-
-  res.json({ success: true, item: ev });
-});
-
-app.delete("/api/schedule/:id", (req, res) => {
-  const role = requireRole(req, res, ["manager", "instructor"]);
-  if (!role) return;
-
-  const a = actorFromReq(req);
-  const id = String(req.params.id);
-  db.schedule = Array.isArray(db.schedule) ? db.schedule : [];
-
-  const idx = db.schedule.findIndex(e => String(e.id) === id);
-  if (idx === -1) return res.status(404).json({ success: false, message: "Schedule event not found" });
-
-  const ev = db.schedule[idx];
-  db.schedule.splice(idx, 1);
-  saveData();
-
-  addNotification({
-    type: "schedule",
-    action: "deleted",
-    message: ev.audienceRole === "student"
-      ? `Schedule deleted: "${ev.title}" (for ${ev.audienceUsername})`
-      : `Schedule deleted: "${ev.title}"`,
-    ...a,
-    targetType: "schedule",
-    targetId: id,
-    audienceRole: ev.audienceRole === "student" ? "student" : "all-students",
-    audienceUsername: ev.audienceRole === "student" ? String(ev.audienceUsername || "") : ""
-  });
-
-  res.json({ success: true });
-});
-
-// ---------- COURSES ----------
-app.get("/api/courses", (req, res) => res.json(db.courses));
-app.get("/api/courses/:id", (req, res) => {
-  const id = String(req.params.id);
-  const course = db.courses.find(c => String(c.id) === id);
-
-  if (!course) {
-    return res.status(404).json({ success: false, message: "Course not found" });
-  }
-
-  res.json({ success: true, course });
-});
-
-app.post("/api/courses", (req, res) => {
-  const a = actorFromReq(req);
-
-  const {
-    title,
-    description = "",
-    cover = "",
-    durationValue = "",
-    durationUnit = "",
-    sessionsValue = "",
-    sessionsUnit = "",
-    programType = "",
-    theme = "",
-    offer = "",
-    startDate = null,
-    endDate = null,
-    status = "draft"
-  } = req.body || {};
-
-  if (!title) {
-    return res.status(400).json({ success: false, message: "Title required" });
-  }
-
-  const newCourse = {
-    id: Date.now(),
-
-    title,
-    description,
-    cover,
-
-    durationValue,
-    durationUnit,
-
-    sessionsValue,
-    sessionsUnit,
-
-    programType,
-    theme,
-    offer,
-
-    startDate,
-    endDate,
-    status,
-
-    createdByUsername: a.byUsername || "",
-    createdByAvatar: req.body.createdByAvatar || "",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-
-  db.courses = Array.isArray(db.courses) ? db.courses : [];
-  db.courses.push(newCourse);
-  saveData();
-
-  addNotification({
-    type: "course",
-    action: "created",
-    message: `Course created: "${newCourse.title}"`,
-    ...a,
-    targetType: "course",
-    targetId: newCourse.id,
-    audienceRole: "all"
-  });
-
-  res.json({ success: true, item: newCourse });
-});
-
-// Update course
-app.put("/api/courses/:id", (req, res) => {
-  const id = String(req.params.id);
-  const idx = db.courses.findIndex(c => String(c.id) === id);
-  if (idx === -1) return res.status(404).json({ success: false, message: "Course not found" });
-
-  const a = actorFromReq(req);
-  const patch = req.body;
-
-  db.courses[idx] = {
-    ...db.courses[idx],
-    ...patch,
-    updatedAt: new Date().toISOString(),
-    updatedBy: a.byName || a.byUsername || "Unknown",
-  };
-
-  saveData();
-
-  addNotification({
-    type: "course",
-    action: "updated",
-    message: `Course updated: "${db.courses[idx].title}"`,
-    ...a,
-    targetType: "course",
-    targetId: id,
-    audienceRole: "all"
-  });
-
-  res.json({ success: true, item: db.courses[idx] });
-});
-
-// Delete course
-app.delete("/api/courses/:id", (req, res) => {
-  const id = String(req.params.id);
-  const idx = db.courses.findIndex(c => String(c.id) === id);
-  if (idx === -1) return res.status(404).json({ success: false, message: "Course not found" });
-
-  const a = actorFromReq(req);
-  const removed = db.courses.splice(idx, 1)[0];
-  saveData();
-
-  addNotification({
-    type: "course",
-    action: "deleted",
-    message: `Course deleted: "${removed.title}"`,
-    ...a,
-    targetType: "course",
-    targetId: id,
-    audienceRole: "all"
-  });
-
-  res.json({ success: true });
-});
-
-
-// ---------- PROJECTS ----------
-app.get("/api/projects", (req, res) => {
-  res.json(db.projects || []);
-});
-
-app.post("/api/projects", (req, res) => {
-  const { title, cover = "", description = "", status = "draft" } = req.body || {};
-
-  if (!title) {
-    return res.status(400).json({ success: false, message: "Title required" });
-  }
-
-  const newProject = {
-    id: Date.now(),
-    title,
-    cover,
-    description,
-    status,
-    createdAt: new Date().toISOString()
-  };
-
-  db.projects = db.projects || [];
-  db.projects.push(newProject);
-  saveData();
-
-  res.json({ success: true, item: newProject }); // ✅ ONLY response
-});
-
-app.get("/api/projects/:id", (req, res) => {
-  const id = String(req.params.id);
-  const project = (db.projects || []).find(p => String(p.id) === id);
-
-  if (!project) {
-    return res.status(404).json({ success: false, message: "Project not found" });
-  }
-
-  res.json({ success: true, project });
-});
-
-// UPDATE project
-app.put("/api/projects/:id", (req, res) => {
-  const id = String(req.params.id);
-  const idx = (db.projects || []).findIndex(p => String(p.id) === id);
-
-  if (idx === -1) {
-    return res.status(404).json({ success: false, message: "Project not found" });
-  }
-
-  db.projects[idx] = {
-    ...db.projects[idx],
-    ...req.body,
-    updatedAt: new Date().toISOString()
-  };
-
-  saveData();
-
-  res.json({ success: true, item: db.projects[idx] });
-});
-
-// DELETE project
-app.delete("/api/projects/:id", (req, res) => {
-  const id = String(req.params.id);
-  const before = db.projects.length;
-
-  db.projects = (db.projects || []).filter(p => String(p.id) !== id);
-
-  if (db.projects.length === before) {
-    return res.status(404).json({ success: false, message: "Project not found" });
-  }
-
-  saveData();
-
-  res.json({ success: true });
-});
-
-
-// ---------- HOMEWORK ----------
-app.get("/api/homework", (req, res) => {
-  const username = String(req.query.username || req.headers["x-username"] || "").trim();
-  const role = String(req.query.role || req.headers["x-role"] || "").trim();
-
-  let items = Array.isArray(db.homework) ? db.homework.slice() : [];
-
-  // Students only see homework for their courses or all
-  if (role === "student" && username) {
-    const student = db.students.find(s => s.username === username);
-    if (student) {
-      items = items.filter(h => h.course === student.course || !h.course);
-    } else {
-      items = [];
-    }
-  }
-
-  // Sort by newest first
-  items.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-
-  res.json({ success: true, items });
-});
-
-app.post("/api/homework", upload?.single("file"), (req, res) => {
-  const role = requireRole(req, res, ["instructor", "manager"]);
-  if (!role) return;
-
-  const a = actorFromReq(req);
-  const { title, description = "", course, submitted_by } = req.body || {};
-
-  if (!title || !course) return res.status(400).json({ success: false, message: "Title and course required" });
-
-  let pdfUrl = "";
-  let pdfName = "";
-  if (req.file) {
-    pdfUrl = `/uploads/${req.file.filename}`;
-    pdfName = req.file.originalname;
-  }
-
-  const autoBy = a.byName || a.byUsername || "Unknown";
-
-  const newHW = {
-    id: Date.now(),
-    title: String(title),
-    description: String(description),
-    course: String(course),
-    submitted_by: (submitted_by && String(submitted_by).trim()) || autoBy,
-    pdfUrl,
-    pdfName,
-    createdBy: autoBy,
-    createdByUsername: a.byUsername || "",
-    createdByRole: a.byRole || "",
-    createdAt: new Date().toISOString()
-  };
-
-  db.homework.push(newHW);
-  saveData();
-
-  addNotification({
-    type: "homework",
-    action: "created",
-    message: `Homework created: "${newHW.title}" (${newHW.course})`,
-    ...a,
-    targetType: "homework",
-    targetId: newHW.id,
-    audienceRole: "all-students"
-  });
-
-  res.json({ success: true, item: newHW });
-});
-
-app.put("/api/homework/:id", upload?.single("file"), (req, res) => {
-  const role = requireRole(req, res, ["instructor", "manager"]);
-  if (!role) return;
-
-  const id = String(req.params.id);
-  const idx = db.homework.findIndex(h => String(h.id) === id);
-  if (idx === -1) return res.status(404).json({ success: false, message: "Homework not found" });
-
-  const a = actorFromReq(req);
-
-  let pdfUrl = db.homework[idx].pdfUrl;
-  let pdfName = db.homework[idx].pdfName;
-  if (req.file) {
-    pdfUrl = `/uploads/${req.file.filename}`;
-    pdfName = req.file.originalname;
-  }
-
-  db.homework[idx] = {
-    ...db.homework[idx],
-    ...req.body,
-    pdfUrl,
-    pdfName,
-    updatedBy: a.byName || a.byUsername || "Unknown",
-    updatedByUsername: a.byUsername || "",
-    updatedByRole: a.byRole || "",
-    updatedAt: new Date().toISOString()
-  };
-
-  saveData();
-
-  addNotification({
-    type: "homework",
-    action: "updated",
-    message: `Homework updated: "${db.homework[idx].title}" (${db.homework[idx].course})`,
-    ...a,
-    targetType: "homework",
-    targetId: id,
-    audienceRole: "all-students"
-  });
-
-  res.json({ success: true, item: db.homework[idx] });
-});
-
-app.delete("/api/homework/:id", (req, res) => {
-  const role = requireRole(req, res, ["instructor", "manager"]);
-  if (!role) return;
-
-  const id = String(req.params.id);
-  const before = db.homework.length;
-  db.homework = db.homework.filter(h => String(h.id) !== id);
-  saveData();
-
-  const a = actorFromReq(req);
-  if (db.homework.length !== before) {
-    addNotification({
-      type: "homework",
-      action: "deleted",
-      message: `Homework deleted (id: ${id})`,
-      ...a,
-      targetType: "homework",
-      targetId: id,
-      audienceRole: "all-students"
-    });
-  }
-
-  res.json({ success: true });
-});
-
-// ---------- STUDENTS ----------
-app.get("/api/students", (req, res) => res.json(db.students));
-
-app.put("/api/students/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const idx = db.students.findIndex((s) => s.enrollment_id === id);
-  if (idx === -1) return res.status(404).json({ error: "Student not found" });
-
-  db.students[idx] = { ...db.students[idx], ...req.body };
-  saveData();
-  res.json(db.students[idx]);
-});
-
-// ---------- USERS ----------
-app.get("/api/users", (req, res) => {
-  const role = requireRole(req, res, ["manager"]);
-  if (!role) return;
-  res.json(db.accounts.map(safeNoPassword));
-});
-
-app.post("/api/users", (req, res) => {
-  const role = requireRole(req, res, ["manager"]);
-  if (!role) return;
-
-  const { username, password, role: newRole, name, email = "" } = req.body || {};
-  if (!username || !password || !newRole) {
-    return res.status(400).json({ success: false, message: "Missing username/password/role" });
-  }
-
-  const allowedRoles = ["student", "instructor", "manager"];
-  if (!allowedRoles.includes(newRole)) {
-    return res.status(400).json({ success: false, message: "Invalid role" });
-  }
-
-  const cleanUsername = String(username).trim();
-  const cleanEmail = String(email || "").trim();
-
-  if (!validEmail(cleanEmail)) {
-    return res.status(400).json({ success: false, message: "Invalid email" });
-  }
-
-  if (db.accounts.find(a => a.username === cleanUsername)) {
-    return res.status(400).json({ success: false, message: "Username already exists" });
-  }
-
-  const newUser = {
-    username: cleanUsername,
-    password: String(password),
-    role: newRole,
-    name: String(name || cleanUsername).trim(),
-    email: cleanEmail,
-    avatarUrl: ""
-  };
-
-  db.accounts.push(newUser);
-
-  if (newRole === "student") {
-    db.students.push({
-      enrollment_id: Date.now(),
-      name: newUser.name,
-      course: "Unassigned",
-      grade: null,
-      username: newUser.username
-    });
-  }
-
-  saveData();
-
-  const a = actorFromReq(req);
-  addNotification({
-    type: "user",
-    action: "created",
-    message: `User created: "${newUser.username}" (${newUser.role})`,
-    ...a,
-    targetType: "user",
-    targetId: newUser.username,
-    audienceRole: "all"
-  });
-
-  res.json({ success: true, user: safeNoPassword(newUser) });
-});
-
-app.delete("/api/users/:username", (req, res) => {
-  const role = requireRole(req, res, ["manager"]);
-  if (!role) return;
-
-  const uname = String(req.params.username || "").trim();
-  if (["root", "manager"].includes(uname)) {
-    return res.status(403).json({ success: false, message: "Cannot delete protected account" });
-  }
-
-  const before = db.accounts.length;
-  db.accounts = db.accounts.filter(a => a.username !== uname);
-  db.students = db.students.filter(s => s.username !== uname);
-
-  if (db.accounts.length === before) {
-    return res.status(404).json({ success: false, message: "User not found" });
-  }
-
-  saveData();
-
-  const a = actorFromReq(req);
-  addNotification({
-    type: "user",
-    action: "deleted",
-    message: `User deleted: "${uname}"`,
-    ...a,
-    targetType: "user",
-    targetId: uname,
-    audienceRole: "all"
-  });
-
-  res.json({ success: true });
-});
-
-// ---------- AUTH ----------
-app.post("/api/login", (req, res) => {
-  const { username, password } = req.body || {};
-  if (!username || !password) return res.status(400).json({ success: false });
-
-  const user = db.accounts.find(
-    (a) => a.username === String(username).trim() && a.password === String(password).trim()
-  );
-
-  if (!user) return res.status(401).json({ success: false });
-
-  const redirect =
-    user.role === "instructor" ? "/instructor" :
-    user.role === "manager" ? "/manager" :
-    "/students";
-
-  res.json({
-    success: true,
-    role: user.role,
-    name: user.name,
-    username: user.username,
-    email: user.email || "",
-    redirect
-  });
-});
-
-app.post("/api/register", (req, res) => {
-  return res.status(403).json({ success: false, message: "Online registration disabled. Visit Hofi Korsou." });
-});
-
-// ---------------- PAGE ROUTES ----------------
-function sendFirstExisting(res, ...relativeCandidates) {
-  for (const rel of relativeCandidates) {
-    const abs = path.join(publicDir, rel);
-    if (fs.existsSync(abs)) return res.sendFile(abs);
-  }
-  res.status(404).send("Not found: " + relativeCandidates.join(" OR "));
 }
 
-app.get("/", (req, res) => sendFirstExisting(res, "homepage/index.html"));
-app.get("/instructor", (req, res) => sendFirstExisting(res, "instructor/index.html"));
-app.get("/manager", (req, res) => sendFirstExisting(res, "manager/manager.html"));
-app.get("/students", (req, res) => sendFirstExisting(res, "students/student.html"));
-app.get("/homepage/login.html", (req, res) => sendFirstExisting(res, "homepage/login.html"));
-app.get("/homepage/login-student.html", (req, res) => sendFirstExisting(res, "homepage/login-student.html", "homepage/login.html"));
-app.get("/homepage/login-instructor.html", (req, res) => sendFirstExisting(res, "homepage/login-instructor.html", "homepage/login.html"));
-app.get("/homepage/login-manager.html", (req, res) => sendFirstExisting(res, "homepage/login-manager.html", "homepage/login.html"));
-app.get("/homepage/register.html", (req, res) => sendFirstExisting(res, "homepage/register.html", "register.html"));
+  // Bind click events from your course cards
+  document.addEventListener("click", (e) => {
+    const courseCard = e.target.closest(".course-card");
+    if (e.target.closest(".menu-btn") || e.target.closest(".menu")) return;
+    if (courseCard) {
+      const id = courseCard.dataset.id;
+      if (id) openProgramDetail(id);
+      return;
+    }
 
-// ---------------- START ----------------
-app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+    const projectCard = e.target.closest(".project-card");
+    if (projectCard) {
+      const id = projectCard.dataset.id;
+      if (id) openProjectDetail(id);
+    }
+  });
+
+
+
+/* ==========================================
+   PROJECTS SECTION (CREATE & DETAIL)
+========================================== */
+
+function openCreateProjectModal() {
+  showModal(`
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-extrabold">Create Project</h2>
+      <button id="cancelModal" class="btn-theme text-sm">Cancel</button>
+    </div>
+
+    <label class="text-sm font-bold muted">Title</label>
+    <input id="projectTitle" class="input-theme mt-1 mb-3" />
+
+    <label class="text-sm font-bold muted">Cover</label>
+    <input id="projectCover" type="file" accept="image/*" class="mb-3"/>
+
+    <label class="text-sm font-bold muted">Content</label>
+
+    <div class="flex gap-2 mb-2">
+      <button class="btn-theme text-sm" onclick="document.execCommand('bold')">Bold</button>
+      <button class="btn-theme text-sm" onclick="document.execCommand('italic')">Italic</button>
+      <button class="btn-theme text-sm" onclick="document.execCommand('insertUnorderedList')">• List</button>
+      <button class="btn-theme text-sm" onclick="addImage()">Insert Image</button>
+      <button class="btn-theme text-sm" onclick="addLink()">Insert Link</button>
+    </div>
+
+    <div id="projectDescription"
+      contenteditable="true"
+      class="input-theme min-h-[200px] mb-4 overflow-y-auto">
+    </div>
+
+    <div class="flex justify-end gap-3 mt-4">
+      <button id="saveDraftProjectBtn" class="btn-theme">Save Draft</button>
+      <button id="publishProjectBtn" class="btn-theme">Publish</button>
+    </div>
+  `);
+
+  qs("#saveDraftProjectBtn")?.addEventListener("click", () => createProject("draft"));
+  qs("#publishProjectBtn")?.addEventListener("click", () => createProject("published"));
+}
+
+window.addImage = function () {
+  const url = prompt("Enter image URL:");
+  if (url) document.execCommand("insertImage", false, url);
+};
+
+window.addLink = function () {
+  const url = prompt("Enter link URL:");
+  if (url) document.execCommand("createLink", false, url);
+};
+
+async function createProject(status) {
+  const title = qs("#projectTitle")?.value.trim();
+  const file = qs("#projectCover")?.files?.[0];
+
+  let cover = "";
+
+  if (file) {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await fetch(`${API}/upload`,{
+      method: "POST",
+      body: formData
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      return toast("Upload failed", "rgba(185,28,28,.85)");
+    }
+
+    cover = data.url;
+  }
+  const description = qs("#projectDescription")?.innerHTML;
+
+  if (!title) return toast("Title required", "rgba(185,28,28,.85)");
+
+  
+
+  const newProject = {
+    title,
+    cover,
+    description,
+    status: status
+  };
+
+  try {
+    const res = await fetch(`${API}/projects`, {
+      method: "POST",
+      headers: jsonHeaders(),
+      body: JSON.stringify(newProject)
+    });
+
+    if (!res.ok) throw new Error();
+
+    closeModal();
+    toast(`Project ${status === "draft" ? "saved as draft" : "published"}`, "rgba(34,197,94,.7)");
+    loadProjects(); 
+  } catch {
+    toast("Failed to create project", "rgba(185,28,28,.85)");
+  }
+}
+
+async function loadProjects() {
+  const projects = await fetchJSON("/projects");
+  const list = qs("#projectsFullList");
+  if (!list) return;
+
+list.innerHTML = (projects || []).map(renderProjectCard).join("");
+
+  // TOGGLE MENU
+list.querySelectorAll(".menu-btn").forEach((btn) => {
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+
+    document.querySelectorAll(".menu").forEach(m => m.classList.add("hidden"));
+
+    btn.nextElementSibling.classList.toggle("hidden");
+  });
+});
+
+// DELETE
+list.querySelectorAll(".del-project").forEach((btn) => {
+  btn.addEventListener("click", async (e) => {
+    e.stopPropagation();
+
+    const id = btn.dataset.id;
+    if (!confirm("Delete project?")) return;
+
+    const res = await fetch(`${API}/projects/${id}`, {
+      method: "DELETE",
+      headers: actorHeaders()
+    });
+
+    if (!res.ok) return toast("Delete failed", "rgba(185,28,28,.85)");
+
+    toast("Deleted", "rgba(185,28,28,.85)");
+    loadProjects();
+    loadDashboard();
+  });
+});
+
+// EDIT
+list.querySelectorAll(".edit-project").forEach((btn) => {
+  btn.addEventListener("click", async (e) => {
+    e.stopPropagation();
+
+    const id = btn.dataset.id;
+
+    const res = await fetchJSON(`/projects/${id}`);
+    if (!res || !res.success) return toast("Project not found", "rgba(185,28,28,.85)");
+
+    openEditProjectModal(res.project);
+  });
+});
+
+  list.querySelectorAll(".project-card").forEach((card) => {
+    card.onclick = async () => {
+      const id = card.dataset.id;
+
+      try {
+        const res = await fetchJSON(`/projects/${id}`);
+        
+        if (!res || !res.success) {
+          return toast("Project not found", "rgba(185,28,28,.85)");
+        }
+
+        openProjectDetail(res.project);
+      } catch (err) {
+        console.error("Fetch error:", err);
+        toast("Failed to load project", "rgba(185,28,28,.85)");
+      }
+    };
+  });
+
+  if (e.target.closest(".menu-btn") || e.target.closest(".menu")) return;
+}
+
+function openProjectDetail(project) {
+  qs("#projectDetailBg")?.remove();
+
+  const bg = document.createElement("div");
+  bg.id = "projectDetailBg";
+  bg.className = "fixed inset-0 bg-black/60 flex items-center justify-center z-[9999] backdrop-blur-md p-4 md:p-8";
+
+  bg.innerHTML = `
+    <div class="surface-2 w-full max-w-3xl max-h-full flex flex-col rounded-[24px] overflow-hidden relative shadow-2xl">
+      
+      <button id="closeDetailBtn" class="absolute top-4 right-4 z-10 w-10 h-10 bg-black/50 hover:bg-black/80 backdrop-blur text-white rounded-full flex items-center justify-center transition-colors text-lg">
+        ✕
+      </button>
+
+      <div class="w-full h-48 md:h-72 bg-gray-800 relative shrink-0">
+        ${
+          project.cover
+            ? `<img src="${project.cover}" class="w-full h-full object-cover"/>`
+            : `<div class="w-full h-full flex items-center justify-center text-gray-400">No Cover Image</div>`
+        }
+      </div>
+
+      <div class="p-6 md:p-8 overflow-y-auto flex-1">
+        <h1 class="text-2xl md:text-3xl font-extrabold mb-4">${esc(project.title)}</h1>
+        
+        <div class="text-base muted leading-relaxed prose prose-invert max-w-none">
+          ${project.description || "No description available for this project."}
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(bg);
+  document.body.style.overflow = "hidden";
+
+  const closeOverlay = () => {
+    bg.remove();
+    document.body.style.overflow = "";
+  };
+
+  bg.querySelector("#closeDetailBtn").addEventListener("click", closeOverlay);
+  bg.addEventListener("click", (e) => { if (e.target === bg) closeOverlay(); });
+
+  const escHandler = (e) => {
+    if (e.key === "Escape") {
+      closeOverlay();
+      window.removeEventListener("keydown", escHandler);
+    }
+  };
+  window.addEventListener("keydown", escHandler);
+}
+
+function openEditProjectModal(project) {
+  showModal(`
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-extrabold">Edit Project</h2>
+      <button id="cancelModal" class="btn-theme text-sm">Cancel</button>
+    </div>
+
+    <label class="text-sm font-bold muted">Title</label>
+    <input id="projectTitle" class="input-theme mt-1 mb-3" />
+
+    <label class="text-sm font-bold muted">Cover</label>
+    <input id="projectCover" type="file" accept="image/*" class="mb-3"/>
+
+    <label class="text-sm font-bold muted">Content</label>
+
+    <div class="flex gap-2 mb-2">
+      <button class="btn-theme text-sm" onclick="document.execCommand('bold')">Bold</button>
+      <button class="btn-theme text-sm" onclick="document.execCommand('italic')">Italic</button>
+      <button class="btn-theme text-sm" onclick="document.execCommand('insertUnorderedList')">• List</button>
+      <button class="btn-theme text-sm" onclick="addImage()">Insert Image</button>
+      <button class="btn-theme text-sm" onclick="addLink()">Insert Link</button>
+    </div>
+
+    <div id="projectDescription"
+      contenteditable="true"
+      class="input-theme min-h-[200px] mb-4 overflow-y-auto">
+    </div>
+
+    <div class="flex justify-end gap-3 mt-4">
+      <button id="saveDraftProjectBtn" class="btn-theme">Save Draft</button>
+      <button id="publishProjectBtn" class="btn-theme">Publish</button>
+    </div>
+  `);
+
+  //  PREFILL
+  qs("#projectTitle").value = project.title || "";
+  qs("#projectDescription").innerHTML = project.description || "";
+
+  // SAVE (PUT)
+  qs("#saveDraftProjectBtn")?.addEventListener("click", async () => {
+    const title = qs("#projectTitle").value.trim();
+    const description = qs("#projectDescription").innerHTML;
+    const file = qs("#projectCover")?.files?.[0];
+
+    if (!title) return toast("Title required", "rgba(185,28,28,.85)");
+
+    let cover = project.cover || "";
+
+    // Upload new cover ONLY if changed
+    if (file) {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch(`${API}/upload`, {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        return toast("Image upload failed", "rgba(185,28,28,.85)");
+      }
+
+      cover = data.url;
+    }
+
+    const updatedProject = {
+      title,
+      description,
+      cover,
+      status: project.status || "draft"
+    };
+
+    try {
+      const res = await fetch(`${API}/projects/${project.id}`, {
+        method: "PUT",
+        headers: jsonHeaders(),
+        body: JSON.stringify(updatedProject)
+      });
+
+      const out = await safeJson(res);
+
+      if (!res.ok || !out?.success) {
+        return toast(out?.message || "Update failed", "rgba(185,28,28,.85)");
+      }
+
+      closeModal();
+      toast("Project updated", "rgba(34,197,94,.7)");
+
+      loadProjects();
+      loadDashboard();
+    } catch (err) {
+      console.error(err);
+      toast("Server error", "rgba(185,28,28,.85)");
+    }
+  });
+}
+
+
+//------------- HOMEWORKS ----------------
+
+
+async function loadHomework() {
+  const data = await fetchJSON("/homework");
+  const createdList = qs("#homework-created");     // teacher assignments
+  const submittedList = qs("#homework-submitted"); // student submissions
+
+  if (!createdList || !submittedList) return;
+
+  const created = data.created || [];
+  const submitted = data.submitted || [];
+
+  // =========================
+  // TEACHER CREATED
+  // =========================
+  createdList.innerHTML = !created.length
+    ? `<div class="surface-2 p-4 rounded-[18px] text-sm muted">No assignments created.</div>`
+    : created.map(h => `
+      <div class="surface-2 p-4 rounded-[18px] flex justify-between items-start">
+        <div class="flex-1">
+          <div class="font-extrabold">${esc(h.title)}</div>
+          <div class="text-sm muted">${esc(h.description || "")}</div>
+
+          <div class="text-xs muted mt-2">
+            Program: ${esc(h.course)} · Created: ${new Date(h.createdAt).toLocaleDateString()}
+          </div>
+
+          <div class="text-xs muted">
+            Due: ${h.dueDate ? new Date(h.dueDate).toLocaleDateString() : "-"}
+          </div>
+
+          <div class="text-xs muted">
+            By: ${esc(h.createdBy || "Manager")}
+          </div>
+
+          ${h.pdfUrl ? `<a href="${h.pdfUrl}" target="_blank" class="text-xs underline">View File</a>` : ""}
+        </div>
+
+        <div class="relative">
+          <button class="menu-btn btn-theme text-sm">⋮</button>
+
+          <div class="menu hidden absolute right-0 mt-2 w-40 bg-white rounded-xl shadow-lg border z-50">
+            <button class="view-hw block w-full text-left px-4 py-2 hover:bg-gray-100" data-id="${h.id}">
+              View
+            </button>
+            <button class="edit-hw block w-full text-left px-4 py-2 hover:bg-gray-100" data-id="${h.id}">
+              Edit
+            </button>
+            <button class="del-hw block w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500" data-id="${h.id}">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    `).join("");
+
+  // =========================
+  // STUDENT SUBMISSIONS
+  // =========================
+  submittedList.innerHTML = !submitted.length
+    ? `<div class="surface-2 p-4 rounded-[18px] text-sm muted">No submissions yet.</div>`
+    : submitted.map(s => `
+      <div class="surface-2 p-4 rounded-[18px] flex justify-between items-start">
+        <div>
+          <div class="font-extrabold">${esc(s.title)}</div>
+          <div class="text-sm muted">
+            ${esc(s.studentName)} · ${esc(s.course)}
+          </div>
+        </div>
+
+        <div class="relative">
+          <button class="menu-btn btn-theme text-sm">⋮</button>
+
+          <div class="menu hidden absolute right-0 mt-2 w-40 bg-white rounded-xl shadow-lg border z-50">
+            <button class="view-sub block w-full text-left px-4 py-2 hover:bg-gray-100" data-id="${s.id}">
+              View
+            </button>
+            <button class="grade-sub block w-full text-left px-4 py-2 hover:bg-gray-100">
+              Grade
+            </button>
+          </div>
+        </div>
+      </div>
+    `).join("");
+
+  // =========================
+  // MENU TOGGLE
+  // =========================
+  document.querySelectorAll(".menu-btn").forEach(btn => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      document.querySelectorAll(".menu").forEach(m => m.classList.add("hidden"));
+      btn.nextElementSibling.classList.toggle("hidden");
+    };
+  });
+
+  // =========================
+  // EVENTS
+  // =========================
+  createdList.querySelectorAll(".view-hw").forEach(btn => {
+    btn.onclick = () => openHomeworkDetail(btn.dataset.id);
+  });
+
+  createdList.querySelectorAll(".edit-hw").forEach(btn => {
+    const found = created.find(x => String(x.id) === btn.dataset.id);
+    if (found) btn.onclick = () => openEditHomeworkModal(found);
+  });
+
+  createdList.querySelectorAll(".del-hw").forEach(btn => {
+    btn.onclick = async () => {
+      if (!confirm("Delete assignment?")) return;
+
+      await fetch(`${API}/homework/${btn.dataset.id}`, {
+        method: "DELETE",
+        headers: actorHeaders()
+      });
+
+      toast("Deleted", "rgba(185,28,28,.85)");
+      loadHomework();
+    };
+  });
+
+  submittedList.querySelectorAll(".view-sub").forEach(btn => {
+    btn.onclick = () => openSubmissionDetail(btn.dataset.id);
+  });
+
+  submittedList.querySelectorAll(".grade-sub").forEach(btn => {
+    btn.onclick = () => openGradeModal(btn.dataset.id);
+  });
+}
+
+
+  
+  function openCreateHomeworkModal() {
+    showModal(`
+      <h2 class="text-xl font-extrabold mb-4">Create Homework</h2>
+      <label class="text-sm font-bold muted">Title</label>
+      <input id="hwTitle" class="input-theme mt-1 mb-3" placeholder="Title" />
+      <label class="text-sm font-bold muted">Description</label>
+      <textarea id="hwDesc" class="input-theme mt-1 mb-3" placeholder="Description"></textarea>
+      <label class="text-sm font-bold muted">Course</label>
+      <input id="hwCourse" class="input-theme mt-1 mb-3" placeholder="Course name" />
+      <label class="text-sm font-bold muted">PDF (optional)</label>
+      <input id="hwPdf" type="file" accept=".pdf" class="mt-2 mb-4 w-full text-sm" />
+      <div class="flex justify-end gap-2">
+        <button id="cancelModal" class="btn-theme">Cancel</button>
+        <button id="submitHw" class="btn-theme">Create</button>
+      </div>
+    `);
+
+    qs("#submitHw").addEventListener("click", async () => {
+      const title = qs("#hwTitle").value.trim();
+      const description = qs("#hwDesc").value.trim();
+      const course = qs("#hwCourse").value.trim();
+      if (!title || !course) return toast("Title + course required", "rgba(185,28,28,.85)");
+
+      let pdfUrl = "", pdfName = "";
+      const file = qs("#hwPdf")?.files?.[0];
+      try {
+        if (file) {
+          const up = await uploadPdf(file);
+          pdfUrl = up.url; pdfName = up.originalName;
+        }
+      } catch (e) {
+        return toast(e.message, "rgba(185,28,28,.85)");
+      }
+
+      const res = await fetch(`${API}/homework`, {
+        method: "POST",
+        headers: jsonHeaders(),
+        body: JSON.stringify({ title, description, course, pdfUrl, pdfName }),
+      });
+
+      if (!res.ok) return toast("Create homework failed", "rgba(185,28,28,.85)");
+
+      closeModal();
+      toast("Homework created", "rgba(34,197,94,.70)");
+      loadHomework();
+      loadDashboard();
+      loadNotifications();
+    });
+  }
+
+  function openEditHomeworkModal(hw) {
+    showModal(`
+      <h2 class="text-xl font-extrabold mb-4">Edit Homework</h2>
+      <label class="text-sm font-bold muted">Title</label>
+      <input id="hwTitle" class="input-theme mt-1 mb-3" value="${esc(hw.title)}" />
+      <label class="text-sm font-bold muted">Description</label>
+      <textarea id="hwDesc" class="input-theme mt-1 mb-3">${esc(hw.description || "")}</textarea>
+      <label class="text-sm font-bold muted">Course</label>
+      <input id="hwCourse" class="input-theme mt-1 mb-3" value="${esc(hw.course || "")}" />
+      <div class="text-xs muted mb-2">${hw.pdfUrl ? `Current PDF: ${esc(hw.pdfName || "Attached")}` : "No PDF attached"}</div>
+      <input id="hwPdf" type="file" accept=".pdf" class="mt-1 mb-4 w-full text-sm" />
+      <div class="flex justify-end gap-2">
+        <button id="cancelModal" class="btn-theme">Cancel</button>
+        <button id="saveHw" class="btn-theme">Save</button>
+      </div>
+    `);
+
+    qs("#saveHw").addEventListener("click", async () => {
+      const title = qs("#hwTitle").value.trim();
+      const description = qs("#hwDesc").value.trim();
+      const course = qs("#hwCourse").value.trim();
+      if (!title || !course) return toast("Title + course required", "rgba(185,28,28,.85)");
+
+      let pdfUrl = hw.pdfUrl || "", pdfName = hw.pdfName || "";
+      const file = qs("#hwPdf")?.files?.[0];
+      try {
+        if (file) {
+          const up = await uploadPdf(file);
+          pdfUrl = up.url; pdfName = up.originalName;
+        }
+      } catch (e) {
+        return toast(e.message, "rgba(185,28,28,.85)");
+      }
+
+      const res = await fetch(`${API}/homework/${encodeURIComponent(hw.id)}`, {
+        method: "PUT",
+        headers: jsonHeaders(),
+        body: JSON.stringify({ title, description, course, pdfUrl, pdfName }),
+      });
+
+      if (!res.ok) return toast("Update failed", "rgba(185,28,28,.85)");
+
+      closeModal();
+      toast("Homework updated", "rgba(34,197,94,.70)");
+      loadHomework();
+      loadDashboard();
+      loadNotifications();
+    });
+  }
+
+  async function openHomeworkDetail(id) {
+  const res = await fetchJSON(`/homework/${id}`);
+    if (!res?.success) return toast("Not found", "rgba(185,28,28,.85)");
+
+    const h = res.homework;
+
+    const bg = document.createElement("div");
+    bg.className = "fixed inset-0 bg-black/60 flex items-center justify-center z-[9999] backdrop-blur-md";
+
+    bg.innerHTML = `
+      <div class="surface-2 w-full max-w-2xl p-6 rounded-[24px] relative">
+
+        <button id="closeDetail" class="absolute top-4 right-4">✕</button>
+
+        <h1 class="text-2xl font-extrabold mb-2">${esc(h.title)}</h1>
+
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-full bg-indigo-400 flex items-center justify-center text-white">
+            ${initials(h.createdBy || "U")}
+          </div>
+          <div>${esc(h.createdBy || "Unknown")}</div>
+        </div>
+
+        <div class="text-sm muted mb-2">Program: ${esc(h.course)}</div>
+        <div class="text-sm muted mb-2">Created: ${new Date(h.createdAt).toLocaleDateString()}</div>
+        <div class="text-sm muted mb-4">Due: ${h.dueDate ? new Date(h.dueDate).toLocaleDateString() : "-"}</div>
+
+        <div class="text-sm mb-4">${esc(h.description || "")}</div>
+
+        ${h.pdfUrl ? `<a href="${h.pdfUrl}" target="_blank" class="underline text-sm">View File</a>` : ""}
+
+      </div>
+    `;
+
+    document.body.appendChild(bg);
+    bg.onclick = (e) => { if (e.target === bg) bg.remove(); };
+    bg.querySelector("#closeDetail").onclick = () => bg.remove();
+  }
+
+
+  async function openSubmissionDetail(id) {
+  const res = await fetchJSON(`/submissions/${id}`);
+  if (!res?.success) return;
+
+  const s = res.submission;
+
+  const bg = document.createElement("div");
+  bg.className = "fixed inset-0 bg-black/60 flex items-center justify-center z-[9999]";
+
+  bg.innerHTML = `
+    <div class="surface-2 w-full max-w-2xl p-6 rounded-[24px] relative">
+
+      <button id="closeDetail">✕</button>
+
+      <h1 class="text-xl font-extrabold">${esc(s.title)}</h1>
+
+      <div class="flex items-center gap-3 my-4">
+        <div class="w-10 h-10 rounded-full bg-indigo-400 flex items-center justify-center text-white">
+          ${initials(s.studentName)}
+        </div>
+        <div>${esc(s.studentName)}</div>
+      </div>
+
+      <div class="text-xs muted mb-2">
+        Submitted: ${new Date(s.createdAt).toLocaleDateString()}
+      </div>
+
+      <div class="mb-4">${esc(s.comment || "")}</div>
+
+      ${s.pdfUrl ? `<a href="${s.pdfUrl}" target="_blank" class="underline">View File</a>` : ""}
+
+      <button id="gradeBtn" class="btn-theme mt-4">Grade</button>
+    </div>
+  `;
+
+  document.body.appendChild(bg);
+
+  qs("#gradeBtn").onclick = () => openGradeModal(id);
+}
+
+function openGradeModal(id) {
+  showModal(`
+    <h2 class="text-xl font-extrabold mb-4">Grade Submission</h2>
+
+    <label class="text-sm font-bold muted">Grade</label>
+    <input id="gradeValue" class="input-theme mt-1 mb-3" placeholder="e.g. 8/10" />
+
+    <label class="text-sm font-bold muted">Comment</label>
+    <textarea id="gradeComment" class="input-theme mt-1 mb-4"></textarea>
+
+    <div class="flex justify-end gap-2">
+      <button id="submitGrade" class="btn-theme">Submit</button>
+    </div>
+  `);
+
+  qs("#submitGrade").onclick = async () => {
+    const grade = qs("#gradeValue").value;
+    const comment = qs("#gradeComment").value;
+
+    await fetch(`${API}/submissions/${id}/grade`, {
+      method: "POST",
+      headers: jsonHeaders(),
+      body: JSON.stringify({ grade, comment })
+    });
+
+    closeModal();
+    toast("Graded successfully", "rgba(34,197,94,.7)");
+  };
+}
+
+
+  
+
+  function openCreateUserModal() {
+    showModal(`
+      <h2 class="text-xl font-extrabold mb-4">Create User</h2>
+      <label class="text-sm font-bold muted">Username</label>
+      <input id="uUsername" class="input-theme mt-1 mb-3" placeholder="Username" />
+      <label class="text-sm font-bold muted">Full name</label>
+      <input id="uName" class="input-theme mt-1 mb-3" placeholder="Full name" />
+      <label class="text-sm font-bold muted">Gmail</label>
+      <input id="uEmail" class="input-theme mt-1 mb-3" placeholder="name@gmail.com" />
+      <label class="text-sm font-bold muted">Password</label>
+      <input id="uPassword" type="password" class="input-theme mt-1 mb-3" placeholder="Password" />
+      <label class="text-sm font-bold muted">Role</label>
+      <select id="uRole" class="select-theme mt-1 mb-4">
+        <option value="student">student</option>
+        <option value="instructor">instructor</option>
+        <option value="manager">manager</option>
+      </select>
+      <div class="flex justify-end gap-2">
+        <button id="cancelModal" class="btn-theme">Cancel</button>
+        <button id="submitUser" class="btn-theme">Create</button>
+      </div>
+    `);
+
+    qs("#submitUser").addEventListener("click", async () => {
+      const username = qs("#uUsername").value.trim();
+      const name = qs("#uName").value.trim() || username;
+      const email = qs("#uEmail").value.trim();
+      const password = qs("#uPassword").value.trim();
+      const role = qs("#uRole").value;
+
+      if (!username || !password) return toast("Username + password required", "rgba(185,28,28,.85)");
+
+      const res = await fetch(`${API}/users`, {
+        method: "POST",
+        headers: jsonHeaders(),
+        body: JSON.stringify({ username, password, role, name, email }),
+      });
+
+      const out = await safeJson(res);
+      if (!res.ok || !out?.success) return toast(out?.message || "Create failed", "rgba(185,28,28,.85)");
+
+      closeModal();
+      toast("User created", "rgba(34,197,94,.70)");
+      loadUsers();
+      loadNotifications();
+    });
+  }
+
+  async function loadUsers() {
+    const table = qs("#usersTable");
+    if (!table) return toast("Missing #usersTable", "rgba(185,28,28,.85)");
+
+    const res = await fetch(`${API}/users`, { headers: actorHeaders() });
+
+    if (res.status === 403) {
+      table.innerHTML = "";
+      return toast("Forbidden: missing manager role", "rgba(185,28,28,.85)");
+    }
+
+    const users = await safeJson(res);
+    if (!Array.isArray(users)) {
+      table.innerHTML = "";
+      return toast("Failed to load users", "rgba(185,28,28,.85)");
+    }
+
+    table.innerHTML = users
+      .map(
+        (u) => `
+      <tr class="border-t border-white/10">
+        <td class="px-6 py-3 font-bold">${esc(u.username)}</td>
+        <td class="px-6 py-3">${esc(u.name || "")}</td>
+        <td class="px-6 py-3">${esc(u.role || "")}</td>
+        <td class="px-6 py-3">${esc(u.email || "")}</td>
+        <td class="px-6 py-3 text-right">
+          <button class="del-user btn-theme px-3 py-2" data-username="${esc(u.username)}">Delete</button>
+        </td>
+      </tr>
+    `
+      )
+      .join("");
+
+    table.querySelectorAll(".del-user").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const username = btn.dataset.username;
+        if (!(await confirmDeleteUser(username))) return;
+
+        const del = await fetch(`${API}/users/${encodeURIComponent(username)}`, {
+          method: "DELETE",
+          headers: actorHeaders(),
+        });
+
+        const out = await safeJson(del);
+        if (!del.ok || !out?.success) return toast(out?.message || "Delete failed", "rgba(185,28,28,.85)");
+
+        toast("User deleted", "rgba(185,28,28,.85)");
+        loadUsers();
+        loadNotifications();
+      });
+    });
+  }
+
+  async function fetchJSON(path) {
+    try {
+      const r = await fetch(API + path);
+      const data = await r.json();
+
+      if (!r.ok) {
+        console.error("API error:", data);
+        return null;
+      }
+
+      return data;
+    } catch (err) {
+      console.error("Fetch failed:", err);
+      return null;
+    }
+  }
+
+  async function safeJson(res) {
+    try {
+      return await res.json();
+    } catch {
+      return null;
+    }
+  }
+})();
