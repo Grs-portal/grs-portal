@@ -1164,6 +1164,7 @@ app.delete("/api/homework/:id", (req, res) => {
   res.json({ success: true });
 });
 
+
 // ---------- STUDENTS ----------
 app.get("/api/students", (req, res) => res.json(db.students));
 
