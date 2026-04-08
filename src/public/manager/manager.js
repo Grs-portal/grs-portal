@@ -1733,15 +1733,18 @@ function openEditProjectModal(project) {
 
 
 async function loadHomework() {
-  const data = await fetchJSON("/homework");
+  const data = await fetchJSON("/api/homework");
   const createdList = qs("#homework-created");     // teacher assignments
   const submittedList = qs("#homework-submitted"); // student submissions
 
   if (!createdList || !submittedList) return;
 
-  const created = data.created || [];
-  const submitted = data.submitted || [];
+  const all = data.items || [];
 
+  const created = all;        // all homework = assignments
+  const submitted = [];     
+  
+  
   // =========================
   // TEACHER CREATED
   // =========================
