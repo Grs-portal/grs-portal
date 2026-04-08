@@ -517,8 +517,298 @@ async function loadDashboard() {
   }
 }
 
-    
-  async function loadCourses() {
+
+  async function loadStudents() {
+    const students = await fetchJSON("/students");
+    const table = qs("#studentTable");
+    if (!table) return;
+
+    table.innerHTML = students
+      .map(
+        (s) => `
+      <tr class="border-t border-white/10">
+        <td class="px-6 py-3 font-bold">${esc(s.name)}</td>
+        <td class="px-6 py-3">${esc(s.course)}</td>
+        <td class="px-6 py-3">${s.grade ?? "-"}</td>
+        <td class="px-6 py-3 text-right muted">—</td>
+      </tr>
+    `
+      )
+      .join("");
+  }
+
+  async function loadHomework() {
+    const hw = await fetchJSON("/homework");
+    const list = qs("#homework-list");
+    if (!list) return;
+
+    list.innerHTML = hw
+      .map(
+        (h) => `
+      <div class="surface-2 p-4 rounded-[18px] flex justify-between items-start">
+        <div>
+          <div class="font-extrabold">${esc(h.title)}</div>
+          <div class="text-sm muted">${esc(h.description || "")}</div>
+          <div class="text-xs muted mt-2">By: ${esc(h.submitted_by || "N/A")} · ${esc(h.course || "")}</div>
+          ${
+            h.pdfUrl
+              ? `<a class="text-xs underline" href="${esc(h.pdfUrl)}" target="_blank">PDF: ${esc(h.pdfName || "View")}</a>`
+              : ""
+          }
+        </div>
+        <div class="flex gap-2">
+          <button class="edit-hw icon-btn" data-id="${h.id}" title="Edit">✏️</button>
+          <button class="del-hw icon-btn" data-id="${h.id}" title="Delete">🗑</button>
+        </div>
+      </div>
+    `
+      )
+      .join("");
+
+    list.querySelectorAll(".del-hw").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const id = btn.dataset.id;
+        if (!confirm("Delete homework?")) return;
+        const r = await fetch(`${API}/homework/${id}`, { method: "DELETE", headers: actorHeaders() });
+        if (!r.ok) return toast("Delete failed", "rgba(185,28,28,.85)");
+        toast("Deleted", "rgba(185,28,28,.85)");
+        loadHomework();
+        loadDashboard();
+      });
+    });
+
+    list.querySelectorAll(".edit-hw").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const id = btn.dataset.id;
+        const found = hw.find((x) => String(x.id) === String(id));
+        if (found) openEditHomeworkModal(found);
+      });
+    });
+  }
+
+
+
+  /* =========================
+    LOAD NEWS
+  ========================= */
+  async function loadNews() {
+    const list = qs("#newsList");
+    if (!list) return;
+
+    const res = await fetch(`${API}/news`);
+    const out = await safeJson(res);
+    const items = out?.items || [];
+
+    if (!items.length) {
+      list.innerHTML = `<div class="surface-2 p-4 rounded-[18px] text-sm muted">No news posted yet.</div>`;
+      return;
+    }
+
+    list.innerHTML = items.map(n => `
+      <div class="surface-2 p-4 rounded-[18px]">
+        <div class="flex items-start justify-between gap-4">
+          <div class="flex-1">
+            <div class="font-extrabold text-lg">${esc(n.title)}</div>
+            ${n.summary ? `<div class="text-sm muted mt-1">${esc(n.summary)}</div>` : ""}
+            
+            ${n.content ? `<div class="text-sm mt-3 prose max-w-none">${n.content}</div>` : ""}
+
+            <div class="text-xs muted mt-3">
+              By ${esc(n.createdBy || "Manager")} · ${new Date(n.createdAt).toLocaleString()}
+            </div>
+          </div>
+
+          <div class="relative">
+            <button class="menu-btn btn-theme text-sm">⋮</button>
+            <div class="menu hidden absolute right-0 mt-2 w-32 bg-white rounded-xl shadow-lg border z-50">
+              <button class="edit-news block w-full text-left px-4 py-2 hover:bg-gray-100" data-id="${n.id}">
+                Edit
+              </button>
+              <button class="del-news block w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500" data-id="${n.id}">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `).join("");
+
+    // MENU TOGGLE
+    list.querySelectorAll(".menu-btn").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        document.querySelectorAll(".menu").forEach(m => m.classList.add("hidden"));
+        btn.nextElementSibling.classList.toggle("hidden");
+      });
+    });
+
+    // EDIT
+    list.querySelectorAll(".edit-news").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const id = btn.dataset.id;
+        const found = items.find(x => String(x.id) === String(id));
+        if (found) openEditNewsModal(found);
+      });
+    });
+
+    // DELETE
+    list.querySelectorAll(".del-news").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const id = btn.dataset.id;
+        if (!confirm("Delete this news item?")) return;
+
+        const res = await fetch(`${API}/news/${id}`, {
+          method: "DELETE",
+          headers: actorHeaders()
+        });
+
+        const out = await safeJson(res);
+        if (!res.ok || !out?.success) {
+          return toast(out?.message || "Delete failed", "rgba(185,28,28,.85)");
+        }
+
+        toast("News deleted", "rgba(185,28,28,.85)");
+        loadNews();
+        loadNotifications();
+      });
+    });
+  }
+
+  function openCreateNewsModal() {
+    showModal(`
+      <h2 class="text-xl font-extrabold mb-4">Create News</h2>
+
+      <label class="text-sm font-bold muted">Title</label>
+      <input id="newsTitle" class="input-theme mt-1 mb-3" />
+
+      <label class="text-sm font-bold muted">Summary</label>
+      <input id="newsSummary" class="input-theme mt-1 mb-3" />
+
+      <label class="text-sm font-bold muted">Content</label>
+
+      <div class="flex gap-2 mb-2">
+        <button class="btn-theme text-sm" onclick="document.execCommand('bold')">Bold</button>
+        <button class="btn-theme text-sm" onclick="document.execCommand('italic')">Italic</button>
+        <button class="btn-theme text-sm" onclick="document.execCommand('insertUnorderedList')">• List</button>
+        <button class="btn-theme text-sm" onclick="addImage()">Insert Image</button>
+        <button class="btn-theme text-sm" onclick="addLink()">Insert Link</button>
+      </div>
+
+      <div id="newsContent" contenteditable="true"
+        class="input-theme min-h-[200px] mb-4 overflow-y-auto"></div>
+
+      <div class="flex justify-end gap-3 mt-4">
+        <button id="saveDraftNewsBtn" class="btn-theme">Save Draft</button>
+        <button id="publishNewsBtn" class="btn-theme">Publish</button>
+      </div>
+    `);
+
+    qs("#saveDraftNewsBtn").addEventListener("click", () => createNews("draft"));
+    qs("#publishNewsBtn").addEventListener("click", () => createNews("published"));
+  }
+
+
+  function openEditNewsModal(item) {
+    showModal(`
+      <h2 class="text-xl font-extrabold mb-4">Edit News</h2>
+
+      <label class="text-sm font-bold muted">Title</label>
+      <input id="newsTitle" class="input-theme mt-1 mb-3" value="${esc(item.title)}" />
+
+      <label class="text-sm font-bold muted">Summary</label>
+      <input id="newsSummary" class="input-theme mt-1 mb-3" value="${esc(item.summary || "")}" />
+
+      <label class="text-sm font-bold muted">Content</label>
+
+      <div class="flex gap-2 mb-2">
+        <button class="btn-theme text-sm" onclick="document.execCommand('bold')">Bold</button>
+        <button class="btn-theme text-sm" onclick="document.execCommand('italic')">Italic</button>
+        <button class="btn-theme text-sm" onclick="document.execCommand('insertUnorderedList')">• List</button>
+        <button class="btn-theme text-sm" onclick="addImage()">Insert Image</button>
+        <button class="btn-theme text-sm" onclick="addLink()">Insert Link</button>
+      </div>
+
+      <div id="newsContent" contenteditable="true"
+        class="input-theme min-h-[200px] mb-4 overflow-y-auto"></div>
+
+      <div class="flex justify-end gap-3 mt-4">
+        <button id="saveDraftNewsBtn" class="btn-theme">Save Draft</button>
+        <button id="publishNewsBtn" class="btn-theme">Publish</button>
+      </div>
+    `);
+
+    // PREFILL CONTENT (IMPORTANT)
+    qs("#newsContent").innerHTML = item.content || "";
+
+    qs("#saveDraftNewsBtn").addEventListener("click", () => updateNews(item.id, "draft"));
+    qs("#publishNewsBtn").addEventListener("click", () => updateNews(item.id, "published"));
+  }
+
+
+  async function createNews(status) {
+    const title = qs("#newsTitle").value.trim();
+    const summary = qs("#newsSummary").value.trim();
+    const content = qs("#newsContent").innerHTML;
+
+    if (!title) return toast("Title required", "rgba(185,28,28,.85)");
+
+    const res = await fetch(`${API}/news`, {
+      method: "POST",
+      headers: jsonHeaders(),
+      body: JSON.stringify({ title, summary, content, status })
+    });
+
+    const out = await safeJson(res);
+    if (!res.ok || !out?.success) {
+      return toast(out?.message || "Create failed", "rgba(185,28,28,.85)");
+    }
+
+    closeModal();
+    toast(`News ${status === "draft" ? "saved as draft" : "published"}`, "rgba(34,197,94,.70)");
+
+    loadNews();
+    loadNotifications();
+  }
+
+  async function updateNews(id, status) {
+    const title = qs("#newsTitle").value.trim();
+    const summary = qs("#newsSummary").value.trim();
+    const content = qs("#newsContent").innerHTML;
+
+    if (!title) return toast("Title required", "rgba(185,28,28,.85)");
+
+    const res = await fetch(`${API}/news/${id}`, {
+      method: "PUT",
+      headers: jsonHeaders(),
+      body: JSON.stringify({ title, summary, content, status })
+    });
+
+    const out = await safeJson(res);
+    if (!res.ok || !out?.success) {
+      return toast(out?.message || "Update failed", "rgba(185,28,28,.85)");
+    }
+
+    closeModal();
+    toast("News updated", "rgba(34,197,94,.70)");
+
+    loadNews();
+    loadNotifications();
+  }
+
+
+
+
+  async function uploadPdf(file) {
+    const fd = new FormData();
+    fd.append("file", file);
+
+    const res = await fetch(`${API}/upload`, { method: "POST", body: fd });
+    const out = await safeJson(res);
+    if (!res.ok || !out?.success) throw new Error(out?.message || "Upload failed");
+    return out;
+  }
+
+    async function loadCourses() {
     const courses = await fetchJSON("/courses");
     const list = qs("#submitted-courses-list");
     const container = list;
@@ -633,232 +923,10 @@ async function loadDashboard() {
     }
   }
 
-  async function loadStudents() {
-    const students = await fetchJSON("/students");
-    const table = qs("#studentTable");
-    if (!table) return;
 
-    table.innerHTML = students
-      .map(
-        (s) => `
-      <tr class="border-t border-white/10">
-        <td class="px-6 py-3 font-bold">${esc(s.name)}</td>
-        <td class="px-6 py-3">${esc(s.course)}</td>
-        <td class="px-6 py-3">${s.grade ?? "-"}</td>
-        <td class="px-6 py-3 text-right muted">—</td>
-      </tr>
-    `
-      )
-      .join("");
-  }
+  function openCreateCourseModal() {
 
-  async function loadHomework() {
-    const hw = await fetchJSON("/homework");
-    const list = qs("#homework-list");
-    if (!list) return;
-
-    list.innerHTML = hw
-      .map(
-        (h) => `
-      <div class="surface-2 p-4 rounded-[18px] flex justify-between items-start">
-        <div>
-          <div class="font-extrabold">${esc(h.title)}</div>
-          <div class="text-sm muted">${esc(h.description || "")}</div>
-          <div class="text-xs muted mt-2">By: ${esc(h.submitted_by || "N/A")} · ${esc(h.course || "")}</div>
-          ${
-            h.pdfUrl
-              ? `<a class="text-xs underline" href="${esc(h.pdfUrl)}" target="_blank">PDF: ${esc(h.pdfName || "View")}</a>`
-              : ""
-          }
-        </div>
-        <div class="flex gap-2">
-          <button class="edit-hw icon-btn" data-id="${h.id}" title="Edit">✏️</button>
-          <button class="del-hw icon-btn" data-id="${h.id}" title="Delete">🗑</button>
-        </div>
-      </div>
-    `
-      )
-      .join("");
-
-    box.querySelectorAll(".del-hw").forEach((btn) => {
-      btn.addEventListener("click", async () => {
-        const id = btn.dataset.id;
-        if (!confirm("Delete homework?")) return;
-        const r = await fetch(`${API}/homework/${id}`, { method: "DELETE", headers: actorHeaders() });
-        if (!r.ok) return toast("Delete failed", "rgba(185,28,28,.85)");
-        toast("Deleted", "rgba(185,28,28,.85)");
-        loadHomework();
-        loadDashboard();
-      });
-    });
-
-    list.querySelectorAll(".edit-hw").forEach((btn) => {
-      btn.addEventListener("click", async () => {
-        const id = btn.dataset.id;
-        const found = hw.find((x) => String(x.id) === String(id));
-        if (found) openEditHomeworkModal(found);
-      });
-    });
-  }
-
-  async function loadNews() {
-    const list = qs("#newsList");
-    if (!list) return;
-
-    const res = await fetch(`${API}/news`);
-    const out = await safeJson(res);
-    const items = out?.items || [];
-
-    if (!items.length) {
-      list.innerHTML = `<div class="surface-2 p-4 rounded-[18px] text-sm muted">No news posted yet.</div>`;
-      return;
-    }
-
-    list.innerHTML = items.map(n => `
-      <div class="surface-2 p-4 rounded-[18px]">
-        <div class="flex items-start justify-between gap-4">
-          <div class="flex-1">
-            <div class="font-extrabold text-lg">${esc(n.title)}</div>
-            ${n.summary ? `<div class="text-sm muted mt-1">${esc(n.summary)}</div>` : ""}
-            ${n.content ? `<div class="text-sm mt-3 whitespace-pre-wrap">${esc(n.content)}</div>` : ""}
-            <div class="text-xs muted mt-3">
-              By ${esc(n.createdBy || "Manager")} · ${new Date(n.createdAt).toLocaleString()}
-            </div>
-          </div>
-          <div class="flex gap-2">
-            <button class="edit-news icon-btn" data-id="${n.id}" title="Edit">✏️</button>
-            <button class="del-news icon-btn" data-id="${n.id}" title="Delete">🗑</button>
-          </div>
-        </div>
-      </div>
-    `).join("");
-
-    list.querySelectorAll(".edit-news").forEach(btn => {
-      btn.addEventListener("click", async () => {
-        const id = btn.dataset.id;
-        const found = items.find(x => String(x.id) === String(id));
-        if (found) openEditNewsModal(found);
-      });
-    });
-
-    box.querySelectorAll(".del-news").forEach(btn => {
-      btn.addEventListener("click", async () => {
-        const id = btn.dataset.id;
-        if (!confirm("Delete this news item?")) return;
-
-        const res = await fetch(`${API}/news/${id}`, {
-          method: "DELETE",
-          headers: actorHeaders()
-        });
-
-        const out = await safeJson(res);
-        if (!res.ok || !out?.success) return toast(out?.message || "Delete failed", "rgba(185,28,28,.85)");
-
-        toast("News deleted", "rgba(185,28,28,.85)");
-        loadNews();
-        loadNotifications();
-      });
-    });
-  }
-
-  function openCreateNewsModal() {
     showModal(`
-      <h2 class="text-xl font-extrabold mb-4">Create News</h2>
-
-      <label class="text-sm font-bold muted">Title</label>
-      <input id="newsTitle" class="input-theme mt-1 mb-3" placeholder="Title" />
-
-      <label class="text-sm font-bold muted">Summary</label>
-      <input id="newsSummary" class="input-theme mt-1 mb-3" placeholder="Short summary" />
-
-      <label class="text-sm font-bold muted">Content</label>
-      <textarea id="newsContent" class="input-theme mt-1 mb-4 min-h-[140px]" placeholder="Write the news content here..."></textarea>
-
-      <div class="flex justify-end gap-2">
-        <button id="cancelModal" class="btn-theme">Cancel</button>
-        <button id="submitNews" class="btn-theme">Post</button>
-      </div>
-    `);
-
-    qs("#submitNews")?.addEventListener("click", async () => {
-      const title = qs("#newsTitle")?.value.trim();
-      const summary = qs("#newsSummary")?.value.trim();
-      const content = qs("#newsContent")?.value.trim();
-
-      if (!title) return toast("Title required", "rgba(185,28,28,.85)");
-
-      const res = await fetch(`${API}/news`, {
-        method: "POST",
-        headers: jsonHeaders(),
-        body: JSON.stringify({ title, summary, content })
-      });
-
-      const out = await safeJson(res);
-      if (!res.ok || !out?.success) return toast(out?.message || "Create failed", "rgba(185,28,28,.85)");
-
-      closeModal();
-      toast("News posted", "rgba(34,197,94,.70)");
-      loadNews();
-      loadNotifications();
-    });
-  }
-
-  function openEditNewsModal(item) {
-    showModal(`
-      <h2 class="text-xl font-extrabold mb-4">Edit News</h2>
-
-      <label class="text-sm font-bold muted">Title</label>
-      <input id="newsTitle" class="input-theme mt-1 mb-3" value="${esc(item.title)}" />
-
-      <label class="text-sm font-bold muted">Summary</label>
-      <input id="newsSummary" class="input-theme mt-1 mb-3" value="${esc(item.summary || "")}" />
-
-      <label class="text-sm font-bold muted">Content</label>
-      <textarea id="newsContent" class="input-theme mt-1 mb-4 min-h-[140px]">${esc(item.content || "")}</textarea>
-
-      <div class="flex justify-end gap-2">
-        <button id="cancelModal" class="btn-theme">Cancel</button>
-        <button id="saveNews" class="btn-theme">Save</button>
-      </div>
-    `);
-
-    qs("#saveNews")?.addEventListener("click", async () => {
-      const title = qs("#newsTitle")?.value.trim();
-      const summary = qs("#newsSummary")?.value.trim();
-      const content = qs("#newsContent")?.value.trim();
-
-      if (!title) return toast("Title required", "rgba(185,28,28,.85)");
-
-      const res = await fetch(`${API}/news/${item.id}`, {
-        method: "PUT",
-        headers: jsonHeaders(),
-        body: JSON.stringify({ title, summary, content })
-      });
-
-      const out = await safeJson(res);
-      if (!res.ok || !out?.success) return toast(out?.message || "Update failed", "rgba(185,28,28,.85)");
-
-      closeModal();
-      toast("News updated", "rgba(34,197,94,.70)");
-      loadNews();
-      loadNotifications();
-    });
-  }
-
-  async function uploadPdf(file) {
-    const fd = new FormData();
-    fd.append("file", file);
-
-    const res = await fetch(`${API}/upload`, { method: "POST", body: fd });
-    const out = await safeJson(res);
-    if (!res.ok || !out?.success) throw new Error(out?.message || "Upload failed");
-    return out;
-  }
-
-
-    function openCreateCourseModal() {
-
-  showModal(`
 
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-xl font-extrabold">Create Programs</h2>
