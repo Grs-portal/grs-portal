@@ -73,7 +73,6 @@ function defaultData() {
     
         programType: "ALL",
         theme: "ALL",
-        offer: "ALL",
     
         startDate: null,
         endDate: null,
@@ -840,7 +839,6 @@ app.post("/api/courses", (req, res) => {
     sessionsUnit = "",
     programType = "",
     theme = "",
-    offer = "",
     startDate = null,
     endDate = null,
     status = "draft"
@@ -865,7 +863,6 @@ app.post("/api/courses", (req, res) => {
 
     programType,
     theme,
-    offer,
 
     startDate,
     endDate,
@@ -1026,51 +1023,20 @@ app.delete("/api/projects/:id", (req, res) => {
 
 
 // ---------- HOMEWORK ----------
-app.get("/api/homework", (req, res) => {
-  const username = String(req.query.username || req.headers["x-username"] || "").trim();
-  const role = String(req.query.role || req.headers["x-role"] || "").trim();
+app.get("/api/homework", (req, res) => res.json(db.homework));
 
-  let items = Array.isArray(db.homework) ? db.homework.slice() : [];
-
-  // Students only see homework for their courses or all
-  if (role === "student" && username) {
-    const student = db.students.find(s => s.username === username);
-    if (student) {
-      items = items.filter(h => h.course === student.course || !h.course);
-    } else {
-      items = [];
-    }
-  }
-
-  // Sort by newest first
-  items.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-
-  res.json({ success: true, items });
-});
-
-app.post("/api/homework", upload?.single("file"), (req, res) => {
-  const role = requireRole(req, res, ["instructor", "manager"]);
-  if (!role) return;
-
-  const a = actorFromReq(req);
-  const { title, description = "", course, submitted_by } = req.body || {};
-
+app.post("/api/homework", (req, res) => {
+  const { title, description = "", course, submitted_by, pdfUrl = "", pdfName = "" } = req.body || {};
   if (!title || !course) return res.status(400).json({ success: false, message: "Title and course required" });
 
-  let pdfUrl = "";
-  let pdfName = "";
-  if (req.file) {
-    pdfUrl = `/uploads/${req.file.filename}`;
-    pdfName = req.file.originalname;
-  }
-
+  const a = actorFromReq(req);
   const autoBy = a.byName || a.byUsername || "Unknown";
 
   const newHW = {
     id: Date.now(),
-    title: String(title),
-    description: String(description),
-    course: String(course),
+    title,
+    description,
+    course,
     submitted_by: (submitted_by && String(submitted_by).trim()) || autoBy,
     pdfUrl,
     pdfName,
@@ -1090,34 +1056,22 @@ app.post("/api/homework", upload?.single("file"), (req, res) => {
     ...a,
     targetType: "homework",
     targetId: newHW.id,
-    audienceRole: "all-students"
+    audienceRole: "all"
   });
 
-  res.json({ success: true, item: newHW });
+  res.json(newHW);
 });
 
-app.put("/api/homework/:id", upload?.single("file"), (req, res) => {
-  const role = requireRole(req, res, ["instructor", "manager"]);
-  if (!role) return;
-
+app.put("/api/homework/:id", (req, res) => {
   const id = String(req.params.id);
   const idx = db.homework.findIndex(h => String(h.id) === id);
   if (idx === -1) return res.status(404).json({ success: false, message: "Homework not found" });
 
   const a = actorFromReq(req);
 
-  let pdfUrl = db.homework[idx].pdfUrl;
-  let pdfName = db.homework[idx].pdfName;
-  if (req.file) {
-    pdfUrl = `/uploads/${req.file.filename}`;
-    pdfName = req.file.originalname;
-  }
-
   db.homework[idx] = {
     ...db.homework[idx],
     ...req.body,
-    pdfUrl,
-    pdfName,
     updatedBy: a.byName || a.byUsername || "Unknown",
     updatedByUsername: a.byUsername || "",
     updatedByRole: a.byRole || "",
@@ -1133,16 +1087,13 @@ app.put("/api/homework/:id", upload?.single("file"), (req, res) => {
     ...a,
     targetType: "homework",
     targetId: id,
-    audienceRole: "all-students"
+    audienceRole: "all"
   });
 
-  res.json({ success: true, item: db.homework[idx] });
+  res.json(db.homework[idx]);
 });
 
 app.delete("/api/homework/:id", (req, res) => {
-  const role = requireRole(req, res, ["instructor", "manager"]);
-  if (!role) return;
-
   const id = String(req.params.id);
   const before = db.homework.length;
   db.homework = db.homework.filter(h => String(h.id) !== id);
@@ -1157,7 +1108,7 @@ app.delete("/api/homework/:id", (req, res) => {
       ...a,
       targetType: "homework",
       targetId: id,
-      audienceRole: "all-students"
+      audienceRole: "all"
     });
   }
 
