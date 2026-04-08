@@ -1096,18 +1096,6 @@ app.post("/api/homework", upload?.single("file"), (req, res) => {
   res.json({ success: true, item: newHW });
 });
 
-app.get("/api/homework/:id", (req, res) => {
-  const id = String(req.params.id);
-  const hw = db.homework.find(h => String(h.id) === id);
-
-  if (!hw) {
-    return res.status(404).json({ success: false, message: "Homework not found" });
-  }
-
-  res.json({ success: true, homework: hw });
-});
-
-
 app.put("/api/homework/:id", upload?.single("file"), (req, res) => {
   const role = requireRole(req, res, ["instructor", "manager"]);
   if (!role) return;
@@ -1175,7 +1163,6 @@ app.delete("/api/homework/:id", (req, res) => {
 
   res.json({ success: true });
 });
-
 
 // ---------- STUDENTS ----------
 app.get("/api/students", (req, res) => res.json(db.students));
