@@ -1757,7 +1757,7 @@ async function loadHomework() {
           <div class="text-sm muted">${esc(h.description || "")}</div>
 
           <div class="text-xs muted mt-2">
-            Program: ${esc(h.course)} · Created: ${new Date(h.createdAt).toLocaleDateString()}
+            Program: ${esc(h.course)} · Created: ${createdDate}
           </div>
 
           <div class="text-xs muted">
