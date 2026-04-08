@@ -1298,7 +1298,7 @@ async function openProgramDetail(id) {
           </div>
 
           <!-- DATA BLOCKS -->
-          <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-center p-6 justify-center max-w-3xl mx-auto">            
+          <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-center p-6 justify-center max-w-5xl mx-auto">            
             <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
               <div class="font-bold text-lg">${esc(data.programType || "-")}</div>
               <div class="text-xs muted">Type</div>
