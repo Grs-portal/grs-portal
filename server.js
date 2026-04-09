@@ -831,6 +831,7 @@ app.post("/api/courses", (req, res) => {
 
   const {
     title,
+    summary = "",
     description = "",
     cover = "",
     durationValue = "",
@@ -841,7 +842,8 @@ app.post("/api/courses", (req, res) => {
     theme = "",
     startDate = null,
     endDate = null,
-    status = "draft"
+    status = "draft",
+    published = false   
   } = req.body || {};
 
   if (!title) {
@@ -849,30 +851,33 @@ app.post("/api/courses", (req, res) => {
   }
 
   const newCourse = {
-    id: Date.now(),
+  id: Date.now(),
 
-    title,
-    description,
-    cover,
+  title,
+  summary,
+  description,
+  cover,
 
-    durationValue,
-    durationUnit,
+  durationValue,
+  durationUnit,
 
-    sessionsValue,
-    sessionsUnit,
+  sessionsValue,
+  sessionsUnit,
 
-    programType,
-    theme,
+  programType,
+  theme,
 
-    startDate,
-    endDate,
-    status,
+  startDate,
+  endDate,
 
-    createdByUsername: a.byUsername || "",
-    createdByAvatar: req.body.createdByAvatar || "",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
+  status,
+  published,    
+
+  createdByUsername: a.byUsername || "",
+  createdByAvatar: req.body.createdByAvatar || "",
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+};
 
   db.courses = Array.isArray(db.courses) ? db.courses : [];
   db.courses.push(newCourse);
@@ -889,6 +894,23 @@ app.post("/api/courses", (req, res) => {
   });
 
   res.json({ success: true, item: newCourse });
+});
+
+// publishing
+app.put("/api/programs/:id/publish", (req, res) => {
+  const { id } = req.params;
+
+  const program = db.courses.find(c => c.id == id);
+  if (!program) {
+    return res.status(404).json({ success: false });
+  }
+
+  program.published = true;
+  program.updatedAt = new Date().toISOString();
+
+  saveData();
+
+  res.json({ success: true });
 });
 
 // Update course
