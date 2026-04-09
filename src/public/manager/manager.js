@@ -1277,7 +1277,7 @@ function openEditCourseModal(course) {
       theme: qs("#courseTheme")?.value,
       startDate: qs("#courseStartDate")?.value || null,
       endDate: qs("#courseEndDate")?.value || null,
-      status: forceDraft ? "draft" : qs("#courseStatus")?.value || "published",
+      published: !forceDraft,
     };
 
     try {
@@ -1298,15 +1298,6 @@ function openEditCourseModal(course) {
       toast("Server error", "rgba(185,28,28,.85)");
     }
   });
-}
-
-
-async function publishProgram(id) {
-  await fetch(`/api/programs/${id}/publish`, {
-    method: "PUT"
-  });
-
-  loadPrograms(); 
 }
 
 
