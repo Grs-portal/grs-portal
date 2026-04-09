@@ -147,7 +147,7 @@
 /* PROGRAM GRID */
 .programs-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
 }
 
@@ -718,7 +718,84 @@
   <section class="programs-main">
 
     <!-- PROGRAM GRID -->
-    <div class="programs-grid" id="programsGrid"></div>
+    <div class="programs-grid">
+
+      <div class="program-card">
+        <div class="status-badge ongoing">Course</div>
+        <img src="/homepage/images/wrap.png"/>
+        <div class="program-content">
+          <h4>Wrap</h4>
+          <p class="program-description">
+            A practical course focused on self-management and daily well-being. You'll learn what helps you feel good, how to recognize signs when things aren't going well, and how to support yourself with concrete plans and tools.          </p>
+          <p class="program-meta">Duration: 8 weekly 2.5 hours sessions</p>
+          <p class="program-meta">Instructor: Experienced Counselor</p>
+          <p class="program-meta">Starts: May 21, 2026</p>
+          <a href="/homepage/#" class="program-button">View Program</a>
+        </div>
+      </div>
+
+
+      <div class="program-card">
+        <div class="status-badge ongoing">Course</div>
+        <img src="/homepage/images/You&I.png" />
+        <div class="program-content">
+          <h4>You & I</h4>
+          <p class="program-description">
+           With an emphasis on connection and relationships. You'll explore how you connect with others, the patterns that play a role in this, and how you can create more space for closeness, boundaries, and reciprocity.
+          </p>
+          <p class="program-meta">Duration: 8 weekly 2.5 hours sessions</p>
+          <p class="program-meta">Instructor: Experienced Counselor</p>
+          <p class="program-meta">Starts: undifined</p>
+          <a href="/homepage/#" class="program-button">View Program</a>
+        </div>
+      </div>
+
+      <div class="program-card">
+        <div class="status-badge ongoing">Course</div>
+        <img src="/homepage/images/eigen story.png" />
+        <div class="program-content">
+          <h4>Personal Story</h4>
+          <p class="program-description">
+           In "Own Story," your personal story takes center stage. You'll explore how life experiences have become part of who you are and how you can express them. Expression, coherence, and strengthening your own voice are paramount.
+          </p>
+          <p class="program-meta">Duration: 8 weekly 2.5 hours sessions</p>
+          <p class="program-meta">Instructor: Experienced Counselor</p>
+          <p class="program-meta">Starts: undifined</p>
+          <a href="/homepage/#" class="program-button">View Program</a>
+        </div>
+      </div>
+
+      <div class="program-card">
+        <div class="status-badge ongoing">Course</div>
+        <img src="/homepage/images/Crisis Plan.png" />
+        <div class="program-content">
+          <h4>Crisis Plan</h4>
+          <p class="program-description">
+           The Crisis Card helps you prepare for difficult times. It documents what's important to you in a crisis, what's helpful and what's not, and who should be involved. This gives many people a sense of overview, security, and control.
+          </p>
+          <p class="program-meta">Duration: 8 weekly 2.5 hours sessions</p>
+          <p class="program-meta">Instructor: Experienced Counselor</p>
+          <p class="program-meta">Starts: undifined</p>
+          <a href="/homepage/#" class="program-button">View Program</a>
+        </div>
+      </div>
+
+      <div class="program-card">
+        <div class="status-badge ongoing">Course</div>
+        <img src="/homepage/images/rock & water.png" />
+        <div class="program-content">
+          <h4>Rock & Water</h4>
+          <p class="program-description">
+           Rock & Water is a body-oriented training program that focuses on resilience, self-confidence, and boundaries. Through movement, posture, and breathing, you'll learn to balance strength and flexibility, and respond more consciously to tension and stress.
+          </p>
+          <p class="program-meta">Duration: Multiple sessions</p>
+          <p class="program-meta">Instructor: Certified Rock & Water Trainer</p>
+          <p class="program-meta">Starts: undifined</p>
+          <a href="/homepage/#" class="program-button">View Program</a>
+        </div>
+      </div>
+
+    </div>
 
     <div class="calendar-modal" id="calendarModal">
       <div class="calendar-modal-content">
@@ -805,9 +882,9 @@
 
       <div class="footer-bottom">
         <div class="footer-social-icons">
-          <a href="/homepage/#" class="social"><i class="fab fa-facebook"></i></a>
-          <a href="/homepage/#" class="social"><i class="fab fa-youtube"></i></a>
-          <a href="/homepage/#" class="social"><i class="fab fa-linkedin"></i></a>
+          <a href="https://www.facebook.com/projectbureaucaribbean" class="social"><i class="fab fa-facebook"></i></a>
+          <a href="https://www.youtube.com/@projectbureaucaribbean9600" class="social"><i class="fab fa-youtube"></i></a>
+          <a href="https://www.linkedin.com/company/projectbureau-caribbean/" class="social"><i class="fab fa-linkedin"></i></a>
           <a href="/homepage/#" class="social"><i class="fab fa-whatsapp"></i></a>
         </div>
       </div>
@@ -822,66 +899,60 @@
 
     <script src="/homepage/JS/script.js"></script>
     <script src="/homepage/JS/lang-translation.js"></script>  
-    <script>
-      const API = "/api";
 
-      async function loadPrograms() {
-        try {
-          const res = await fetch(`${API}/programs`);
-          const programs = await res.json();
+<script>
+const modalButtons = document.querySelectorAll('.choice-button');
+const modalOverlays = document.querySelectorAll('.modal-overlay');
 
-          const container = document.getElementById("programsGrid");
+// Open modal
+modalButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    const modalName = button.dataset.modal;
+    const modal = document.getElementById(modalName + "Modal");
 
-          // 🔑 Only show published programs
-          const published = programs.filter(p => p.status === "published");
+    if (modal) {
+      modal.classList.add("active");
+    }
+  });
+});
 
-          if (published.length === 0) {
-            container.innerHTML = "<p>No programs available yet.</p>";
-            return;
-          }
+// Close modal via X button
+document.querySelectorAll('.modal-close').forEach(btn => {
+  btn.addEventListener('click', () => {
+    btn.closest('.modal-overlay').classList.remove('active');
+  });
+});
 
-          container.innerHTML = published.map(program => `
-            <div class="program-card">
+// Close modal when clicking outside
+modalOverlays.forEach(overlay => {
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) {
+      overlay.classList.remove('active');
+    }
+  });
+});
 
-              <div class="status-badge ongoing">
-                ${program.type || "Program"}
-              </div>
+  const toggleBtn = document.getElementById("offeringsToggle");
+  const content = document.getElementById("offeringsContent");
+  const icon = document.querySelector(".toggle-icon");
 
-              <img src="${program.cover || '/homepage/images/default.jpg'}" />
+  toggleBtn.addEventListener("click", () => {
+    content.classList.toggle("open");
+    icon.classList.toggle("rotate");
+  });
 
-              <div class="program-content">
-                <h4>${program.title}</h4>
+  const filterToggle = document.getElementById("filterToggle");
+  const filterSidebar = document.querySelector(".programs-sidebar");
+  const filterIcon = filterToggle.querySelector(".toggle-icon");
 
-                <p class="program-description">
-                  ${program.description || "No description available"}
-                </p>
+  filterToggle.addEventListener("click", () => {
 
-                <p class="program-meta">
-                  Duration: ${program.duration || "Not specified"}
-                </p>
+    filterSidebar.classList.toggle("open");
+    filterIcon.classList.toggle("rotate");
 
-                <p class="program-meta">
-                  Instructor: ${program.instructor || "Not specified"}
-                </p>
+  });
 
-                <p class="program-meta">
-                  Starts: ${program.startDate || "TBD"}
-                </p>
-
-                <a href="/homepage/program-detail.html?id=${program.id}" class="program-button">
-                  View Program
-                </a>
-              </div>
-            </div>
-          `).join("");
-
-        } catch (err) {
-          console.error(err);
-        }
-      }
-
-      loadPrograms();
-      </script>
+</script>
 
 
 </body>
