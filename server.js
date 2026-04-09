@@ -813,6 +813,7 @@ app.delete("/api/schedule/:id", (req, res) => {
   res.json({ success: true });
 });
 
+
 // ---------- COURSES ----------
 app.get("/api/courses", (req, res) => res.json(db.courses));
 app.get("/api/courses/:id", (req, res) => {
@@ -897,20 +898,9 @@ app.post("/api/courses", (req, res) => {
 });
 
 // publishing
-app.put("/api/programs/:id/publish", (req, res) => {
-  const { id } = req.params;
-
-  const program = db.courses.find(c => c.id == id);
-  if (!program) {
-    return res.status(404).json({ success: false });
-  }
-
-  program.published = true;
-  program.updatedAt = new Date().toISOString();
-
-  saveData();
-
-  res.json({ success: true });
+app.get("/api/courses/published", (req, res) => {
+  const publishedCourses = db.courses.filter(c => c.published === true);
+  res.json(publishedCourses);
 });
 
 // Update course
