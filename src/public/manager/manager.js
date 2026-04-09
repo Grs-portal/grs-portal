@@ -759,7 +759,7 @@ async function loadDashboard() {
     return out;
   }
 
-  
+
 
   //---------------courses----------------
 
@@ -892,6 +892,10 @@ async function loadDashboard() {
 
       <label class="text-sm font-bold muted">Title</label>
       <input id="courseTitle" class="input-theme mt-1 mb-3" required />
+
+      <label class="text-sm font-bold muted">Summary (max 40 words)</label>
+      <textarea id="courseSummary" class="input-theme mt-1 mb-3" placeholder="Write a short summary..." required></textarea>
+      <div id="summaryWordCount" class="text-xs text-gray-500 mb-3">0 / 40 words</div>
 
       <label class="text-sm font-bold muted">Description</label>
       <textarea id="courseDescription" class="input-theme mt-1 mb-3"></textarea>
@@ -1043,7 +1047,7 @@ function setupCourseForm() {
     const selectedStatus = qs("#courseStatus")?.value;
     
     // If trying to save draft but status is not draft
-    if (forceDraft && selectedStatus && selectedStatus !== "draft") {
+    if (!forceDraft && selectedStatus === "draft") {
       toast("Set status to 'Draft' or click Publish instead.", "rgba(185,28,28,.85)");
       return;
     }
@@ -1065,7 +1069,8 @@ function setupCourseForm() {
 
       startDate: qs("#courseStartDate")?.value || null,
       endDate: qs("#courseEndDate")?.value || null,
-      status: forceDraft ? "draft" : selectedStatus || "published",
+      status: selectedStatus || "draft",   
+      published: !forceDraft,              
 
       createdByUsername: username,      
       createdByAvatar: profilePic
@@ -1111,6 +1116,10 @@ function openEditCourseModal(course) {
 
       <label class="text-sm font-bold muted">Title</label>
       <input id="courseTitle" class="input-theme mt-1 mb-3" required />
+
+      <label class="text-sm font-bold muted">Summary (max 40 words)</label>
+      <textarea id="courseSummary" class="input-theme mt-1 mb-3" placeholder="Write a short summary..." required></textarea>
+      <div id="summaryWordCount" class="text-xs text-gray-500 mb-3">0 / 40 words</div>
 
       <label class="text-sm font-bold muted">Description</label>
       <textarea id="courseDescription" class="input-theme mt-1 mb-3"></textarea>
@@ -1231,8 +1240,8 @@ function openEditCourseModal(course) {
 
     // Handle new cover upload
     const file = qs("#courseCover")?.files?.[0];
-    let cover = course.cover || "";
 
+    
     if (file) {
       const formData = new FormData();
       formData.append("file", file);
@@ -1243,8 +1252,21 @@ function openEditCourseModal(course) {
       cover = data.url;
     }
 
+    // summary word count and limit 40 words
+    const summaryInput = qs("#courseSummary");
+    const summaryCounter = qs("#summaryWordCount");
+
+    summaryInput?.addEventListener("input", () => {
+      const words = summaryInput.value.trim().split(/\s+/).filter(Boolean);
+      if (words.length > 40) {
+        summaryInput.value = words.slice(0, 40).join(" ");
+      }
+      summaryCounter.textContent = `${Math.min(words.length, 40)} / 40 words`;
+    });
+
     const updatedCourse = {
       title: qs("#courseTitle")?.value.trim(),
+      summary: qs("#courseSummary")?.value.trim(),
       description: qs("#courseDescription")?.value.trim(),
       cover,
       durationValue: qs("#courseDurationValue")?.value,
@@ -1276,6 +1298,15 @@ function openEditCourseModal(course) {
       toast("Server error", "rgba(185,28,28,.85)");
     }
   });
+}
+
+
+async function publishProgram(id) {
+  await fetch(`/api/programs/${id}/publish`, {
+    method: "PUT"
+  });
+
+  loadPrograms(); 
 }
 
 
