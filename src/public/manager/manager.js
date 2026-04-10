@@ -1070,8 +1070,7 @@ function setupCourseForm() {
       startDate: qs("#courseStartDate")?.value || null,
       endDate: qs("#courseEndDate")?.value || null,
       status: selectedStatus || "draft",   
-      published: !forceDraft,              
-
+      published: forceDraft ? false : course.published ?? true,
       createdByUsername: username,      
       createdByAvatar: profilePic
     };
@@ -1266,7 +1265,7 @@ function openEditCourseModal(course) {
 
     const updatedCourse = {
       title: qs("#courseTitle")?.value.trim(),
-      summary: qs("#courseSummary")?.value.trim(),
+      summary: qs("#courseSummary").value = course.summary || "",
       description: qs("#courseDescription")?.value.trim(),
       cover,
       durationValue: qs("#courseDurationValue")?.value,
@@ -1277,8 +1276,7 @@ function openEditCourseModal(course) {
       theme: qs("#courseTheme")?.value,
       startDate: qs("#courseStartDate")?.value || null,
       endDate: qs("#courseEndDate")?.value || null,
-      published: !forceDraft,
-    };
+      published: forceDraft ? false : course.published ?? true,    };
 
     try {
       const res = await fetch(`${API}/courses/${course.id}`, {
