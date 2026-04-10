@@ -764,7 +764,7 @@ async function loadDashboard() {
   //---------------courses----------------
 
     async function loadCourses() {
-    const courses = await fetchJSON("/courses");
+    const courses = await fetchJSON("/api/courses");
     const list = qs("#submitted-courses-list");
     const container = list;
     if (!list) return;
@@ -1046,11 +1046,6 @@ function setupCourseForm() {
 
     const selectedStatus = qs("#courseStatus")?.value;
     
-    // If trying to save draft but status is not draft
-    if (!forceDraft && selectedStatus === "draft") {
-      toast("Set status to 'Draft' or click Publish instead.", "rgba(185,28,28,.85)");
-      return;
-    }
     
     const newCourse = {
 
@@ -1070,7 +1065,7 @@ function setupCourseForm() {
       startDate: qs("#courseStartDate")?.value || null,
       endDate: qs("#courseEndDate")?.value || null,
       status: selectedStatus || "draft",   
-      published: forceDraft ? false : course.published ?? true,
+      published: forceDraft ? false : true,
       createdByUsername: username,      
       createdByAvatar: profilePic
     };
@@ -1265,7 +1260,7 @@ function openEditCourseModal(course) {
 
     const updatedCourse = {
       title: qs("#courseTitle")?.value.trim(),
-      summary: qs("#courseSummary").value = course.summary || "",
+      summary: qs("#courseSummary")?.value.trim(),
       description: qs("#courseDescription")?.value.trim(),
       cover,
       durationValue: qs("#courseDurationValue")?.value,
@@ -1276,7 +1271,7 @@ function openEditCourseModal(course) {
       theme: qs("#courseTheme")?.value,
       startDate: qs("#courseStartDate")?.value || null,
       endDate: qs("#courseEndDate")?.value || null,
-      published: forceDraft ? false : course.published ?? true,    };
+      published: forceDraft ? false : true,    };
 
     try {
       const res = await fetch(`${API}/courses/${course.id}`, {
