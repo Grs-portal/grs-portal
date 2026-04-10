@@ -877,7 +877,7 @@ async function loadDashboard() {
       });
     }
 
-    
+
   }
 
 
@@ -1219,6 +1219,8 @@ function openEditCourseModal(course) {
   let forceDraft = false;
 
   const form = qs("#courseForm");
+
+  let cover = course.cover || "";
 
   // Buttons
   qs("#saveDraftBtn")?.addEventListener("click", () => {
