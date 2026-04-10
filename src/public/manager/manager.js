@@ -876,6 +876,8 @@ async function loadDashboard() {
         document.querySelectorAll(".menu").forEach((m) => m.classList.add("hidden"));
       });
     }
+
+    
   }
 
 
@@ -1052,7 +1054,7 @@ function setupCourseForm() {
       title: qs("#courseTitle")?.value.trim(),
       description: qs("#courseDescription")?.value.trim(),
       cover,
-
+      summary: qs("#courseSummary")?.value.trim(),
       durationValue: qs("#courseDurationValue")?.value,
       durationUnit: qs("#courseDurationUnit")?.value,
 
