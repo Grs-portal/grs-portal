@@ -816,9 +816,14 @@ app.delete("/api/schedule/:id", (req, res) => {
 
 // ---------- COURSES ----------
 app.get("/api/courses", (req, res) => res.json(db.courses));
+app.get("/api/courses/published", (req, res) => {
+  const publishedCourses = db.courses.filter(c => c.published === true);
+    res.json(publishedCourses);
+});
+
 app.get("/api/courses/:id", (req, res) => {
   const id = String(req.params.id);
-  const course = db.courses.find(c => String(c.id) === id);
+  const course = (db.courses || []).find(c => String(c.id) === id);
 
   if (!course) {
     return res.status(404).json({ success: false, message: "Course not found" });
