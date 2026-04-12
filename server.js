@@ -814,152 +814,153 @@ app.delete("/api/schedule/:id", (req, res) => {
 });
 
 
-// ---------- COURSES ----------
-app.get("/api/courses", (req, res) => res.json(db.courses));
-app.get("/api/courses/published", (req, res) => {
-  const publishedCourses = db.courses.filter(c => c.published === true);
-    res.json(publishedCourses);
-});
+const STRAPI_URL = "http://localhost:1337/api/courses";
 
-app.get("/api/courses/:id", (req, res) => {
-  const id = String(req.params.id);
-  const course = (db.courses || []).find(c => String(c.id) === id);
+// ---------- COURSES (STRAPI BRIDGE) ----------
 
-  if (!course) {
-    return res.status(404).json({ success: false, message: "Course not found" });
+// GET ALL (dashboard)
+app.get("/api/courses", async (req, res) => {
+  try {
+    const r = await fetch(`${STRAPI_URL}?populate=*`);
+    const data = await r.json();
+
+    const courses = data.data.map(item => ({
+      id: item.id,
+      ...item.attributes
+    }));
+
+    res.json(courses);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch courses" });
   }
-
-  res.json({ success: true, course });
 });
 
-app.post("/api/courses", (req, res) => {
-  const a = actorFromReq(req);
+// GET ONLY PUBLISHED (public site)
+app.get("/api/courses/published", async (req, res) => {
+  try {
+    const r = await fetch(`${STRAPI_URL}?filters[published][$eq]=true&populate=*`);
+    const data = await r.json();
 
-  const {
-    title,
-    summary = "",
-    description = "",
-    cover = "",
-    durationValue = "",
-    durationUnit = "",
-    sessionsValue = "",
-    sessionsUnit = "",
-    programType = "",
-    theme = "",
-    startDate = null,
-    endDate = null,
-    status = "draft",
-    published = false   
-  } = req.body || {};
+    const courses = data.data.map(item => ({
+      id: item.id,
+      ...item.attributes
+    }));
 
-  if (!title) {
-    return res.status(400).json({ success: false, message: "Title required" });
+    res.json(courses);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch published courses" });
   }
-
-  const newCourse = {
-  id: Date.now(),
-
-  title,
-  summary,
-  description,
-  cover,
-
-  durationValue,
-  durationUnit,
-
-  sessionsValue,
-  sessionsUnit,
-
-  programType,
-  theme,
-
-  startDate,
-  endDate,
-
-  status,
-  published,    
-
-  createdByUsername: a.byUsername || "",
-  createdByAvatar: req.body.createdByAvatar || "",
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-};
-
-  db.courses = Array.isArray(db.courses) ? db.courses : [];
-  db.courses.push(newCourse);
-  saveData();
-
-  addNotification({
-    type: "course",
-    action: "created",
-    message: `Course created: "${newCourse.title}"`,
-    ...a,
-    targetType: "course",
-    targetId: newCourse.id,
-    audienceRole: "all"
-  });
-
-  res.json({ success: true, item: newCourse });
 });
 
-// publishing
-app.get("/api/courses/published", (req, res) => {
-  const publishedCourses = db.courses.filter(c => c.published === true);
-  res.json(publishedCourses);
+// GET ONE
+app.get("/api/courses/:id", async (req, res) => {
+  try {
+    const r = await fetch(`${STRAPI_URL}/${req.params.id}?populate=*`);
+    const data = await r.json();
+
+    if (!data.data) {
+      return res.status(404).json({ success: false, message: "Course not found" });
+    }
+
+    res.json({
+      success: true,
+      course: {
+        id: data.data.id,
+        ...data.data.attributes
+      }
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch course" });
+  }
 });
 
-// Update course
-app.put("/api/courses/:id", (req, res) => {
-  const id = String(req.params.id);
-  const idx = db.courses.findIndex(c => String(c.id) === id);
-  if (idx === -1) return res.status(404).json({ success: false, message: "Course not found" });
+// CREATE
+app.post("/api/courses", async (req, res) => {
+  try {
+    const r = await fetch(STRAPI_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // add token later if needed
+      },
+      body: JSON.stringify({
+        data: req.body
+      })
+    });
 
-  const a = actorFromReq(req);
-  const patch = req.body;
+    const data = await r.json();
 
-  db.courses[idx] = {
-    ...db.courses[idx],
-    ...patch,
-    updatedAt: new Date().toISOString(),
-    updatedBy: a.byName || a.byUsername || "Unknown",
-  };
+    if (!r.ok) {
+      return res.status(400).json(data);
+    }
 
-  saveData();
+    res.json({
+      success: true,
+      item: {
+        id: data.data.id,
+        ...data.data.attributes
+      }
+    });
 
-  addNotification({
-    type: "course",
-    action: "updated",
-    message: `Course updated: "${db.courses[idx].title}"`,
-    ...a,
-    targetType: "course",
-    targetId: id,
-    audienceRole: "all"
-  });
-
-  res.json({ success: true, item: db.courses[idx] });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Create failed" });
+  }
 });
 
-// Delete course
-app.delete("/api/courses/:id", (req, res) => {
-  const id = String(req.params.id);
-  const idx = db.courses.findIndex(c => String(c.id) === id);
-  if (idx === -1) return res.status(404).json({ success: false, message: "Course not found" });
+// UPDATE
+app.put("/api/courses/:id", async (req, res) => {
+  try {
+    const r = await fetch(`${STRAPI_URL}/${req.params.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        data: req.body
+      })
+    });
 
-  const a = actorFromReq(req);
-  const removed = db.courses.splice(idx, 1)[0];
-  saveData();
+    const data = await r.json();
 
-  addNotification({
-    type: "course",
-    action: "deleted",
-    message: `Course deleted: "${removed.title}"`,
-    ...a,
-    targetType: "course",
-    targetId: id,
-    audienceRole: "all"
-  });
+    if (!r.ok) {
+      return res.status(400).json(data);
+    }
 
-  res.json({ success: true });
+    res.json({
+      success: true,
+      item: {
+        id: data.data.id,
+        ...data.data.attributes
+      }
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Update failed" });
+  }
+});
+
+// DELETE
+app.delete("/api/courses/:id", async (req, res) => {
+  try {
+    const r = await fetch(`${STRAPI_URL}/${req.params.id}`, {
+      method: "DELETE"
+    });
+
+    if (!r.ok) {
+      return res.status(400).json({ error: "Delete failed" });
+    }
+
+    res.json({ success: true });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Delete failed" });
+  }
 });
 
 
