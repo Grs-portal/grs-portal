@@ -410,9 +410,9 @@ function renderProjectCard(p) {
   return `
     <div class="project-card surface-2 rounded-[18px] overflow-hidden relative group cursor-pointer" data-id="${p.id}">
 
-      <!-- STATUS -->
+      <!-- courseStatus-->
       <div class="absolute top-3 left-3 px-3 py-1 text-xs font-bold rounded-full ${getStatusColor(p.status)}">
-        ${esc(p.status || "unknown")}
+        ${esc(p.courseStatus|| "unknown")}
       </div>
 
       <!-- MENU -->
@@ -472,7 +472,7 @@ async function loadDashboard() {
       <div class="course-card surface-2 rounded-[18px] overflow-hidden relative group cursor-pointer" data-id="${c.id}">
 
         <div class="absolute top-3 left-3 px-3 py-1 text-xs font-bold rounded-full ${getStatusColor(c.status)}">
-          ${esc(c.status || "unknown")}
+          ${esc(c.courseStatus|| "unknown")}
         </div>
 
         <div class="h-40 w-full bg-gray-200">
@@ -706,7 +706,7 @@ async function loadDashboard() {
     const res = await fetch(`${API}/news`, {
       method: "POST",
       headers: jsonHeaders(),
-      body: JSON.stringify({ title, summary, content, status })
+      body: JSON.stringify({ title, summary, content, courseStatus})
     });
 
     const out = await safeJson(res);
@@ -715,7 +715,7 @@ async function loadDashboard() {
     }
 
     closeModal();
-    toast(`News ${status === "draft" ? "saved as draft" : "published"}`, "rgba(34,197,94,.70)");
+    toast(`News ${courseStatus=== "draft" ? "saved as draft" : "published"}`, "rgba(34,197,94,.70)");
 
     loadNews();
     loadNotifications();
@@ -731,7 +731,7 @@ async function loadDashboard() {
     const res = await fetch(`${API}/news/${id}`, {
       method: "PUT",
       headers: jsonHeaders(),
-      body: JSON.stringify({ title, summary, content, status })
+      body: JSON.stringify({ title, summary, content, courseStatus})
     });
 
     const out = await safeJson(res);
@@ -787,7 +787,7 @@ async function loadDashboard() {
         <div class="course-card surface-2 rounded-[18px] overflow-hidden relative group cursor-pointer" data-id="${c.id}">
 
           <div class="absolute top-3 left-3 px-3 py-1 text-xs font-bold rounded-full ${getStatusColor(c.status)}">
-            ${esc(c.status || "unknown")}
+            ${esc(c.courseStatus|| "unknown")}
           </div>
 
           <div class="h-40 w-full bg-gray-200">
@@ -1184,7 +1184,7 @@ function openEditCourseModal(course) {
   qs("#courseSessionsUnit").value = course.sessionsUnit || "daily";
   qs("#courseProgramType").value = course.programType || "";
   qs("#courseTheme").value = course.theme || "";
-  qs("#courseStatus").value = course.status || "draft";
+  qs("#courseStatus").value = course.courseStatus|| "draft";
   qs("#courseStartDate").value = course.startDate || "";
   qs("#courseEndDate").value = course.endDate || "";
 
@@ -1243,7 +1243,7 @@ function openEditCourseModal(course) {
         startDate: qs("#courseStartDate")?.value || null,
         endDate: qs("#courseEndDate")?.value || null,
 
-        status: qs("#courseStatus")?.value || "draft",
+        courseStatus: qs("#courseStatus")?.value || "draft",
         publishedAt: forceDraft ? null : new Date().toISOString(),
 
         cover: coverId 
@@ -1398,7 +1398,7 @@ async function createProject(status) {
     if (!res.ok) throw new Error();
 
     closeModal();
-    toast(`Project ${status === "draft" ? "saved as draft" : "published"}`, "rgba(34,197,94,.7)");
+    toast(`Project ${courseStatus=== "draft" ? "saved as draft" : "published"}`, "rgba(34,197,94,.7)");
     loadProjects(); 
   } catch {
     toast("Failed to create project", "rgba(185,28,28,.85)");
@@ -1603,7 +1603,7 @@ function openEditProjectModal(project) {
       title,
       description,
       cover,
-      status: project.status || "draft"
+      status: project.courseStatus|| "draft"
     };
 
     try {
@@ -2036,7 +2036,7 @@ function openGradeModal(id) {
 
     const res = await fetch(`${API}/users`, { headers: actorHeaders() });
 
-    if (res.status === 403) {
+    if (res.courseStatus=== 403) {
       table.innerHTML = "";
       return toast("Forbidden: missing manager role", "rgba(185,28,28,.85)");
     }
