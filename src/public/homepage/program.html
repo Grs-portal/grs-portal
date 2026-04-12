@@ -823,14 +823,12 @@
     <script src="/homepage/JS/script.js"></script>
     <script src="/homepage/JS/lang-translation.js"></script>  
     <script>
-      const STRAPI = "http://localhost:1337/api";
+      const res = await fetch("/api/courses/published");
+      const courses = await res.json();
       const programsGrid = document.querySelector("#programsGrid");
 
       async function loadSitePrograms() {
         try {
-          const res = await fetch(
-            `${STRAPI}/courses?filters[publishedAt][$notNull]=true&populate=*`
-          );
           const json = await res.json();
 
           const courses = json.data || [];
