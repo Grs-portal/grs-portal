@@ -969,7 +969,7 @@ app.get("/api/projects", (req, res) => {
 });
 
 app.post("/api/projects", (req, res) => {
-  const { title, cover = "", description = "", status = "draft" } = req.body || {};
+  const { title, cover = "", description = "", courseStatus= "draft" } = req.body || {};
 
   if (!title) {
     return res.status(400).json({ success: false, message: "Title required" });
