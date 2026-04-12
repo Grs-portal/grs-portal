@@ -763,22 +763,33 @@ async function loadDashboard() {
 
   //---------------courses----------------
 
-    async function loadCourses() {
-    const courses = await fetchJSON("/api/courses");
+
+  const STRAPI = "http://localhost:1337/api";
+
+
+  async function loadCourses() {
+    const res = await fetch(`${STRAPI}/courses?populate=*`);
+    const json = await res.json();
+
+    const courses = json.data.map(item => ({
+      id: item.id,
+      ...item.attributes,
+      cover: item.attributes.cover?.data?.attributes?.url
+        ? `http://localhost:1337${item.attributes.cover.data.attributes.url}`
+        : ""
+    }));
+
     const list = qs("#submitted-courses-list");
-    const container = list;
     if (!list) return;
 
     list.innerHTML = courses
       .map((c) => `
         <div class="course-card surface-2 rounded-[18px] overflow-hidden relative group cursor-pointer" data-id="${c.id}">
 
-          <!-- STATUS TAG -->
           <div class="absolute top-3 left-3 px-3 py-1 text-xs font-bold rounded-full ${getStatusColor(c.status)}">
             ${esc(c.status || "unknown")}
           </div>
 
-          <!-- COVER IMAGE -->
           <div class="h-40 w-full bg-gray-200">
             ${
               c.cover
@@ -787,7 +798,6 @@ async function loadDashboard() {
             }
           </div>
 
-          <!-- 3 DOT MENU -->
           <div class="absolute top-3 right-3">
             <button class="menu-btn text-xl px-2 py-1 rounded-lg bg-black/40 text-white" data-id="${c.id}">
               ⋮
@@ -803,81 +813,56 @@ async function loadDashboard() {
             </div>
           </div>
 
-          <!-- CONTENT -->
           <div class="p-4 space-y-2">
-
-            <!-- TITLE -->
             <div class="font-extrabold text-lg">${esc(c.title)}</div>
 
-            <!-- PROGRAM TYPE -->
             <div class="text-xs font-semibold text-indigo-400">
               ${esc(c.programType || "—")}
             </div>
 
-            <!-- DURATION -->
             <div class="text-sm muted">
               ${esc(c.durationValue || "-")} ${esc(c.durationUnit || "")}
             </div>
 
-            <!-- SESSIONS -->
             <div class="text-sm muted">
               ${esc(c.sessionsValue || "-")} ${esc(c.sessionsUnit || "")}
             </div>
 
-            <!-- DATES -->
             <div class="text-xs muted">
               ${c.startDate ? new Date(c.startDate).toLocaleDateString() : "-"} 
               → 
               ${c.endDate ? new Date(c.endDate).toLocaleDateString() : "-"}
             </div>
-
           </div>
         </div>
       `)
       .join("");
 
-        // TOGGLE MENU
-    container.querySelectorAll(".menu-btn").forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-
-        document.querySelectorAll(".menu").forEach(m => m.classList.add("hidden"));
-
-        const menu = btn.nextElementSibling;
-        menu.classList.toggle("hidden");
-      });
-    });
-
-    container.querySelectorAll(".del-course").forEach((btn) => {
+    // DELETE
+    document.querySelectorAll(".del-course").forEach((btn) => {
       btn.addEventListener("click", async (e) => {
         e.stopPropagation();
         const id = btn.dataset.id;
         if (!confirm("Delete course?")) return;
-        const r = await fetch(`${API}/courses/${id}`, { method: "DELETE", headers: actorHeaders() });
-        if (!r.ok) return toast("Delete failed", "rgba(185,28,28,.85)");
-        toast("Deleted", "rgba(185,28,28,.85)");
+
+        const r = await fetch(`${STRAPI}/courses/${id}`, { method: "DELETE" });
+
+        if (!r.ok) return toast("Delete failed", "red");
+
+        toast("Deleted", "red");
         loadCourses();
-        loadDashboard();
       });
     });
 
-    container.querySelectorAll(".edit-course").forEach((btn) => {
-      btn.addEventListener("click", async (e) => {
+    // EDIT
+    document.querySelectorAll(".edit-course").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
         e.stopPropagation();
         const id = btn.dataset.id;
         const found = courses.find((x) => String(x.id) === String(id));
         if (found) openEditCourseModal(found);
       });
     });
-  
-    if (!window.menuListenerAdded) {
-      window.menuListenerAdded = true;
-      document.addEventListener("click", () => {
-        document.querySelectorAll(".menu").forEach((m) => m.classList.add("hidden"));
-      });
-    }
-
-
   }
 
 
@@ -1021,81 +1006,68 @@ function setupCourseForm() {
   });
 
   form?.addEventListener("submit", async (e) => {
-
     e.preventDefault();
 
-    const file = qs("#courseCover")?.files?.[0];
+    try {
+      let coverId = null;
 
-    let cover = "";
+      // 🖼️ Upload image to Strapi
+      const file = qs("#courseCover")?.files?.[0];
+      if (file) {
+        const formData = new FormData();
+        formData.append("files", file);
 
-    if (file) {
-      const formData = new FormData();
-      formData.append("file", file);
+        const uploadRes = await fetch("http://localhost:1337/api/upload", {
+          method: "POST",
+          body: formData
+        });
 
-      const res = await fetch(`${API}/upload`, {
-        method: "POST",
-        body: formData
-      });
-
-      const data = await res.json();
-
-      if (!res.ok || !data.success) {
-        return toast("Image upload failed", "rgba(185,28,28,.85)");
+        const uploadData = await uploadRes.json();
+        coverId = uploadData[0]?.id;
       }
 
-      cover = data.url; 
-    }
+      const newCourse = {
+        title: qs("#courseTitle")?.value.trim(),
+        description: qs("#courseDescription")?.value.trim(),
+        summary: qs("#courseSummary")?.value.trim(),
 
-    const selectedStatus = qs("#courseStatus")?.value;
-    
-    
-    const newCourse = {
+        durationValue: qs("#courseDurationValue")?.value,
+        durationUnit: qs("#courseDurationUnit")?.value,
 
-      title: qs("#courseTitle")?.value.trim(),
-      description: qs("#courseDescription")?.value.trim(),
-      cover,
-      summary: qs("#courseSummary")?.value.trim(),
-      durationValue: qs("#courseDurationValue")?.value,
-      durationUnit: qs("#courseDurationUnit")?.value,
+        sessionsValue: qs("#courseSessionsValue")?.value,
+        sessionsUnit: qs("#courseSessionsUnit")?.value,
 
-      sessionsValue: qs("#courseSessionsValue")?.value,
-      sessionsUnit: qs("#courseSessionsUnit")?.value,
+        programType: qs("#courseProgramType")?.value,
+        theme: qs("#courseTheme")?.value,
 
-      programType: qs("#courseProgramType")?.value,
-      theme: qs("#courseTheme")?.value,
+        startDate: qs("#courseStartDate")?.value || null,
+        endDate: qs("#courseEndDate")?.value || null,
 
-      startDate: qs("#courseStartDate")?.value || null,
-      endDate: qs("#courseEndDate")?.value || null,
-      status: selectedStatus || "draft",   
-      published: forceDraft ? false : true,
-      createdByUsername: username,      
-      createdByAvatar: profilePic
-    };
+        status: qs("#courseStatus")?.value || "draft",
+        published: forceDraft ? false : true,
 
-    closeModal();
-    forceDraft = false;
+        cover: coverId
+      };
 
-    try {
-
-      const res = await fetch(`${API}/courses`, {
+      await fetch(`${STRAPI}/courses`, {
         method: "POST",
-        headers: jsonHeaders(),
-        body: JSON.stringify(newCourse)
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          data: newCourse
+        })
       });
 
-      if (!res.ok) throw new Error("Create failed");
-
-      toast("Course created", "rgba(34,197,94,.7)");
+      closeModal();
+      toast("Course created", "green");
 
       loadCourses();
-      loadDashboard();
-      loadNotifications();
 
     } catch (err) {
       console.error(err);
-      toast("Failed to create course", "rgba(185,28,28,.85)");
+      toast("Failed to create course", "red");
     }
-
   });
 
 }
@@ -1236,63 +1208,65 @@ function openEditCourseModal(course) {
   form?.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    // Handle new cover upload
-    const file = qs("#courseCover")?.files?.[0];
-
-    
-    if (file) {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const res = await fetch(`${API}/upload`, { method: "POST", body: formData });
-      const data = await res.json();
-      if (!res.ok || !data.success) return toast("Image upload failed", "rgba(185,28,28,.85)");
-      cover = data.url;
-    }
-
-    // summary word count and limit 40 words
-    const summaryInput = qs("#courseSummary");
-    const summaryCounter = qs("#summaryWordCount");
-
-    summaryInput?.addEventListener("input", () => {
-      const words = summaryInput.value.trim().split(/\s+/).filter(Boolean);
-      if (words.length > 40) {
-        summaryInput.value = words.slice(0, 40).join(" ");
-      }
-      summaryCounter.textContent = `${Math.min(words.length, 40)} / 40 words`;
-    });
-
-    const updatedCourse = {
-      title: qs("#courseTitle")?.value.trim(),
-      summary: qs("#courseSummary")?.value.trim(),
-      description: qs("#courseDescription")?.value.trim(),
-      cover,
-      durationValue: qs("#courseDurationValue")?.value,
-      durationUnit: qs("#courseDurationUnit")?.value,
-      sessionsValue: qs("#courseSessionsValue")?.value,
-      sessionsUnit: qs("#courseSessionsUnit")?.value,
-      programType: qs("#courseProgramType")?.value,
-      theme: qs("#courseTheme")?.value,
-      startDate: qs("#courseStartDate")?.value || null,
-      endDate: qs("#courseEndDate")?.value || null,
-      published: forceDraft ? false : true,    };
-
     try {
-      const res = await fetch(`${API}/courses/${course.id}`, {
+      let coverId = null;
+
+      // Upload image to Strapi
+      const file = qs("#courseCover")?.files?.[0];
+      if (file) {
+        const formData = new FormData();
+        formData.append("files", file);
+
+        const uploadRes = await fetch("http://localhost:1337/api/upload", {
+          method: "POST",
+          body: formData
+        });
+
+        const uploadData = await uploadRes.json();
+        coverId = uploadData[0]?.id;
+      }
+
+      const newCourse = {
+        title: qs("#courseTitle")?.value.trim(),
+        description: qs("#courseDescription")?.value.trim(),
+        summary: qs("#courseSummary")?.value.trim(),
+
+        durationValue: qs("#courseDurationValue")?.value,
+        durationUnit: qs("#courseDurationUnit")?.value,
+
+        sessionsValue: qs("#courseSessionsValue")?.value,
+        sessionsUnit: qs("#courseSessionsUnit")?.value,
+
+        programType: qs("#courseProgramType")?.value,
+        theme: qs("#courseTheme")?.value,
+
+        startDate: qs("#courseStartDate")?.value || null,
+        endDate: qs("#courseEndDate")?.value || null,
+
+        status: qs("#courseStatus")?.value || "draft",
+        published: forceDraft ? false : true,
+
+        cover: coverId 
+      };
+
+      await fetch(`${STRAPI}/courses/${course.id}`, {
         method: "PUT",
-        headers: jsonHeaders(),
-        body: JSON.stringify(updatedCourse),
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          data: updatedCourse
+        })
       });
-      const out = await safeJson(res);
-      if (!res.ok || !out?.success) return toast(out?.message || "Update failed", "rgba(185,28,28,.85)");
 
       closeModal();
-      toast("Course updated", "rgba(34,197,94,.7)");
+      toast("Course created", "green");
+
       loadCourses();
-      loadDashboard();
-      loadNotifications();
-    } catch {
-      toast("Server error", "rgba(185,28,28,.85)");
+
+    } catch (err) {
+      console.error(err);
+      toast("Failed to create course", "red");
     }
   });
 }
@@ -1300,127 +1274,29 @@ function openEditCourseModal(course) {
 
 async function openProgramDetail(id) {
   try {
-    const program = await fetchJSON(`/courses/${id}`); 
-    if (!program || !program.success) return toast("Program not found", "rgba(185,28,28,.85)");
 
-    const data = program.course; // server sends { success: true, course }
+    //  NEW FETCH (Strapi)
+    const res = await fetch(`${STRAPI}/courses/${id}?populate=*`);
+    const json = await res.json();
 
-    const publisherName = data.createdByUsername || "Unknown";
-    const publisherImg = data.createdByAvatar || "";
+    if (!json.data) {
+      return toast("Program not found", "rgba(185,28,28,.85)");
+    }
 
-    const page = document.createElement("div");
-    page.id = "programDetailPage";
-    page.className = "fixed inset-0 bg-black/40 backdrop-blur-lg z-[9999] flex justify-center items-start overflow-y-auto";
-    page.innerHTML = `
-      <div id="detailContainer" class="min-h-screen flex justify-center pt-20 pb-10">
-        <div class="w-[30cm] max-w-full bg-white rounded-[24px] overflow-hidden shadow-2xl relative">
-
-          <!-- COVER IMAGE -->
-          <div class="relative w-full h-[300px] bg-gray-200">
-            ${
-              data.cover
-                ? `<img src="${data.cover}" class="w-full h-full object-cover"/>`
-                : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
-            }
-          </div>
-
-          <!-- TITLE BELOW COVER -->
-          <div class="p-6 border-b">
-            <div class="text-4xl font-extrabold text-black mb-4">
-              ${esc(data.title)}
-            </div>
-
-            <!-- PUBLISHER -->
-            <div class="flex items-center gap-4 mb-6">
-              ${
-                publisherImg
-                  ? `<img src="${publisherImg}" class="w-16 h-16 rounded-full object-cover"/>`
-                  : `<div class="w-16 h-16 rounded-full bg-indigo-400 flex items-center justify-center text-white font-bold text-xl">
-                      ${initials(publisherName)}
-                    </div>`
-              }
-              <div class="font-semibold text-black text-xl">${esc(publisherName)}</div>
-            </div>
-          </div>
-
-          <!-- DATA BLOCKS -->
-          <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-center p-6 justify-center max-w-5xl mx-auto">            
-            <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
-              <div class="font-bold text-lg">${esc(data.programType || "-")}</div>
-              <div class="text-xs muted">Type</div>
-            </div>
-            <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
-              <div class="font-bold text-lg">${esc(data.durationValue || "-")}</div>
-              <div class="text-xs muted">${esc(data.durationUnit || "")}</div>
-            </div>
-            <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
-              <div class="font-bold text-lg">${esc(data.sessionsValue || "-")}</div>
-              <div class="text-xs muted">${esc(data.sessionsUnit || "")}</div>
-            </div>
-            <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
-              <div class="font-bold text-lg">${esc(data.theme || "-")}</div>
-              <div class="text-xs muted">Theme</div>
-            </div>
-            <div class="p-4 rounded-xl bg-green-900/60 backdrop-blur-md border border-white-200/30 shadow-sm hover:bg-green-800/60 hover:scale-[1.02] transition-all duration-200">
-              <div class="text-sm">${data.startDate ? new Date(data.startDate).toLocaleDateString() : "-"}</div>
-              <div class="text-sm">${data.endDate ? new Date(data.endDate).toLocaleDateString() : "-"}</div>
-            </div>
-          </div>
-
-          <!-- DESCRIPTION -->
-          <div class="p-6 text-black text-sm whitespace-pre-wrap">
-            ${esc(data.description || "No description")}
-          </div>
-
-          <!-- CLOSE BUTTON -->
-          <button id="closeDetail"
-            class="absolute top-4 right-4 px-3 py-2 rounded-lg bg-black/50 text-white backdrop-blur">
-            ✕
-          </button>
-
-        </div>
-      </div>
-    `;
-
-    document.body.appendChild(page);
-    document.body.style.overflow = "hidden";
-
-    // CLOSE BUTTON
-    qs("#closeDetail").addEventListener("click", () => {
-      page.remove();
-      document.body.style.overflow = "";
-    });
-
-    // CLOSE BY CLICKING OUTSIDE
-    page.addEventListener("click", (e) => {
-      if (e.target.id === "programDetailPage") {
-        page.remove();
-        document.body.style.overflow = "";
-      }
-    });
-
-  } catch (err) {
+    // FLATTEN DATA (this replaces program.course)
+    const data = {
+      id: json.data.id,
+      ...json.data.attributes,
+      cover: json.data.attributes.cover?.data?.attributes?.url
+        ? `http://localhost:1337${json.data.attributes.cover.data.attributes.url}`
+        : ""
+    };
+  } 
+  catch (err) {
     console.error(err);
-    toast("Error loading program details", "rgba(185,28,28,.85)");
+    toast("Failed to load program details", "rgba(185,28,28,.85)");
   }
 }
-
-  // Bind click events from your course cards
-  document.addEventListener("click", (e) => {
-    const courseCard = e.target.closest(".course-card");
-    if (e.target.closest(".menu-btn") || e.target.closest(".menu")) return;
-    if (courseCard) {
-      const id = courseCard.dataset.id;
-      if (id) openProgramDetail(id);
-      return;
-    }
-
-    const projectCard = e.target.closest(".project-card");
-    if (projectCard) {
-      const id = projectCard.dataset.id;
-      if (id) openProjectDetail(id);
-    }
-  });
 
 
 
