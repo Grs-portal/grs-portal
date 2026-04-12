@@ -1044,7 +1044,7 @@ function setupCourseForm() {
         endDate: qs("#courseEndDate")?.value || null,
 
         status: qs("#courseStatus")?.value || "draft",
-        published: forceDraft ? false : true,
+        publishedAt: forceDraft ? null : new Date().toISOString(),
 
         cover: coverId
       };
@@ -1244,7 +1244,7 @@ function openEditCourseModal(course) {
         endDate: qs("#courseEndDate")?.value || null,
 
         status: qs("#courseStatus")?.value || "draft",
-        published: forceDraft ? false : true,
+        publishedAt: forceDraft ? null : new Date().toISOString(),
 
         cover: coverId 
       };
