@@ -814,9 +814,10 @@ app.delete("/api/schedule/:id", (req, res) => {
 });
 
 
+// ---------- COURSES (STRAPI BRIDGE) ----------
+
 const STRAPI_URL = "http://localhost:1337/api/courses";
 
-// ---------- COURSES (STRAPI BRIDGE) ----------
 
 // GET ALL (dashboard)
 app.get("/api/courses", async (req, res) => {
@@ -886,9 +887,7 @@ app.post("/api/courses", async (req, res) => {
         "Content-Type": "application/json",
         // add token later if needed
       },
-      body: JSON.stringify({
-        data: req.body
-      })
+      body: JSON.stringify(req.body)
     });
 
     const data = await r.json();
@@ -920,7 +919,7 @@ app.put("/api/courses/:id", async (req, res) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        data: req.body
+        data: newCourse
       })
     });
 
