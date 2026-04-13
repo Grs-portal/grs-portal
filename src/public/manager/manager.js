@@ -471,7 +471,7 @@ async function loadDashboard() {
     coursesBox.innerHTML = safeCourses.map((c) => `
       <div class="course-card surface-2 rounded-[18px] overflow-hidden relative group cursor-pointer" data-id="${c.id}">
 
-        <div class="absolute top-3 left-3 px-3 py-1 text-xs font-bold rounded-full ${getStatusColor(c.status)}">
+        <div class="absolute top-3 left-3 px-3 py-1 text-xs font-bold rounded-full ${getStatusColor(c.courseStatus)}">
           ${esc(c.courseStatus|| "unknown")}
         </div>
 
@@ -764,18 +764,15 @@ async function loadDashboard() {
   //---------------courses----------------
 
 
-  const STRAPI = "http://localhost:1337/api";
-
-
   async function loadCourses() {
-    const res = await fetch(`${STRAPI}/courses?populate=*`);
+    const res = await fetch(`/api/courses`);
     const json = await res.json();
 
-    const courses = json.data.map(item => ({
-      id: item.id,
-      ...item.attributes,
-      cover: item.attributes.cover?.data?.attributes?.url
-        ? `http://localhost:1337${item.attributes.cover.data.attributes.url}`
+    const courses = json.map(item => ({
+    id: item.id,
+    ...item,
+      cover: item.cover?.data?.attributes?.url
+        ? `http://localhost:1337${item.cover.data.attributes.url}`
         : ""
     }));
 
@@ -786,7 +783,7 @@ async function loadDashboard() {
       .map((c) => `
         <div class="course-card surface-2 rounded-[18px] overflow-hidden relative group cursor-pointer" data-id="${c.id}">
 
-          <div class="absolute top-3 left-3 px-3 py-1 text-xs font-bold rounded-full ${getStatusColor(c.status)}">
+          <div class="absolute top-3 left-3 px-3 py-1 text-xs font-bold rounded-full ${getStatusColor(c.courseStatus)}">
             ${esc(c.courseStatus|| "unknown")}
           </div>
 
@@ -845,7 +842,7 @@ async function loadDashboard() {
         const id = btn.dataset.id;
         if (!confirm("Delete course?")) return;
 
-        const r = await fetch(`${STRAPI}/courses/${id}`, { method: "DELETE" });
+        const r = await fetch(`/api/courses/${id}`, { method: "DELETE" });
 
         if (!r.ok) return toast("Delete failed", "red");
 
@@ -1011,8 +1008,8 @@ function setupCourseForm() {
     try {
       let coverId = null;
 
-      // 🖼️ Upload image to Strapi
       const file = qs("#courseCover")?.files?.[0];
+
       if (file) {
         const formData = new FormData();
         formData.append("files", file);
@@ -1023,13 +1020,19 @@ function setupCourseForm() {
         });
 
         const uploadData = await uploadRes.json();
-        coverId = uploadData[0]?.id;
+
+        if (!uploadData?.[0]?.id) {
+          throw new Error("Upload failed");
+        }
+
+        coverId = uploadData[0].id;
       }
 
       const newCourse = {
         title: qs("#courseTitle")?.value.trim(),
         description: qs("#courseDescription")?.value.trim(),
         summary: qs("#courseSummary")?.value.trim(),
+        
 
         durationValue: qs("#courseDurationValue")?.value,
         durationUnit: qs("#courseDurationUnit")?.value,
@@ -1043,13 +1046,11 @@ function setupCourseForm() {
         startDate: qs("#courseStartDate")?.value || null,
         endDate: qs("#courseEndDate")?.value || null,
 
-        status: qs("#courseStatus")?.value || "draft",
-        publishedAt: forceDraft ? null : new Date().toISOString(),
-
+        courseStatus: forceDraft ? "draft" : "published",   
         cover: coverId
       };
 
-      await fetch(`${STRAPI}/courses`, {
+      await fetch(`${API}/courses`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -1177,6 +1178,7 @@ function openEditCourseModal(course) {
 
   // Prefill values
   qs("#courseTitle").value = course.title || "";
+  qs("#courseSummary").value = course.summary || "";
   qs("#courseDescription").value = course.description || "";
   qs("#courseDurationValue").value = course.durationValue || "";
   qs("#courseDurationUnit").value = course.durationUnit || "minutes";
@@ -1211,8 +1213,8 @@ function openEditCourseModal(course) {
     try {
       let coverId = null;
 
-      // Upload image to Strapi
       const file = qs("#courseCover")?.files?.[0];
+
       if (file) {
         const formData = new FormData();
         formData.append("files", file);
@@ -1223,7 +1225,12 @@ function openEditCourseModal(course) {
         });
 
         const uploadData = await uploadRes.json();
-        coverId = uploadData[0]?.id;
+
+        if (!uploadData?.[0]?.id) {
+          throw new Error("Upload failed");
+        }
+
+        coverId = uploadData[0].id;
       }
 
       const newCourse = {
@@ -1243,24 +1250,22 @@ function openEditCourseModal(course) {
         startDate: qs("#courseStartDate")?.value || null,
         endDate: qs("#courseEndDate")?.value || null,
 
-        courseStatus: qs("#courseStatus")?.value || "draft",
-        publishedAt: forceDraft ? null : new Date().toISOString(),
-
+        courseStatus: forceDraft ? "draft" : "published",
         cover: coverId 
       };
 
-      await fetch(`${STRAPI}/courses/${course.id}`, {
+      await fetch(`${API}/courses/${course.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          data: updatedCourse
+          data: newCourse
         })
       });
 
       closeModal();
-      toast("Course created", "green");
+      toast("Course updated", "green");
 
       loadCourses();
 
@@ -1276,7 +1281,7 @@ async function openProgramDetail(id) {
   try {
 
     //  NEW FETCH (Strapi)
-    const res = await fetch(`${STRAPI}/courses/${id}?populate=*`);
+    const res = await fetch(`http://localhost:1337/api/courses/${id}?populate=*`);
     const json = await res.json();
 
     if (!json.data) {
@@ -1568,6 +1573,7 @@ function openEditProjectModal(project) {
 
   //  PREFILL
   qs("#projectTitle").value = project.title || "";
+  qs("#courseSummary").value = course.summary || "";
   qs("#projectDescription").innerHTML = project.description || "";
 
   // SAVE (PUT)
@@ -1580,7 +1586,7 @@ function openEditProjectModal(project) {
 
     let cover = project.cover || "";
 
-    // Upload new cover ONLY if changed
+    //  new cover ONLY if changed
     if (file) {
       const formData = new FormData();
       formData.append("file", file);
