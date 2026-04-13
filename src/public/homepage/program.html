@@ -823,48 +823,27 @@
     <script src="/homepage/JS/script.js"></script>
     <script src="/homepage/JS/lang-translation.js"></script>  
     <script>
-      async function loadSitePrograms() {
-      try {
-        const programsGrid = document.querySelector("#programsGrid");
-        if (!programsGrid) return;
+      async function loadPrograms() {
+        const res = await fetch(
+          `${API_URL}/programs?filters[publishedAt][$notNull]=true&populate=*`
+        );
 
-        const res = await fetch("/api/courses/published");
-        const courses = await res.json();
+        const json = await res.json();
+        const programs = json.data;
 
-        console.log("Published courses:", courses);
+        const grid = document.querySelector("#programsGrid");
 
-        programsGrid.innerHTML = courses.map((c) => {
-
-          const cover =
-            c.cover?.data?.attributes?.url
-              ? `http://localhost:1337${c.cover.data.attributes.url}`
-              : "";
+        grid.innerHTML = programs.map((p) => {
+          const c = p.attributes;
 
           return `
-            <div class="course-card surface-2 rounded-[18px] cursor-pointer" data-id="${c.id}">
-              <div class="h-40 w-full bg-gray-200">
-                ${
-                  cover
-                    ? `<img src="${cover}" class="w-full h-full object-cover"/>`
-                    : `<div class="w-full h-full flex items-center justify-center text-sm muted">No Image</div>`
-                }
-              </div>
-
-              <div class="p-4 space-y-1">
-                <div class="font-bold text-lg">${c.title}</div>
-                <div class="text-sm text-gray-600">${c.summary || ""}</div>
-                <div class="text-xs font-semibold text-indigo-400">${c.programType || "-"}</div>
-              </div>
+            <div class="card">
+              <h3>${c.title}</h3>
+              <p>${c.summary}</p>
             </div>
           `;
         }).join("");
-
-      } catch (err) {
-        console.error(err);
       }
-    }
-
-    loadSitePrograms();
     </script>
 
 
