@@ -814,10 +814,10 @@ app.delete("/api/schedule/:id", (req, res) => {
 });
 
 
-
 // ---------- COURSES (STRAPI BRIDGE) ----------
 
 const STRAPI_URL = "http://localhost:1337/api/courses";
+
 
 // GET ALL (dashboard)
 app.get("/api/courses", async (req, res) => {
@@ -840,9 +840,7 @@ app.get("/api/courses", async (req, res) => {
 // GET ONLY PUBLISHED (public site)
 app.get("/api/courses/published", async (req, res) => {
   try {
-    const r = await fetch(
-      `${STRAPI_URL}?filters[courseStatus][$eq]=published&populate=*`
-    );
+    const r = await fetch(`${STRAPI_URL}?filters[published][$eq]=true&populate=*`);
     const data = await r.json();
 
     const courses = data.data.map(item => ({
@@ -920,7 +918,9 @@ app.put("/api/courses/:id", async (req, res) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(req.body)
+      body: JSON.stringify({
+        data: newCourse
+      })
     });
 
     const data = await r.json();
