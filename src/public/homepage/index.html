@@ -199,44 +199,55 @@
 <section class="story-bank-preview">    
   <h2 id="story-h" data-translate="story-h">Personal Stories</h2>
   <p id="story-p" data-translate="story-p">How do others work on their recovery?</p>
-  <div class="story-grid-preview">
 
-    <div class="story-card-preview">
-      <img src="https://www.aconsciousrethink.com/wp-content/uploads/2015/08/0-truly-happy-people.jpg" alt="Emma">
-      <div class="story-overlay">
-        <p class="story-quote">“A short quote from the persons…”</p>
-        <p class="story-name">Sharon, deelnemer</p>
-        <a href="/homepage/construction.html" class="story-button">Lees haar verhaal</a>
+  <div class="story-slider-preview">
+    <button class="story-slider-btn prev" type="button">&#10094;</button>
+
+    <div class="story-slider-window">
+      <div class="story-grid-preview">
+
+        <div class="story-card-preview">
+          <img src="https://www.aconsciousrethink.com/wp-content/uploads/2015/08/0-truly-happy-people.jpg" alt="Emma">
+          <div class="story-overlay">
+            <p class="story-quote">“A short quote from the persons…”</p>
+            <p class="story-name">Sharon, deelnemer</p>
+            <a href="/homepage/construction.html" class="story-button">Lees haar verhaal</a>
+          </div>
+        </div>
+
+        <div class="story-card-preview">
+          <img src="https://www.publishers.org.uk/wp-content/uploads/2025/10/People25_202506PU0008j_Still-Charlotte_01-1024x576.jpg" alt="Jonas">
+          <div class="story-overlay">
+            <p class="story-quote">“A short quote from the persons…”</p>
+            <p class="story-name">Marlon, deelnemer</p>
+            <a href="/homepage/construction.html" class="story-button">Lees zijn verhaal</a>
+          </div>
+        </div>
+
+        <div class="story-card-preview">
+          <img src="https://www.covenanthouse.org/sites/default/files/styles/805x740/public/2023-08/bipoc-youth.jpg.webp?itok=0gtkoEHM" alt="Noor">
+          <div class="story-overlay">
+            <p class="story-quote">“A short quote from the persons…”</p>
+            <p class="story-name">Noor, deelnemer</p>
+            <a href="/homepage/construction.html" class="story-button">Lees haar verhaal</a>
+          </div>
+        </div>
+
+        <div class="story-card-preview">
+          <img src="https://media.licdn.com/dms/image/v2/D4E03AQGznkuVumCbtg/profile-displayphoto-scale_400_400/B4EZslMykGKMAg-/0/1765855676453?e=2147483647&v=beta&t=m-ByL4TUO0cBRplvt9G5wFfJRX12c8A9NghHki8JO3Q" alt="Lars">
+          <div class="story-overlay">
+            <p class="story-quote">“A short quote from the persons…”</p>
+            <p class="story-name">Anthony, deelnemer</p>
+            <a href="/homepage/construction.html" class="story-button">Lees zijn verhaal</a>
+          </div>
+        </div>
+
+       <!-- Can add more story's -->
+
       </div>
     </div>
 
-    <div class="story-card-preview">
-      <img src="https://www.publishers.org.uk/wp-content/uploads/2025/10/People25_202506PU0008j_Still-Charlotte_01-1024x576.jpg" alt="Jonas">
-      <div class="story-overlay">
-        <p class="story-quote">“A short quote from the persons…”</p>
-        <p class="story-name">Marlon, deelnemer</p>
-        <a href="/homepage/construction.html" class="story-button">Lees zijn verhaal</a>
-      </div>
-    </div>
-
-    <div class="story-card-preview">
-      <img src="https://www.covenanthouse.org/sites/default/files/styles/805x740/public/2023-08/bipoc-youth.jpg.webp?itok=0gtkoEHM" alt="Noor">
-      <div class="story-overlay">
-        <p class="story-quote">“A short quote from the persons…”</p>
-        <p class="story-name">Noor, deelnemer</p>
-        <a href="/homepage/construction.html" class="story-button">Lees haar verhaal</a>
-      </div>
-    </div>
-
-    <div class="story-card-preview">
-      <img src="https://media.licdn.com/dms/image/v2/D4E03AQGznkuVumCbtg/profile-displayphoto-scale_400_400/B4EZslMykGKMAg-/0/1765855676453?e=2147483647&v=beta&t=m-ByL4TUO0cBRplvt9G5wFfJRX12c8A9NghHki8JO3Q" alt="Lars">
-      <div class="story-overlay">
-        <p class="story-quote">“A short quote from the persons…”</p>
-        <p class="story-name">Anthony, deelnemer</p>
-        <a href="/homepage/construction.html" class="story-button">Lees zijn verhaal</a>
-      </div>
-    </div>
-
+    <button class="story-slider-btn next" type="button">&#10095;</button>
   </div>
 </section>
 
@@ -471,6 +482,60 @@
         });
       });
     </script>
+
+    <script>
+  const storyTrack = document.querySelector(".story-grid-preview");
+  const storyCards = document.querySelectorAll(".story-card-preview");
+  const storyPrevBtn = document.querySelector(".story-slider-btn.prev");
+  const storyNextBtn = document.querySelector(".story-slider-btn.next");
+
+  let storyIndex = 0;
+
+  function getStoriesPerView() {
+    if (window.innerWidth <= 640) return 1;
+    if (window.innerWidth <= 1024) return 2;
+    return 4;
+  }
+
+  function updateStorySlider() {
+    if (!storyTrack || storyCards.length === 0) return;
+
+    const storiesPerView = getStoriesPerView();
+    const gap = 20;
+    const cardWidth = storyCards[0].offsetWidth + gap;
+    const maxIndex = Math.max(0, storyCards.length - storiesPerView);
+
+    if (storyIndex > maxIndex) {
+      storyIndex = maxIndex;
+    }
+
+    storyTrack.style.transform = `translateX(-${storyIndex * cardWidth}px)`;
+
+    storyPrevBtn.disabled = storyIndex === 0;
+    storyNextBtn.disabled = storyIndex >= maxIndex;
+  }
+
+  if (storyPrevBtn && storyNextBtn) {
+    storyNextBtn.addEventListener("click", () => {
+      const maxIndex = Math.max(0, storyCards.length - getStoriesPerView());
+      if (storyIndex < maxIndex) {
+        storyIndex++;
+        updateStorySlider();
+      }
+    });
+
+    storyPrevBtn.addEventListener("click", () => {
+      if (storyIndex > 0) {
+        storyIndex--;
+        updateStorySlider();
+      }
+    });
+
+    window.addEventListener("resize", updateStorySlider);
+    window.addEventListener("load", updateStorySlider);
+  }
+</script>
+    
 </body>
 </html>
 
