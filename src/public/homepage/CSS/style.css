@@ -4094,3 +4094,55 @@ html,body {
     flex: 0 0 100%;
   }
 }
+
+
+
+.story-all-button {
+  text-align: center;
+  margin-top: 25px;
+}
+
+.story-button-main {
+  display: inline-block;
+  padding: 12px 26px;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: 0.25s ease;
+}
+
+.story-button-main:hover {
+  transform: translateY(-2px);
+}
+
+
+
+.story-all-button {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.story-button-main {
+  display: inline-block;
+  padding: 14px 34px;
+  background: linear-gradient(135deg, #59b987, #3fae72);
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  text-decoration: none;
+  border-radius: 40px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  transition: all 0.25s ease;
+  letter-spacing: 0.3px;
+}
+
+.story-button-main:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.2);
+  background: linear-gradient(135deg, #4caf7d, #349f65);
+}
+
+.story-button-main:active {
+  transform: translateY(0px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
