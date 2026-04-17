@@ -1715,12 +1715,13 @@ html,body {
   text-transform: uppercase;
   color: var(--accent-2);
   margin-bottom: 1rem;
+  color: #000;
 }
 
 .recognition-closing {
-  font-size: 1.15rem;
+  font-size: 2rem;
   font-weight: 500;
-  color: #1f3d34;
+  color: #317658;
 }
 
 /* ... ✿°•∘ɷ∘•°✿ .. RIGHT COLUMN */
