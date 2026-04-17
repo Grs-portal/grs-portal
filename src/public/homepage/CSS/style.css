@@ -4043,3 +4043,54 @@ html,body {
 .action-btn:hover {
   background-color: #3a6545;
 }
+
+
+.story-slider-preview {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.story-slider-window {
+  overflow: hidden;
+  width: 100%;
+}
+
+.story-grid-preview {
+  display: flex;
+  gap: 20px;
+  transition: transform 0.4s ease;
+  will-change: transform;
+}
+
+.story-card-preview {
+  flex: 0 0 calc(25% - 15px);
+}
+
+.story-slider-btn {
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.story-slider-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+@media (max-width: 1024px) {
+  .story-card-preview {
+    flex: 0 0 calc(50% - 10px);
+  }
+}
+
+@media (max-width: 640px) {
+  .story-card-preview {
+    flex: 0 0 100%;
+  }
+}
