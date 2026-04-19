@@ -108,6 +108,18 @@
       max-width: 760px;
     }
 
+    .featured-slider{
+      position: relative;
+    }
+
+    .featured-slide{
+      display: none;
+    }
+
+    .featured-slide.active{
+      display: block;
+    }
+    
     .featured-story-card {
       display: grid;
       grid-template-columns: 1fr 1.15fr;
@@ -440,30 +452,59 @@
     </div>
   </section>
 
-  <section class="stories-featured">
-    <h2 class="section-title">Featured story</h2>
-    <p class="section-subtitle">
-      We are building a growing collection of personal stories. For now, Sharon's story is the first one available in full.
-    </p>
+<section class="stories-featured">
+  <h2 class="section-title">Featured story</h2>
+  <p class="section-subtitle">
+    We are building a growing collection of personal stories. For now, Sharon's story is the first one available in full.
+  </p>
 
-    <div class="featured-story-card">
-      <div class="featured-story-image">
-        <img src="/homepage/images/sharon photo.jpg" alt="Sharon">
-      </div>
+  <div class="featured-slider">
 
-      <div class="featured-story-content">
-        <span class="featured-label">Now available</span>
-        <h3>Sharon</h3>
-        <p class="featured-story-quote">
-          “Recovery means knowing that you will move forward again.”
-        </p>
-        <p class="featured-story-text">
-          Sharon shares how depressive feelings were part of her life from a young age, how certain moments became real breaking points, and how help, faith, and honesty helped her begin to breathe again.
-        </p>
-        <a href="/homepage/Sharon_story.html" class="featured-story-btn">Read Sharon's story</a>
+    <div class="featured-slide active">
+      <div class="featured-story-card">
+        <div class="featured-story-image">
+          <img src="images/sharonp photo.jpg" alt="Sharon">
+        </div>
+
+        <div class="featured-story-content">
+          <span class="featured-label">Now available</span>
+          <h3>Sharon</h3>
+          <p class="featured-story-quote">
+            “Recovery means knowing that you will move forward again.”
+          </p>
+          <p class="featured-story-text">
+            Sharon shares how depressive feelings were part of her life from a young age, how certain moments became real breaking points, and how help, faith, and honesty helped her begin to breathe again.
+          </p>
+          <a href="/homepage/story-sharon.html" class="featured-story-btn">Read Sharon's story</a>
+        </div>
       </div>
     </div>
-  </section>
+
+    <!-- futura historia destacada -->
+    <!--
+    <div class="featured-slide">
+      <div class="featured-story-card">
+        <div class="featured-story-image">
+          <img src="images/otra-foto.jpg" alt="Next story">
+        </div>
+
+        <div class="featured-story-content">
+          <span class="featured-label">Coming soon</span>
+          <h3>Next story</h3>
+          <p class="featured-story-quote">
+            “A new lived experience will be shared here soon.”
+          </p>
+          <p class="featured-story-text">
+            This featured section is ready for future stories.
+          </p>
+          <a href="/homepage/construction.html" class="featured-story-btn">Story coming soon</a>
+        </div>
+      </div>
+    </div>
+    -->
+
+  </div>
+</section>
 
   <section class="stories-archive">
     <h2 class="section-title">All stories</h2>
@@ -590,5 +631,20 @@
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="/homepage/JS/script.js"></script>
+
+  <script>
+  const featuredSlides = document.querySelectorAll(".featured-slide");
+  let featuredIndex = 0;
+
+  function autoSlideFeatured() {
+    if (featuredSlides.length <= 1) return;
+
+    featuredSlides[featuredIndex].classList.remove("active");
+    featuredIndex = (featuredIndex + 1) % featuredSlides.length;
+    featuredSlides[featuredIndex].classList.add("active");
+  }
+
+  setInterval(autoSlideFeatured, 6000);
+</script>
 </body>
 </html>
