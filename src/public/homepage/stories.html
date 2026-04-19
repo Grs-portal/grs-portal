@@ -112,12 +112,26 @@
       position: relative;
     }
 
+    .featured-slider{
+      position: relative;
+    }
+
+    .featured-slider{
+      position: relative;
+    }
+
     .featured-slide{
-      display: none;
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 1.8s cubic-bezier(.4,0,.2,1);
     }
 
     .featured-slide.active{
-      display: block;
+      opacity: 1;
+      visibility: visible;
+      position: relative;
     }
     
     .featured-story-card {
@@ -632,7 +646,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="/homepage/JS/script.js"></script>
 
-  <script>
+<script>
   const featuredSlides = document.querySelectorAll(".featured-slide");
   let featuredIndex = 0;
 
@@ -644,7 +658,7 @@
     featuredSlides[featuredIndex].classList.add("active");
   }
 
-  setInterval(autoSlideFeatured, 6000);
+  setInterval(autoSlideFeatured, 8000);
 </script>
 </body>
 </html>
