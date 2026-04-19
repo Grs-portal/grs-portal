@@ -4167,6 +4167,11 @@ html,body {
   box-shadow: 0 10px 22px rgba(0,0,0,0.18);
 }
 
+.policy-link-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
 
 
 .story-side-links {
@@ -4201,8 +4206,4 @@ html,body {
 
 .story-side-btn.primary:hover {
   background: #3fae72;
-}
-.policy-link-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
 }
