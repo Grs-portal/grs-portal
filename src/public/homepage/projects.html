@@ -2,54 +2,350 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Projects</title>
+  <title>Projects | Green Recovery Space</title>
+  <link rel="icon" type="image/png" href="/homepage/images/Favicon.png" />
   <link rel="stylesheet" href="/homepage/CSS/style.css" />
+
+  <style>
+    .projects-hero {
+      position: relative;
+      padding: 130px 20px 85px;
+      background: linear-gradient(180deg, #edf8f0 0%, #ffffff 100%);
+      overflow: hidden;
+    }
+
+    .projects-hero::before,
+    .projects-hero::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.16;
+      z-index: 0;
+    }
+
+    .projects-hero::before {
+      width: 320px;
+      height: 320px;
+      background: #59b987;
+      top: -90px;
+      right: -70px;
+    }
+
+    .projects-hero::after {
+      width: 240px;
+      height: 240px;
+      background: #194f82;
+      bottom: -90px;
+      left: -70px;
+    }
+
+    .projects-hero-inner,
+    .projects-section,
+    .projects-cta-wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    .projects-breadcrumb {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+      color: #4e6b60;
+      font-size: 0.95rem;
+    }
+
+    .projects-breadcrumb a {
+      text-decoration: none;
+      color: #194f82;
+      font-weight: 600;
+    }
+
+    .projects-badge {
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: rgba(89, 185, 135, 0.12);
+      color: #2f8e5f;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    .projects-title {
+      font-size: clamp(2.2rem, 4.5vw, 4rem);
+      color: #194f82;
+      line-height: 1.08;
+      margin: 0 0 18px;
+      max-width: 950px;
+    }
+
+    .projects-lead {
+      max-width: 860px;
+      font-size: 1.08rem;
+      line-height: 1.9;
+      color: #2c3934;
+      margin: 0;
+    }
+
+    .projects-section {
+      padding: 70px 20px 10px;
+    }
+
+    .section-title {
+      font-size: 2rem;
+      color: #194f82;
+      margin: 0 0 12px;
+    }
+
+    .section-subtitle {
+      color: #50635c;
+      line-height: 1.85;
+      margin: 0 0 32px;
+      max-width: 860px;
+    }
+
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 28px;
+    }
+
+    .project-card {
+      background: #ffffff;
+      border-radius: 30px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.07);
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    
+    .project-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 22px 48px rgba(0, 0, 0, 0.1);
+    }
+    
+    .project-card img {
+      width: 100%;
+      height: 230px;
+      object-fit: cover;
+      display: block;
+    }
+    
+    .project-card-content {
+      padding: 30px 28px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    
+    .project-year {
+      display: inline-block;
+      align-self: flex-start;
+      padding: 7px 14px;
+      border-radius: 999px;
+      background: rgba(25, 79, 130, 0.08);
+      color: #194f82;
+      font-weight: 700;
+      margin-bottom: 16px;
+      font-size: 0.92rem;
+    }
+    
+    .project-card h3 {
+      margin: 0 0 14px;
+      color: #194f82;
+      font-size: 1.45rem;
+      line-height: 1.3;
+    }
+    
+    .project-card p {
+      margin: 0 0 24px;
+      color: #2c3934;
+      line-height: 1.85;
+      flex: 1;
+    }
+
+        @media (max-width: 640px) {
+      .project-card img {
+        height: 210px;
+      }
+    
+      .project-card-content {
+        padding: 24px 20px;
+      }
+    }
+
+    .project-btn,
+    .projects-cta-btn {
+      display: inline-block;
+      text-decoration: none;
+      font-weight: 700;
+      border-radius: 999px;
+      transition: 0.25s ease;
+    }
+
+    .project-btn {
+      padding: 12px 18px;
+      background: #f2f8f4;
+      color: #194f82;
+      border: 1px solid rgba(25, 79, 130, 0.08);
+      align-self: flex-start;
+    }
+
+    .project-btn:hover {
+      background: #e7f3ec;
+      transform: translateX(4px);
+    }
+
+    .projects-highlight {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 28px;
+      align-items: stretch;
+    }
+
+    .highlight-main,
+    .highlight-side {
+      background: #ffffff;
+      border-radius: 28px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.07);
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      padding: 30px 28px;
+    }
+
+    .highlight-main h3,
+    .highlight-side h3 {
+      margin: 0 0 16px;
+      color: #194f82;
+      font-size: 1.35rem;
+    }
+
+    .highlight-main p,
+    .highlight-side p,
+    .highlight-side li {
+      color: #2c3934;
+      line-height: 1.85;
+      margin: 0;
+    }
+
+    .highlight-side ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .highlight-side li + li {
+      margin-top: 10px;
+    }
+
+    .projects-cta-wrap {
+      padding: 50px 20px 90px;
+    }
+
+    .projects-cta-box {
+      background: linear-gradient(135deg, #194f82 0%, #2b6c7a 100%);
+      color: white;
+      border-radius: 32px;
+      padding: 38px 34px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+      box-shadow: 0 24px 60px rgba(25, 79, 130, 0.18);
+    }
+
+    .projects-cta-box h3 {
+      margin: 0 0 10px;
+      font-size: 1.6rem;
+    }
+
+    .projects-cta-box p {
+      margin: 0;
+      max-width: 760px;
+      line-height: 1.85;
+      opacity: 0.96;
+    }
+
+    .projects-cta-btn {
+      padding: 14px 24px;
+      background: var(--header-green);
+      color: white;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
+      white-space: nowrap;
+    }
+
+    .projects-cta-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    @media (max-width: 1024px) {
+      .project-grid,
+      .projects-highlight {
+        grid-template-columns: 1fr;
+      }
+
+      .projects-cta-box {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .projects-hero {
+        padding: 110px 20px 70px;
+      }
+
+      .project-card,
+      .highlight-main,
+      .highlight-side,
+      .projects-cta-box {
+        padding: 24px 20px;
+      }
+    }
+  </style>
 </head>
-<body class="project-page" style="background-color: #e5ffff;" >
 
-
-    <!--══✿══╡°˖✧᯽ DESKTOP NAVIGATION BAR ᯽✧˖°╞══✿══-->
-
+<body style="background-color: var(--bg-green);">
 
   <header class="site-header" style="background-color: white;">
     <div class="container header-inner" style="background-color: white;">
       <nav class="main-nav desktop-nav">
         <div class="nav-left">
-          <a href="/homepage/index.html" class="nav-link" data-translate="nav-home">Home</a>
-          <a href="/homepage/forwho.html" class="nav-link " data-translate="nav-forwho">For whom</a>
-          <a href="/homepage/green recovery space.html" class="nav-link" data-translate="nav-grs">Recovery Academy</a>
+          <a href="/homepage/index.html" class="nav-link">Home</a>
+          <a href="/homepage/forwho.html" class="nav-link">For whom</a>
+          <a href="/homepage/green recovery space.html" class="nav-link">Recovery Academy</a>
         </div>
-
-        <!-- ... ✿°•∘ɷ∘•°✿ ..  logo circle  -->
 
         <div class="logo-circle">
           <img src="/homepage/images/Logo HK.png" alt="PBC logo">
         </div>
 
-        <div class="nav-right">          
-          <a href="/homepage/offerings.html" class="nav-link active" data-translate="nav-offer">What we offer</a>
-          <a href="/homepage/about.html" class="nav-link" data-translate="nav-about">About Us</a>
-          <a href="/homepage/contact.html" class="nav-link" data-translate="nav-contact">Contact</a>
+        <div class="nav-right">
+          <a href="/homepage/offerings.html" class="nav-link">What we offer</a>
+          <a href="/homepage/about.html" class="nav-link">About us</a>
+          <a href="/homepage/contact.html" class="nav-link">Contact</a>
           <div class="language-dropdown">
-              <button class="lang-btn">EN ▾</button>
-              <ul class="lang-menu">
-                <li data-lang="en">English</li>
-                <li data-lang="nl">Dutch</li>
-                <li data-lang="es">Spanish</li>
-              </ul>
-          </div>        
+            <button class="lang-btn">EN ▾</button>
+            <ul class="lang-menu">
+              <li data-lang="en">English</li>
+              <li data-lang="nl">Dutch</li>
+              <li data-lang="es">Spanish</li>
+            </ul>
+          </div>
           <a href="/homepage/Portal.html" class="profile">
             <img src="/homepage/images/unkown.png" alt="User profile">
             <p class="profile-text">Sign in</p>
           </a>
         </div>
       </nav>
-
     </div>
-
-
-    <!--══✿══╡°˖✧᯽ MOBILE NAVIGATION BAR ᯽✧˖°╞══✿══-->
 
     <nav class="mobile-nav">
       <div class="mobile-header">
@@ -58,145 +354,125 @@
           <img src="/homepage/images/Logo HK.png" alt="PBC logo">
         </div>
         <button class="hamburger-btn" aria-label="Open menu">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M3.46447 20.5355C4.92893 22 7.28595 22 12 22C16.714 22 19.0711 22 20.5355 20.5355C22 19.0711 22 16.714 22 12C22 7.28595 22 4.92893 20.5355 3.46447C19.0711 2 16.714 2 12 2C7.28595 2 4.92893 2 3.46447 3.46447C2 4.92893 2 7.28595 2 12C2 16.714 2 19.0711 3.46447 20.5355ZM18.75 16C18.75 16.4142 18.4142 16.75 18 16.75H6C5.58579 16.75 5.25 16.4142 5.25 16C5.25 15.5858 5.58579 15.25 6 15.25H18C18.4142 15.25 18.75 15.5858 18.75 16ZM18 12.75C18.4142 12.75 18.75 12.4142 18.75 12C18.75 11.5858 18.4142 11.25 18 11.25H6C5.58579 11.25 5.25 11.5858 5.25 12C5.25 12.4142 5.58579 12.75 6 12.75H18ZM18.75 8C18.75 8.41421 18.4142 8.75 18 8.75H6C5.58579 8.75 5.25 8.41421 5.25 8C5.25 7.58579 5.58579 7.25 6 7.25H18C18.4142 7.25 18.75 7.58579 18.75 8Z" fill="#59b987"></path> </g></svg>
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M3.46447 20.5355C4.92893 22 7.28595 22 12 22C16.714 22 19.0711 22 20.5355 20.5355C22 19.0711 22 16.714 22 12C22 7.28595 22 4.92893 20.5355 3.46447C19.0711 2 16.714 2 12 2C7.28595 2 4.92893 2 3.46447 3.46447C2 4.92893 2 7.28595 2 12C2 16.714 2 19.0711 3.46447 20.5355ZM18.75 16C18.75 16.4142 18.4142 16.75 18 16.75H6C5.58579 16.75 5.25 16.4142 5.25 16C5.25 15.5858 5.58579 15.25 6 15.25H18C18.4142 15.25 18.75 15.5858 18.75 16ZM18 12.75C18.4142 12.75 18.75 12.4142 18.75 12C18.75 11.5858 18.4142 11.25 18 11.25H6C5.58579 11.25 5.25 11.5858 5.25 12C5.25 12.4142 5.58579 12.75 6 12.75H18ZM18.75 8C18.75 8.41421 18.4142 8.75 18 8.75H6C5.58579 8.75 5.25 8.41421 5.25 8C5.25 7.58579 5.58579 7.25 6 7.25H18C18.4142 7.25 18.75 7.58579 18.75 8Z" fill="#59b987"></path>
+          </svg>
         </button>
       </div>
 
       <ul class="mobile-menu">
-        <!-- User profile at top -->
         <li class="mobile-profile">
           <a href="/homepage/Portal.html" class="profile">
             <img src="/homepage/images/unkown.png" alt="User profile">
             <p class="profile-text">Sign in</p>
           </a>
         </li>
-
-        <!-- Rest of the links -->
-        <li><a href="/homepage/index.html" class="nav-link" data-translate="nav-home">Home</a></li>
-        <li><a href="/homepage/forwho.html" class="nav-link" data-translate="nav-forwho">For whom</a></li>
-        <li><a href="/homepage/green recovery space.html" class="nav-link" data-translate="nav-grs">Recovery Academy</a></li>
-        <li><a href="/homepage/offerings.html" class="nav-link active" data-translate="nav-offer">What we offer</a></li>
-        <li><a href="/homepage/about.html" data-translate="nav-about">About Us</a></li>
-        <li><a href="/homepage/contact.html" data-translate="nav-contact">Contact</a></li>
+        <li><a href="/homepage/index.html" class="nav-link">Home</a></li>
+        <li><a href="/homepage/forwho.html" class="nav-link">For whom</a></li>
+        <li><a href="/homepage/green recovery space.html" class="nav-link">Recovery Academy</a></li>
+        <li><a href="/homepage/offerings.html" class="nav-link">What we offer</a></li>
+        <li><a href="/homepage/about.html" class="nav-link">About us</a></li>
+        <li><a href="/homepage/contact.html" class="nav-link">Contact</a></li>
       </ul>
     </nav>
   </header>
 
-
-
-    <!--══✿══╡°˖✧᯽  HERO ᯽✧˖°╞══✿══-->
-
-  <section class="hero sub-hero" aria-label="Courses hero">
-
-      <!-- ... ✿°•∘ɷ∘•°✿ ..  background img layers  -->
-    <div class="hero-bg" style="background-image:url('images/Header hofi.png')"></div>
-    <div class="hero-tint"></div>
-      <div class="container hero-inner">
-        <div class="hero-copy">
-          <h1 data-translate="hero-projects-h" style="color: var(--header-green);">Explore Our Projects</h1>
-          <p data-translate="hero-projects-p" style="color: #fff; margin: auto;">
-            Want to work on a project with us? 
-          </p>
-          <a href="/homepage/contact.html" class="hero-cta" style="margin: 10px;" data-translate="hero-projects-cta">Contact Us</a>
-        </div>
+  <section class="projects-hero">
+    <div class="projects-hero-inner">
+      <div class="projects-breadcrumb">
+        <a href="/homepage/index.html">Home</a>
+        <span>•</span>
+        <span>Projects</span>
       </div>
 
-      <!-- ... ✿°•∘ɷ∘•°✿ ..  wavy divider svg  -->
-      <svg class="hero-wave" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
-        <path d="M0,40 C220,110 440,0 720,40 C1000,80 1220,10 1440,50 L1440,120 L0,120 Z" fill="#e5ffff"></path>
-      </svg>
-    </section>
+      <div class="projects-badge">Projects</div>
 
+      <h1 class="projects-title">
+        Together building mental health, recovery-oriented support, and stronger collaboration in the Caribbean.
+      </h1>
 
-
-    <!--══✿══╡°˖✧᯽  MAIN PROJECT SECTION ᯽✧˖°╞══✿══-->
-
-  <section class="projects-page">
-
-  <div class="projects-page-header">
-
-    <!-- Search bar -->
-    <div class="projects-search">
-      <input type="text" placeholder="Search by project name or keyword...">
-      <button>Search</button>
+      <p class="projects-lead">
+        Since 2018, Stichting Expertisecentrum Preventie has worked with partners across the Caribbean islands to strengthen mental health, reduce stigma, and improve support for people who have become mentally stuck. Through a series of projects, knowledge has been developed step by step and a network has been built in which professionals, lived-experience experts, researchers, and communities work together on recovery-oriented care and support. These projects form an important foundation for what is now offered within the Green Recovery Space. :contentReference[oaicite:1]{index=1}
+      </p>
     </div>
-  </div>
+  </section>
 
-  <div class="projects-grid-wrapper">
-    <div class="projects-grid">
+  <section class="projects-section">
+    <h2 class="section-title">Project overview</h2>
+    <p class="section-subtitle">
+      The projects below show how mental health, destigmatization, lived experience, and collaboration have been developed over time on Curaçao and across the wider Caribbean context. Each project page gives more background about its goals, approach, and impact. :contentReference[oaicite:2]{index=2}
+    </p>
 
-      <!-- Project card -->
-      <div class="project-card-preview">
-        <img src="https://wijzijnmind.nl/uploads/media/max-width/05/6795-Green%20recovery%201.jpg?v=1-0" alt="Green Recovery Space">
-        <div class="project-overlay">
-          <h3>Green Recovery Space</h3>
-          <p>An accessible and safe place where people can meet, get information, and work].</p>
-          <a href="/homepage/project-green-recovery.html" class="project-button">Read More</a>
-        </div>
-      </div>
-
-      <div class="project-card-preview">
-        <img src="https://images.unsplash.com/photo-1533750349088-cd871a92f312?q=80&w=1200&auto=format&fit=crop" alt="Workshop">
-        <div class="project-overlay">
-          <h3>MHFA</h3>
-          <p>Interactive workshop to learn practical tools for self-recovery and resilience.</p>
-          <a href="/homepage/project-workshop.html" class="project-button">Read More</a>
-        </div>
-      </div>
-
-      <div class="project-card-preview">
-        <img src="https://www.harmonyhealthcareli.org/wp-content/uploads/2023/07/Blog-Healthy-Community-feature-final-1.jpg" alt="Community Project">
-        <div class="project-overlay">
-          <h3>Regionale Kenniswerkplaats</h3>
-          <p>Collaborative initiative to build supportive networks and social connections.</p>
-          <a href="/homepage/project-community.html" class="project-button">Read More</a>
-        </div>
-      </div>
-
-      <div class="project-card-preview">
-        <img src="https://images.unsplash.com/photo-1507537297725-24a1c029d3ca?q=80&w=1200&auto=format&fit=crop" alt="Research Initiative">
-        <div class="project-overlay">
-          <h3>Living Lab</h3>
-          <p>Gathering insights and data to improve recovery programs and methods.</p>
-          <a href="/homepage/project-research.html" class="project-button">Read More</a>
-        </div>
-      </div>
-
-
+  <article class="project-card">
+    <img src="/homepage/images/project-mhfa.jpg" alt="Mental Health First Aid on Curaçao">
+  
+    <div class="project-card-content">
+      <span class="project-year">2018–2020</span>
+      <h3>Mental Health First Aid on Curaçao</h3>
+      <p>
+        Training professionals to recognize mental health problems earlier, reduce stigma, and activate appropriate support. MHFA proved to be more than a training; it also became a catalyst for collaboration.
+      </p>
+      <a href="/homepage/project-mhfa.html" class="project-btn">Read project →</a>
     </div>
-  </div>
+  </article>
+  </section>
 
-</section>
+  <section class="projects-section">
+    <h2 class="section-title">Why these projects matter</h2>
+    <p class="section-subtitle">
+      Together, these projects show a longer development path rather than isolated initiatives. They help explain how the Green Recovery Space is rooted in collaboration, recovery thinking, learning, and practice. :contentReference[oaicite:8]{index=8}
+    </p>
 
+    <div class="projects-highlight">
+      <div class="highlight-main">
+        <h3>From separate projects to a shared foundation</h3>
+        <p>
+          The projects move from early recognition and destigmatization toward lived-experience development, local experimentation in communities, and a more structural Caribbean-wide collaboration model. That progression is important: it means the Green Recovery Space is not built on one idea alone, but on years of practice, research, learning, and cooperation across different contexts. :contentReference[oaicite:9]{index=9}
+        </p>
+      </div>
 
+      <div class="highlight-side">
+        <h3>Key themes across the projects</h3>
+        <ul>
+          <li>Earlier recognition of mental health challenges</li>
+          <li>Reducing stigma and encouraging openness</li>
+          <li>Strengthening collaboration between organizations</li>
+          <li>Developing lived-experience expertise</li>
+          <li>Building recovery-oriented support in local communities</li>
+        </ul>
+      </div>
+    </div>
+  </section>
 
-
-
-
-     <!--══✿══╡°˖✧᯽  FOOTER   ᯽✧˖°╞══✿══-->
-
+  <section class="projects-cta-wrap">
+    <div class="projects-cta-box">
+      <div>
+        <h3>Want to explore the background of a specific project?</h3>
+        <p>
+          Each project has its own page with more detail about the context, goals, approach, and outcomes. This overview page is designed to help visitors understand the broader development behind the Green Recovery Space.
+        </p>
+      </div>
+      <a href="/homepage/contact.html" class="projects-cta-btn">Contact us</a>
+    </div>
+  </section>
 
   <footer class="fancy-footer" style="margin-top: 0;">
     <div class="footer-background-word">Hofi Korsou</div>
 
     <div class="footer-container">
       <div class="footer-grid">
-
-        <!-- ... ✿°•∘ɷ∘•°✿ .. LOGO + TEXT -->
         <div class="footer-col-wide">
           <img src="/homepage/images/HK logo no bg.png" alt="logo" class="footer-logo" />
         </div>
 
-        <!-- ... ✿°•∘ɷ∘•°✿ .. COL 1 -->
         <div class="footer-col">
           <h3 data-translate="col-com">Company</h3>
           <ul>
             <li><a data-translate="nav-about" href="/homepage/about.html">About Us</a></li>
-            <li><a data-translate="nav-contact" href="/homepage/contact.html">Contact Us</a></li>            
+            <li><a data-translate="nav-contact" href="/homepage/contact.html">Contact Us</a></li>
           </ul>
         </div>
 
-        <!-- ... ✿°•∘ɷ∘•°✿ .. COL 2 -->
         <div class="footer-col">
           <h3 data-translate="col-por">Portals</h3>
           <ul>
@@ -205,9 +481,6 @@
           </ul>
         </div>
 
-
-
-        <!-- ... ✿°•∘ɷ∘•°✿ .. COL 3 -->
         <div class="footer-col">
           <h3 data-translate="col-legal">Legal</h3>
           <ul>
@@ -217,9 +490,9 @@
             <li><a href="/homepage/#">Security</a></li>
           </ul>
         </div>
-        <!-- ... ✿°•∘ɷ∘•°✿ .. COL 4 -->
+
         <div class="footer-col">
-          <h3 data-translate="col-know">Quick Links </h3>
+          <h3 data-translate="col-know">Quick Links</h3>
           <ul>
             <li><a data-translate="nav-forwho" href="/homepage/forwho.html">For whom</a></li>
             <li><a data-translate="nav-grs" href="/homepage/green recovery space.html">Recovery Academy</a></li>
@@ -229,31 +502,29 @@
             <li><a data-translate="nav-stories" href="/homepage/stories.html">Personal Stories</a></li>
           </ul>
         </div>
-
       </div>
-
-      <!--... ✿°•∘ɷ∘•°✿ .. SOCIALS -->
 
       <div class="footer-bottom">
         <div class="footer-social-icons">
-          <a href="/homepage/#" class="social"><i class="fab fa-facebook"></i></a>
-          <a href="/homepage/#" class="social"><i class="fab fa-youtube"></i></a>
-          <a href="/homepage/#" class="social"><i class="fab fa-linkedin"></i></a>
-          <a href="/homepage/#" class="social"><i class="fab fa-whatsapp"></i></a>
+          <a href="https://www.facebook.com/projectbureaucaribbean" class="social"><i class="fab fa-facebook"></i></a>
+          <a href="https://www.youtube.com/@projectbureaucaribbean9600" class="social"><i class="fab fa-youtube"></i></a>
+          <a href="https://www.linkedin.com/company/projectbureau-caribbean/" class="social"><i class="fab fa-linkedin"></i></a>
+          <a href="https://wa.me/59995208184" class="social"><i class="fab fa-whatsapp"></i></a>
         </div>
       </div>
     </div>
   </footer>
 
-
-  <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-
-
-    <script src="/homepage/JS/script.js"></script>
-    <script src="/homepage/JS/lang-translation.js"></script>  
-
-
+  <script src="/homepage/JS/script.js"></script>
+  <script>
+    document.querySelectorAll(".lang-menu li").forEach(item => {
+      item.addEventListener("click", function () {
+        const lang = this.getAttribute("data-lang");
+        setLanguage(lang);
+      });
+    });
+  </script>
 </body>
 </html>
