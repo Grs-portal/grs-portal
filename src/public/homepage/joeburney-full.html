@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Full Story | Joeburney Josephina</title>
+  <link rel="icon" type="image/png" href="/homepage/images/Favicon.png" />
+  <link rel="stylesheet" href="/homepage/CSS/style.css" />
+
+  <style>
+    body {
+      background: #f4f8f5;
+      color: #26332f;
+    }
+
+    .full-story-hero {
+      position: relative;
+      padding: 130px 20px 90px;
+      background:
+        linear-gradient(135deg, rgba(25,79,130,0.88), rgba(43,108,122,0.78)),
+        url("/homepage/images/story-joeburney.PNG") center/cover no-repeat;
+      color: white;
+      overflow: hidden;
+    }
+
+    .full-story-hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.32));
+      z-index: 0;
+    }
+
+    .full-story-hero-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    .story-back-link {
+      display: inline-block;
+      margin-bottom: 24px;
+      color: white;
+      text-decoration: none;
+      font-weight: 700;
+      opacity: 0.92;
+    }
+
+    .story-back-link:hover {
+      opacity: 1;
+      transform: translateX(-3px);
+    }
+
+    .story-label {
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.14);
+      backdrop-filter: blur(6px);
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    .full-story-hero h1 {
+      font-size: clamp(2.4rem, 5vw, 4.4rem);
+      line-height: 1.05;
+      margin: 0 0 20px;
+      max-width: 880px;
+    }
+
+    .full-story-hero p {
+      max-width: 760px;
+      line-height: 1.85;
+      font-size: 1.08rem;
+      opacity: 0.96;
+      margin: 0;
+    }
+
+    .reader-shell {
+      max-width: 980px;
+      margin: -45px auto 90px;
+      padding: 0 20px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .reader-paper {
+      background: #fffdf8;
+      border-radius: 34px;
+      padding: 48px 54px;
+      box-shadow: 0 26px 70px rgba(25,79,130,0.16);
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .reader-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 34px;
+    }
+
+    .reader-meta span {
+      display: inline-block;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(89,185,135,0.12);
+      color: #2f8e5f;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .reader-intro {
+      font-size: 1.22rem;
+      line-height: 1.95;
+      color: #244138;
+      border-left: 5px solid #59b987;
+      padding: 18px 0 18px 24px;
+      margin-bottom: 38px;
+      background: linear-gradient(90deg, rgba(89,185,135,0.08), transparent);
+      border-radius: 0 18px 18px 0;
+    }
+
+    .story-chapter {
+      margin-top: 42px;
+    }
+
+    .story-chapter h2 {
+      color: #194f82;
+      font-size: 1.65rem;
+      margin: 0 0 18px;
+      line-height: 1.3;
+    }
+
+    .story-chapter p {
+      color: #2b3934;
+      line-height: 2;
+      font-size: 1.05rem;
+      margin: 0 0 20px;
+    }
+
+    .story-quote {
+      margin: 40px 0;
+      padding: 30px 32px;
+      background: linear-gradient(135deg, rgba(25,79,130,0.08), rgba(89,185,135,0.10));
+      border-radius: 26px;
+      color: #194f82;
+      font-size: 1.28rem;
+      line-height: 1.8;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .reader-footer-actions {
+      margin-top: 50px;
+      padding-top: 34px;
+      border-top: 1px solid rgba(25,79,130,0.10);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .reader-btn {
+      display: inline-block;
+      padding: 14px 24px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 700;
+      transition: 0.25s ease;
+    }
+
+    .reader-btn.primary {
+      background: var(--header-green);
+      color: white;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.14);
+    }
+
+    .reader-btn.secondary {
+      background: #f2f8f4;
+      color: #194f82;
+      border: 1px solid rgba(25,79,130,0.08);
+    }
+
+    .reader-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 760px) {
+      .reader-paper {
+        padding: 34px 24px;
+        border-radius: 26px;
+      }
+
+      .full-story-hero {
+        padding: 110px 20px 80px;
+      }
+
+      .story-chapter p {
+        font-size: 1rem;
+        line-height: 1.9;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <section class="full-story-hero">
+    <div class="full-story-hero-inner">
+      <a href="/homepage/story-joeburney.html" class="story-back-link">← Back to summary</a>
+      <div class="story-label">Full Recovery Story</div>
+      <h1>Herstelverhaal Joeburney Josephina</h1>
+      <p>
+        Een persoonlijk verhaal over verantwoordelijkheid, burn-out, depressie, geloof,
+        herstel en het opnieuw leren leven met grenzen, kwetsbaarheid en hoop.
+      </p>
+    </div>
+  </section>
+
+  <main class="reader-shell">
+    <article class="reader-paper">
+      <div class="reader-meta">
+        <span>Joeburney Josephina</span>
+        <span>Full story</span>
+        <span>Recovery journey</span>
+      </div>
+
+      <p class="reader-intro">
+        Dit is de volledige herstelervaring van Joeburney, weergegeven als lange leespagina.
+        De tekst behoudt de inhoud en volgorde van het aangeleverde verhaal.
+      </p>
+
+      <section class="story-chapter">
+        <h2>Van jongs af aan verantwoordelijkheid dragen</h2>
+        <p>
+          Ik ben geboren in Montaña op Curaçao als oudste van vier kinderen in een eenoudergezin. Vanaf jongs af aan voelde ik een sterk verantwoordelijkheidsgevoel voor mijn moeder, broers en zussen. Al vanaf mijn elfde werkte ik om mijn moeder financieel te ondersteunen en ervoor te zorgen dat mijn broers en zussen niets tekortkwamen.
+        </p>
+        <p>
+          Ik zag hoe zwaar mijn moeder het had, zowel financieel als emotioneel. Ik voelde me verantwoordelijk voor haar welzijn. Ik probeerde haar altijd te motiveren, aan het lachen te maken en haar te troosten wanneer het moeilijk werd.
+        </p>
+        <p>
+          In dat sterke gevoel van verantwoordelijkheid voor anderen vergat ik mezelf. Ik zette altijd iedereen om mij heen op de eerste plaats en hield mezelf op de laatste plaats. Dit past bij wat in de literatuur wordt gezien als parentificatie: een kind dat te vroeg zorg- en verantwoordelijkheidsrollen op zich neemt, wat later kan bijdragen aan overbelasting en burn-out.
+        </p>
+        <p>
+          In mijn jeugd en tienerjaren ontwikkelde ik de overtuiging dat het mijn taak was om voor anderen te zorgen en dat ik pas goed was als iedereen om mij heen het goed had. Mijn motto was: “Als iedereen rondom mij goed is, dan ben ik goed.”
+        </p>
+        <p>
+          In dit proces vergat ik mezelf voortdurend. Dit patroon nam ik mee toen ik naar Nederland verhuisde en later mijn carrière begon. In mijn werk bleef ik dezelfde houding houden: ik voelde me eindverantwoordelijk voor het slagen van projecten en wilde koste wat kost fouten voorkomen. Mijn verantwoordelijkheidsgevoel, mijn zorg voor anderen en de druk die ik mezelf oplegde, werden alleen maar sterker.
+        </p>
+      </section>
+
+      <div class="story-quote">
+        “Als iedereen rondom mij goed is, dan ben ik goed.”
+      </div>
+
+      <section class="story-chapter">
+        <h2>De rol als directeur en de val richting burn-out</h2>
+        <p>
+          Toen ik directeur werd van een instelling, kwam deze dynamiek in een stroomversnelling. Ik nam de volledige verantwoordelijkheid voor het functioneren en succes van de organisatie op mijn schouders en ontwikkelde de overtuiging dat er “niets fout mocht gaan onder mijn regime.”
+        </p>
+        <p>
+          Ik zei het zelfs meerdere keren hardop: dit mag niet onder mijn leiding fout gaan. Ik gaf alles wat ik had. Ik ging voortdurend above and beyond om ervoor te zorgen dat alles goed liep. Fouten, negatieve resultaten of kritiek voelden als persoonlijke mislukkingen.
+        </p>
+        <p>
+          Een tijdlang lukte het ook: de dingen liepen goed, de organisatie functioneerde, en naar buiten toe leek alles onder controle. Maar na verloop van tijd begon mijn lichamelijke, mentale en emotionele belastbaarheid af te nemen.
+        </p>
+        <p>
+          Ik raakte uitgeput, kon informatie en spanningen niet meer goed verwerken en ontwikkelde daarnaast hoge bloedsuikerwaarden, diabetes, wat de belasting verder vergrootte. De combinatie van chronische stress en lichamelijke klachten wordt in onderzoek vaak gezien als een vicieuze cirkel die het risico op burn-out en depressie versterkt.
+        </p>
+      </section>
+
+      <section class="story-chapter">
+        <h2>De breuk: conflict, ziekte en isolatie</h2>
+        <p>
+          In deze periode ontstonden er spanningen met het personeel. Er werden dingen over mij gezegd die niet in lijn waren met de werkelijkheid. Toch bleef ik doorgaan en bleef ik boven mijn grenzen presteren.
+        </p>
+        <p>
+          Uiteindelijk escaleerde het tijdens een algemene vergadering, waar collega’s zich als groep tegen mij keerden. Ik werd beschuldigd van allerlei zaken die mij diep raakten. Op dat moment was ik al mentaal en emotioneel uitgeput. Ik zakte verder weg in een donkere put, voelde geen kracht meer en wist niet wat er met mij gebeurde.
+        </p>
+        <p>
+          Na deze gebeurtenissen kwam ik in de ziektewet terecht, maar mijn toestand verslechterde verder. In de media, op social media en in mijn directe leefomgeving werden negatieve dingen over mij gezegd. Mensen op straat keken mij boos aan. Sommigen wilden mij niet eens groeten. Als iemand mij zag, liepen ze naar de andere kant.
+        </p>
+        <p>
+          Ik voelde me alleen. Ik zakte steeds verder weg in de put en had geen idee hoe ik daaruit moest komen. Dagen gingen voorbij waarop ik niet eens uit bed kwam. Ik had geen energie, geen motivatie, geen zin in het leven. Mijn hoofd was leeg en toch vol met donkere gedachten.
+        </p>
+        <p>
+          Ik kon niet helder denken. Ik raakte vrienden kwijt en voelde me een persona non grata op het eiland waar ik woonde. De sociale afwijzing en het verlies van status en verbinding hadden een grote impact op mezelf, mijn vrouw en mijn kinderen. Het was een extreem zware periode.
+        </p>
+      </section>
+
+      <section class="story-chapter">
+        <h2>De diagnose burn-out, depressie en een TIA</h2>
+        <p>
+          De druk en stress leidden op een gegeven moment tot een TIA, waarvoor ik met spoed in het ziekenhuis werd opgenomen. Hoewel er geen permanente lichamelijke schade overbleef, was dit een ernstige waarschuwing.
+        </p>
+        <p>
+          Het gevoel dat ik niets meer had, overheerste. Ik kon mijn nieuwe realiteit niet accepteren; geleidelijk raakte ik in een diepe depressie. Ik kon geen toekomst meer zien, verloor mijn gevoel van eigenwaarde als man, echtgenoot en vader, en voelde een sterke disconnectie met mijn vrouw, kinderen en mijn omgeving.
+        </p>
+        <p>
+          Alles voelde ver weg, alsof ik achter glas leefde. Ondertussen bleven de verhalen en de oordelen over mij in de media en in de omgeving doorgaan. Ik voelde mij steeds kleiner worden. Ik herkende mezelf niet meer.
+        </p>
+        <p>
+          Wie was ik nog? Als man had ik het gevoel: ik ben geen man meer. Ik kon niet functioneren, niet voorzien in mijn gezin, hen niet beschermen. Ik kon niet staan als leider in mijn huis.
+        </p>
+        <p>
+          Terwijl ik nog in deze kwetsbare situatie zat, werd ik op staande voet ontslagen. Ik hoorde dit niet in een gesprek, maar in de krant. Er was geen zorgvuldig onderzoek geweest naar de beschuldigingen, en ik kreeg geen gelegenheid tot wederhoor.
+        </p>
+        <p>
+          Terwijl ik ziek was, werd ik als het ware “de grond in gestampt”. Jaren van inzet en opoffering leken in één klap uitgewist. Dit versterkte mijn gevoel van onrecht, waardeloosheid en wanhoop.
+        </p>
+        <p>
+          Op een gegeven moment vroeg ik mij af wat de zin van mijn leven nog was. Ik zag geen uitweg meer en kreeg suïcidale gedachten. De suïcidale gedachten kwamen op, niet omdat ik diep van binnen niet wilde leven, maar omdat ik geen uitweg meer zag. Alles was donker. En gedachten leidden tot actie.
+        </p>
+      </section>
+
+      <section class="story-chapter">
+        <h2>Het keerpunt: hulp vragen en God ontmoeten in de diepte</h2>
+        <p>
+          Toen heb ik het sterkste gebed uitgesproken: God, help mij! In deze diepste fase speelde een goede vriend, die tevens coach en pastor is, een cruciale rol. Hij nam contact met mij op, moedigde mij aan en stond naast mij.
+        </p>
+        <p>
+          In deze periode riep ik God om hulp. Ik ervoer dat ik zonder Hem niet uit deze diepe put zou kunnen komen. Het besef dat ik hulp nodig had, werd een keerpunt dat langzaam kwam.
+        </p>
+        <p>
+          Ik heb hulp nodig. Ik wíl hulp. Ik wil leven. Ik wil beter worden. Ik zette een eerste, kleine maar moedige stap: ik ging naar de huisarts en vroeg om een verwijzing naar een psycholoog.
+        </p>
+        <p>
+          In de periode daarna kreeg ik ondersteuning van een psycholoog, een burn-outcentrum, een coach en mijn directe netwerk. Mijn vrouw heeft mij ontzettend gesteund. Voor haar was het ook zwaar en stressvol; zij verdiepte zich in burn-out en depressie en leerde, mede op advies van de psycholoog, hoe zij mij beter kon ondersteunen.
+        </p>
+        <p>
+          Een vriend die zelf eerder een burn-out had doorgemaakt, begeleidde mij met adviezen, dagelijkse check-ins en gebed. Hij wist uit eigen ervaring hoe het voelde. Hij deelde zijn inzichten, gaf adviezen, checkte dagelijks hoe het met mij ging. Hij bad voor mij en met mij; hij las de Bijbel met mij.
+        </p>
+        <p>
+          In deze periode begon ik af en toe weer licht te zien. Dat ging niet vanzelf en zeker niet snel. De zin om te leven kwam niet zomaar terug. In het begin was het vooral: doe wat er wordt gezegd, geadviseerd, ook al voel je het niet.
+        </p>
+      </section>
+
+      <div class="story-quote">
+        “Ik heb hulp nodig. Ik wíl hulp. Ik wil leven. Ik wil beter worden.”
+      </div>
+
+      <section class="story-chapter">
+        <h2>Een nieuwe ik: Joeburney 2.0</h2>
+        <p>
+          Het herstel was langzaam en moeizaam. Het kostte bijna twee jaar voordat ik grotendeels uit de burn-out en de diepste depressie kwam. In die periode moest ik accepteren dat ik niet meer dezelfde man was als voorheen.
+        </p>
+        <p>
+          Ik ontdekte dat depressie ook in mijn familie voorkomt, wat mij dwong om eerlijk in de spiegel te kijken en vragen te stellen zoals: “Wie ben ik nu?” en “Wat voor man wil ik zijn?”
+        </p>
+        <p>
+          Ik begon mezelf te zien als een nieuwe versie van wie ik was – Joeburney 2.0. In plaats van te streven naar dezelfde prestaties, hetzelfde tempo en dezelfde rol als vroeger, leerde ik mijn grenzen te accepteren en mijn leven daarop aan te passen.
+        </p>
+        <p>
+          Ik moest opnieuw leren lopen in figuurlijke zin: weer leren leven, weer leren voelen, weer leren accepteren. Terugvallen maakten deel uit van dit proces. Iedere terugval hielp mij inzien waar ik mijn grenzen had genegeerd en waar ik te veel hooi op mijn vork had genomen.
+        </p>
+        <p>
+          In deze periode veranderde mijn motto radicaal. Waar ik vroeger dacht: “Als iedereen om mij heen goed is, dan ben ik goed,” leerde ik nu: “Als ik goed ben, kunnen de anderen om mij heen ook goed zijn.”
+        </p>
+        <p>
+          Ik leerde dat ik eerst voor mezelf moet zorgen voordat ik voor anderen kan zorgen. Ik begon mijn grenzen beter te bewaken, nam niet langer ieders strijd over, accepteerde dat fouten maken menselijk is en leerde om hulp te vragen wanneer het niet ging.
+        </p>
+        <p>
+          Ik probeerde vriendelijker te zijn voor mezelf en te erkennen dat ik niet alles kan en niet alles hoef te dragen.
+        </p>
+      </section>
+
+      <div class="story-quote">
+        “Als ik goed ben, kunnen de anderen om mij heen ook goed zijn.”
+      </div>
+
+      <section class="story-chapter">
+        <h2>Dankbaarheid en roeping</h2>
+        <p>
+          Vandaag kan ik zeggen dat ik nog steeds in het proces ben, maar dat ik onderweg ben naar een gezonder, evenwichtiger leven. Ik ben dankbaar voor de lessen, de parels, inzichten, kennis en de wijsheid die ik uit deze moeilijke periode heb gehaald.
+        </p>
+        <p>
+          Zonder deze ervaring had ik nooit zo diep kunnen leren over mezelf, over mensen, over grenzen en over kwetsbaarheid. Ik ben zelfs dankbaar voor deze moeilijke periode. Niet omdat het makkelijk was – integendeel, het was één van de zwaarste tijden in mijn leven – maar omdat ik er parels uit heb gehaald: diepe lessen, wijsheid, inzichten en meer begrip voor mezelf en voor andere mensen die lijden.
+        </p>
+        <p>
+          Die parels zijn onbetaalbaar. En de enige manier waarop ik ze kon krijgen, was door deze weg te gaan. Ik zie mijn verhaal nu als een bron van deskundigheid die ik professioneel wil inzetten om anderen te ondersteunen die door soortgelijke processen gaan.
+        </p>
+        <p>
+          Daarmee krijgt mijn lijden betekenis, niet alleen voor mij en voor nu, maar ook voor de generaties die na mij komen. Deze ervaringskennis wil ik vooral voor mannen inzetten, want bij mannen is het niet makkelijk om over bepaalde issues te praten, vooral door stigma's, onder anderen “mannen huilen niet”.
+        </p>
+        <p>
+          Tegelijkertijd blijf ik erkennen dat mijn herstel niet los te zien is van Gods rol in mijn leven. Ik ben dankbaar dat God mij in deze diepe kloof bij de hand heeft genomen. Ik ervaar dat Hij mij door de donkerste periode heen bij de hand heeft gehouden.
+        </p>
+        <p>
+          Vanuit die dankbaarheid wil ik mijn verhaal delen, niet alleen als getuigenis van pijn, maar ook als getuigenis van hoop, herstel en groei.
+        </p>
+      </section>
+
+      <div class="reader-footer-actions">
+        <a href="/homepage/story-joeburney.html" class="reader-btn secondary">← Back to summary</a>
+        <a href="/homepage/stories.html" class="reader-btn primary">Read more stories</a>
+      </div>
+    </article>
+  </main>
+
+</body>
+</html>
