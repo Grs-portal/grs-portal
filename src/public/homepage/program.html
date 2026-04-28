@@ -2,56 +2,490 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Programs</title>
-    <link rel="icon" type="image/png" href="/homepage/images/Favicon.png">
-    <link rel="stylesheet" href="/homepage/CSS/style.css" />
+
+  <title>Program & Activities | Green Recovery Space</title>
+
+  <link rel="icon" type="image/png" href="/homepage/images/Favicon.png" />
+  <link rel="stylesheet" href="/homepage/CSS/style.css" />
+
+  <style>
+    .program-hero {
+      position: relative;
+      padding: 135px 20px 90px;
+      background:
+        linear-gradient(135deg, rgba(25,79,130,0.88), rgba(43,108,122,0.72)),
+        url('/homepage/images/Hofi Korsow_inganggeheel.png') center/cover no-repeat;
+      color: white;
+      overflow: hidden;
+    }
+
+    .program-hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.28));
+      pointer-events: none;
+    }
+
+    .program-hero-inner,
+    .program-section,
+    .program-cta-wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    .program-breadcrumb {
+      display: inline-flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 18px;
+      color: rgba(255,255,255,0.9);
+      font-size: 0.95rem;
+    }
+
+    .program-breadcrumb a {
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .program-badge {
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.15);
+      color: white;
+      font-weight: 700;
+      margin-bottom: 18px;
+      backdrop-filter: blur(6px);
+    }
+
+    .program-title {
+      font-size: clamp(2.4rem, 5vw, 4.4rem);
+      line-height: 1.04;
+      margin: 0 0 20px;
+      max-width: 920px;
+    }
+
+    .program-lead {
+      max-width: 850px;
+      font-size: 1.1rem;
+      line-height: 1.9;
+      margin: 0 0 30px;
+      color: rgba(255,255,255,0.95);
+    }
+
+    .program-hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .program-btn,
+    .program-card-btn,
+    .program-cta-btn {
+      display: inline-block;
+      text-decoration: none;
+      font-weight: 700;
+      border-radius: 999px;
+      transition: 0.25s ease;
+    }
+
+    .program-btn.primary,
+    .program-cta-btn {
+      padding: 14px 24px;
+      background: var(--header-green);
+      color: white;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.16);
+    }
+
+    .program-btn.secondary {
+      padding: 14px 24px;
+      background: rgba(255,255,255,0.14);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.22);
+      backdrop-filter: blur(8px);
+    }
+
+    .program-btn:hover,
+    .program-card-btn:hover,
+    .program-cta-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .program-section {
+      padding: 75px 20px 0;
+    }
+
+    .program-section-head {
+      max-width: 860px;
+      margin-bottom: 34px;
+    }
+
+    .program-section-head.center {
+      text-align: center;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .program-section-head h2 {
+      color: #194f82;
+      font-size: 2rem;
+      margin: 0 0 12px;
+    }
+
+    .program-section-head p {
+      color: #50635c;
+      line-height: 1.85;
+      margin: 0;
+    }
+
+    .program-intro-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 28px;
+      align-items: stretch;
+    }
+
+    .program-panel,
+    .program-highlight,
+    .program-type-card,
+    .program-step-card,
+    .program-offer-card,
+    .program-calendar-card {
+      background: #ffffff;
+      border-radius: 30px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.07);
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+
+    .program-panel,
+    .program-highlight {
+      padding: 34px 30px;
+    }
+
+    .program-panel h2,
+    .program-highlight h2,
+    .program-type-card h3,
+    .program-step-card h3,
+    .program-offer-card h3,
+    .program-calendar-card h3 {
+      color: #194f82;
+      margin: 0 0 14px;
+    }
+
+    .program-panel p,
+    .program-highlight p,
+    .program-type-card p,
+    .program-step-card p,
+    .program-offer-card p,
+    .program-calendar-card p,
+    .program-offer-card li {
+      color: #2c3934;
+      line-height: 1.85;
+      margin: 0;
+    }
+
+    .program-panel p + p,
+    .program-highlight p + p {
+      margin-top: 16px;
+    }
+
+    .program-highlight {
+      background: linear-gradient(135deg, rgba(89,185,135,0.12), rgba(25,79,130,0.06));
+      border-left: 5px solid #59b987;
+    }
+
+    .program-strip {
+      margin-top: 24px;
+      padding: 18px 20px;
+      border-radius: 20px;
+      background: rgba(25,79,130,0.05);
+      color: #194f82;
+      font-weight: 600;
+      line-height: 1.7;
+    }
+
+    .program-types-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 24px;
+    }
+
+    .program-type-card {
+      overflow: hidden;
+      height: 100%;
+      transition: 0.25s ease;
+    }
+
+    .program-type-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 22px 48px rgba(0,0,0,0.1);
+    }
+
+    .program-type-card img {
+      width: 100%;
+      height: 190px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .program-type-content {
+      padding: 26px 24px;
+    }
+
+    .program-type-tag {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(89,185,135,0.12);
+      color: #2f8e5f;
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+    }
+
+    .program-steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 24px;
+    }
+
+    .program-step-card {
+      padding: 30px 26px;
+      position: relative;
+      overflow: hidden;
+      min-height: 240px;
+    }
+
+    .program-step-card::before {
+      content: "";
+      position: absolute;
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      right: -35px;
+      top: -35px;
+      background: rgba(89,185,135,0.08);
+    }
+
+    .program-step-number {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(25,79,130,0.08);
+      color: #194f82;
+      font-weight: 700;
+      margin-bottom: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .program-offer-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+
+    .program-offer-card {
+      padding: 32px 28px;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .program-offer-card ul {
+      margin: 0 0 22px;
+      padding-left: 18px;
+      flex: 1;
+    }
+
+    .program-offer-card li + li {
+      margin-top: 10px;
+    }
+
+    .program-card-btn {
+      padding: 12px 18px;
+      background: #f2f8f4;
+      color: #194f82;
+      border: 1px solid rgba(25,79,130,0.08);
+      align-self: flex-start;
+      margin-top: 22px;
+    }
+
+    .program-card-btn:hover {
+      background: #e7f3ec;
+      transform: translateX(4px);
+    }
+
+    .program-calendar-card {
+      padding: 34px 30px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .calendar-preview {
+      background: linear-gradient(135deg, rgba(89,185,135,0.12), rgba(25,79,130,0.06));
+      border-radius: 24px;
+      padding: 24px;
+      min-height: 230px;
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      align-content: center;
+    }
+
+    .calendar-day {
+      aspect-ratio: 1;
+      border-radius: 12px;
+      background: white;
+      color: #194f82;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.05);
+      font-size: 0.9rem;
+    }
+
+    .calendar-day.active {
+      background: var(--header-green);
+      color: white;
+    }
+
+    .calendar-day.soft {
+      background: rgba(255,255,255,0.55);
+      color: #8aa09a;
+    }
+
+    .program-cta-wrap {
+      padding: 55px 20px 90px;
+    }
+
+    .program-cta-box {
+      background: linear-gradient(135deg, #194f82 0%, #2b6c7a 100%);
+      color: white;
+      border-radius: 32px;
+      padding: 40px 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+      box-shadow: 0 24px 60px rgba(25,79,130,0.18);
+    }
+
+    .program-cta-box h3 {
+      margin: 0 0 10px;
+      font-size: 1.65rem;
+    }
+
+    .program-cta-box p {
+      margin: 0;
+      max-width: 760px;
+      line-height: 1.85;
+      opacity: 0.96;
+    }
+
+    .program-cta-btn {
+      padding: 14px 24px;
+      background: var(--header-green);
+      color: white;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 1100px) {
+      .program-types-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .program-intro-grid,
+      .program-steps-grid,
+      .program-offer-layout,
+      .program-calendar-card {
+        grid-template-columns: 1fr;
+      }
+
+      .program-cta-box {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .program-hero {
+        padding: 110px 20px 75px;
+      }
+
+      .program-types-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .program-panel,
+      .program-highlight,
+      .program-type-content,
+      .program-step-card,
+      .program-offer-card,
+      .program-calendar-card,
+      .program-cta-box {
+        padding: 24px 20px;
+      }
+
+      .program-type-card img {
+        height: 220px;
+      }
+
+      .calendar-preview {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+  </style>
 </head>
-<body style="background-color: #f4faf7;">
 
-
-
-    <!--══✿══╡°˖✧᯽ DESKTOP NAVIGATION BAR ᯽✧˖°╞══✿══-->
-
+<body style="background-color: var(--bg-green);">
 
   <header class="site-header" style="background-color: white;">
     <div class="container header-inner" style="background-color: white;">
       <nav class="main-nav desktop-nav">
         <div class="nav-left">
-          <a href="/homepage/index.html" class="nav-link" data-translate="nav-home">Home</a>
-          <a href="/homepage/forwho.html" class="nav-link " data-translate="nav-forwho">For whom</a>
-          <a href="/homepage/green recovery space.html" class="nav-link" data-translate="nav-grs">Recovery Academy</a>
+          <a href="/homepage/index.html" class="nav-link">Home</a>
+          <a href="/homepage/forwho.html" class="nav-link">For whom</a>
+          <a href="/homepage/green recovery space.html" class="nav-link">Recovery Academy</a>
         </div>
-
-        <!-- ... ✿°•∘ɷ∘•°✿ ..  logo circle  -->
 
         <div class="logo-circle">
           <img src="/homepage/images/Logo HK.png" alt="PBC logo">
         </div>
 
-        <div class="nav-right">          
-          <a href="/homepage/offerings.html" class="nav-link active" data-translate="nav-offer">What we offer</a>
-          <a href="/homepage/about.html" class="nav-link" data-translate="nav-about">About Us</a>
-          <a href="/homepage/contact.html" class="nav-link" data-translate="nav-contact">Contact</a>
+        <div class="nav-right">
+          <a href="/homepage/offerings.html" class="nav-link">What we offer</a>
+          <a href="/homepage/about.html" class="nav-link">About us</a>
+          <a href="/homepage/contact.html" class="nav-link">Contact</a>
+
           <div class="language-dropdown">
-              <button class="lang-btn">EN ▾</button>
-              <ul class="lang-menu">
-                <li data-lang="en">English</li>
-                <li data-lang="nl">Dutch</li>
-                <li data-lang="es">Spanish</li>
-              </ul>
-          </div>        
+            <button class="lang-btn">EN ▾</button>
+            <ul class="lang-menu">
+              <li data-lang="en">English</li>
+              <li data-lang="nl">Dutch</li>
+              <li data-lang="es">Spanish</li>
+            </ul>
+          </div>
+
           <a href="/homepage/Portal.html" class="profile">
             <img src="/homepage/images/unkown.png" alt="User profile">
             <p class="profile-text">Sign in</p>
           </a>
         </div>
       </nav>
-
     </div>
-
-
-    <!--══✿══╡°˖✧᯽ MOBILE NAVIGATION BAR ᯽✧˖°╞══✿══-->
 
     <nav class="mobile-nav">
       <div class="mobile-header">
@@ -60,12 +494,13 @@
           <img src="/homepage/images/Logo HK.png" alt="PBC logo">
         </div>
         <button class="hamburger-btn" aria-label="Open menu">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M3.46447 20.5355C4.92893 22 7.28595 22 12 22C16.714 22 19.0711 22 20.5355 20.5355C22 19.0711 22 16.714 22 12C22 7.28595 22 4.92893 20.5355 3.46447C19.0711 2 16.714 2 12 2C7.28595 2 4.92893 2 3.46447 3.46447C2 4.92893 2 7.28595 2 12C2 16.714 2 19.0711 3.46447 20.5355ZM18.75 16C18.75 16.4142 18.4142 16.75 18 16.75H6C5.58579 16.75 5.25 16.4142 5.25 16C5.25 15.5858 5.58579 15.25 6 15.25H18C18.4142 15.25 18.75 15.5858 18.75 16ZM18 12.75C18.4142 12.75 18.75 12.4142 18.75 12C18.75 11.5858 18.4142 11.25 18 11.25H6C5.58579 11.25 5.25 11.5858 5.25 12C5.25 12.4142 5.58579 12.75 6 12.75H18ZM18.75 8C18.75 8.41421 18.4142 8.75 18 8.75H6C5.58579 8.75 5.25 8.41421 5.25 8C5.25 7.58579 5.58579 7.25 6 7.25H18C18.4142 7.25 18.75 7.58579 18.75 8Z" fill="#59b987"></path> </g></svg>
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M3.46447 20.5355C4.92893 22 7.28595 22 12 22C16.714 22 19.0711 22 20.5355 20.5355C22 19.0711 22 16.714 22 12C22 7.28595 22 4.92893 20.5355 3.46447C19.0711 2 16.714 2 12 2C7.28595 2 4.92893 2 3.46447 3.46447C2 4.92893 2 7.28595 2 12C2 16.714 2 19.0711 3.46447 20.5355ZM18.75 16C18.75 16.4142 18.4142 16.75 18 16.75H6C5.58579 16.75 5.25 16.4142 5.25 16C5.25 15.5858 5.58579 15.25 6 15.25H18C18.4142 15.25 18.75 15.5858 18.75 16ZM18 12.75C18.4142 12.75 18.75 12.4142 18.75 12C18.75 11.5858 18.4142 11.25 18 11.25H6C5.58579 11.25 5.25 11.5858 5.25 12C5.25 12.4142 5.58579 12.75 6 12.75H18ZM18.75 8C18.75 8.41421 18.4142 8.75 18 8.75H6C5.58579 8.75 5.25 8.41421 5.25 8C5.25 7.58579 5.58579 7.25 6 7.25H18C18.4142 7.25 18.75 7.58579 18.75 8Z" fill="#59b987"></path>
+          </svg>
         </button>
       </div>
 
       <ul class="mobile-menu">
-        <!-- User profile at top -->
         <li class="mobile-profile">
           <a href="/homepage/Portal.html" class="profile">
             <img src="/homepage/images/unkown.png" alt="User profile">
@@ -73,699 +508,262 @@
           </a>
         </li>
 
-        <!-- Rest of the links -->
-        <li><a href="/homepage/index.html" class="nav-link" data-translate="nav-home">Home</a></li>
-        <li><a href="/homepage/forwho.html" class="nav-link" data-translate="nav-forwho">For whom</a></li>
-        <li><a href="/homepage/green recovery space.html" class="nav-link" data-translate="nav-grs">Recovery Academy</a></li>
-        <li><a href="/homepage/offerings.html" class="nav-link active" data-translate="nav-offer">What we offer</a></li>
-        <li><a href="/homepage/about.html" data-translate="nav-about">About Us</a></li>
-        <li><a href="/homepage/contact.html" data-translate="nav-contact">Contact</a></li>
+        <li><a href="/homepage/index.html" class="nav-link">Home</a></li>
+        <li><a href="/homepage/forwho.html" class="nav-link">For whom</a></li>
+        <li><a href="/homepage/green recovery space.html" class="nav-link">Recovery Academy</a></li>
+        <li><a href="/homepage/offerings.html" class="nav-link">What we offer</a></li>
+        <li><a href="/homepage/about.html" class="nav-link">About us</a></li>
+        <li><a href="/homepage/contact.html" class="nav-link">Contact</a></li>
       </ul>
     </nav>
   </header>
 
-
-<style>
-
-/* ═════════ PROGRAMS PAGE ═════════ */
-
-/* HERO */
-
-/* SECTION TITLES */
-.section-title {
-  font-size: 2.2rem;
-  color: #2e5e4e;
-  text-align: center;
-}
-
-.section-intro {
-  max-width: 700px;
-  text-align: center;
-  line-height: 1.7;
-}
-
-.programs-container {
-  background: var(--white);
-  display: grid;
-  grid-template-columns: 260px 1fr;
-  gap: 2rem;
-  padding: 0 1rem;}
-
-.programs-sidebar {
-  align-self: start;
-  position: sticky;
-  background: #ffffff;
-  padding: 1.5rem ;
-  border-radius: 10px;
-  border: 1px solid #ddd;
-}
-
-.programs-main {
-  display: flex;
-  flex-direction: column;
-  gap: 3rem;
-}
-
-/* CALENDAR */
-.programs-calendar {
-  background: #f4faf7;
-  padding: 1.5rem;
-  border-radius: 12px;
-}
-
-.calendar-item {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-.calendar-date {
-  font-weight: bold;
-  color: #4d8658;
-}
-
-/* PROGRAM GRID */
-.programs-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-  gap: 1.5rem;
-}
-
-.program-card {
-  background: white;
-  border-radius: 14px;
-  overflow: hidden;
-  border: 1px solid #ddd;
-  transition: 0.25s ease;
-  position: relative;
-}
-
-.program-card:hover {
-  transform: translateY(-4px);
-}
-
-.program-card img {
-  width: 100%;
-  height: 220px;
-  object-fit: cover;
-}
-
-.program-content {
-  padding: 1rem;
-}
-
-.program-content h4 {
-  margin-bottom: 0.5rem;
-}
-
-.program-description {
-  font-size: 0.9rem;
-  margin-bottom: 0.8rem;
-  color: #555;
-}
-
-.program-meta {
-  font-size: 0.85rem;
-  color: #666;
-  margin-bottom: 4px;
-}
-
-.program-button {
-  display: inline-block;
-  margin-top: 10px;
-  padding: 8px 14px;
-  background: var(--accent-2);
-  color: var(--white);
-  text-decoration: none;
-  border-radius: 6px;
-  font-size: 0.9rem;
-}
-
-.program-button:hover {
-  background: #6cb29e;
-}
-
-/* STATUS BADGES */
-.status-badge {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  padding: 4px 10px;
-  font-size: 0.75rem;
-  border-radius: 20px;
-  color: white;
-}
-
-.status-badge.upcoming {
-  background: #4d8658;
-}
-
-.status-badge.ongoing {
-  background: #d4a017;
-}
-
-.status-badge.completed {
-  background: #999;
-}
-
-/* Responsive */
-@media(max-width: 850px) {
-  .programs-container {
-    grid-template-columns: 1fr;
-  }
-  .programs-sidebar {
-    position: static;
-  }
-}
-
-/* SIDEBAR CALENDAR */
-
-.sidebar-calendar {
-  margin-top: 2rem;
-}
-
-.calendar-preview {
-  background: #f4faf7;
-  padding: 1rem;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.calendar-preview:hover {
-  background: #e6f3ef;
-}
-
-.calendar-header {
-  font-weight: bold;
-  margin-bottom: 10px;
-  text-align: center;
-}
-
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  font-size: 0.75rem;
-  gap: 5px;
-  text-align: center;
-}
-
-.calendar-grid span {
-  padding: 4px;
-}
-
-.event-day {
-  background: #92dacc;
-  border-radius: 50%;
-  font-weight: bold;
-}
-
-.calendar-hint {
-  margin-top: 8px;
-  font-size: 0.7rem;
-  text-align: center;
-  color: #666;
-}
-
-/* MODAL */
-
-.calendar-modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-}
-
-.calendar-modal.active {
-  display: flex;
-}
-
-.calendar-modal-content {
-  background: white;
-  padding: 2rem;
-  border-radius: 16px;
-  width: 90%;
-  max-width: 700px;
-  position: relative;
-  animation: fadeIn 0.3s ease;
-}
-
-.close-calendar {
-  position: absolute;
-  top: 15px;
-  right: 20px;
-  background: none;
-  border: none;
-  font-size: 28px;
-  cursor: pointer;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-
-.programs-offerings {
-  max-width: 95%;
-  padding: 2rem;
-  margin: 0 auto 1rem auto;
-  background: #fff;
-  border-radius: 14px;
-  box-shadow: 4px 4px 4px 4px rgba(165, 188, 177, 0.068);
-
-}
-
-.offerings-toggle {
-  width: 100%;
-  background: none;
-  border: none;
-  font-size: 1.8rem;
-  font-weight: 600;
-  display: flex;
-  justify-content:start;
-  align-items: center;
-  cursor: pointer;
-  padding: 0;
-  color: #3b6944;
-}
-
-.toggle-icon {
-  display: inline-flex;
-  transition: transform 0.3s ease;
-  padding-left: 10px;
-}
-
-.toggle-icon.rotate {
-  transform: rotate(180deg);
-}
-
-.offerings-content {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.5s ease, opacity 0.4s ease;
-  opacity: 0;
-  line-height: 1.7;
-  margin-top: 1rem;
-}
-
-.offerings-content.open {
-  max-height: 1000px; /* large enough to fit content */
-  opacity: 1;
-}
-
-.offerings-content p {
-  margin-bottom: 1rem;
-}
-
-/* FILTER TOGGLE (hidden on desktop) */
-
-.filter-toggle{
-  display:none;
-  width:100%;
-  background:white;
-  border:none;
-  border-radius:10px;
-  padding:14px;
-  font-size:1.2rem;
-  font-weight:600;
-  color:#3b6944;
-
-  justify-content:space-between;
-  align-items:center;
-  cursor:pointer;
-}
-
-
-/* MOBILE LAYOUT */
-
-@media(max-width:850px){
-
-  .programs-container{
-    grid-template-columns:1fr;
-    gap:1.5rem;
-  }
-
-  .filter-toggle{
-    display:flex;
-  }
-
-  .programs-sidebar{
-    max-height:0;
-    overflow:hidden;
-    opacity:0;
-    transition:max-height .5s ease, opacity .3s ease;
-  }
-
-  .programs-sidebar.open{
-    max-height:1200px;
-    opacity:1;
-  }
-
-}
-
-/* MOBILE RESPONSIVENESS */
-@media(max-width: 850px) {
-
-  /* Container becomes single-column */
-  .programs-container {
-    grid-template-columns: 1fr;
-    margin: 0 0 20px 0;
-  }
-
-  /* Sidebar moves below registration section */
-  .programs-sidebar {
-    position: static;
-    width: 100%;
-  }
-
-  /* Program cards slightly smaller */
-  .programs-grid {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 1rem;
-  }
-
-  .program-card img {
-    height: 180px;
-  }
-
-  .program-content {
-    padding: 0.8rem;
-  }
-
-  .program-content h4 {
-    font-size: 1rem;
-  }
-
-  .program-description {
-    font-size: 0.85rem;
-  }
-
-  .program-meta {
-    font-size: 0.75rem;
-  }
-
-  .program-button {
-    font-size: 0.85rem;
-    padding: 6px 12px;
-  }
-
-  /* Registration Section */
-  .registration-section {
-    padding: 0 1.5rem;
-  }
-
-  /* Registration buttons stacked */
-  .registration-card,
-  .registration-box {
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .choice-button {
-    width: 100%;
-    margin-top: 10px;
-  }
-
-  /* Offerings toggle content spacing */
-  .offerings-toggle {
-    font-size: 1.5rem;
-  }
-
-  /* Filter toggle visible and placed under registration */
-  .filter-toggle {
-    display: flex;
-    margin-top: 1rem;
-    padding: 12px;
-    font-size: 1rem;
-  }
-
-  /* Calendar */
-  .programs-calendar {
-    padding: 1rem;
-  }
-
-  .calendar-item {
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .calendar-date {
-    font-size: 0.85rem;
-  }
-
-  .calendar-grid {
-    grid-template-columns: repeat(7, 1fr);
-    font-size: 0.65rem;
-  }
-}
-
-/* SMALLER DEVICES */
-@media(max-width: 500px) {
-
-  .programs-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .program-card img {
-    height: 160px;
-  }
-
-  .section-title {
-    font-size: 1.8rem;
-  }
-
-  .section-intro {
-    font-size: 0.95rem;
-    padding: 0 1rem;
-  }
-
-  .filter-toggle {
-    font-size: 0.95rem;
-    padding: 10px;
-  }
-
-  .choice-button {
-    height: 45px;
-  }
-}
-
-</style>
-
-
-<section class="hero sub-hero" aria-label="Courses hero">
-
-  <!-- ... ✿°•∘ɷ∘•°✿ .. background img -->
-  <div class="hero-bg" style="background-image:url('images/Christoffelberg.png')"></div>
-  <div class="hero-tint"></div>
-
-    <div class="container hero-inner">
-      <div class="hero-copy">
-        <h1 data-translate="hero-courses-h" style="color: var(--header-green); margin-top: -40px;">Discover what you can do with us</h1>
-        <p style=" margin: auto; color: rgb(245, 232, 232); font-size: 1.1rem;">
-             Small steps, at your own pace, from introduction to deeper engagement. <br>
-        <br> At the Green Recovery Space, you can take part in activities, trainings, and self-help methods that contribute to recovery, balance, and overall well-being.
+  <section class="program-hero">
+    <div class="program-hero-inner">
+      <div class="program-breadcrumb">
+        <a href="/homepage/index.html">Home</a>
+        <span>•</span>
+        <span>Program & Activities</span>
+      </div>
+
+      <div class="program-badge">Program & Activities</div>
+
+      <h1 class="program-title">
+        Activities, learning, and recovery support at your own pace.
+      </h1>
+
+      <p class="program-lead">
+        The Green Recovery Space offers a welcoming place where people can join activities, learn about recovery, meet others, and find practical support for well-being. The program is designed to be accessible, human, and connected to real lived experience.
+      </p>
+
+      <div class="program-hero-actions">
+        <a href="/homepage/contact.html" class="program-btn primary">Ask about the program</a>
+        <a href="#current-offer" class="program-btn secondary">Explore activities</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="program-section">
+    <div class="program-intro-grid">
+      <div class="program-panel">
+        <h2>What is this page about?</h2>
+        <p>
+          This page gives visitors a clear overview of what they can expect from the Green Recovery Space program. It explains the types of activities, the way people can participate, and how the program supports recovery, balance, and connection.
+        </p>
+        <p>
+          The program may grow and change over time. New activities, trainings, and schedules can be added without changing the structure of this page.
+        </p>
+
+        <div class="program-strip">
+          The goal is not to pressure people, but to create space where they can breathe, learn, connect, and take steps forward in their own rhythm.
+        </div>
+      </div>
+
+      <div class="program-highlight">
+        <h2>Why it matters</h2>
+        <p>
+          Many people need a place where they can feel welcome without having to explain everything immediately. A recovery-oriented program gives room for personal growth, peer connection, and practical learning.
+        </p>
+        <p>
+          The Green Recovery Space combines activities, training, self-help, and lived-experience knowledge in a way that feels approachable and supportive.
         </p>
       </div>
     </div>
-
-    <!-- ... ✿°•∘ɷ∘•°✿ ..  wavy divider svg  -->
-
-    <svg class="hero-wave" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
-      <path d="M0,40 C220,110 440,0 720,40 C1000,80 1220,10 1440,50 L1440,120 L0,120 Z" fill="#f4faf7"></path>
-    </svg>
-
   </section>
-  
-  <!-- ══✿══ OUR OFFERINGS (Collapsible) ══✿══ -->
-<section class="programs-offerings" style="height: fit-content;">
 
-  <button class="offerings-toggle" id="offeringsToggle">
-    <span>Our Offerings</span>
-
-    <span class="toggle-icon">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-          xmlns="http://www.w3.org/2000/svg">
-        <path d="M2.99854 7.00153L12.0006 17.0027L21.0027 7.00153"
-          stroke="#4d8658"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"/>
-      </svg>
-    </span>
-  </button>
-
-  <div class="offerings-content" id="offeringsContent">
-
-    <p>
-      At Green Recovery Space, we provide recovery-focused courses for people 
-      who want to work on their mental health, well-being, and resilience.
-    </p>
-
-    <p>
-      We do not start from diagnoses or labels but from the person behind the story. 
-      For us, recovery means finding direction again, experiencing connection, and 
-      learning to navigate life in a way that fits who you are and the context you live in.
-    </p>
-
-    <p>
-      Our courses differ in approach but share the same foundation: safety, equality, 
-      personal agency, and respect for each person’s pace.
-    </p>
-
-    <p>
-      All courses are guided by trained lived-experience experts and trainers, 
-      in small, trusted groups, and a calm setting. Everything happens at your pace.
-      You are welcome as you are.
-    </p>
-
-  </div>
-
-</section>
-
-
-<!-- 🌱 OUR OFFERINGS -->
-<main class="programs-container" style="background-color: #f4faf7;">
-
-<!-- MOBILE FILTER TOGGLE -->
-<button class="filter-toggle" id="filterToggle">
-  <span>Filter Programs</span>
-
-  <span class="toggle-icon">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-      <path d="M2.99854 7.00153L12.0006 17.0027L21.0027 7.00153"
-      stroke="#4d8658"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"/>
-    </svg>
-  </span>
-</button>
-
-  <!-- SIDEBAR -->
-  <aside class="programs-sidebar">
-    <h3>Filter Programs</h3>
-
-    <div class="filter-group">
-      <label>Search</label>
-      <input type="text" placeholder="Search programs..." />
+  <section class="program-section" id="current-offer">
+    <div class="program-section-head center">
+      <h2>Types of activities</h2>
+      <p>
+        The exact offer can be updated over time, but these are the main types of activities and learning opportunities that fit within the Green Recovery Space.
+      </p>
     </div>
 
-    <div class="filter-group">
-      <label>Type of offerings</label>
-      <select>
-        <option value="">All</option>
-        <option>Activities</option>
-        <option>Learning & deepening recovery knowledge</option>
-        <option>Regular offerings</option>
-        <option>Lived-experience training</option>
-      </select>
-    </div>
-
-    <div class="filter-group">
-      <label>Duration</label>
-      <select>
-        <option value="">Any</option>
-        <option>Short (± 1.5 to 2 hours)</option>
-        <option>Half-day (± 4 hours)</option>
-        <option>Multiple sessions</option>
-      </select>
-    </div>
-
-    <div class="filter-group">
-      <label>Theme</label>
-      <select>
-        <option value="">Any</option>
-        <option>Rest & relaxation</option>
-        <option>Recovery & balance</option>
-        <option>Self-insight</option>
-        <option>Connection</option>
-      </select>
-    </div>
-
-
-    <div class="sidebar-calendar">
-      <h4 style="padding-bottom: 0.5rem;">Program Calendar</h4>
-
-      <div class="calendar-preview" id="openCalendar">
-        <div class="calendar-header">
-          <span>March 2026</span>
+    <div class="program-types-grid">
+      <article class="program-type-card">
+        <img src="/homepage/images/Hofi Korsow_molen (1).png" alt="Rest and reflection">
+        <div class="program-type-content">
+          <span class="program-type-tag">Recovery</span>
+          <h3>Rest & reflection</h3>
+          <p>
+            Activities that help people slow down, reflect, and reconnect with themselves in a calm environment.
+          </p>
         </div>
+      </article>
 
-        <div class="calendar-grid">
-          <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
-
-          <span></span><span></span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
-          <span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
-          <span class="event-day">12</span>
-          <span>13</span>
-          <span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span>
-          <span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span>
-          <span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span>
+      <article class="program-type-card">
+        <img src="/homepage/images/Hofi Korsow_inganggeheel.png" alt="Learning activities">
+        <div class="program-type-content">
+          <span class="program-type-tag">Learning</span>
+          <h3>Self-help & recovery knowledge</h3>
+          <p>
+            Practical sessions focused on recovery, well-being, coping skills, and understanding personal processes.
+          </p>
         </div>
+      </article>
 
-        <p class="calendar-hint">Click to view full calendar</p>
+      <article class="program-type-card">
+        <img src="/homepage/images/Hofi Korsow_molen (1).png" alt="Peer connection">
+        <div class="program-type-content">
+          <span class="program-type-tag">Connection</span>
+          <h3>Peer exchange</h3>
+          <p>
+            Spaces where people can meet others, share experiences if they want, and feel less alone.
+          </p>
+        </div>
+      </article>
+
+      <article class="program-type-card">
+        <img src="/homepage/images/Hofi Korsow_inganggeheel.png" alt="Training">
+        <div class="program-type-content">
+          <span class="program-type-tag">Training</span>
+          <h3>Lived-experience development</h3>
+          <p>
+            Learning opportunities connected to lived experience, recovery-oriented work, and supporting others.
+          </p>
+        </div>
+      </article>
     </div>
-  </div>
+  </section>
 
-  </aside>
+  <section class="program-section">
+    <div class="program-section-head">
+      <h2>How participation works</h2>
+      <p>
+        Visitors should quickly understand that participation is approachable. The program is not about pressure, performance, or doing everything at once.
+      </p>
+    </div>
 
+    <div class="program-steps-grid">
+      <div class="program-step-card">
+        <div class="program-step-number">Step 1</div>
+        <h3>Explore what fits</h3>
+        <p>
+          People can first read about the program, ask questions, or look at the available activities before deciding what feels right.
+        </p>
+      </div>
 
-  <!-- MAIN CONTENT -->
-  <section class="programs-main">
+      <div class="program-step-card">
+        <div class="program-step-number">Step 2</div>
+        <h3>Join at your own pace</h3>
+        <p>
+          Participation can happen step by step. Visitors do not need to know everything in advance or commit to everything immediately.
+        </p>
+      </div>
 
-    <!-- PROGRAM GRID -->
-    <div id="programsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6"></div>
-
-    <div class="calendar-modal" id="calendarModal">
-      <div class="calendar-modal-content">
-        <button class="close-calendar" id="closeCalendar">&times;</button>
-        <h2>Full Program Calendar</h2>
-
-        <div class="full-calendar-grid">
-          <!-- You can expand this later with real dynamic JS -->
-          <p>Here you can integrate a real monthly calendar view.</p>
-          <p>March 12 – Green Recovery Program</p>
-          <p>April 3 – Mindfulness Journey</p>
-        </div>
+      <div class="program-step-card">
+        <div class="program-step-number">Step 3</div>
+        <h3>Grow through support</h3>
+        <p>
+          Through activities, learning, and connection, people can discover tools and support that help them move forward.
+        </p>
       </div>
     </div>
-
-
-
-
-
   </section>
-</main>
 
+  <section class="program-section">
+    <div class="program-section-head">
+      <h2>What visitors can expect</h2>
+      <p>
+        This section helps the page feel complete even before all detailed program information has been added.
+      </p>
+    </div>
 
-     <!--══✿══╡°˖✧᯽  FOOTER   ᯽✧˖°╞══✿══-->
+    <div class="program-offer-layout">
+      <div class="program-offer-card">
+        <h3>A welcoming program environment</h3>
+        <ul>
+          <li>A safe and accessible atmosphere</li>
+          <li>Activities without unnecessary pressure</li>
+          <li>Room to talk, listen, or simply be present</li>
+          <li>Support from people with understanding and experience</li>
+        </ul>
+        <a href="/homepage/forwho.html" class="program-card-btn">Who is this for? →</a>
+      </div>
 
+      <div class="program-offer-card">
+        <h3>A growing activity offer</h3>
+        <ul>
+          <li>Recovery-oriented learning sessions</li>
+          <li>Peer contact and group-based activities</li>
+          <li>Self-help methods and practical tools</li>
+          <li>Training connected to lived-experience expertise</li>
+        </ul>
+        <a href="/homepage/contact.html" class="program-card-btn">Ask about current activities →</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="program-section">
+    <div class="program-calendar-card">
+      <div>
+        <h3>Planning & upcoming activities</h3>
+        <p>
+          A more detailed activity planning can be added here later. For now, this section clearly shows that the program page is prepared for schedules, recurring sessions, or monthly activity updates.
+        </p>
+        <p style="margin-top: 14px;">
+          When the official planning is ready, this area can be replaced with real dates, activity cards, or a monthly calendar.
+        </p>
+        <a href="/homepage/contact.html" class="program-card-btn">Contact us for current planning →</a>
+      </div>
+
+      <div class="calendar-preview" aria-label="Calendar preview">
+        <div class="calendar-day soft">M</div>
+        <div class="calendar-day soft">T</div>
+        <div class="calendar-day soft">W</div>
+        <div class="calendar-day soft">T</div>
+        <div class="calendar-day soft">F</div>
+        <div class="calendar-day soft">S</div>
+        <div class="calendar-day soft">S</div>
+
+        <div class="calendar-day">1</div>
+        <div class="calendar-day">2</div>
+        <div class="calendar-day active">3</div>
+        <div class="calendar-day">4</div>
+        <div class="calendar-day">5</div>
+        <div class="calendar-day">6</div>
+        <div class="calendar-day">7</div>
+
+        <div class="calendar-day">8</div>
+        <div class="calendar-day active">9</div>
+        <div class="calendar-day">10</div>
+        <div class="calendar-day">11</div>
+        <div class="calendar-day active">12</div>
+        <div class="calendar-day">13</div>
+        <div class="calendar-day">14</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="program-cta-wrap">
+    <div class="program-cta-box">
+      <div>
+        <h3>Not sure which activity fits you best?</h3>
+        <p>
+          You are welcome to get in touch. Together we can explore what kind of activity, training, or support may fit your situation or interest.
+        </p>
+      </div>
+      <a href="/homepage/contact.html" class="program-cta-btn">Get in touch</a>
+    </div>
+  </section>
 
   <footer class="fancy-footer" style="margin-top: 0;">
     <div class="footer-background-word">Hofi Korsou</div>
 
     <div class="footer-container">
       <div class="footer-grid">
-
-        <!-- ... ✿°•∘ɷ∘•°✿ .. LOGO + TEXT -->
         <div class="footer-col-wide">
           <img src="/homepage/images/HK logo no bg.png" alt="logo" class="footer-logo" />
         </div>
 
-        <!-- ... ✿°•∘ɷ∘•°✿ .. COL 1 -->
         <div class="footer-col">
           <h3 data-translate="col-com">Company</h3>
           <ul>
             <li><a data-translate="nav-about" href="/homepage/about.html">About Us</a></li>
-            <li><a data-translate="nav-contact" href="/homepage/contact.html">Contact Us</a></li>            
+            <li><a data-translate="nav-contact" href="/homepage/contact.html">Contact Us</a></li>
           </ul>
         </div>
 
-        <!-- ... ✿°•∘ɷ∘•°✿ .. COL 2 -->
         <div class="footer-col">
           <h3 data-translate="col-por">Portals</h3>
           <ul>
@@ -774,9 +772,6 @@
           </ul>
         </div>
 
-
-
-        <!-- ... ✿°•∘ɷ∘•°✿ .. COL 3 -->
         <div class="footer-col">
           <h3 data-translate="col-legal">Legal</h3>
           <ul>
@@ -786,9 +781,9 @@
             <li><a href="/homepage/#">Security</a></li>
           </ul>
         </div>
-        <!-- ... ✿°•∘ɷ∘•°✿ .. COL 4 -->
+
         <div class="footer-col">
-          <h3 data-translate="col-know">Quick Links </h3>
+          <h3 data-translate="col-know">Quick Links</h3>
           <ul>
             <li><a data-translate="nav-forwho" href="/homepage/forwho.html">For whom</a></li>
             <li><a data-translate="nav-grs" href="/homepage/green recovery space.html">Recovery Academy</a></li>
@@ -798,54 +793,29 @@
             <li><a data-translate="nav-stories" href="/homepage/stories.html">Personal Stories</a></li>
           </ul>
         </div>
-
       </div>
-
-      <!--... ✿°•∘ɷ∘•°✿ .. SOCIALS -->
 
       <div class="footer-bottom">
         <div class="footer-social-icons">
-          <a href="/homepage/#" class="social"><i class="fab fa-facebook"></i></a>
-          <a href="/homepage/#" class="social"><i class="fab fa-youtube"></i></a>
-          <a href="/homepage/#" class="social"><i class="fab fa-linkedin"></i></a>
-          <a href="/homepage/#" class="social"><i class="fab fa-whatsapp"></i></a>
+          <a href="https://www.facebook.com/projectbureaucaribbean" class="social"><i class="fab fa-facebook"></i></a>
+          <a href="https://www.youtube.com/@projectbureaucaribbean9600" class="social"><i class="fab fa-youtube"></i></a>
+          <a href="https://www.linkedin.com/company/projectbureau-caribbean/" class="social"><i class="fab fa-linkedin"></i></a>
+          <a href="https://wa.me/59995208184" class="social"><i class="fab fa-whatsapp"></i></a>
         </div>
       </div>
     </div>
   </footer>
 
-
-  <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-
-
-    <script src="/homepage/JS/script.js"></script>
-    <script src="/homepage/JS/lang-translation.js"></script>  
-    <script>
-      async function loadPrograms() {
-        const res = await fetch(
-          `${API_URL}/programs?filters[publishedAt][$notNull]=true&populate=*`
-        );
-
-        const json = await res.json();
-        const programs = json.data;
-
-        const grid = document.querySelector("#programsGrid");
-
-        grid.innerHTML = programs.map((p) => {
-          const c = p.attributes;
-
-          return `
-            <div class="card">
-              <h3>${c.title}</h3>
-              <p>${c.summary}</p>
-            </div>
-          `;
-        }).join("");
-      }
-    </script>
-
-
+  <script src="/homepage/JS/script.js"></script>
+  <script>
+    document.querySelectorAll(".lang-menu li").forEach(item => {
+      item.addEventListener("click", function () {
+        const lang = this.getAttribute("data-lang");
+        setLanguage(lang);
+      });
+    });
+  </script>
 </body>
 </html>
