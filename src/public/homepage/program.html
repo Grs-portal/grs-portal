@@ -80,12 +80,6 @@
       color: rgba(255,255,255,0.95);
     }
 
-    .program-hero-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px;
-    }
-
     .program-btn,
     .program-card-btn,
     .program-cta-btn {
@@ -102,14 +96,6 @@
       background: var(--header-green);
       color: white;
       box-shadow: 0 12px 28px rgba(0,0,0,0.16);
-    }
-
-    .program-btn.secondary {
-      padding: 14px 24px;
-      background: rgba(255,255,255,0.14);
-      color: white;
-      border: 1px solid rgba(255,255,255,0.22);
-      backdrop-filter: blur(8px);
     }
 
     .program-btn:hover,
@@ -145,82 +131,22 @@
       margin: 0;
     }
 
-    .program-intro-grid {
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 28px;
-      align-items: stretch;
-    }
-
-    .program-panel,
-    .program-highlight,
-    .program-type-card,
-    .program-step-card,
-    .program-offer-card,
-    .program-calendar-card {
-      background: #ffffff;
-      border-radius: 30px;
-      box-shadow: 0 16px 40px rgba(0,0,0,0.07);
-      border: 1px solid rgba(0,0,0,0.04);
-    }
-
-    .program-panel,
-    .program-highlight {
-      padding: 34px 30px;
-    }
-
-    .program-panel h2,
-    .program-highlight h2,
-    .program-type-card h3,
-    .program-step-card h3,
-    .program-offer-card h3,
-    .program-calendar-card h3 {
-      color: #194f82;
-      margin: 0 0 14px;
-    }
-
-    .program-panel p,
-    .program-highlight p,
-    .program-type-card p,
-    .program-step-card p,
-    .program-offer-card p,
-    .program-calendar-card p,
-    .program-offer-card li {
-      color: #2c3934;
-      line-height: 1.85;
-      margin: 0;
-    }
-
-    .program-panel p + p,
-    .program-highlight p + p {
-      margin-top: 16px;
-    }
-
-    .program-highlight {
-      background: linear-gradient(135deg, rgba(89,185,135,0.12), rgba(25,79,130,0.06));
-      border-left: 5px solid #59b987;
-    }
-
-    .program-strip {
-      margin-top: 24px;
-      padding: 18px 20px;
-      border-radius: 20px;
-      background: rgba(25,79,130,0.05);
-      color: #194f82;
-      font-weight: 600;
-      line-height: 1.7;
-    }
-
     .program-types-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 24px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 28px;
     }
 
     .program-type-card {
+      background: #ffffff;
+      border-radius: 30px;
       overflow: hidden;
       height: 100%;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.07);
+      border: 1px solid rgba(0,0,0,0.04);
       transition: 0.25s ease;
+      display: flex;
+      flex-direction: column;
     }
 
     .program-type-card:hover {
@@ -230,17 +156,21 @@
 
     .program-type-card img {
       width: 100%;
-      height: 190px;
+      height: 220px;
       object-fit: cover;
       display: block;
     }
 
     .program-type-content {
-      padding: 26px 24px;
+      padding: 28px 26px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
     }
 
     .program-type-tag {
       display: inline-block;
+      align-self: flex-start;
       padding: 6px 12px;
       border-radius: 999px;
       background: rgba(89,185,135,0.12);
@@ -250,119 +180,16 @@
       margin-bottom: 12px;
     }
 
-    .program-steps-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 24px;
-    }
-
-    .program-step-card {
-      padding: 30px 26px;
-      position: relative;
-      overflow: hidden;
-      min-height: 240px;
-    }
-
-    .program-step-card::before {
-      content: "";
-      position: absolute;
-      width: 130px;
-      height: 130px;
-      border-radius: 50%;
-      right: -35px;
-      top: -35px;
-      background: rgba(89,185,135,0.08);
-    }
-
-    .program-step-number {
-      display: inline-block;
-      padding: 6px 12px;
-      border-radius: 999px;
-      background: rgba(25,79,130,0.08);
+    .program-type-card h3 {
       color: #194f82;
-      font-weight: 700;
-      margin-bottom: 14px;
-      position: relative;
-      z-index: 1;
+      margin: 0 0 14px;
+      font-size: 1.35rem;
     }
 
-    .program-offer-layout {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 28px;
-    }
-
-    .program-offer-card {
-      padding: 32px 28px;
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-    }
-
-    .program-offer-card ul {
-      margin: 0 0 22px;
-      padding-left: 18px;
-      flex: 1;
-    }
-
-    .program-offer-card li + li {
-      margin-top: 10px;
-    }
-
-    .program-card-btn {
-      padding: 12px 18px;
-      background: #f2f8f4;
-      color: #194f82;
-      border: 1px solid rgba(25,79,130,0.08);
-      align-self: flex-start;
-      margin-top: 22px;
-    }
-
-    .program-card-btn:hover {
-      background: #e7f3ec;
-      transform: translateX(4px);
-    }
-
-    .program-calendar-card {
-      padding: 34px 30px;
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 28px;
-      align-items: center;
-    }
-
-    .calendar-preview {
-      background: linear-gradient(135deg, rgba(89,185,135,0.12), rgba(25,79,130,0.06));
-      border-radius: 24px;
-      padding: 24px;
-      min-height: 230px;
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 8px;
-      align-content: center;
-    }
-
-    .calendar-day {
-      aspect-ratio: 1;
-      border-radius: 12px;
-      background: white;
-      color: #194f82;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      box-shadow: 0 8px 18px rgba(0,0,0,0.05);
-      font-size: 0.9rem;
-    }
-
-    .calendar-day.active {
-      background: var(--header-green);
-      color: white;
-    }
-
-    .calendar-day.soft {
-      background: rgba(255,255,255,0.55);
-      color: #8aa09a;
+    .program-type-card p {
+      color: #2c3934;
+      line-height: 1.85;
+      margin: 0;
     }
 
     .program-cta-wrap {
@@ -407,13 +234,6 @@
     }
 
     @media (max-width: 1024px) {
-      .program-intro-grid,
-      .program-steps-grid,
-      .program-offer-layout,
-      .program-calendar-card {
-        grid-template-columns: 1fr;
-      }
-
       .program-cta-box {
         flex-direction: column;
         align-items: flex-start;
@@ -429,22 +249,13 @@
         grid-template-columns: 1fr;
       }
 
-      .program-panel,
-      .program-highlight,
       .program-type-content,
-      .program-step-card,
-      .program-offer-card,
-      .program-calendar-card,
       .program-cta-box {
         padding: 24px 20px;
       }
 
       .program-type-card img {
         height: 220px;
-      }
-
-      .calendar-preview {
-        grid-template-columns: repeat(4, 1fr);
       }
     }
   </style>
@@ -529,218 +340,102 @@
       <div class="program-badge">Program & Activities</div>
 
       <h1 class="program-title">
-        Activities, learning, and recovery support at your own pace.
+        Trainings and activities for recovery, reflection, and connection.
       </h1>
 
       <p class="program-lead">
-        The Green Recovery Space offers a welcoming place where people can join activities, learn about recovery, meet others, and find practical support for well-being. The program is designed to be accessible, human, and connected to real lived experience.
+        The Green Recovery Space offers a welcoming place where people can join activities, learn about recovery, meet others, and find practical support for well-being. This page provides an overview of the trainings and activities currently offered. These may continue to grow and evolve over time.
       </p>
 
-      <div class="program-hero-actions">
-        <a href="/homepage/contact.html" class="program-btn primary">Ask about the program</a>
-        <a href="#current-offer" class="program-btn secondary">Explore activities</a>
-      </div>
+      <a href="/homepage/contact.html" class="program-btn primary">Ask about the program</a>
     </div>
   </section>
 
   <section class="program-section">
-    <div class="program-intro-grid">
-      <div class="program-panel">
-        <h2>What is this page about?</h2>
-        <p>
-          This page gives visitors a clear overview of what they can expect from the Green Recovery Space program. It explains the types of activities, the way people can participate, and how the program supports recovery, balance, and connection.
-        </p>
-        <p>
-          The program may grow and change over time. New activities, trainings, and schedules can be added without changing the structure of this page.
-        </p>
-
-        <div class="program-strip">
-          The goal is not to pressure people, but to create space where they can breathe, learn, connect, and take steps forward in their own rhythm.
-        </div>
-      </div>
-
-      <div class="program-highlight">
-        <h2>Why it matters</h2>
-        <p>
-          Many people need a place where they can feel welcome without having to explain everything immediately. A recovery-oriented program gives room for personal growth, peer connection, and practical learning.
-        </p>
-        <p>
-          The Green Recovery Space combines activities, training, self-help, and lived-experience knowledge in a way that feels approachable and supportive.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <section class="program-section" id="current-offer">
     <div class="program-section-head center">
-      <h2>Types of activities</h2>
+      <h2>Trainings & activities</h2>
       <p>
-        The exact offer can be updated over time, but these are the main types of activities and learning opportunities that fit within the Green Recovery Space.
+        These courses and activities are designed to support recovery, self-understanding, resilience, and connection with others.
       </p>
     </div>
 
     <div class="program-types-grid">
+
       <article class="program-type-card">
-        <img src="/homepage/images/Hofi Korsow_molen (1).png" alt="Rest and reflection">
+        <img src="/homepage/images/wrap.jpg" alt="WRAP">
         <div class="program-type-content">
-          <span class="program-type-tag">Recovery</span>
-          <h3>Rest & reflection</h3>
+          <span class="program-type-tag">Recovery plan</span>
+          <h3>WRAP</h3>
           <p>
-            Activities that help people slow down, reflect, and reconnect with themselves in a calm environment.
+            WRAP (Wellness Recovery Action Plan) is a practical, recovery-oriented approach that helps you reflect on what you need to feel well. In a small, safe group, you take time to explore what supports you in daily life – and what you can do when things become more difficult.
           </p>
         </div>
       </article>
 
       <article class="program-type-card">
-        <img src="/homepage/images/Hofi Korsow_inganggeheel.png" alt="Learning activities">
+        <img src="/homepage/images/zicht-op-herstel.jpg" alt="Zicht op herstel">
         <div class="program-type-content">
-          <span class="program-type-tag">Learning</span>
-          <h3>Self-help & recovery knowledge</h3>
+          <span class="program-type-tag">Reflection</span>
+          <h3>Zicht op herstel</h3>
           <p>
-            Practical sessions focused on recovery, well-being, coping skills, and understanding personal processes.
+            Zicht op herstel is a recovery-oriented course for people who want to reflect on their life story and on what recovery means for them personally. It is not about solving problems or making plans, but about creating space to understand, feel, and gradually find new direction.
           </p>
         </div>
       </article>
 
       <article class="program-type-card">
-        <img src="/homepage/images/Hofi Korsow_molen (1).png" alt="Peer connection">
+        <img src="/homepage/images/jijenik.jpg" alt="JIJenIK">
         <div class="program-type-content">
           <span class="program-type-tag">Connection</span>
-          <h3>Peer exchange</h3>
+          <h3>JIJenIK</h3>
           <p>
-            Spaces where people can meet others, share experiences if they want, and feel less alone.
+            JIJenIK is a recovery-oriented group course in which connection is central – connection with yourself, with others, and with what happens between people. In JIJenIK, you explore how you relate to others, and what feels helpful or difficult in those connections.
           </p>
         </div>
       </article>
 
       <article class="program-type-card">
-        <img src="/homepage/images/Hofi Korsow_inganggeheel.png" alt="Training">
+        <img src="/homepage/images/eigen-verhaal.jpg" alt="Eigen verhaal">
         <div class="program-type-content">
-          <span class="program-type-tag">Training</span>
-          <h3>Lived-experience development</h3>
+          <span class="program-type-tag">Personal story</span>
+          <h3>Eigen verhaal</h3>
           <p>
-            Learning opportunities connected to lived experience, recovery-oriented work, and supporting others.
+            Eigen verhaal is a recovery-oriented course in which you create space for your personal narrative. In Eigen verhaal, you explore how you can tell your story in a way that does justice both to what you have experienced and to who you are.
           </p>
         </div>
       </article>
-    </div>
-  </section>
 
-  <section class="program-section">
-    <div class="program-section-head">
-      <h2>How participation works</h2>
-      <p>
-        Visitors should quickly understand that participation is approachable. The program is not about pressure, performance, or doing everything at once.
-      </p>
-    </div>
+      <article class="program-type-card">
+        <img src="/homepage/images/crisiskaart.jpg" alt="Crisiskaart">
+        <div class="program-type-content">
+          <span class="program-type-tag">Support tool</span>
+          <h3>Crisiskaart</h3>
+          <p>
+            The Crisiskaart is a personal document in which you record what is important to you in a crisis situation. It helps you clearly communicate who you are, what you need, and what others can do to support you as well as possible.
+          </p>
+        </div>
+      </article>
 
-    <div class="program-steps-grid">
-      <div class="program-step-card">
-        <div class="program-step-number">Step 1</div>
-        <h3>Explore what fits</h3>
-        <p>
-          People can first read about the program, ask questions, or look at the available activities before deciding what feels right.
-        </p>
-      </div>
+      <article class="program-type-card">
+        <img src="/homepage/images/rots-water.jpg" alt="Rots & Water">
+        <div class="program-type-content">
+          <span class="program-type-tag">Resilience</span>
+          <h3>Rots & Water</h3>
+          <p>
+            Rots & Water is a resilience training programme that helps you develop a balance between strength and flexibility. Through physical and experiential exercises, you learn when it is important to stand firm and when it is helpful to adapt.
+          </p>
+        </div>
+      </article>
 
-      <div class="program-step-card">
-        <div class="program-step-number">Step 2</div>
-        <h3>Join at your own pace</h3>
-        <p>
-          Participation can happen step by step. Visitors do not need to know everything in advance or commit to everything immediately.
-        </p>
-      </div>
-
-      <div class="program-step-card">
-        <div class="program-step-number">Step 3</div>
-        <h3>Grow through support</h3>
-        <p>
-          Through activities, learning, and connection, people can discover tools and support that help them move forward.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <section class="program-section">
-    <div class="program-section-head">
-      <h2>What visitors can expect</h2>
-      <p>
-        This section helps the page feel complete even before all detailed program information has been added.
-      </p>
-    </div>
-
-    <div class="program-offer-layout">
-      <div class="program-offer-card">
-        <h3>A welcoming program environment</h3>
-        <ul>
-          <li>A safe and accessible atmosphere</li>
-          <li>Activities without unnecessary pressure</li>
-          <li>Room to talk, listen, or simply be present</li>
-          <li>Support from people with understanding and experience</li>
-        </ul>
-        <a href="/homepage/forwho.html" class="program-card-btn">Who is this for? →</a>
-      </div>
-
-      <div class="program-offer-card">
-        <h3>A growing activity offer</h3>
-        <ul>
-          <li>Recovery-oriented learning sessions</li>
-          <li>Peer contact and group-based activities</li>
-          <li>Self-help methods and practical tools</li>
-          <li>Training connected to lived-experience expertise</li>
-        </ul>
-        <a href="/homepage/contact.html" class="program-card-btn">Ask about current activities →</a>
-      </div>
-    </div>
-  </section>
-
-  <section class="program-section">
-    <div class="program-calendar-card">
-      <div>
-        <h3>Planning & upcoming activities</h3>
-        <p>
-          A more detailed activity planning can be added here later. For now, this section clearly shows that the program page is prepared for schedules, recurring sessions, or monthly activity updates.
-        </p>
-        <p style="margin-top: 14px;">
-          When the official planning is ready, this area can be replaced with real dates, activity cards, or a monthly calendar.
-        </p>
-        <a href="/homepage/contact.html" class="program-card-btn">Contact us for current planning →</a>
-      </div>
-
-      <div class="calendar-preview" aria-label="Calendar preview">
-        <div class="calendar-day soft">M</div>
-        <div class="calendar-day soft">T</div>
-        <div class="calendar-day soft">W</div>
-        <div class="calendar-day soft">T</div>
-        <div class="calendar-day soft">F</div>
-        <div class="calendar-day soft">S</div>
-        <div class="calendar-day soft">S</div>
-
-        <div class="calendar-day">1</div>
-        <div class="calendar-day">2</div>
-        <div class="calendar-day active">3</div>
-        <div class="calendar-day">4</div>
-        <div class="calendar-day">5</div>
-        <div class="calendar-day">6</div>
-        <div class="calendar-day">7</div>
-
-        <div class="calendar-day">8</div>
-        <div class="calendar-day active">9</div>
-        <div class="calendar-day">10</div>
-        <div class="calendar-day">11</div>
-        <div class="calendar-day active">12</div>
-        <div class="calendar-day">13</div>
-        <div class="calendar-day">14</div>
-      </div>
     </div>
   </section>
 
   <section class="program-cta-wrap">
     <div class="program-cta-box">
       <div>
-        <h3>Not sure which activity fits you best?</h3>
+        <h3>Want to know which activity fits you best?</h3>
         <p>
-          You are welcome to get in touch. Together we can explore what kind of activity, training, or support may fit your situation or interest.
+          You are welcome to get in touch. Together we can explore what kind of training or activity may fit your situation or interest.
         </p>
       </div>
       <a href="/homepage/contact.html" class="program-cta-btn">Get in touch</a>
