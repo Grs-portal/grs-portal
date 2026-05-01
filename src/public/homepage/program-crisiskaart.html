@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Crisiskaart | Green Recovery Space</title>
+
+  <link rel="icon" type="image/png" href="/homepage/images/Favicon.png" />
+  <link rel="stylesheet" href="/homepage/CSS/style.css" />
+
+  <style>
+    .training-hero {
+      position: relative;
+      padding: 130px 20px 90px;
+      background:
+        linear-gradient(135deg, rgba(25,79,130,0.88), rgba(43,108,122,0.72)),
+        url('/homepage/images/crisiskaart.jpg') center/cover no-repeat;
+      color: white;
+      overflow: hidden;
+    }
+
+    .training-hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.28));
+      pointer-events: none;
+    }
+
+    .training-hero-inner,
+    .training-content,
+    .training-cta-wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    .training-breadcrumb {
+      display: inline-flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 18px;
+      color: rgba(255,255,255,0.9);
+      font-size: 0.95rem;
+    }
+
+    .training-breadcrumb a {
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .training-badge {
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.15);
+      color: white;
+      font-weight: 700;
+      margin-bottom: 18px;
+      backdrop-filter: blur(6px);
+    }
+
+    .training-title {
+      font-size: clamp(2.4rem, 5vw, 4.2rem);
+      line-height: 1.05;
+      margin: 0 0 18px;
+      max-width: 900px;
+    }
+
+    .training-lead {
+      max-width: 820px;
+      font-size: 1.1rem;
+      line-height: 1.9;
+      margin: 0;
+      color: rgba(255,255,255,0.96);
+    }
+
+    .training-content {
+      padding: 75px 20px 30px;
+    }
+
+    .training-intro-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 28px;
+      align-items: stretch;
+    }
+
+    .training-panel,
+    .training-highlight,
+    .training-info-card {
+      background: white;
+      border-radius: 30px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.07);
+      border: 1px solid rgba(0,0,0,0.04);
+      padding: 34px 30px;
+    }
+
+    .training-panel h2,
+    .training-highlight h2,
+    .training-info-card h2 {
+      margin: 0 0 14px;
+      color: #194f82;
+    }
+
+    .training-panel p,
+    .training-highlight p,
+    .training-info-card p,
+    .training-info-card li {
+      color: #2c3934;
+      line-height: 1.9;
+      margin: 0;
+    }
+
+    .training-panel p + p,
+    .training-highlight p + p,
+    .training-info-card p + p {
+      margin-top: 16px;
+    }
+
+    .training-highlight {
+      background: linear-gradient(135deg, rgba(89,185,135,0.12), rgba(25,79,130,0.06));
+      border-left: 5px solid #59b987;
+    }
+
+    .training-strip {
+      margin-top: 24px;
+      padding: 18px 20px;
+      border-radius: 20px;
+      background: rgba(25,79,130,0.05);
+      color: #194f82;
+      font-weight: 600;
+      line-height: 1.7;
+    }
+
+    .training-section-head {
+      max-width: 860px;
+      margin: 70px 0 28px;
+    }
+
+    .training-section-head h2 {
+      color: #194f82;
+      font-size: 2rem;
+      margin: 0 0 12px;
+    }
+
+    .training-section-head p {
+      color: #50635c;
+      line-height: 1.85;
+      margin: 0;
+    }
+
+    .training-info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+    }
+
+    .training-info-card ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .training-info-card li + li {
+      margin-top: 10px;
+    }
+
+    .training-cta-wrap {
+      padding: 45px 20px 90px;
+    }
+
+    .training-cta-box {
+      background: linear-gradient(135deg, #194f82 0%, #2b6c7a 100%);
+      color: white;
+      border-radius: 32px;
+      padding: 38px 34px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+      box-shadow: 0 24px 60px rgba(25,79,130,0.18);
+    }
+
+    .training-cta-box h3 {
+      margin: 0 0 10px;
+      font-size: 1.6rem;
+    }
+
+    .training-cta-box p {
+      margin: 0;
+      max-width: 760px;
+      line-height: 1.85;
+      opacity: 0.96;
+    }
+
+    .training-btn {
+      display: inline-block;
+      padding: 14px 24px;
+      border-radius: 999px;
+      background: var(--header-green);
+      color: white;
+      text-decoration: none;
+      font-weight: 700;
+      white-space: nowrap;
+      transition: 0.25s ease;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.16);
+    }
+
+    .training-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 32px rgba(0,0,0,0.2);
+    }
+
+    @media (max-width: 1024px) {
+      .training-intro-grid,
+      .training-info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .training-cta-box {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .training-hero {
+        padding: 110px 20px 75px;
+      }
+
+      .training-panel,
+      .training-highlight,
+      .training-info-card,
+      .training-cta-box {
+        padding: 24px 20px;
+      }
+    }
+  </style>
+</head>
+
+<body style="background-color: var(--bg-green);">
+
+  <header class="site-header" style="background-color: white;">
+    <div class="container header-inner" style="background-color: white;">
+      <nav class="main-nav desktop-nav">
+        <div class="nav-left">
+          <a href="/homepage/index.html" class="nav-link">Home</a>
+          <a href="/homepage/forwho.html" class="nav-link">For whom</a>
+          <a href="/homepage/green recovery space.html" class="nav-link">Recovery Academy</a>
+        </div>
+
+        <div class="logo-circle">
+          <img src="/homepage/images/Logo HK.png" alt="PBC logo">
+        </div>
+
+        <div class="nav-right">
+          <a href="/homepage/offerings.html" class="nav-link">What we offer</a>
+          <a href="/homepage/about.html" class="nav-link">About us</a>
+          <a href="/homepage/contact.html" class="nav-link">Contact</a>
+          <div class="language-dropdown">
+            <button class="lang-btn">EN ▾</button>
+            <ul class="lang-menu">
+              <li data-lang="en">English</li>
+              <li data-lang="nl">Dutch</li>
+              <li data-lang="es">Spanish</li>
+            </ul>
+          </div>
+          <a href="/homepage/Portal.html" class="profile">
+            <img src="/homepage/images/unkown.png" alt="User profile">
+            <p class="profile-text">Sign in</p>
+          </a>
+        </div>
+      </nav>
+    </div>
+
+    <nav class="mobile-nav">
+      <div class="mobile-header">
+        <button class="lang-btn">EN ▾</button>
+        <div class="logo-circle small-logo">
+          <img src="/homepage/images/Logo HK.png" alt="PBC logo">
+        </div>
+        <button class="hamburger-btn" aria-label="Open menu">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M3.46447 20.5355C4.92893 22 7.28595 22 12 22C16.714 22 19.0711 22 20.5355 20.5355C22 19.0711 22 16.714 22 12C22 7.28595 22 4.92893 20.5355 3.46447C19.0711 2 16.714 2 12 2C7.28595 2 4.92893 2 3.46447 3.46447C2 4.92893 2 7.28595 2 12C2 16.714 2 19.0711 3.46447 20.5355ZM18.75 16C18.75 16.4142 18.4142 16.75 18 16.75H6C5.58579 16.75 5.25 16.4142 5.25 16C5.25 15.5858 5.58579 15.25 6 15.25H18C18.4142 15.25 18.75 15.5858 18.75 16ZM18 12.75C18.4142 12.75 18.75 12.4142 18.75 12C18.75 11.5858 18.4142 11.25 18 11.25H6C5.58579 11.25 5.25 11.5858 5.25 12C5.25 12.4142 5.58579 12.75 6 12.75H18ZM18.75 8C18.75 8.41421 18.4142 8.75 18 8.75H6C5.58579 8.75 5.25 8.41421 5.25 8C5.25 7.58579 5.58579 7.25 6 7.25H18C18.4142 7.25 18.75 7.58579 18.75 8Z" fill="#59b987"></path>
+          </svg>
+        </button>
+      </div>
+
+      <ul class="mobile-menu">
+        <li class="mobile-profile">
+          <a href="/homepage/Portal.html" class="profile">
+            <img src="/homepage/images/unkown.png" alt="User profile">
+            <p class="profile-text">Sign in</p>
+          </a>
+        </li>
+        <li><a href="/homepage/index.html" class="nav-link">Home</a></li>
+        <li><a href="/homepage/forwho.html" class="nav-link">For whom</a></li>
+        <li><a href="/homepage/green recovery space.html" class="nav-link">Recovery Academy</a></li>
+        <li><a href="/homepage/offerings.html" class="nav-link">What we offer</a></li>
+        <li><a href="/homepage/about.html" class="nav-link">About us</a></li>
+        <li><a href="/homepage/contact.html" class="nav-link">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="training-hero">
+    <div class="training-hero-inner">
+      <div class="training-breadcrumb">
+        <a href="/homepage/index.html">Home</a>
+        <span>•</span>
+        <a href="/homepage/program.html">Program & Activities</a>
+        <span>•</span>
+        <span>Crisiskaart</span>
+      </div>
+
+      <div class="training-badge">Training</div>
+
+      <h1 class="training-title">
+        Crisiskaart
+      </h1>
+
+      <p class="training-lead">
+        A personal document that helps you clearly communicate what is important to you in a crisis situation.
+      </p>
+    </div>
+  </section>
+
+  <main class="training-content">
+    <div class="training-intro-grid">
+      <section class="training-panel">
+        <h2>About Crisiskaart</h2>
+        <p>
+          The Crisiskaart is a personal document in which you record what is important to you in a crisis situation. It helps you clearly communicate who you are, what you need, and what others can do to support you as well as possible.
+        </p>
+        <p>
+          In this course, you work step by step on your own Crisiskaart. You reflect on signals that show things are not going well, what can help you stay calm, and what is not helpful for you.
+        </p>
+        <p>
+          You also record who may be involved and which agreements are important when you are less able to explain what you need yourself.
+        </p>
+
+        <div class="training-strip">
+          Making a Crisiskaart is not a sign of weakness. It is a way of caring for yourself and for the people around you.
+        </div>
+      </section>
+
+      <section class="training-highlight">
+        <h2>What you work on</h2>
+        <p>
+          You create the card in your own way, at your own pace, with respect for your own boundaries.
+        </p>
+        <p>
+          For many people, making a Crisiskaart gives a feeling of overview, clarity, and control before difficult moments happen.
+        </p>
+      </section>
+    </div>
+
+    <div class="training-section-head">
+      <h2>Practical information</h2>
+      <p>
+        The Crisiskaart can be made individually or in a small group, depending on what fits best.
+      </p>
+    </div>
+
+    <div class="training-info-grid">
+      <section class="training-info-card">
+        <h2>Duration</h2>
+        <ul>
+          <li>Multiple meetings</li>
+          <li>Individually or in a small group</li>
+          <li>Guidance by experienced recovery workers</li>
+        </ul>
+      </section>
+
+      <section class="training-info-card">
+        <h2>For whom?</h2>
+        <p>
+          The Crisiskaart is for everyone who wants to prepare for difficult moments in life. You do not need a diagnosis.
+        </p>
+        <p>
+          It can be helpful if you have experienced crisis situations before, are afraid of losing control, or want others to know how they can best support you when things become difficult.
+        </p>
+      </section>
+    </div>
+  </main>
+
+  <section class="training-cta-wrap">
+    <div class="training-cta-box">
+      <div>
+        <h3>Interested in Crisiskaart?</h3>
+        <p>
+          Contact Green Recovery Space to ask about availability, registration, or upcoming support.
+        </p>
+      </div>
+      <a href="/homepage/contact.html" class="training-btn">Contact us</a>
+    </div>
+  </section>
+
+  <footer class="fancy-footer" style="margin-top: 0;">
+    <div class="footer-background-word">Hofi Korsou</div>
+
+    <div class="footer-container">
+      <div class="footer-grid">
+        <div class="footer-col-wide">
+          <img src="/homepage/images/HK logo no bg.png" alt="logo" class="footer-logo" />
+        </div>
+
+        <div class="footer-col">
+          <h3 data-translate="col-com">Company</h3>
+          <ul>
+            <li><a data-translate="nav-about" href="/homepage/about.html">About Us</a></li>
+            <li><a data-translate="nav-contact" href="/homepage/contact.html">Contact Us</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h3 data-translate="col-por">Portals</h3>
+          <ul>
+            <li><a data-translate="Students" href="/homepage/login-students.html">Students</a></li>
+            <li><a data-translate="Teachers" href="/homepage/login-teachers.html">Teachers</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h3 data-translate="col-legal">Legal</h3>
+          <ul>
+            <li><a href="/homepage/#">Privacy Policy</a></li>
+            <li><a href="/homepage/#">Terms of Service</a></li>
+            <li><a href="/homepage/#">Cookie Policy</a></li>
+            <li><a href="/homepage/#">Security</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h3 data-translate="col-know">Quick Links</h3>
+          <ul>
+            <li><a data-translate="nav-forwho" href="/homepage/forwho.html">For whom</a></li>
+            <li><a data-translate="nav-grs" href="/homepage/green recovery space.html">Recovery Academy</a></li>
+            <li><a data-translate="nav-offer" href="/homepage/offerings.html">What we offer</a></li>
+            <li><a data-translate="nav-program" href="/homepage/program.html">Program & Activities</a></li>
+            <li><a data-translate="nav-announce" href="/homepage/projects.html">Projects</a></li>
+            <li><a data-translate="nav-stories" href="/homepage/stories.html">Personal Stories</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div class="footer-social-icons">
+          <a href="https://www.facebook.com/projectbureaucaribbean" class="social"><i class="fab fa-facebook"></i></a>
+          <a href="https://www.youtube.com/@projectbureaucaribbean9600" class="social"><i class="fab fa-youtube"></i></a>
+          <a href="https://www.linkedin.com/company/projectbureau-caribbean/" class="social"><i class="fab fa-linkedin"></i></a>
+          <a href="https://wa.me/59995208184" class="social"><i class="fab fa-whatsapp"></i></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <script src="/homepage/JS/script.js"></script>
+  <script>
+    document.querySelectorAll(".lang-menu li").forEach(item => {
+      item.addEventListener("click", function () {
+        const lang = this.getAttribute("data-lang");
+        setLanguage(lang);
+      });
+    });
+  </script>
+</body>
+</html>
