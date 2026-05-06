@@ -4272,3 +4272,32 @@ html,body {
   transform:translateY(-2px);
   box-shadow:0 8px 20px rgba(0,0,0,0.18);
 }
+
+
+/* ════════════════✿══╡°˖✧‿୨˚̣̣̣͙୧ Opening hours banner˚̣̣̣͙୧‿✧˖°╞══✿════════════════ */
+
+.opening-banner{
+  width: 100%;
+  background: linear-gradient(135deg, #59b987, #2b6c7a);
+  color: white;
+  text-align: center;
+  padding: 14px 20px;
+  font-size: 0.96rem;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  position: relative;
+  z-index: 20;
+}
+
+.opening-banner span{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.opening-banner span::before{
+  content: "●";
+  font-size: 0.7rem;
+  opacity: 0.85;
+}
