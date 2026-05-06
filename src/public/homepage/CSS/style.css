@@ -1323,7 +1323,7 @@ html,body {
 }
 
 .video-container {
-  width: 90%;          
+  width: 120%;          
   max-width: 1200px;   
   margin: auto;
   display: flex;
