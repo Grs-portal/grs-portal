@@ -643,9 +643,12 @@ html,body {
 
 
 .parallax-hero {
-  position: relative;
-  min-height: 760px;
-  overflow: hidden;
+    position: relative;
+    place-items: center;
+    justify-content: center;
+    min-height: 80vh;
+    overflow: hidden; 
+    background-color: var(--bg-green);
 }
  
 
