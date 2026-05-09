@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>KEES Award 2026 | Green Recovery Space</title>
+
+  <link rel="icon" type="image/png" href="/homepage/images/Favicon.png" />
+  <link rel="stylesheet" href="/homepage/CSS/style.css" />
+
+  <style>
+
+    .news-hero {
+      position: relative;
+      padding: 140px 20px 100px;
+      background:
+        linear-gradient(135deg, rgba(25,79,130,0.82), rgba(43,108,122,0.72)),
+        url('/homepage/images/kees-award-2026.jpg') center/cover no-repeat;
+      color: white;
+      overflow: hidden;
+    }
+
+    .news-hero::after{
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.08), rgba(0,0,0,0.28));
+    }
+
+    .news-hero-inner{
+      position: relative;
+      z-index: 2;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .news-badge{
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.14);
+      backdrop-filter: blur(6px);
+      font-weight: 700;
+      margin-bottom: 22px;
+    }
+
+    .news-title{
+      font-size: clamp(2.7rem, 5vw, 4.8rem);
+      line-height: 1.05;
+      margin-bottom: 22px;
+      max-width: 900px;
+    }
+
+    .news-date{
+      font-size: 1rem;
+      opacity: 0.92;
+      font-style: italic;
+    }
+
+    .news-main{
+      padding: 80px 20px 100px;
+      background: var(--bg-green);
+    }
+
+    .news-container{
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .news-layout{
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 36px;
+      align-items: start;
+    }
+
+    .news-article{
+      background: white;
+      border-radius: 34px;
+      padding: 46px;
+      box-shadow: 0 22px 55px rgba(0,0,0,0.08);
+    }
+
+    .news-article h2{
+      color: #194f82;
+      font-size: 2rem;
+      margin-bottom: 24px;
+    }
+
+    .news-article p{
+      color: #42514b;
+      line-height: 2;
+      margin-bottom: 22px;
+      font-size: 1.03rem;
+    }
+
+    .news-highlight{
+      font-size: 1.18rem;
+      font-weight: 600;
+      color: #194f82 !important;
+      line-height: 1.8 !important;
+    }
+
+    .news-side{
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .news-image-card{
+      background: white;
+      border-radius: 30px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+    }
+
+    .news-image-card img{
+      width: 100%;
+      display: block;
+    }
+
+    .news-image-caption{
+      padding: 18px 22px;
+      color: #60716a;
+      font-size: 0.95rem;
+      line-height: 1.7;
+      font-style: italic;
+    }
+
+    .news-info-card{
+      background: linear-gradient(135deg, #194f82, #2b6c7a);
+      color: white;
+      border-radius: 30px;
+      padding: 34px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+    }
+
+    .news-info-card h3{
+      margin-bottom: 18px;
+      font-size: 1.5rem;
+    }
+
+    .news-info-card p{
+      line-height: 1.9;
+      opacity: 0.96;
+    }
+
+    .news-back-btn{
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 40px;
+      background: linear-gradient(135deg,#59b987,#2b6c7a);
+      color: white;
+      text-decoration: none;
+      padding: 14px 24px;
+      border-radius: 999px;
+      font-weight: 700;
+      transition: 0.25s ease;
+      box-shadow: 0 14px 30px rgba(0,0,0,0.12);
+    }
+
+    .news-back-btn:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 18px 36px rgba(0,0,0,0.18);
+    }
+
+    @media (max-width: 980px){
+
+      .news-layout{
+        grid-template-columns: 1fr;
+      }
+
+      .news-article{
+        padding: 34px 24px;
+      }
+
+    }
+
+    @media (max-width: 640px){
+
+      .news-hero{
+        padding: 120px 20px 80px;
+      }
+
+      .news-title{
+        font-size: 2.5rem;
+      }
+
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+
+  <header class="site-header" style="background-color: white;">
+    <div class="container header-inner" style="background-color: white;">
+      <nav class="main-nav desktop-nav">
+
+        <div class="nav-left">
+          <a href="/homepage/index.html" class="nav-link">Home</a>
+          <a href="/homepage/forwho.html" class="nav-link">For whom</a>
+          <a href="/homepage/green recovery space.html" class="nav-link">Recovery Academy</a>
+        </div>
+
+        <div class="logo-circle">
+          <img src="/homepage/images/Logo HK.png" alt="PBC logo">
+        </div>
+
+        <div class="nav-right">
+          <a href="/homepage/offerings.html" class="nav-link">What we offer</a>
+          <a href="/homepage/about.html" class="nav-link">About us</a>
+          <a href="/homepage/contact.html" class="nav-link">Contact</a>
+
+          <div class="language-dropdown">
+            <button class="lang-btn">EN ▾</button>
+            <ul class="lang-menu">
+              <li data-lang="en">English</li>
+              <li data-lang="nl">Dutch</li>
+              <li data-lang="es">Spanish</li>
+            </ul>
+          </div>
+
+          <a href="/homepage/Portal.html" class="profile">
+            <img src="/homepage/images/unkown.png" alt="User profile">
+            <p class="profile-text">Sign in</p>
+          </a>
+        </div>
+
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO -->
+
+  <section class="news-hero">
+
+    <div class="news-hero-inner">
+
+      <span class="news-badge">
+        Announcement
+      </span>
+
+      <h1 class="news-title">
+        Green Recovery Space wins the KEES Award 2026
+      </h1>
+
+      <p class="news-date">
+        Published on: 15 April 2026
+      </p>
+
+    </div>
+
+  </section>
+
+  <!-- MAIN -->
+
+  <main class="news-main">
+
+    <div class="news-container">
+
+      <div class="news-layout">
+
+        <!-- ARTICLE -->
+
+        <article class="news-article">
+
+          <h2>
+            Recognition for experiential knowledge and recovery-oriented support
+          </h2>
+
+          <p class="news-highlight">
+            Green Recovery Space is the winner of the KEES Award 2026. This award is presented to initiatives that place experiential knowledge at the center and contribute to recovery and mental health.
+          </p>
+
+          <p>
+            The KEES Award (Quality Mark Award for Experiential Knowledge, Experiential Expertise, and System Correction) was established to highlight how experiential knowledge and lived experience can contribute to change within health and social care.
+          </p>
+
+          <p>
+            The award emphasizes that this type of knowledge is still too often undervalued, while it has the potential to make systems more humane, inclusive, and just.
+          </p>
+
+          <p>
+            The KEES Award is an initiative of the Amsterdam Network of Experiential Knowledge.
+          </p>
+
+          <p>
+            This recognition is an important milestone for Green Recovery Space and for the trained peer experts who will play a central role within the recovery space.
+          </p>
+
+          <p>
+            The fact that an organization from Curaçao has won this award underscores the importance of person-centered and recovery-oriented support, also within the Caribbean region.
+          </p>
+
+          <p>
+            Green Recovery Space aims not only to make a difference on Curaçao, but also to inspire other Caribbean islands in developing similar recovery spaces and mental health initiatives.
+          </p>
+
+          <a href="/homepage/index.html" class="news-back-btn">
+            ← Back to Homepage
+          </a>
+
+        </article>
+
+        <!-- SIDE -->
+
+        <aside class="news-side">
+
+          <div class="news-image-card">
+            <img src="/homepage/images/kees-award-2026.jpg" alt="KEES Award">
+            <div class="news-image-caption">
+              Daanje Daniëls receives the KEES Award on behalf of Zaira Barriento.
+            </div>
+          </div>
+
+          <div class="news-info-card">
+
+            <h3>
+              About the award
+            </h3>
+
+            <p>
+              The KEES Award recognizes initiatives that strengthen experiential expertise and promote recovery-oriented approaches within mental health and social care.
+            </p>
+
+          </div>
+
+        </aside>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+
+  <footer class="fancy-footer" style="margin-top: 0;">
+
+    <div class="footer-background-word">
+      Hofi Korsou
+    </div>
+
+    <div class="footer-container">
+
+      <div class="footer-grid">
+
+        <div class="footer-col-wide">
+          <img src="/homepage/images/HK logo no bg.png"
+               alt="logo"
+               class="footer-logo" />
+        </div>
+
+        <div class="footer-col">
+          <h3>Company</h3>
+          <ul>
+            <li><a href="/homepage/about.html">About Us</a></li>
+            <li><a href="/homepage/contact.html">Contact Us</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h3>Portals</h3>
+          <ul>
+            <li><a href="/homepage/login-students.html">Students</a></li>
+            <li><a href="/homepage/login-teachers.html">Teachers</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h3>Legal</h3>
+          <ul>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Cookie Policy</a></li>
+            <li><a href="#">Security</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h3>Quick Links</h3>
+          <ul>
+            <li><a href="/homepage/forwho.html">For whom</a></li>
+            <li><a href="/homepage/green recovery space.html">Recovery Academy</a></li>
+            <li><a href="/homepage/offerings.html">What we offer</a></li>
+            <li><a href="/homepage/program.html">Program & Activities</a></li>
+            <li><a href="/homepage/projects.html">Projects</a></li>
+            <li><a href="/homepage/stories.html">Personal Stories</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="footer-bottom">
+
+        <div class="footer-social-icons">
+          <a href="https://www.facebook.com/projectbureaucaribbean" class="social"><i class="fab fa-facebook"></i></a>
+          <a href="https://www.youtube.com/@projectbureaucaribbean9600" class="social"><i class="fab fa-youtube"></i></a>
+          <a href="https://www.linkedin.com/company/projectbureau-caribbean/" class="social"><i class="fab fa-linkedin"></i></a>
+          <a href="https://wa.me/59995208184" class="social"><i class="fab fa-whatsapp"></i></a>
+        </div>
+
+      </div>
+
+    </div>
+
+  </footer>
+
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <script src="/homepage/JS/script.js"></script>
+
+</body>
+</html>
