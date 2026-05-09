@@ -38,12 +38,12 @@ window.addEventListener("scroll", () => {
 /*══✿══╡°˖✧᯽   ANNOUNCEMENTS SECTION ᯽✧˖°╞══✿══*/
 document.addEventListener("DOMContentLoaded", () => {
   const slides = document.querySelectorAll(".announcement-slide");
-  const nextBtn = document.querySelector(".next");
-  const prevBtn = document.querySelector(".prev");
+  const nextBtn = document.querySelector(".announcement-next");
+  const prevBtn = document.querySelector(".announcement-prev");
 
   if (slides.length > 0) {
     let current = 0;
-    const AUTO_TIMEOUT = 10000; // 10 seconds
+    const AUTO_TIMEOUT = 10000;
     let autoInterval = null;
 
     function showSlide(index) {
@@ -71,8 +71,19 @@ document.addEventListener("DOMContentLoaded", () => {
       startAuto();
     }
 
-    if (nextBtn) nextBtn.addEventListener("click", () => { nextSlide(); resetAuto(); });
-    if (prevBtn) prevBtn.addEventListener("click", () => { prevSlide(); resetAuto(); });
+    if (nextBtn) {
+      nextBtn.addEventListener("click", () => {
+        nextSlide();
+        resetAuto();
+      });
+    }
+
+    if (prevBtn) {
+      prevBtn.addEventListener("click", () => {
+        prevSlide();
+        resetAuto();
+      });
+    }
 
     showSlide(current);
     startAuto();
