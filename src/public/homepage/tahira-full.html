@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Full Story | Tahira Jansen</title>
+
+  <link rel="icon" type="image/png" href="/homepage/images/Favicon.png" />
+  <link rel="stylesheet" href="/homepage/CSS/style.css" />
+
+  <style>
+    body {
+      background: #f4f8f5;
+      color: #26332f;
+    }
+
+    .full-story-hero {
+      position: relative;
+      padding: 130px 20px 90px;
+      background:
+        linear-gradient(135deg, rgba(25,79,130,0.88), rgba(43,108,122,0.78)),
+        url("/homepage/images/story-tahira.jpg") center/cover no-repeat;
+      color: white;
+      overflow: hidden;
+    }
+
+    .full-story-hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.32));
+      z-index: 0;
+    }
+
+    .full-story-hero-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    .story-back-link {
+      display: inline-block;
+      margin-bottom: 24px;
+      color: white;
+      text-decoration: none;
+      font-weight: 700;
+      opacity: 0.92;
+    }
+
+    .story-back-link:hover {
+      opacity: 1;
+      transform: translateX(-3px);
+    }
+
+    .story-label {
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.14);
+      backdrop-filter: blur(6px);
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    .full-story-hero h1 {
+      font-size: clamp(2.4rem, 5vw, 4.4rem);
+      line-height: 1.05;
+      margin: 0 0 20px;
+      max-width: 880px;
+    }
+
+    .full-story-hero p {
+      max-width: 760px;
+      line-height: 1.85;
+      font-size: 1.08rem;
+      opacity: 0.96;
+      margin: 0;
+    }
+
+    .reader-shell {
+      max-width: 980px;
+      margin: -45px auto 90px;
+      padding: 0 20px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .reader-paper {
+      background: #fffdf8;
+      border-radius: 34px;
+      padding: 48px 54px;
+      box-shadow: 0 26px 70px rgba(25,79,130,0.16);
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .reader-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 34px;
+    }
+
+    .reader-meta span {
+      display: inline-block;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(89,185,135,0.12);
+      color: #2f8e5f;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .reader-intro {
+      font-size: 1.22rem;
+      line-height: 1.95;
+      color: #244138;
+      border-left: 5px solid #59b987;
+      padding: 18px 0 18px 24px;
+      margin-bottom: 38px;
+      background: linear-gradient(90deg, rgba(89,185,135,0.08), transparent);
+      border-radius: 0 18px 18px 0;
+    }
+
+    .story-chapter {
+      margin-top: 42px;
+    }
+
+    .story-chapter h2 {
+      color: #194f82;
+      font-size: 1.65rem;
+      margin: 0 0 18px;
+      line-height: 1.3;
+    }
+
+    .story-chapter p {
+      color: #2b3934;
+      line-height: 2;
+      font-size: 1.05rem;
+      margin: 0 0 20px;
+    }
+
+    .story-quote {
+      margin: 40px 0;
+      padding: 30px 32px;
+      background: linear-gradient(135deg, rgba(25,79,130,0.08), rgba(89,185,135,0.10));
+      border-radius: 26px;
+      color: #194f82;
+      font-size: 1.28rem;
+      line-height: 1.8;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .reader-footer-actions {
+      margin-top: 50px;
+      padding-top: 34px;
+      border-top: 1px solid rgba(25,79,130,0.10);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .reader-btn {
+      display: inline-block;
+      padding: 14px 24px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 700;
+      transition: 0.25s ease;
+    }
+
+    .reader-btn.primary {
+      background: var(--header-green);
+      color: white;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.14);
+    }
+
+    .reader-btn.secondary {
+      background: #f2f8f4;
+      color: #194f82;
+      border: 1px solid rgba(25,79,130,0.08);
+    }
+
+    .reader-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 760px) {
+      .reader-paper {
+        padding: 34px 24px;
+        border-radius: 26px;
+      }
+
+      .full-story-hero {
+        padding: 110px 20px 80px;
+      }
+
+      .story-chapter p {
+        font-size: 1rem;
+        line-height: 1.9;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <section class="full-story-hero">
+    <div class="full-story-hero-inner">
+      <a href="/homepage/story-tahira.html" class="story-back-link">← Back to summary</a>
+      <div class="story-label">Full Recovery Story</div>
+
+      <h1>Herstelverhaal Tahira Jansen</h1>
+
+      <p>
+        A personal story about sexual and mental abuse, depression, faith, family,
+        recovery, taking back control, and turning pain into strength.
+      </p>
+    </div>
+  </section>
+
+  <main class="reader-shell">
+    <article class="reader-paper">
+
+      <div class="reader-meta">
+        <span>Tahira Jansen</span>
+        <span>Full story</span>
+        <span>Recovery journey</span>
+      </div>
+
+      <p class="reader-intro">
+        This is the full recovery story of Tahira Jansen, displayed as a long reading page.
+        The text keeps the content and order of the supplied story.
+      </p>
+
+      <div class="story-quote">
+        “There is enough space for all of us to shine. Let’s empower each other.”
+      </div>
+
+      <section class="story-chapter">
+        <p>
+          My story is about sexual and mental abuse, depression, faith, family, recovery, and taking back control of my own life. But above all, it is about strength. About continuing to rise. And about how pain can eventually become something that helps others.
+        </p>
+
+        <p>
+          I was born in Curaçao, with a father from Curaçao and a mother from Bonaire. Family always played a major role in my life. Being together, protecting one another, and always being there for each other came naturally to me. I grew up with three brothers, and although they protected me, as you would expect, I also felt a very strong need to protect my family myself. That protective instinct eventually became my greatest burden.
+        </p>
+      </section>
+
+      <section class="story-chapter">
+        <h2>A secret that changed my life</h2>
+
+        <p>
+          As a young girl, I was cheerful, energetic, and full of life. I loved dancing, laughing, and dreaming about the future. I was a good student and truly enjoyed life. Until everything changed.
+        </p>
+
+        <p>
+          I was seventeen years old when I became a victim of sexual abuse by a police officer. One message and one phone call were enough to completely turn my world upside down. Before my life had truly begun, it felt as though it had already been destroyed, and I wished it would end.
+        </p>
+
+        <p>
+          What made it even harder was my silence. I wanted to protect my family. I was afraid of the consequences. On the outside, I seemed strong and cheerful, but inside I was broken. The things that once made me happy suddenly felt empty. Even compliments became painful, because I had lost my sense of safety and trust.
+        </p>
+
+        <p>
+          For years, I lived with anger, shame, sadness, and flashbacks. A kind of “happy depression”: smiling on the outside while feeling completely stuck on the inside.
+        </p>
+      </section>
+
+      <section class="story-chapter">
+        <h2>Always moving forward</h2>
+
+        <p>
+          Despite everything, I kept going. I built a life, became the mother of two beautiful children, a partner, daughter, friend, and professional. Today, I work within the police and immigration services. Precisely in an environment that was also connected to my trauma. For me, it became important to make a difference.
+        </p>
+
+        <p>
+          I wanted to be a good civil servant, a good police officer, someone who truly helps and understands people.
+        </p>
+
+        <p>
+          Because of my own experiences, I see people differently. I know what it feels like to be afraid, unheard, or unsafe. Because of that, I am often able to connect with people in a different way. In some situations, that human approach has even helped prevent human smuggling. Sometimes you achieve more by truly listening than by simply following rules and procedures.
+        </p>
+      </section>
+
+      <section class="story-chapter">
+        <h2>When life became too heavy</h2>
+
+        <p>
+          Still, there came a moment when I could no longer continue the way I had been. The pain kept returning. I tried everything: therapy, distancing myself from people, shutting myself off, trying to open up again. Sometimes things seemed to improve for a while, but I kept falling back into the same cycle of sadness and fear.
+        </p>
+
+        <p>
+          Perhaps the hardest part was the silence. Not being able to talk about the abuse because of shame, fear of being judged, or not being believed. It felt like a prison. At the same time, I kept trying to stay strong for everyone around me. But eventually, I realized I could no longer carry everything alone.
+        </p>
+
+        <p>
+          That may have been the most important step in my recovery: admitting to myself that I needed help.
+        </p>
+      </section>
+
+      <div class="story-quote">
+        “That may have been the most important step in my recovery: admitting to myself that I needed help.”
+      </div>
+
+      <section class="story-chapter">
+        <h2>The road to recovery</h2>
+
+        <p>
+          My recovery did not happen all at once. It came through small steps. Small steps toward peace, safety, and acceptance. The support of my partner, children, best friend, and family was incredibly important in that process. My faith also helped me regain stability. I returned to church and started praying again. Setting boundaries also became an essential part of finding inner peace.
+        </p>
+
+        <p>
+          Another major turning point was my journey at Green Recovery Space. At first, I did not know exactly what it would bring me, but I was excited to try something new for my personal healing. There, I met people who truly understood trauma and pain. For the first time, I felt heard, without judgment. Because of that, I slowly became able to open myself up more deeply, layer by layer.
+        </p>
+
+        <p>
+          During my training as a lived experience expert, I not only learned to face my trauma, but I also began to feel lighter, more understood, and genuinely supported. I discovered that my story is not only something painful, but also something that can give hope to others.
+        </p>
+
+        <p>
+          Photography, nature, and horses also helped me tremendously to find peace and calmness. In nature, I finally felt space to breathe.
+        </p>
+      </section>
+
+      <section class="story-chapter">
+        <h2>What recovery means to me</h2>
+
+        <p>
+          Recovery does not mean that the past has disappeared. It means that the past no longer controls my life. Today, I can talk about what I have been through without being overwhelmed by shame or fear. I can enjoy life again while feeling happier, wiser, and stronger. Not only physically, but mentally and emotionally as well.
+        </p>
+
+        <p>
+          For me, recovery also means that I have found inner peace and that I can truly laugh again. Not only on the outside, but from within. It means that memories can remain memories, without forcing me to relive the same pain over and over again.
+        </p>
+      </section>
+
+      <div class="story-quote">
+        “Recovery does not mean that the past has disappeared. It means that the past no longer controls my life.”
+      </div>
+
+      <section class="story-chapter">
+        <h2>How I support others today</h2>
+
+        <p>
+          Today, I consciously use my experiences to support others. I offer people a listening ear and try to create a safe place where they are free to be themselves. I do not simply give advice. I believe true strength begins when people reconnect with themselves. That is why I support others through empowerment: helping them discover their own strength, value, and possibilities.
+        </p>
+
+        <p>
+          Sometimes I organize small group sessions where people can share their stories, support one another, and find the courage to begin their own healing journey.
+        </p>
+      </section>
+
+      <section class="story-chapter">
+        <h2>A message to anyone going through difficult times</h2>
+
+        <p>
+          What I especially want people to understand is that silence does not bring peace. Your heart, mind, and soul deserve peace. To anyone currently going through a difficult time, I want to say: you are not alone.
+        </p>
+
+        <p>
+          Even when it feels as though there is no light left, there is always a small light somewhere. You may not feel it yet, but it is already inside you. And above all: treat yourself with the same love and gentleness that you give to others.
+        </p>
+      </section>
+
+      <section class="story-chapter">
+        <h2>What I hope people find at Green Recovery Space</h2>
+
+        <p>
+          A place where people can arrive carrying the weight of life on their shoulders, and leave with a lighter heart. Surrounded by supportive and understanding people, free from judgment. A place where people can truly be themselves and receive the help that fits them best.
+        </p>
+      </section>
+
+      <div class="reader-footer-actions">
+        <a href="/homepage/story-tahira.html" class="reader-btn secondary">← Back to summary</a>
+        <a href="/homepage/stories.html" class="reader-btn primary">Read more stories</a>
+      </div>
+
+    </article>
+  </main>
+
+</body>
+</html>
