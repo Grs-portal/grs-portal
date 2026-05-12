@@ -4471,3 +4471,26 @@ html,body {
   width: 100%;
   height: 100%;
 }
+
+/* ════════════════✿══╡°˖✧‿୨˚̣̣̣͙୧ View all announcements button ୨˚̣̣̣͙୧‿✧˖°╞══✿════════════════ */
+.announcement-all-button {
+  text-align: center;
+  margin-top: 35px;
+}
+
+.announcement-view-all-btn {
+  display: inline-block;
+  padding: 14px 26px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #59b987, #2b6c7a);
+  color: white;
+  text-decoration: none;
+  font-weight: 700;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+  transition: 0.25s ease;
+}
+
+.announcement-view-all-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(0,0,0,0.16);
+}
