@@ -227,3 +227,84 @@ document.addEventListener("DOMContentLoaded", function() {
 
   setInterval(nextCard, 4000); // auto-slide every 4s
 });
+
+/*══✿══╡°˖✧᯽ STORY SLIDER ᯽✧˖°╞══✿══*/
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  const storyTrack = document.querySelector(".story-grid-preview");
+  const storyCards = document.querySelectorAll(".story-card-preview");
+
+  const storyPrevBtn = document.querySelector(".story-slider-btn.prev");
+  const storyNextBtn = document.querySelector(".story-slider-btn.next");
+
+  if (!storyTrack || !storyCards.length) return;
+
+  let storyIndex = 0;
+
+  function getStoriesPerView() {
+    if (window.innerWidth <= 640) return 1;
+    if (window.innerWidth <= 1024) return 2;
+    return 4;
+  }
+
+  function updateStorySlider() {
+
+    const storiesPerView = getStoriesPerView();
+
+    const gap = 20;
+
+    const cardWidth =
+      storyCards[0].offsetWidth + gap;
+
+    const maxIndex =
+      Math.max(0, storyCards.length - storiesPerView);
+
+    if (storyIndex > maxIndex) {
+      storyIndex = maxIndex;
+    }
+
+    storyTrack.style.transform =
+      `translateX(-${storyIndex * cardWidth}px)`;
+  }
+
+  function nextStories() {
+
+    const storiesPerView = getStoriesPerView();
+
+    const maxIndex =
+      Math.max(0, storyCards.length - storiesPerView);
+
+    if (storyIndex < maxIndex) {
+      storyIndex++;
+    } else {
+      storyIndex = 0;
+    }
+
+    updateStorySlider();
+  }
+
+  function prevStories() {
+
+    const storiesPerView = getStoriesPerView();
+
+    const maxIndex =
+      Math.max(0, storyCards.length - storiesPerView);
+
+    if (storyIndex > 0) {
+      storyIndex--;
+    } else {
+      storyIndex = maxIndex;
+    }
+
+    updateStorySlider();
+  }
+
+  storyNextBtn?.addEventListener("click", nextStories);
+  storyPrevBtn?.addEventListener("click", prevStories);
+
+  window.addEventListener("resize", updateStorySlider);
+
+  updateStorySlider();
+
+});
