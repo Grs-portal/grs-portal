@@ -41,53 +41,48 @@ document.addEventListener("DOMContentLoaded", () => {
   const nextBtn = document.querySelector(".announcement-next");
   const prevBtn = document.querySelector(".announcement-prev");
 
-  if (slides.length > 0) {
-    let current = 0;
-    const AUTO_TIMEOUT = 10000;
-    let autoInterval = null;
+  if (!slides.length) return;
 
-    function showSlide(index) {
-      slides.forEach((slide, i) => {
-        slide.style.display = i === index ? "grid" : "none";
-      });
-    }
+  let current = 0;
+  let autoInterval;
 
-    function nextSlide() {
-      current = (current + 1) % slides.length;
-      showSlide(current);
-    }
+  function showSlide(index) {
+    slides.forEach((slide, i) => {
+      slide.style.display = i === index ? "grid" : "none";
+    });
+  }
 
-    function prevSlide() {
-      current = (current - 1 + slides.length) % slides.length;
-      showSlide(current);
-    }
-
-    function startAuto() {
-      autoInterval = setInterval(nextSlide, AUTO_TIMEOUT);
-    }
-
-    function resetAuto() {
-      clearInterval(autoInterval);
-      startAuto();
-    }
-
-    if (nextBtn) {
-      nextBtn.addEventListener("click", () => {
-        nextSlide();
-        resetAuto();
-      });
-    }
-
-    if (prevBtn) {
-      prevBtn.addEventListener("click", () => {
-        prevSlide();
-        resetAuto();
-      });
-    }
-
+  function nextSlide() {
+    current = (current + 1) % slides.length;
     showSlide(current);
+  }
+
+  function prevSlide() {
+    current = (current - 1 + slides.length) % slides.length;
+    showSlide(current);
+  }
+
+  function startAuto() {
+    autoInterval = setInterval(nextSlide, 10000);
+  }
+
+  function resetAuto() {
+    clearInterval(autoInterval);
     startAuto();
   }
+
+  nextBtn?.addEventListener("click", () => {
+    nextSlide();
+    resetAuto();
+  });
+
+  prevBtn?.addEventListener("click", () => {
+    prevSlide();
+    resetAuto();
+  });
+
+  showSlide(current);
+  startAuto();
 });
 
 /*══✿══╡°˖✧᯽   MOBILE NAV BAR ᯽✧˖°╞══✿══*/
