@@ -308,3 +308,6 @@ document.addEventListener("DOMContentLoaded", () => {
   updateStorySlider();
 
 });
+
+
+/*══✿════════╡°˖✧᯽   Received message notification in contact form ᯽✧˖°════════╡✿══*/
